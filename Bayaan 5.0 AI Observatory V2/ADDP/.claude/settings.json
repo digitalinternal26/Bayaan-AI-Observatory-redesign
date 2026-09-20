@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp styles.css __TRACKED_VAR__/styles.css.bak)",
+      "Bash(cat)"
+    ]
+  }
+}

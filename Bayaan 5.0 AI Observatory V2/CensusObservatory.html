@@ -1,0 +1,3360 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Census Observatory — Overview · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <!-- Shared design system — same stylesheets as CPI.html / observe.html.
+         This page intentionally reuses #screen-cpi-obs, the generic
+         Observatory shell id every CPI Observatory page (CPI.html,
+         observe.html, forecast.html, benchmark.html, trade.html) already
+         shares, so every card/sidebar/table/typography rule below comes
+         for free with zero duplicated CSS. -->
+    <link rel="stylesheet" href="css/pages/ai.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/pages/exec-home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" ? "dark" : "light"
+        );
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/census-global-filter.js"></script>
+    <script src="js/census-region-map.js"></script>
+    <script src="js/census-icons.js"></script>
+    <style>
+      /* ====================================================================
+         CENSUS OBSERVATORY — INTERPRET
+         Layout-only additions on top of the existing design system:
+           • hero        → .cpi-hero (CPI.html Executive brief)
+           • sections    → .section-hdr / .cpi-section-title (CPI.html)
+           • cards       → .obs-card (shared Observatory card)
+           • badges      → .kpi-badge / .ai-badge convention
+           • insight rows→ .impacts-list / .impact-item (CPI.html Key Impacts)
+         Only genuinely new card shapes (Census at a Glance, What's Changed,
+         Policy Considerations, the Executive Brief takeaways panel) get new
+         classes below — everything else is reused as-is.
+         ==================================================================== */
+
+      /* ── Global container hardening ──
+         The shared .cpi-obs-content/.cpi-page-header rules (cpi-obs.css) have
+         no max-width, so at very wide viewports the content column and this
+         page's new grids (glance/what's-changed/policy) can stretch or, with
+         a wide enough child, force horizontal overflow. This caps the column,
+         centers it in the space already reserved beside the floating sidebar
+         (.page-wrap's grid — untouched), and stops any stray overflow. */
+      #screen-cpi-obs {
+        overflow-x: hidden;
+      }
+      #screen-cpi-obs .obs-ai-split {
+        min-width: 0;
+      }
+      /* ── Census AI panel — floating right dock ──
+         style.css turns #bayaan-ai-panel into an inline split column for
+         #screen-cpi-obs, which here stretches to the full scroll height and
+         pushes the composer far below the fold. This page wants the same
+         floating drawer the LMO pages use (lmo-common.css's .cpanel): fixed
+         under the 67px topnav, its own viewport-height box, content scrolling
+         behind it. Colours/width stay with the shared rules (and theme.css's
+         dark-mode mapping) — only the geometry changes here. */
+      #screen-cpi-obs .obs-ai-split > #bayaan-ai-panel {
+        position: fixed;
+        top: 67px;
+        right: 0;
+        height: calc(100vh - 67px);
+        align-self: auto;
+        z-index: 200;
+      }
+      #screen-cpi-obs .cpi-page-header,
+      #screen-cpi-obs .cpi-obs-content {
+        max-width: 1600px;
+        margin-left: auto;
+        margin-right: auto;
+        box-sizing: border-box;
+      }
+      #screen-cpi-obs .cpi-page-header {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+      #screen-cpi-obs .cpi-obs-content {
+        padding: 0 40px 60px;
+        margin-top: 24px;
+      }
+      /* Explicit grow/no-shrink split so a long title never gets squeezed by
+         the Year/Download actions, and vice versa. */
+      #screen-cpi-obs .cpi-page-header-inner > div:first-child {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      #screen-cpi-obs .cpi-hdr-actions {
+        flex: 0 0 auto;
+      }
+      /* Download button — aligned with census-observe.html's .cen-btn
+         (the Export button there is the explicit reference), so both
+         Census pages use one consistent header-action button style. */
+      #screen-cpi-obs .cpi-hdr-download {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #e5e7eb;
+        background: var(--white);
+        color: var(--text);
+        transition: border-color 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .cpi-hdr-download:hover {
+        border-color: var(--accent);
+        background: var(--bg);
+      }
+      #screen-cpi-obs .cpi-hdr-download i {
+        font-size: var(--fs-lg);
+        color: var(--accent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-hdr-download {
+        background: var(--surface, #141a26);
+        border-color: var(--border);
+      }
+      /* Every grid this page adds gets a min-width:0 escape hatch on its
+         children — the classic CSS Grid trap where a 1fr track still refuses
+         to shrink below its content's intrinsic (max-content) width. */
+      #screen-cpi-obs .glance-grid > * {
+        min-width: 0;
+      }
+      /* Shared colour key + source note beneath the three cards — a subtle
+         secondary reminder of what each dot colour means (no percentages,
+         those live in each card's own legend) plus the rounding/source
+         line already used elsewhere on this page (e.g. the regional
+         comparison table), reused verbatim here rather than inventing new
+         wording. */
+      #screen-cpi-obs .glance-shared-legend {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px 20px;
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+      }
+      #screen-cpi-obs .glance-shared-legend-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      #screen-cpi-obs .glance-shared-legend-items span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: var(--fs-xs);
+        color: var(--text2);
+      }
+      #screen-cpi-obs .glance-shared-legend-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: var(--fs-2xs);
+        color: var(--muted);
+      }
+      #screen-cpi-obs .glance-shared-legend-note i {
+        color: var(--muted);
+      }
+      @media (max-width: 700px) {
+        #screen-cpi-obs .glance-shared-legend {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+
+      /* Growth here reads as positive news (population/workforce/housing all
+         growing), the opposite convention from CPI's inflation "up = bad" red.
+         Scoped to this page's own new classes only, so it never touches the
+         shared --up/--down tokens other Observatory pages depend on. */
+      #screen-cpi-obs .cen-badge--up {
+        color: #16a34a;
+        background: #f0fdf4;
+      }
+      #screen-cpi-obs .cen-badge--down {
+        color: #dc2626;
+        background: #fef2f2;
+      }
+      #screen-cpi-obs .cen-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 100px;
+        line-height: 1.5;
+      }
+      #screen-cpi-obs .cen-badge i {
+        font-size: var(--fs-2xs);
+      }
+
+      /* Section "module card" — ported verbatim from CPI.html's page-local
+         `#cpi-obs-content > section` rule, applied there to EVERY top-level
+         section (Overview, Inflation Drivers, Key Impacts alike) for a
+         consistent soft-gradient outer card around each module, with inner
+         .obs-card elements nesting inside it. This page's content wrapper
+         is a class (.cpi-obs-content), not CPI's id, so it never inherited
+         that rule — ported here as a class selector so every top-level
+         section on THIS page gets the same treatment. The Executive Brief
+         (.cpi-hero) and the preliminary-data notice (.cpi-notice) are plain
+         divs, not sections, so — exactly as on CPI.html — they're
+         untouched by this rule and keep their own distinct treatments. */
+      #screen-cpi-obs .cpi-obs-content > section {
+        background:
+          radial-gradient(ellipse 90% 70% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%),
+          linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 28px;
+        box-shadow:
+          0 1px 2px rgba(15, 23, 42, 0.05),
+          0 10px 28px rgba(42, 61, 76, 0.07);
+        padding: 24px 28px 28px;
+        margin-bottom: 24px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-obs-content > section {
+        background: var(--surface, #141a26);
+        border: 1px solid var(--border);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+      }
+      /* Key Insights — ported verbatim from CPI.html's page-local override
+         (not in the shared cpi-obs.css, which only has a plainer generic
+         fallback). Single vertical list inside one card, icon + text rows,
+         rather than a card grid. .impacts-list is deliberately
+         transparent/borderless because it relies on the outer section-level
+         card above, not a card of its own. */
+      #screen-cpi-obs .impacts-list {
+        padding: 0;
+        border-radius: 0;
+        border: none;
+        background-color: transparent;
+      }
+      #screen-cpi-obs .impacts-list,
+      #screen-cpi-obs .impacts-list:hover {
+        box-shadow: none;
+      }
+      #screen-cpi-obs .impacts-list .impact-item {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 11px;
+        align-items: start;
+        padding: 10px 0;
+        border-bottom: 1px solid #eaecf0;
+        font-size: var(--fs-md);
+        line-height: 1.5;
+        color: #536277;
+        transition: transform 0.22s ease;
+      }
+      #screen-cpi-obs .impacts-list .impact-item:last-child {
+        border-bottom: 0;
+      }
+      #screen-cpi-obs .impacts-list .impact-item:hover {
+        background: none;
+        transform: translateX(3px);
+      }
+      #screen-cpi-obs .impacts-list .impact-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 9%, white);
+      }
+      #screen-cpi-obs .impacts-list .impact-icon i {
+        font-size: var(--fs-xl);
+        line-height: 1;
+      }
+      #screen-cpi-obs .impacts-list .impact-icon--up {
+        --tone: #e5484d;
+      }
+      #screen-cpi-obs .impacts-list .impact-icon--down {
+        --tone: #0c9b70;
+      }
+      #screen-cpi-obs .impacts-list .impact-icon--neutral {
+        --tone: #246bfd;
+      }
+      #screen-cpi-obs .impacts-list .impact-val {
+        color: #172033;
+        font-weight: 700;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-item {
+        border-color: var(--border);
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-val {
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-icon {
+        background: color-mix(in srgb, var(--tone) 18%, transparent);
+      }
+
+      /* AI-generated pill — the one AI treatment reused everywhere the spec
+         calls for it (brief, Key Insights, Jobseekers). */
+      #screen-cpi-obs .ai-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: var(--fs-micro);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        background: var(--accent-light);
+        color: var(--accent);
+        padding: 2px 8px;
+        border-radius: 100px;
+      }
+      #screen-cpi-obs .ai-pill i {
+        font-size: var(--fs-2xs);
+      }
+      #screen-cpi-obs .ai-footnote {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        font-size: var(--fs-xs);
+        color: var(--text2);
+      }
+      /* Plain info icon (not the .ai-pill badge) for a footnote that sits
+         right below a panel already carrying its own AI-generated pill —
+         Jobseekers' insight panel, so the badge isn't shown twice in a row. */
+      #screen-cpi-obs .ai-footnote > i {
+        font-size: var(--fs-sm);
+        color: var(--muted);
+      }
+      #screen-cpi-obs .section-hdr-sub {
+        margin: 2px 0 16px;
+        font-size: var(--fs-sm);
+        color: var(--text2);
+      }
+
+      /* ── Section header icon + title — the shared component ported
+         verbatim from CPI.html (also used by LMO/Crisis Intelligence),
+         which this page never had. Every .cpi-section-title on this page
+         (Census at a Glance, Key Insights, Population and Housing by
+         Region, Notable: Emirati Jobseekers, News) now gets the same
+         small inline icon, gap and vertical centring instead of falling
+         back to default heading styles or a one-off treatment. ── */
+      #screen-cpi-obs .section-hdr h2.cpi-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: var(--fs-2xl);
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      #screen-cpi-obs .section-hdr h2.cpi-section-title i {
+        font-size: var(--fs-2xl);
+        line-height: 1;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+
+      /* ── Executive Brief base card — ported verbatim from CPI.html.
+         This is the actual root cause of the layout break: .cpi-hero and
+         the audio-brief control are page-local styles in CPI.html (not in
+         the shared cpi-obs.css), so this page never had them and the hero
+         was rendering with no card padding/sizing at all — everything
+         inside it (including Key Takeaways) was laying out against an
+         unconstrained container. ── */
+      #screen-cpi-obs .cpi-hero {
+        position: relative;
+        overflow: hidden;
+        min-height: 150px;
+        margin-bottom: 24px;
+        border-radius: 16px;
+        padding: 24px 28px;
+        background: radial-gradient(ellipse 70% 55% at 8% 15%, rgba(99, 179, 255, 0.22) 0%, transparent 55%), linear-gradient(135deg, #f0f6ff 0%, #eef4fc 45%, #e8f0fa 100%);
+        border: 1px solid #bfdbfe;
+        box-shadow: 0 1px 6px rgba(15, 23, 42, 0.04);
+        --brief-blue: #246bfd;
+        --brief-red: #e5484d;
+      }
+      #screen-cpi-obs .cpi-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(37, 99, 235, 0.08) 1.5px, transparent 1.5px);
+        background-size: 18px 18px;
+        pointer-events: none;
+        opacity: 0.7;
+      }
+      #screen-cpi-obs .cpi-hero-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        min-width: 0;
+        max-width: 100%;
+      }
+      #screen-cpi-obs .cpi-hero-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+        margin-left: auto;
+        align-self: center;
+      }
+      #screen-cpi-obs .cpi-hero-ico {
+        color: #fff;
+        font-size: var(--fs-2xl);
+        line-height: 1;
+        margin-top: 1px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #6366f1, #3b82f6);
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.28);
+      }
+      #screen-cpi-obs .cpi-hero-title {
+        font-size: var(--fs-xl);
+        font-weight: 700;
+        color: #0f2744;
+        letter-spacing: -0.01em;
+      }
+      #screen-cpi-obs .cpi-hero-sub {
+        margin-top: 20px;
+        max-width: 100%;
+        font-size: var(--fs-md);
+        line-height: 1.55;
+        color: var(--text2);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-hero {
+        background: radial-gradient(ellipse 70% 55% at 8% 15%, rgba(59, 130, 246, 0.18) 0%, transparent 55%), linear-gradient(135deg, var(--surface2) 0%, var(--surface) 45%, #151E32 100%);
+        border-color: var(--border-md);
+        box-shadow: var(--shadow-sm);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-hero::before {
+        background-image: radial-gradient(rgba(59, 130, 246, 0.12) 1.5px, transparent 1.5px);
+        opacity: 0.5;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-hero-title {
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-hero-sub {
+        color: var(--text-secondary);
+      }
+
+      /* ── Audio brief — ported from CPI.html's Executive brief listen
+         control. Keep in sync with that copy if it ever changes. ── */
+      #screen-cpi-obs .cpi-hero .brief-speech {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        width: fit-content;
+        height: 30px;
+        padding: 0;
+        border-radius: 15px;
+        background: transparent;
+        box-shadow: none;
+        transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: linear-gradient(110deg, rgba(36, 107, 253, 0.22), transparent 42%);
+        opacity: 0;
+        z-index: -1;
+        transition: 0.3s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech.is-active {
+        box-shadow: inset 0 0 0 1px rgba(120, 166, 236, 0.55), 0 5px 14px rgba(36, 107, 253, 0.13);
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech.is-active::before {
+        opacity: 1;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-hero .brief-speech {
+        background: transparent;
+        box-shadow: none;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-hero .brief-speech.is-active {
+        box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.35), 0 5px 14px rgba(0, 0, 0, 0.3);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        height: 26px;
+        padding: 0;
+        border: 0;
+        border-radius: 13px;
+        background: transparent;
+        color: #28415f;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: 0.22s ease;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen:hover .brief-listen__icon {
+        transform: scale(1.06);
+        box-shadow: 0 5px 12px rgba(36, 107, 253, 0.32);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen:focus-visible,
+      #screen-cpi-obs .cpi-hero .brief-audio-action:focus-visible {
+        outline: 3px solid rgba(36, 107, 253, 0.17);
+        outline-offset: 2px;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__icon {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        color: #fff;
+        background: linear-gradient(145deg, #1f5ef0, #5b97f8);
+        box-shadow: 0 3px 8px rgba(36, 107, 253, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+        transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__icon::after {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border: 1px solid rgba(36, 107, 253, 0.22);
+        border-radius: 50%;
+        transform: scale(0.84);
+        opacity: 0;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__speaker,
+      #screen-cpi-obs .cpi-hero .brief-listen__play,
+      #screen-cpi-obs .cpi-hero .brief-listen__pause {
+        grid-area: 1 / 1;
+        display: block;
+        font-size: var(--fs-xs);
+        line-height: 1;
+        transition: opacity 0.15s, transform 0.15s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__play {
+        margin-left: 1px;
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__pause {
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__speaker {
+        opacity: 1;
+        transform: scale(1);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__speaker,
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__speaker {
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__pause {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__play {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__icon {
+        background: linear-gradient(145deg, #3b7af5, #7aafff);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__icon::after {
+        animation: brief-voice-ring 1.8s ease-out infinite;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__copy {
+        display: none;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+        line-height: 1.05;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__text {
+        color: #2b4462;
+        font-size: var(--fs-micro);
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__text,
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__text {
+        display: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        height: 14px;
+        color: var(--brief-blue);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave i {
+        display: block;
+        width: 2px;
+        height: 5px;
+        border-radius: 2px;
+        background: currentColor;
+        animation: brief-wave 0.72s ease-in-out infinite;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave i:nth-child(2) { animation-delay: 0.12s; }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave i:nth-child(3) { animation-delay: 0.24s; }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave i:nth-child(4) { animation-delay: 0.36s; }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__wave,
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__wave {
+        display: inline-flex;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__wave i {
+        height: 8px;
+        animation-play-state: paused;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech__actions {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateX(-6px);
+        transition: max-width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s, transform 0.3s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech.is-active .brief-speech__actions {
+        max-width: 56px;
+        opacity: 1;
+        transform: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech__actions::before {
+        content: "";
+        width: 1px;
+        height: 14px;
+        margin: 0 2px 0 0;
+        background: #d7e2f0;
+      }
+      #screen-cpi-obs .cpi-hero .brief-audio-action {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: #6d7f95;
+        font-size: var(--fs-xs);
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+      #screen-cpi-obs .cpi-hero .brief-audio-action:hover {
+        color: var(--brief-blue);
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(36, 75, 125, 0.1);
+        transform: scale(1.06);
+      }
+      #screen-cpi-obs .cpi-hero .brief-stop-box {
+        display: block;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: currentColor;
+      }
+      #screen-cpi-obs .cpi-hero .brief-audio-action--stop:hover {
+        color: var(--brief-red);
+        background: #fff5f5;
+      }
+      #screen-cpi-obs .cpi-hero .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      @keyframes brief-wave {
+        0%, 100% { height: 5px; }
+        50% { height: 14px; }
+      }
+      @keyframes brief-voice-ring {
+        0% { transform: scale(0.82); opacity: 0.8; }
+        80%, 100% { transform: scale(1.5); opacity: 0; }
+      }
+
+      /* ── Executive Brief: hero header row + two-col body (copy | takeaways) ── */
+      #screen-cpi-obs .cpi-hero-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      #screen-cpi-obs .cpi-hero-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      /* ── Section header row with a trailing element (used by Population
+         and Housing by Region's legend) ── */
+      #screen-cpi-obs .section-hdr-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      /* ── Executive Brief decorative skyline — a plain generic silhouette
+         (not a photo asset — see CensusObservatory revision history for why
+         a real photo asset wasn't used) so the hero has some of the visual
+         interest the reference design shows, without a new image dependency. ── */
+      #screen-cpi-obs .cpi-hero-skyline {
+        position: absolute;
+        right: 18px;
+        bottom: 0;
+        width: 220px;
+        height: 68px;
+        opacity: 0.16;
+        color: var(--accent);
+        pointer-events: none;
+      }
+      @media (max-width: 900px) {
+        #screen-cpi-obs .cpi-hero-skyline {
+          display: none;
+        }
+      }
+
+      /* ── Census at a Glance ── */
+      #screen-cpi-obs .glance-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      #screen-cpi-obs .glance-card {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+      #screen-cpi-obs .glance-card-hd {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+        position: relative;
+        z-index: 1;
+      }
+      #screen-cpi-obs .glance-card-hd .kpi-label {
+        margin: 0;
+      }
+      #screen-cpi-obs .glance-card-ic {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .glance-card-ic i {
+        font-size: var(--fs-lg);
+      }
+      /* Category tint per card — Population/Labour/Real Estate each read as
+         a distinct topic at a glance, matching the reference design. Reuses
+         the same blue/teal/amber already assigned to these three domains in
+         Regional Profile's legend further down this page (.cen-region-legend-dot),
+         rather than inventing a second colour mapping for the same data. */
+      #screen-cpi-obs .glance-card--pop .glance-card-ic {
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .glance-card--labour .glance-card-ic {
+        color: var(--teal-400);
+        background: var(--teal-50);
+      }
+      #screen-cpi-obs .glance-card--re .glance-card-ic {
+        color: #d97706;
+        background: #fff7ed;
+      }
+
+      /* ── Large corner illustrations ──
+         Large contextual image assets positioned in the upper-right of each
+         card, sitting beside/behind the KPI area. Absolutely positioned for
+         placement only — the grid/flex card layout itself stays untouched —
+         and kept out of the paint order below every text row via z-index.
+         All three assets share one 1000x841 source aspect, so a single box
+         size renders them at matching visual scale — object-fit: contain
+         fills that box instead of letterboxing inside it. */
+      #screen-cpi-obs .glance-card-art {
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        width: 148px;
+        height: 133px;
+        z-index: 0;
+        pointer-events: none;
+        object-fit: contain;
+        object-position: top right;
+        opacity: 0.95;
+      }
+      /* Reserve room beside the header/KPI text so the illustration reads as
+         "alongside", not "under", the numbers; wrap the growth badge instead
+         of forcing it under the art on narrower cards. */
+      /* Real Estate carries two KPIs where the other cards carry one. They
+         share a single band (.glance-re-vals) that reserves the same art
+         gutter as Population/Labour's KPI row, so all three illustrations
+         can run at one size; the "by use" bar columns then sit below the
+         art entirely and take the card's full width. */
+      #screen-cpi-obs .glance-card--pop .glance-card-hd,
+      #screen-cpi-obs .glance-card--pop .glance-card-value,
+      #screen-cpi-obs .glance-card--labour .glance-card-hd,
+      #screen-cpi-obs .glance-card--labour .glance-card-value,
+      #screen-cpi-obs .glance-card--re .glance-card-hd,
+      #screen-cpi-obs .glance-card--re .glance-re-vals {
+        padding-right: 158px;
+      }
+      /* The art only needs 144px of gutter to clear content (148px wide +
+         14px offset - 18px card padding). The single-KPI rows keep the
+         roomier 158px; the Real Estate band takes the tighter figure
+         because it has two columns to fit into the same space. */
+      #screen-cpi-obs .glance-card--re .glance-re-vals {
+        padding-right: 144px;
+      }
+      /* Whether the two KPIs fit side by side depends on this card's own
+         width, not the window's: the glance grid steps 3 -> 2 -> 1 columns,
+         so the card is narrowest in the middle (2-up) range rather than at
+         the smallest viewport. A container query reads that width directly;
+         below it the KPIs stack instead of overlapping. */
+      #screen-cpi-obs .glance-card--re {
+        container-type: inline-size;
+        container-name: re-card;
+      }
+      /* Below this the two KPI columns get too narrow for a "X.X% vs 2024"
+         pill side by side, so they stack (each then spans the full band). */
+      @container re-card (max-width: 344px) {
+        #screen-cpi-obs .glance-card--re .glance-re-vals {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+      @media (max-width: 900px) {
+        #screen-cpi-obs .glance-card-art {
+          width: 112px;
+          height: 101px;
+          top: 8px;
+          right: 10px;
+        }
+        #screen-cpi-obs .glance-card--pop .glance-card-hd,
+        #screen-cpi-obs .glance-card--pop .glance-card-value,
+        #screen-cpi-obs .glance-card--labour .glance-card-hd,
+        #screen-cpi-obs .glance-card--labour .glance-card-value,
+        #screen-cpi-obs .glance-card--re .glance-card-hd,
+        #screen-cpi-obs .glance-card--re .glance-re-vals {
+          padding-right: 122px;
+        }
+        #screen-cpi-obs .glance-card--re .glance-re-vals {
+          padding-right: 114px;
+        }
+      }
+      @media (max-width: 480px) {
+        #screen-cpi-obs .glance-card-art {
+          display: none;
+        }
+        #screen-cpi-obs .glance-card--pop .glance-card-hd,
+        #screen-cpi-obs .glance-card--pop .glance-card-value,
+        #screen-cpi-obs .glance-card--labour .glance-card-hd,
+        #screen-cpi-obs .glance-card--labour .glance-card-value,
+        #screen-cpi-obs .glance-card--re .glance-card-hd,
+        #screen-cpi-obs .glance-card--re .glance-re-vals {
+          padding-right: 0;
+        }
+      }
+
+      /* ── Notable: Emirati Jobseekers — executive insight section. Header
+         uses the standard .section-hdr/.cpi-section-title treatment (same
+         as every other section on this page). Two equal cards (Total
+         Jobseekers / by Region) share Census at a Glance's
+         .glance-card-hd/.glance-card-ic roundel-icon header instead of a
+         one-off heading style, so every card on this page reads as the
+         same component; the AI Insight is a full-width panel below the
+         pair (not a third grid column) so it reads as commentary on both
+         cards, not a card competing with them for width. ── */
+      #screen-cpi-obs .jobseekers-grid-v2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        align-items: stretch;
+      }
+      #screen-cpi-obs .jobseekers-col-main,
+      #screen-cpi-obs .jobseekers-col-region {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+      #screen-cpi-obs .jobseekers-col-main {
+        container-type: inline-size;
+        container-name: js-main;
+      }
+      #screen-cpi-obs .jobseekers-col-main .glance-card-hd,
+      #screen-cpi-obs .jobseekers-col-region .glance-card-hd {
+        position: relative;
+        z-index: 1;
+      }
+      /* Large illustration — upper-right of the Total Jobseekers card, a
+         provided image asset (not an icon/illustration built here). The
+         slot is reserved and object-fit-contained so dropping the real
+         <img src="assets/…"> in later is a one-line change; nothing
+         decorative renders while it's empty. */
+      #screen-cpi-obs .jobseekers-illustration {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 148px;
+        height: 168px;
+        z-index: 0;
+        pointer-events: none;
+      }
+      #screen-cpi-obs .jobseekers-illustration img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: top right;
+      }
+      /* Value block + gender viz sit on one horizontal band rather than the
+         value on top and the viz pushed to the card's foot — keeps this
+         card as short as its content and, via the grid's align-items:
+         stretch, stops the region card growing a tall empty gap above its
+         CTA. space-between puts the KPI on the card's left, the gender split
+         on its right, and the divider centred between them, so the band
+         fills the width instead of leaving dead space trailing on the
+         right. Wraps to stacked on a narrow card. */
+      #screen-cpi-obs .jobseekers-main-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 18px 30px;
+        margin-top: 10px;
+        /* Inset so "15,855" starts under the header TEXT, not the icon
+           (icon 34px + its 10px gap); mirrored on the right. */
+        padding: 0 44px;
+        position: relative;
+        z-index: 1;
+      }
+      #screen-cpi-obs .jobseekers-value-lg {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+      #screen-cpi-obs .jobseekers-value-lg .jobseekers-value-num {
+        font-size: var(--fs-4xl);
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text);
+        letter-spacing: -0.03em;
+      }
+      #screen-cpi-obs .jobseekers-value-lg span {
+        font-size: var(--fs-sm);
+        font-weight: 500;
+        color: var(--text2);
+      }
+      /* Hairline between the KPI and the gender split — same weight as the
+         donut column dividers elsewhere on the page. Stretches to the
+         taller side of the row (the donut) with a small inset. */
+      #screen-cpi-obs .jobseekers-main-sep {
+        align-self: stretch;
+        width: 1px;
+        margin: 2px 0;
+        background: rgba(15, 23, 42, 0.1);
+        flex: 0 0 auto;
+      }
+      /* Once the row wraps to a stacked value / gender viz, the hairline
+         turns horizontal so it still reads as a divider between them.
+         Threshold accounts for the 88px of horizontal inset on the row. */
+      @container js-main (max-width: 526px) {
+        #screen-cpi-obs .jobseekers-main-sep {
+          align-self: auto;
+          width: 100%;
+          height: 1px;
+          margin: 6px 0;
+          order: 1;
+        }
+        #screen-cpi-obs .jobseekers-gender-viz {
+          order: 2;
+        }
+      }
+      #screen-cpi-obs .jobseekers-gender-viz {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        position: relative;
+        z-index: 1;
+      }
+      #screen-cpi-obs .glance-donut-wrap--lg {
+        width: 104px;
+        height: 104px;
+      }
+      #screen-cpi-obs .glance-donut-wrap--lg .glance-donut-ic svg {
+        width: 30px;
+        height: 30px;
+      }
+      #screen-cpi-obs .jobseekers-gender-stats {
+        display: flex;
+        gap: 32px;
+      }
+      #screen-cpi-obs .jobseekers-gender-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      #screen-cpi-obs .jobseekers-gender-stat-lbl {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .jobseekers-gender-stat-pct {
+        font-size: var(--fs-3xl);
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+      #screen-cpi-obs .jobseekers-gender-stat-count {
+        font-size: var(--fs-xs);
+        color: var(--muted);
+      }
+      #screen-cpi-obs .jobseekers-col-region .glance-card-hd {
+        margin-bottom: 18px;
+      }
+      #screen-cpi-obs .jobseekers-region-row {
+        display: grid;
+        grid-template-columns: 110px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        font-size: var(--fs-sm);
+        margin-bottom: 14px;
+      }
+      #screen-cpi-obs .jobseekers-region-row:last-of-type {
+        margin-bottom: 0;
+      }
+      #screen-cpi-obs .jobseekers-region-label {
+        color: var(--text2);
+      }
+      #screen-cpi-obs .jobseekers-region-track {
+        display: block;
+        height: 8px;
+        border-radius: 5px;
+        background: rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+      }
+      #screen-cpi-obs .jobseekers-region-fill {
+        display: block;
+        height: 100%;
+        border-radius: 5px;
+        background: var(--accent);
+      }
+      #screen-cpi-obs .jobseekers-region-val {
+        font-weight: 700;
+        color: var(--text);
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .jobseekers-region-pct {
+        color: var(--text2);
+        font-weight: 500;
+        margin-left: 4px;
+      }
+      #screen-cpi-obs .jobseekers-col-region .glance-cta {
+        margin-top: 16px;
+        padding-top: 0;
+        border-top: 0;
+      }
+      @media (max-width: 700px) {
+        #screen-cpi-obs .jobseekers-grid-v2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 480px) {
+        #screen-cpi-obs .jobseekers-illustration {
+          width: 100px;
+          height: 116px;
+          top: 12px;
+          right: 12px;
+        }
+      }
+
+      /* Population and Housing by Region — an actual Abu Dhabi Emirate map
+         (3 regions), built from the region boundary coordinates already in
+         this project (lmo/data/abu-dhabi-regions.geojson — simplified but
+         real lat/lon polygons, reused here rather than inventing a new
+         shape) projected to SVG, with per-region dot + leader-line callouts
+         showing Population % (blue) | Housing % (amber), plus a compact
+         comparison table alongside. One .obs-card container, same pattern
+         as Key Impacts. */
+      #screen-cpi-obs .cen-region-legend {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: var(--fs-xs);
+        color: var(--text2);
+      }
+      #screen-cpi-obs .cen-region-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #screen-cpi-obs .cen-region-legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      /* Regional Profile filter — same pill/popover interaction pattern as
+         the LMO floating filter (lmo/lmo-sidenav.js, .lsb-fp-* in
+         css/pages/lmo-common.css), ported as page-local markup/CSS/JS
+         since this page's chrome doesn't share LMO's sidebar-rail shell
+         the original component is anchored to. Trigger reuses the shared
+         .cen-btn look already used elsewhere on this page. */
+      #screen-cpi-obs .cen-region-hdr-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      #screen-cpi-obs .cen-filter-wrap {
+        position: relative;
+      }
+      #screen-cpi-obs .cen-filter-toggle.is-active {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .cen-filter-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 4px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #fff;
+        font-size: var(--fs-micro);
+        font-weight: 700;
+      }
+      #screen-cpi-obs .cen-filter-badge[hidden] {
+        display: none;
+      }
+      #screen-cpi-obs .cen-filter-panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: min(320px, calc(100vw - 48px));
+        max-height: min(480px, 70vh);
+        background: var(--white);
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 8px 32px rgba(42, 61, 76, 0.12), 0 2px 8px rgba(42, 61, 76, 0.06);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 40;
+      }
+      #screen-cpi-obs .cen-filter-panel.open {
+        display: flex;
+      }
+      #screen-cpi-obs .cen-fp-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px 10px;
+        border-bottom: 1px solid #eef2f6;
+      }
+      #screen-cpi-obs .cen-fp-title {
+        font-size: var(--fs-md);
+        font-weight: 700;
+        color: var(--text);
+      }
+      #screen-cpi-obs .cen-fp-close {
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(15, 23, 42, 0.05);
+        color: var(--text2);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: var(--fs-sm);
+      }
+      #screen-cpi-obs .cen-fp-close:hover {
+        background: rgba(15, 23, 42, 0.09);
+        color: var(--text);
+      }
+      #screen-cpi-obs .cen-fp-body {
+        padding: 12px 16px 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow-y: auto;
+      }
+      #screen-cpi-obs .cen-fp-section-hd {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 8px;
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        color: var(--text);
+      }
+      #screen-cpi-obs .cen-fp-section-hd .ti {
+        font-size: var(--fs-md);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .cen-fp-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      #screen-cpi-obs .cen-fp-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid #e5e7eb;
+        font-size: var(--fs-xs);
+        font-weight: 500;
+        color: var(--text2);
+        background: var(--white);
+        cursor: pointer;
+        font-family: inherit;
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .cen-fp-pill:hover:not(:disabled) {
+        border-color: #99c2ff;
+        color: var(--text);
+      }
+      #screen-cpi-obs .cen-fp-pill.act {
+        background: var(--accent-light);
+        border-color: var(--accent);
+        color: var(--accent);
+        font-weight: 700;
+      }
+      #screen-cpi-obs .cen-fp-pill:disabled {
+        cursor: default;
+        opacity: 0.7;
+      }
+      #screen-cpi-obs .cen-fp-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px 12px;
+        border-top: 1px solid #eef2f6;
+        background: rgba(15, 23, 42, 0.015);
+      }
+      #screen-cpi-obs .cen-fp-count {
+        font-size: var(--fs-xs);
+        color: var(--text2);
+      }
+      #screen-cpi-obs .cen-fp-count[hidden] {
+        display: none;
+      }
+      #screen-cpi-obs .cen-fp-reset {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border: none;
+        background: none;
+        font-family: inherit;
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        color: var(--accent);
+        cursor: pointer;
+        padding: 3px 0;
+      }
+      #screen-cpi-obs .cen-fp-reset:disabled {
+        color: var(--muted);
+        cursor: default;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cen-filter-panel {
+        background: var(--surface, #141a26);
+        border-color: var(--border);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cen-fp-head,
+      html[data-theme="dark"] #screen-cpi-obs .cen-fp-foot {
+        border-color: var(--border);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cen-fp-close {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text2);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cen-fp-pill {
+        background: transparent;
+        border-color: var(--border);
+        color: var(--text2);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cen-fp-pill.act {
+        background: rgba(0, 115, 240, 0.15);
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      /* Below this width the trigger button can sit close enough to the
+         screen edge that a right-anchored popover of fixed width would
+         run off the opposite edge (measured: overflows left by ~100px at
+         390px viewport) — pin it to the viewport as a bottom sheet
+         instead of anchoring it to the button. */
+      @media (max-width: 640px) {
+        #screen-cpi-obs .cen-filter-panel {
+          position: fixed;
+          left: 16px;
+          right: 16px;
+          top: auto;
+          bottom: 16px;
+          width: auto;
+          max-height: min(70vh, 520px);
+        }
+      }
+      #screen-cpi-obs .cen-region-body {
+        display: grid;
+        grid-template-columns: minmax(0, 21fr) minmax(0, 29fr);
+        gap: 32px;
+        align-items: center;
+      }
+      #screen-cpi-obs .cen-map-wrap {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 500 / 290;
+      }
+      #screen-cpi-obs .cen-map-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #screen-cpi-obs .cen-map-label {
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        fill: #0f2744;
+        font-family: inherit;
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cen-map-label--muted {
+        font-size: var(--fs-micro);
+        font-weight: 600;
+        fill: #94a3b8;
+      }
+      #screen-cpi-obs .cen-map-label--on-dark {
+        fill: #fff;
+      }
+      #screen-cpi-obs .cen-map-compass text {
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        fill: #64748b;
+        font-family: inherit;
+      }
+      #screen-cpi-obs .cen-map-compass polygon {
+        fill: #94a3b8;
+      }
+      #screen-cpi-obs .cen-map-scale line {
+        stroke: #94a3b8;
+        stroke-width: 1;
+      }
+      #screen-cpi-obs .cen-map-scale text {
+        font-size: var(--fs-micro);
+        fill: #94a3b8;
+        font-family: inherit;
+      }
+      #screen-cpi-obs .cen-map-dot {
+        fill: #0f2744;
+        stroke: #fff;
+        stroke-width: 1.5;
+      }
+      #screen-cpi-obs .cen-map-line {
+        stroke: #94a3b8;
+        stroke-width: 1;
+        stroke-dasharray: 2 2;
+      }
+      #screen-cpi-obs .cen-map-callout {
+        position: absolute;
+        transform: translate(-50%, -100%);
+        background: var(--white);
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 6px 10px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+        text-align: center;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cen-map-callout--below {
+        transform: translate(-50%, 8px);
+      }
+      #screen-cpi-obs .cen-map-callout-pct {
+        font-size: var(--fs-sm);
+        font-weight: 700;
+      }
+      #screen-cpi-obs .cen-map-callout-pct .cen-pop { color: #0073F0; }
+      #screen-cpi-obs .cen-map-callout-pct .cen-sep { color: var(--border); font-weight: 400; margin: 0 3px; }
+      #screen-cpi-obs .cen-map-callout-pct .cen-housing { color: #d97706; }
+      #screen-cpi-obs .cen-map-callout-name {
+        font-size: var(--fs-2xs);
+        color: var(--text2);
+        margin-top: 1px;
+      }
+      #screen-cpi-obs .cen-compare-title {
+        font-size: var(--fs-md);
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 14px;
+      }
+      #screen-cpi-obs .cen-compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: var(--fs-sm);
+      }
+      /* Value + (%) are allowed to wrap onto their own line (rather than
+         nowrap) once a column gets narrow — the actual root cause of the
+         overlap that used to force this whole row to stack at 1500px
+         (see the .cen-region-body breakpoint below): nowrap cells can't
+         shrink below their content's natural width, so table-layout:fixed
+         just let them overflow into the next cell instead of shrinking.
+         Wrapping fixes that at the source, so the breakpoint no longer
+         needs to be nearly this conservative. */
+      #screen-cpi-obs .cen-compare-table td:not(:first-child) {
+        white-space: normal;
+      }
+      #screen-cpi-obs .cen-compare-table th {
+        text-align: right;
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        color: var(--text);
+        padding: 10px 10px;
+        background: rgba(0, 115, 240, 0.06);
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+      }
+      #screen-cpi-obs .cen-compare-table th:first-child { text-align: left; border-radius: 8px 0 0 8px; }
+      #screen-cpi-obs .cen-compare-table th:last-child { border-radius: 0 8px 8px 0; }
+      #screen-cpi-obs .cen-compare-table td {
+        padding: 11px 10px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        text-align: right;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .cen-compare-table tr:last-child td { border-bottom: 0; }
+      /* Keep this a real table-cell (not display:flex) so it stretches to
+         the row's height like the value cells and its row highlight fills
+         the whole row — a flex td collapses to its own content height and
+         leaves a gap. The dot rides inline with the region name; nowrap
+         keeps that name on one line so the dot never detaches from it. */
+      #screen-cpi-obs .cen-compare-table td:first-child {
+        text-align: left;
+        white-space: nowrap;
+        color: var(--text);
+        font-weight: 600;
+      }
+      #screen-cpi-obs .cen-compare-table td.cen-best { color: var(--text); font-weight: 700; }
+      #screen-cpi-obs .cen-compare-dot {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 8px;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+      /* Force the share onto its own line in every value cell so all rows
+         are the same height regardless of how long the number is or how
+         narrow the column gets. */
+      #screen-cpi-obs .cen-compare-pct {
+        display: block;
+        margin-top: 1px;
+        color: var(--text2);
+        font-weight: 500;
+      }
+      #screen-cpi-obs .cen-compare-row--top td {
+        background: rgba(0, 115, 240, 0.045);
+      }
+      #screen-cpi-obs .cen-compare-row--top td:first-child {
+        font-weight: 700;
+      }
+      /* Was 1500px, compared against raw viewport width — well above
+         even common 1440px/1366px laptop widths, so side-by-side was
+         stacking on completely ordinary desktops (confirmed by direct
+         measurement: .cen-region-body still had 900-1100px of real,
+         non-overflowing room to work with at those widths once the
+         nowrap overlap above was fixed). 1500px was compensating for
+         the nowrap-overlap bug, not for a genuine lack of space — with
+         that fixed at the cell level, side-by-side holds cleanly with
+         no overflow and no overlap all the way down to ~1000px in
+         testing. Lowered to this page's existing narrow-desktop cutoff
+         (matches .lf-pair-grid/.re-pair-grid elsewhere) so it only
+         stacks once there's genuinely not enough width, not on every
+         normal laptop. */
+      @media (max-width: 900px) {
+        #screen-cpi-obs .cen-region-body {
+          grid-template-columns: 1fr;
+          overflow-x: auto;
+        }
+        #screen-cpi-obs .cen-map-wrap {
+          width: 340px;
+          min-width: 340px;
+          /* Callout boxes are a fixed ~50px tall regardless of map size
+             (sized by their own padding/font, not scaled with the SVG),
+             but their anchor point sits proportionally closer to the
+             map's top edge once the map itself shrinks this much —
+             without this clearance the Al Ain callout's top edge pokes
+             out above .obs-card and gets clipped. */
+          margin-top: 24px;
+        }
+        #screen-cpi-obs .cen-compare-table {
+          min-width: 690px;
+        }
+      }
+      @media (max-width: 420px) {
+        #screen-cpi-obs .cen-map-callout { padding: 4px 7px; }
+        #screen-cpi-obs .cen-map-callout-pct { font-size: var(--fs-2xs); }
+        #screen-cpi-obs .cen-map-callout-name { font-size: var(--fs-micro); }
+      }
+      #screen-cpi-obs .cd-key-card {
+        border-radius: 12px;
+        background: var(--accent-light);
+        padding: 14px 16px;
+      }
+      #screen-cpi-obs .cd-key-card-hd {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 6px;
+      }
+      #screen-cpi-obs .cd-key-card p {
+        margin: 0;
+        font-size: var(--fs-sm);
+        line-height: 1.55;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .cd-key-card p b {
+        color: var(--text);
+      }
+      #screen-cpi-obs .glance-card-value {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: var(--fs-4xl);
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.03em;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+      }
+      #screen-cpi-obs .glance-comp-row {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .glance-comp-row b {
+        color: var(--text);
+        font-weight: 600;
+      }
+      #screen-cpi-obs .glance-comp-pct {
+        color: var(--muted);
+      }
+      /* Composition donuts — Citizenship + Gender, side by side, for the
+         Population/Labour Force cards (the two places a confirmed overall
+         citizenship AND gender split both exist). Each donut is a complete
+         two-colour split (no grey "remainder") with a neutral icon at its
+         centre instead of a percentage — the legend beneath carries the
+         numbers. Plain SVG stroke-dasharray, same technique already used
+         for LMO's donuts. */
+      #screen-cpi-obs .glance-value-label {
+        margin: -8px 0 0;
+        font-size: var(--fs-2xs);
+        color: var(--text2);
+        position: relative;
+        z-index: 1;
+      }
+      #screen-cpi-obs .glance-donut-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+        padding-top: 14px;
+        margin-top: 10px;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+        position: relative;
+        z-index: 1;
+      }
+      #screen-cpi-obs .glance-donut-col {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+      #screen-cpi-obs .glance-donut-col-sep {
+        width: 1px;
+        align-self: stretch;
+        background: rgba(15, 23, 42, 0.06);
+      }
+      #screen-cpi-obs .glance-donut-col-label {
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      #screen-cpi-obs .glance-donut-wrap {
+        position: relative;
+        width: 90px;
+        height: 90px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .glance-donut {
+        width: 100%;
+        height: 100%;
+      }
+      #screen-cpi-obs .glance-donut-ic {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+      }
+      #screen-cpi-obs .glance-donut-ic svg {
+        width: 26px;
+        height: 26px;
+      }
+      #screen-cpi-obs .glance-donut-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: var(--fs-2xs);
+        color: var(--text2);
+        width: 100%;
+      }
+      #screen-cpi-obs .glance-donut-legend span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .glance-donut-legend b {
+        margin-left: auto;
+        color: var(--text);
+        font-weight: 700;
+      }
+      #screen-cpi-obs .glance-donut-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .glance-donut-dot--emirati {
+        background: #16a34a;
+      }
+      #screen-cpi-obs .glance-donut-dot--nonemirati {
+        background: #C5FBD8;
+      }
+      #screen-cpi-obs .glance-donut-dot--male {
+        background: #0073F0;
+      }
+      #screen-cpi-obs .glance-donut-dot--female {
+        background: #ec4899;
+      }
+      @media (max-width: 480px) {
+        #screen-cpi-obs .glance-donut-row {
+          flex-direction: column;
+        }
+        #screen-cpi-obs .glance-donut-col-sep {
+          display: none;
+        }
+        #screen-cpi-obs .glance-re-cols {
+          flex-direction: column;
+          gap: 14px;
+        }
+      }
+      /* Mini composition bars — Real Estate card's Units-by-use rows. */
+      #screen-cpi-obs .glance-block-label {
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 6px;
+      }
+      #screen-cpi-obs .glance-mini-bar-track {
+        flex: 1;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+        margin-left: 8px;
+      }
+      #screen-cpi-obs .glance-mini-bar-fill {
+        display: block;
+        height: 100%;
+        border-radius: 3px;
+        background: var(--accent);
+      }
+      #screen-cpi-obs .glance-comp-row--bar {
+        gap: 0;
+      }
+      #screen-cpi-obs .glance-comp-row--bar > span:first-child {
+        flex-shrink: 0;
+        min-width: 84px;
+      }
+      #screen-cpi-obs .glance-comp-row--bar .glance-comp-pct {
+        flex-shrink: 0;
+        min-width: 40px;
+        text-align: right;
+      }
+      #screen-cpi-obs .glance-card .glance-cta {
+        margin-top: auto;
+      }
+      #screen-cpi-obs .glance-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        color: var(--accent);
+        text-decoration: none;
+        position: relative;
+        z-index: 1;
+      }
+      #screen-cpi-obs .glance-cta i {
+        font-size: var(--fs-sm);
+        transition: transform 0.15s;
+      }
+      #screen-cpi-obs .glance-cta:hover i {
+        transform: translateX(2px);
+      }
+      #screen-cpi-obs .glance-card--labour .glance-cta {
+        color: var(--teal-400);
+      }
+      #screen-cpi-obs .glance-card--re .glance-cta {
+        color: #d97706;
+      }
+      /* Real estate variant — Buildings and Units each form one column
+         (KPI value stacked directly above that metric's usage bars), both
+         columns sharing one flex row so they stay equal-width with one
+         continuous divider, instead of the KPI row and bars row being
+         sized independently of each other. */
+      #screen-cpi-obs .glance-re-body {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 1;
+      }
+      /* KPI band: both numbers side by side, inset from the illustration. */
+      #screen-cpi-obs .glance-re-vals {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      /* Bar columns: full card width, clear of the illustration above. */
+      #screen-cpi-obs .glance-re-cols {
+        display: flex;
+        align-items: stretch;
+        gap: 18px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+      }
+      #screen-cpi-obs .glance-re-col {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      #screen-cpi-obs .glance-re-val {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      #screen-cpi-obs .glance-re-num {
+        font-size: var(--fs-2xl);
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+      /* Match the "Residents" / "Employed" value label on the other two
+         cards — same size and colour, word case (not the all-caps the
+         "Buildings by Use" block labels use). */
+      #screen-cpi-obs .glance-re-lbl {
+        font-size: var(--fs-2xs);
+        color: var(--text2);
+      }
+      /* Same green pill as Population's / Labour's delta — one notch smaller
+         (10px vs 11px, 6px vs 7px side padding) because this card fits two
+         of them across the width the other cards give to one, and a full
+         "vs 2024" phrase can't wrap. Same shape, fill, and arrow, so it
+         still reads as the same chip. */
+      #screen-cpi-obs .glance-re-val .cen-badge {
+        align-self: flex-start;
+        gap: 2px;
+        padding: 2px 6px;
+        font-size: var(--fs-micro);
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .glance-re-val .cen-badge i {
+        font-size: var(--fs-micro);
+      }
+      /* Buildings has no confirmed YoY figure in the Census data reference
+         (only Units' +2.9% is given) — flagged in place of a badge rather
+         than fabricating one, same convention as the Real Estate detail
+         page's KPI row. */
+      #screen-cpi-obs .glance-re-nodata {
+        align-self: flex-start;
+        font-size: var(--fs-2xs);
+        color: var(--muted);
+      }
+      /* Buildings by Use / Units by Use — sits directly beneath its own
+         column's KPI value (same column as the divider above), with the
+         same divider treatment as the Citizenship/Gender columns on
+         Population and Labour Force. Each row stacks its label above a
+         full-width track — at this column's width (half the card), an
+         inline "label | track | pct" row leaves no room for the track once
+         a fixed label column is reserved, so the label gets its own line
+         instead. */
+      #screen-cpi-obs .glance-re-bars-col {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      #screen-cpi-obs .glance-re-bar-row {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      #screen-cpi-obs .glance-re-bar-label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: var(--fs-2xs);
+        color: var(--text2);
+      }
+      #screen-cpi-obs .glance-re-bar-label i {
+        font-size: var(--fs-xs);
+        color: #d97706;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .glance-re-bar-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #screen-cpi-obs .glance-re-bar-track {
+        flex: 1;
+        min-width: 0;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+      }
+      #screen-cpi-obs .glance-re-bar-fill {
+        display: block;
+        height: 100%;
+        border-radius: 3px;
+        background: #d97706;
+      }
+      #screen-cpi-obs .glance-re-bar-pct {
+        flex-shrink: 0;
+        min-width: 34px;
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        color: var(--text);
+        text-align: right;
+      }
+      #screen-cpi-obs .glance-re-composition {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 10px 0;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+        font-size: var(--fs-sm);
+        color: var(--text2);
+      }
+      @media (max-width: 1100px) and (min-width: 701px) {
+        #screen-cpi-obs .glance-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 700px) {
+        #screen-cpi-obs .glance-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ── News — ported from LaborMarketObservatory.html's .lmo-news-*
+         carousel verbatim (image cards + .dg-carousel nav), for the
+         full-width scrolling news block every topic screen carries. ── */
+      #screen-cpi-obs .cen-news-hdr {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      #screen-cpi-obs .cen-news-track .dg-slide {
+        flex: 0 0 calc((100% - 28px) / 3);
+      }
+      #screen-cpi-obs .cen-news-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px;
+        min-height: 340px;
+        padding: 0;
+        display: flex;
+        color: #fff;
+        isolation: isolate;
+      }
+      #screen-cpi-obs .cen-news-media {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background-color: #0b172c;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: transform 0.5s ease;
+      }
+      #screen-cpi-obs .cen-news-card:hover .cen-news-media { transform: scale(1.05); }
+      #screen-cpi-obs .cen-news-shade {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(180deg, rgba(11, 23, 44, 0.1) 0%, rgba(11, 23, 44, 0.32) 42%, rgba(11, 23, 44, 0.9) 100%);
+      }
+      #screen-cpi-obs .cen-news-inner {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        padding: 16px;
+      }
+      #screen-cpi-obs .cen-news-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      #screen-cpi-obs .cen-news-badge {
+        font-size: var(--fs-micro);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        padding: 3px 9px;
+        border-radius: 100px;
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        backdrop-filter: blur(4px);
+      }
+      #screen-cpi-obs .cen-news-date {
+        font-size: var(--fs-2xs);
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.85);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      #screen-cpi-obs .cen-news-foot { display: flex; flex-direction: column; gap: 8px; }
+      #screen-cpi-obs .cen-news-title {
+        margin: 0;
+        font-size: var(--fs-lg);
+        font-weight: 700;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+      }
+      #screen-cpi-obs .cen-news-sum {
+        margin: 0;
+        font-size: var(--fs-xs);
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.86);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      #screen-cpi-obs .cen-news-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+      #screen-cpi-obs .cen-news-act {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font: inherit;
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 8px;
+        padding: 5px 9px;
+        transition: background 0.15s;
+      }
+      #screen-cpi-obs .cen-news-act:hover { background: rgba(255, 255, 255, 0.26); }
+      #screen-cpi-obs .cen-news-act i { font-size: var(--fs-md); }
+      #screen-cpi-obs .cen-news-more {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        color: #fff;
+        text-decoration: none;
+      }
+      #screen-cpi-obs .cen-news-more:hover { text-decoration: underline; }
+      #screen-cpi-obs .cen-news-more i { font-size: var(--fs-md); }
+      @media (max-width: 1080px) {
+        #screen-cpi-obs .cen-news-track .dg-slide { flex: 0 0 calc((100% - 14px) / 2); }
+      }
+      @media (max-width: 620px) {
+        #screen-cpi-obs .cen-news-track .dg-slide { flex: 0 0 100%; }
+        #screen-cpi-obs .cen-news-hdr { flex-direction: column; }
+      }
+
+      /* Carousel shell — .dg-carousel/.dg-track/.dg-slide/.home-carousel-*
+         (ported from LMO verbatim; not present in the shared cpi-obs.css). */
+      #screen-cpi-obs .dg-carousel { position: relative; }
+      #screen-cpi-obs .dg-track {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        padding: 2px 2px 4px;
+      }
+      #screen-cpi-obs .dg-track::-webkit-scrollbar { display: none; }
+      #screen-cpi-obs .dg-slide {
+        flex: 0 0 calc((100% - 14px) / 2);
+        box-sizing: border-box;
+        min-width: 0;
+      }
+      #screen-cpi-obs .dg-carousel-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 14px;
+      }
+      #screen-cpi-obs .dg-carousel-nav.is-single { display: none; }
+      #screen-cpi-obs .home-carousel-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text2);
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .home-carousel-arrow:hover:not(:disabled) {
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .home-carousel-arrow:disabled { opacity: 0.35; cursor: default; }
+      #screen-cpi-obs .home-carousel-arrow i { font-size: var(--fs-lg); }
+      #screen-cpi-obs .home-carousel-dots { display: flex; align-items: center; gap: 4px; }
+      #screen-cpi-obs .home-carousel-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 3px;
+        background: #d3dfec;
+        flex-shrink: 0;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+        transition: width 0.2s, background 0.2s;
+      }
+      #screen-cpi-obs .home-carousel-dot.active { width: 16px; background: var(--accent); }
+
+      /* Toast — minimal reuse of the app's notification tone for the
+         placeholder sidebar destinations (Diagnose/Forecast/Benchmark/Geo
+         View aren't built in this pass; see spec). */
+      #screen-cpi-obs .cen-toast {
+        position: fixed;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%) translateY(12px);
+        background: #0f172a;
+        color: #fff;
+        font-size: var(--fs-sm);
+        font-weight: 500;
+        padding: 10px 18px;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s, transform 0.2s;
+        z-index: 999;
+      }
+      #screen-cpi-obs .cen-toast.is-visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==================== SCREEN: CENSUS OBSERVATORY — INTERPRET (standalone) ==================== -->
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Census Observatory</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <div id="census-global-filter-mount"></div>
+            <aside class="sidebar" aria-label="Census Observatory views">
+              <button
+                type="button"
+                class="sidebar-item sidebar-item--ai"
+                onclick="openObsSidebarAI(this)"
+              >
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Census AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item active" href="CensusObservatory.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="census-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="census-population-projection.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+                <span class="sidebar-label">Forecast</span>
+              </a>
+              <a class="sidebar-item" href="census-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+              <a class="sidebar-item" href="census-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="census-geo.html">
+                <div class="sidebar-icon"><i class="ti ti-map-2"></i></div>
+                <span class="sidebar-label">Geo View</span>
+              </a>
+            </aside>
+          </div>
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <h1 class="topic-title">Overview</h1>
+                    <p class="topic-title-sub">Abu Dhabi · 2025 Census data</p>
+                  </div>
+                  <div class="cpi-hdr-actions">
+                    <button type="button" class="cpi-hdr-download" onclick="censusComingSoon('Download')">
+                      <i class="ti ti-download" aria-hidden="true"></i> Download
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cpi-obs-content">
+                <!-- ══════════════ 1. EXECUTIVE BRIEF ══════════════ -->
+                <div class="cpi-hero" id="exec-brief">
+                  <svg class="cpi-hero-skyline" viewBox="0 0 220 68" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
+                    <rect x="4" y="30" width="16" height="38" fill="currentColor" />
+                    <rect x="24" y="18" width="14" height="50" fill="currentColor" />
+                    <rect x="42" y="40" width="12" height="28" fill="currentColor" />
+                    <rect x="58" y="8" width="16" height="60" fill="currentColor" />
+                    <polygon points="66,8 66,0 68,8" fill="currentColor" />
+                    <rect x="78" y="26" width="14" height="42" fill="currentColor" />
+                    <rect x="96" y="36" width="12" height="32" fill="currentColor" />
+                    <circle cx="122" cy="52" r="16" fill="none" stroke="currentColor" stroke-width="2.5" />
+                    <rect x="140" y="20" width="14" height="48" fill="currentColor" />
+                    <rect x="158" y="34" width="12" height="34" fill="currentColor" />
+                    <rect x="174" y="12" width="16" height="56" fill="currentColor" />
+                    <rect x="194" y="30" width="14" height="38" fill="currentColor" />
+                  </svg>
+                  <div class="cpi-hero-topline">
+                    <div class="cpi-hero-inner" style="flex:1">
+                      <span class="cpi-hero-ico"><i class="ti ti-brain"></i></span>
+                      <div class="cpi-hero-text">
+                        <div class="cpi-hero-badge-row">
+                          <span class="cpi-hero-title">Executive Brief</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cpi-hero-meta">
+                      <div class="brief-speech" id="censusBriefSpeech">
+                        <button class="brief-listen" id="censusBriefListen" type="button" data-state="idle" aria-label="Listen to the Census brief" aria-pressed="false">
+                          <span class="brief-listen__icon" aria-hidden="true">
+                            <svg class="brief-listen__speaker" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                              <path d="M9 4L9 20" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M15 4L15 20" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M20 8L20 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M4 8L4 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <i class="ti ti-player-play brief-listen__play"></i>
+                            <i class="ti ti-player-pause brief-listen__pause"></i>
+                          </span>
+                          <span class="brief-listen__copy">
+                            <span class="brief-listen__wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                            <span class="brief-listen__text">Audio brief</span>
+                          </span>
+                        </button>
+                        <span class="brief-speech__actions" aria-label="Playback options">
+                          <button class="brief-audio-action" id="censusBriefRestart" type="button" aria-label="Restart Census brief" title="Restart">
+                            <i class="ti ti-refresh" aria-hidden="true"></i>
+                          </button>
+                          <button class="brief-audio-action brief-audio-action--stop" id="censusBriefStop" type="button" aria-label="Stop Census brief" title="Stop">
+                            <span class="brief-stop-box" aria-hidden="true"></span>
+                          </button>
+                        </span>
+                      </div>
+                      <div id="censusBriefSpeechStatus" role="status" aria-live="polite" class="visually-hidden"></div>
+                    </div>
+                  </div>
+                  <p class="cpi-hero-sub" id="censusHeroSub">
+                    Abu Dhabi's population reached 4.44 million in 2025, growing 7.4% year-on-year,
+                    with the employed population up 7.7% and housing units up 2.9%. Growth remains
+                    concentrated in Abu Dhabi Region, and the population skews heavily male
+                    (67.3%) — a pattern driven by the non-Emirati workforce.
+                  </p>
+                </div>
+
+                <!-- ══════════════ 2. CENSUS AT A GLANCE ══════════════ -->
+                <section id="glance">
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-chart-donut-3"></i>Census at a Glance</h2>
+                  </div>
+                  <div class="glance-grid">
+                    <div class="obs-card glance-card glance-card--pop">
+                      <img class="glance-card-art" src="assets/census-illustration-population.png" alt="Population illustration" />
+                      <div class="glance-card-hd"><span class="glance-card-ic"><i class="ti ti-users"></i></span><span class="kpi-label">Population</span></div>
+                      <div class="glance-card-value">4.44M <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>7.4% vs 2024</span></div>
+                      <div class="glance-value-label">Residents</div>
+                      <div class="glance-donut-row">
+                        <div class="glance-donut-col">
+                          <div class="glance-donut-col-label">Citizenship</div>
+                          <div class="glance-donut-wrap">
+                            <svg class="glance-donut" viewBox="0 0 42 42" role="img" aria-label="Emirati 18.4%, Non-Emirati 81.6%">
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#C5FBD8" stroke-width="5" />
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#16a34a" stroke-width="5" stroke-dasharray="18.4 81.6" stroke-dashoffset="25" />
+                            </svg>
+                            <span class="glance-donut-ic" aria-hidden="true" data-census-icon="popCitizenship"></span>
+                          </div>
+                          <div class="glance-donut-legend">
+                            <span><span class="glance-donut-dot glance-donut-dot--emirati"></span>Emirati<b>18.4%</b></span>
+                            <span><span class="glance-donut-dot glance-donut-dot--nonemirati"></span>Non-Emirati<b>81.6%</b></span>
+                          </div>
+                        </div>
+                        <div class="glance-donut-col-sep"></div>
+                        <div class="glance-donut-col">
+                          <div class="glance-donut-col-label">Gender</div>
+                          <div class="glance-donut-wrap">
+                            <svg class="glance-donut" viewBox="0 0 42 42" role="img" aria-label="Male 67.3%, Female 32.7%">
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#ec4899" stroke-width="5" />
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#0073F0" stroke-width="5" stroke-dasharray="67.3 32.7" stroke-dashoffset="25" />
+                            </svg>
+                            <span class="glance-donut-ic" aria-hidden="true" data-census-icon="popGender"></span>
+                          </div>
+                          <div class="glance-donut-legend">
+                            <span><span class="glance-donut-dot glance-donut-dot--male"></span>Male<b>67.3%</b></span>
+                            <span><span class="glance-donut-dot glance-donut-dot--female"></span>Female<b>32.7%</b></span>
+                          </div>
+                        </div>
+                      </div>
+                      <a class="glance-cta" href="census-interpret.html?domain=population">Explore Population <i class="ti ti-arrow-right"></i></a>
+                    </div>
+
+                    <div class="obs-card glance-card glance-card--labour">
+                      <img class="glance-card-art" src="assets/census-illustration-labour-force.png" alt="Labour Force illustration" />
+                      <div class="glance-card-hd"><span class="glance-card-ic"><i class="ti ti-briefcase"></i></span><span class="kpi-label">Labour Force</span></div>
+                      <div class="glance-card-value">2.98M <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>7.7% vs 2024</span></div>
+                      <div class="glance-value-label">Employed</div>
+                      <div class="glance-donut-row">
+                        <div class="glance-donut-col">
+                          <div class="glance-donut-col-label">Citizenship</div>
+                          <div class="glance-donut-wrap">
+                            <svg class="glance-donut" viewBox="0 0 42 42" role="img" aria-label="Emirati 11.2%, Non-Emirati 88.8%">
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#C5FBD8" stroke-width="5" />
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#16a34a" stroke-width="5" stroke-dasharray="11.2 88.8" stroke-dashoffset="25" />
+                            </svg>
+                            <span class="glance-donut-ic" aria-hidden="true" data-census-icon="labourCitizenship"></span>
+                          </div>
+                          <div class="glance-donut-legend">
+                            <span><span class="glance-donut-dot glance-donut-dot--emirati"></span>Emirati<b>11.2%</b></span>
+                            <span><span class="glance-donut-dot glance-donut-dot--nonemirati"></span>Non-Emirati<b>88.8%</b></span>
+                          </div>
+                        </div>
+                        <div class="glance-donut-col-sep"></div>
+                        <div class="glance-donut-col">
+                          <div class="glance-donut-col-label">Gender</div>
+                          <div class="glance-donut-wrap">
+                            <svg class="glance-donut" viewBox="0 0 42 42" role="img" aria-label="Male 78.2%, Female 21.8%">
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#ec4899" stroke-width="5" />
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#0073F0" stroke-width="5" stroke-dasharray="78.2 21.8" stroke-dashoffset="25" />
+                            </svg>
+                            <span class="glance-donut-ic" aria-hidden="true" data-census-icon="labourGender"></span>
+                          </div>
+                          <div class="glance-donut-legend">
+                            <span><span class="glance-donut-dot glance-donut-dot--male"></span>Male<b>78.2%</b></span>
+                            <span><span class="glance-donut-dot glance-donut-dot--female"></span>Female<b>21.8%</b></span>
+                          </div>
+                        </div>
+                      </div>
+                      <a class="glance-cta" href="census-interpret.html?domain=labour">Explore Labour Force <i class="ti ti-arrow-right"></i></a>
+                    </div>
+
+                    <div class="obs-card glance-card glance-card--re">
+                      <img class="glance-card-art" src="assets/census-illustration-realestate.png" alt="Real Estate illustration" />
+                      <div class="glance-card-hd"><span class="glance-card-ic"><i class="ti ti-building-community"></i></span><span class="kpi-label">Real Estate</span></div>
+                      <div class="glance-re-body">
+                        <div class="glance-re-vals">
+                          <div class="glance-re-val">
+                            <span class="glance-re-num">326.1K</span>
+                            <span class="glance-re-lbl">Buildings</span>
+                            <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>4.1% vs 2024</span>
+                          </div>
+                          <div class="glance-re-val">
+                            <span class="glance-re-num">899.6K</span>
+                            <span class="glance-re-lbl">Units</span>
+                            <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>2.9% vs 2024</span>
+                          </div>
+                        </div>
+                        <div class="glance-re-cols">
+                        <div class="glance-re-col">
+                          <div class="glance-re-bars-col">
+                            <div class="glance-block-label">Buildings by Use</div>
+                            <div class="glance-re-bar-row">
+                              <div class="glance-re-bar-label"><i class="ti ti-home"></i>Residential</div>
+                              <div class="glance-re-bar-line"><span class="glance-re-bar-track"><span class="glance-re-bar-fill" style="width:62.3%"></span></span><span class="glance-re-bar-pct">62.3%</span></div>
+                            </div>
+                            <div class="glance-re-bar-row">
+                              <div class="glance-re-bar-label"><i class="ti ti-category-2"></i>Other</div>
+                              <div class="glance-re-bar-line"><span class="glance-re-bar-track"><span class="glance-re-bar-fill" style="width:17.3%"></span></span><span class="glance-re-bar-pct">17.3%</span></div>
+                            </div>
+                            <div class="glance-re-bar-row">
+                              <div class="glance-re-bar-label"><i class="ti ti-building"></i>Commercial</div>
+                              <div class="glance-re-bar-line"><span class="glance-re-bar-track"><span class="glance-re-bar-fill" style="width:16.9%"></span></span><span class="glance-re-bar-pct">16.9%</span></div>
+                            </div>
+                            <div class="glance-re-bar-row">
+                              <div class="glance-re-bar-label"><i class="ti ti-layout-grid"></i>Multi-use</div>
+                              <div class="glance-re-bar-line"><span class="glance-re-bar-track"><span class="glance-re-bar-fill" style="width:3.5%"></span></span><span class="glance-re-bar-pct">3.5%</span></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="glance-donut-col-sep"></div>
+                        <div class="glance-re-col">
+                          <div class="glance-re-bars-col">
+                            <div class="glance-block-label">Units by Use</div>
+                            <div class="glance-re-bar-row">
+                              <div class="glance-re-bar-label"><i class="ti ti-home"></i>Residential</div>
+                              <div class="glance-re-bar-line"><span class="glance-re-bar-track"><span class="glance-re-bar-fill" style="width:58.0%"></span></span><span class="glance-re-bar-pct">58.0%</span></div>
+                            </div>
+                            <div class="glance-re-bar-row">
+                              <div class="glance-re-bar-label"><i class="ti ti-building"></i>Commercial</div>
+                              <div class="glance-re-bar-line"><span class="glance-re-bar-track"><span class="glance-re-bar-fill" style="width:31.3%"></span></span><span class="glance-re-bar-pct">31.3%</span></div>
+                            </div>
+                            <div class="glance-re-bar-row">
+                              <div class="glance-re-bar-label"><i class="ti ti-category-2"></i>Other</div>
+                              <div class="glance-re-bar-line"><span class="glance-re-bar-track"><span class="glance-re-bar-fill" style="width:10.7%"></span></span><span class="glance-re-bar-pct">10.7%</span></div>
+                            </div>
+                          </div>
+                        </div>
+                        </div>
+                      </div>
+                      <a class="glance-cta" href="census-interpret.html?domain=realestate">Explore Real Estate <i class="ti ti-arrow-right"></i></a>
+                    </div>
+                  </div>
+                  <div class="glance-shared-legend">
+                    <div class="glance-shared-legend-items">
+                      <span><span class="glance-donut-dot glance-donut-dot--emirati"></span>Emirati</span>
+                      <span><span class="glance-donut-dot glance-donut-dot--nonemirati"></span>Non-Emirati</span>
+                      <span><span class="glance-donut-dot glance-donut-dot--male"></span>Male</span>
+                      <span><span class="glance-donut-dot glance-donut-dot--female"></span>Female</span>
+                    </div>
+                    <span class="glance-shared-legend-note"><i class="ti ti-info-circle"></i>Percentages are rounded to one decimal place. Source: Abu Dhabi 2025 Census (Statistics Centre – Abu Dhabi).</span>
+                  </div>
+                </section>
+
+                <!-- ══════════════ POPULATION AND HOUSING BY REGION ══════════════
+                     Real Abu Dhabi Emirate coastline — projected from actual
+                     boundary coordinates already in this project
+                     (lmo/data/uae-emirates.geojson: the Abu Dhabi + Dubai
+                     MultiPolygon features, downsampled for a lightweight
+                     inline SVG), not an invented/abstract shape. The three
+                     regions are approximate vertical bands clipped to that
+                     real coastline (no sub-region-level boundary data exists
+                     anywhere in this project to draw precise internal
+                     borders), coloured with the official Design Guidelines'
+                     "Abu Dhabi Map" blue tokens. One .obs-card container,
+                     same pattern as Key Impacts. -->
+                <section>
+                  <div class="section-hdr-row">
+                    <div class="section-hdr">
+                      <h2 class="cpi-section-title"><i class="ti ti-map-2"></i>Regional Profile</h2>
+                    </div>
+                    <div class="cen-region-hdr-actions">
+                      <div class="cen-region-legend">
+                        <span><span class="cen-region-legend-dot" style="background:#0073F0"></span>Population</span>
+                        <span><span class="cen-region-legend-dot" style="background:#d97706"></span>Units</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="section-hdr-sub">Population, labour force and built environment by region</p>
+                  <div class="obs-card">
+                    <div class="cen-region-body">
+                      <div id="cenMapInterpret"></div>
+                      <div>
+                        <p class="cen-compare-title">Population, Labour Force, Buildings and Housing Units by Region</p>
+                        <table class="cen-compare-table">
+                          <colgroup>
+                            <col style="width:26%" />
+                            <col style="width:18.5%" />
+                            <col style="width:18.5%" />
+                            <col style="width:18.5%" />
+                            <col style="width:18.5%" />
+                          </colgroup>
+                          <thead><tr><th>Region</th><th>Population</th><th>Labour Force</th><th>Buildings</th><th>Units</th></tr></thead>
+                          <tbody id="cenRegionTableBody">
+                            <tr class="cen-compare-row--top">
+                              <td><span class="cen-compare-dot" style="background:#0073F0"></span>Abu Dhabi Region</td>
+                              <td class="cen-best">3,066,635 <span class="cen-compare-pct">(69.0%)</span></td>
+                              <td class="cen-best">2,047,185 <span class="cen-compare-pct">(68.8%)</span></td>
+                              <td class="cen-best">176,905 <span class="cen-compare-pct">(54.2%)</span></td>
+                              <td class="cen-best">624,455 <span class="cen-compare-pct">(69.4%)</span></td>
+                            </tr>
+                            <tr>
+                              <td><span class="cen-compare-dot" style="background:#1B4F9E"></span>Al Ain Region</td>
+                              <td>1,020,955 <span class="cen-compare-pct">(23.0%)</span></td>
+                              <td>661,245 <span class="cen-compare-pct">(22.2%)</span></td>
+                              <td>117,425 <span class="cen-compare-pct">(36.0%)</span></td>
+                              <td>207,205 <span class="cen-compare-pct">(23.0%)</span></td>
+                            </tr>
+                            <tr>
+                              <td><span class="cen-compare-dot" style="background:#5B9BD5"></span>Al Dhafra Region</td>
+                              <td>353,960 <span class="cen-compare-pct">(8.0%)</span></td>
+                              <td>268,090 <span class="cen-compare-pct">(9.0%)</span></td>
+                              <td>31,805 <span class="cen-compare-pct">(9.8%)</span></td>
+                              <td>67,910 <span class="cen-compare-pct">(7.5%)</span></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <p class="cd-insight"><i class="ti ti-bulb"></i><span>Abu Dhabi Region accounts for roughly seven in ten residents, jobs, and housing units across the Emirate (69.0% population, 68.8% labour force, 69.4% units) — despite holding just 54.2% of buildings, pointing to denser, more multi-unit housing stock than Al Ain or Al Dhafra.</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════ NOTABLE: EMIRATI JOBSEEKERS ══════════════
+                     The only unemployment-adjacent figure in the dataset —
+                     an executive insight section (two cards: hero
+                     figure+gender, regional bars) plus a full-width AI
+                     insight panel, not a full domain grid, per its scope
+                     relative to Population/Labour/Real Estate.
+
+                     .jobseekers-illustration is a reserved, currently-empty
+                     slot for a provided image asset (not an icon or a
+                     generated illustration) — see project notes for the
+                     pending file. Add <img src="assets/<file>" alt=""> as
+                     its only child once the asset is in place; nothing else
+                     needs to change. ── -->
+                <section id="jobseekers">
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-users"></i>Emirati Jobseekers</h2>
+                  </div>
+                  <p class="section-hdr-sub">Emirati jobseekers by gender and region, 2025</p>
+                  <div class="jobseekers-grid-v2">
+                    <div class="obs-card jobseekers-col-main">
+                      <div class="glance-card-hd"><span class="glance-card-ic"><i class="ti ti-users"></i></span><span class="kpi-label">Total Emirati Jobseekers</span></div>
+                      <div class="jobseekers-illustration" aria-hidden="true"></div>
+                      <div class="jobseekers-main-row">
+                      <div class="jobseekers-value-lg"><span class="jobseekers-value-num">15,855</span><span>Emirati jobseekers</span></div>
+                      <span class="jobseekers-main-sep" aria-hidden="true"></span>
+                      <div class="jobseekers-gender-viz">
+                        <div class="glance-donut-wrap glance-donut-wrap--lg">
+                          <svg class="glance-donut" viewBox="0 0 42 42" role="img" aria-label="Female 71%, Male 29%">
+                            <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#0073F0" stroke-width="6" />
+                            <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#ec4899" stroke-width="6" stroke-dasharray="71 29" stroke-dashoffset="25" />
+                          </svg>
+                          <span class="glance-donut-ic" aria-hidden="true" data-census-icon="labourGender"></span>
+                        </div>
+                        <div class="jobseekers-gender-stats">
+                          <div class="jobseekers-gender-stat">
+                            <span class="jobseekers-gender-stat-lbl"><span class="glance-donut-dot glance-donut-dot--female"></span>Female</span>
+                            <div class="jobseekers-gender-stat-pct">71%</div>
+                            <div class="jobseekers-gender-stat-count">11,220</div>
+                          </div>
+                          <div class="jobseekers-gender-stat">
+                            <span class="jobseekers-gender-stat-lbl"><span class="glance-donut-dot glance-donut-dot--male"></span>Male</span>
+                            <div class="jobseekers-gender-stat-pct">29%</div>
+                            <div class="jobseekers-gender-stat-count">4,635</div>
+                          </div>
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+                    <div class="obs-card jobseekers-col-region">
+                      <div class="glance-card-hd"><span class="glance-card-ic"><i class="ti ti-map-pin"></i></span><span class="kpi-label">Emirati Jobseekers by Region</span></div>
+                      <div class="jobseekers-region-row">
+                        <span class="jobseekers-region-label">Abu Dhabi Region</span>
+                        <span class="jobseekers-region-track"><span class="jobseekers-region-fill" style="width:100%"></span></span>
+                        <span><span class="jobseekers-region-val">8,110</span><span class="jobseekers-region-pct">(51.2%)</span></span>
+                      </div>
+                      <div class="jobseekers-region-row">
+                        <span class="jobseekers-region-label">Al Ain Region</span>
+                        <span class="jobseekers-region-track"><span class="jobseekers-region-fill" style="width:85.6%"></span></span>
+                        <span><span class="jobseekers-region-val">6,940</span><span class="jobseekers-region-pct">(43.8%)</span></span>
+                      </div>
+                      <div class="jobseekers-region-row">
+                        <span class="jobseekers-region-label">Al Dhafra Region</span>
+                        <span class="jobseekers-region-track"><span class="jobseekers-region-fill" style="width:9.9%"></span></span>
+                        <span><span class="jobseekers-region-val">805</span><span class="jobseekers-region-pct">(5.1%)</span></span>
+                      </div>
+                      <a class="glance-cta" href="census-interpret.html?domain=labour">Explore Labour Force <i class="ti ti-arrow-right"></i></a>
+                    </div>
+                  </div>
+                  <p class="cd-insight"><i class="ti ti-bulb"></i><span>Emirati jobseekers are <b>71% female</b> — the opposite gender skew from the population and labour force overall (both majority-male). This points to a distinct Emiratisation and female-workforce-participation opportunity, separate from the broader labour market story.</span></p>
+                </section>
+
+                <!-- Census equivalent of CPI Interpret's methodology notice,
+                     placed the same way: between Overview and the driver
+                     cards. ── -->
+                <div class="cpi-notice" style="margin:0 0 24px">
+                  <i class="ti ti-alert-triangle"></i>
+                  <div class="cpi-notice-text">Census 2025 figures are preliminary and subject to revision by the Statistics Centre – Abu Dhabi.</div>
+                </div>
+
+                <!-- ══════════════ KEY INSIGHTS ══════════════
+                     CPI Interpret's "Key Impacts" visual treatment (single
+                     card, vertical icon+text list) — every row is
+                     traceable to a confirmed figure in
+                     docs/census-data-reference.md. Answers "why do these
+                     numbers matter?", not "what are the numbers?" (that's
+                     Census at a Glance, above). Placed directly before News
+                     so readers see the takeaways before moving on. -->
+                <section id="key-impacts">
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-bulb"></i>Key Insights</h2>
+                  </div>
+                  <p class="section-hdr-sub">What do these Census findings mean?</p>
+                  <div class="obs-card impacts-list">
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--up"><i class="ti ti-trending-up"></i></div>
+                      <div>Abu Dhabi's population reached <span class="impact-val impact-val--up">4.44M</span> in 2025, growing <span class="impact-val impact-val--up">7.4%</span> year-on-year and skewing <span class="impact-val impact-val--up">67.3%</span> male — a pattern driven almost entirely by the non-Emirati group, while the Emirati population is close to balanced (50.1%/49.9%)</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--up"><i class="ti ti-briefcase"></i></div>
+                      <div>Employment reached <span class="impact-val impact-val--up">2.98M</span>, increasing <span class="impact-val impact-val--up">7.7%</span>, with white-collar employment growing faster than blue-collar employment — a sign of strong labour force growth</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--neutral"><i class="ti ti-building-community"></i></div>
+                      <div>The Emirate recorded <span class="impact-val impact-val--neutral">326,130</span> buildings and <span class="impact-val impact-val--neutral">899,575</span> units in 2025, with residential units accounting for <span class="impact-val impact-val--neutral">58.0%</span> — housing supply continues to expand</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--neutral"><i class="ti ti-map-pin"></i></div>
+                      <div>Abu Dhabi Region accounts for <span class="impact-val impact-val--neutral">69%</span> of the population and approximately <span class="impact-val impact-val--neutral">69.4%</span> of housing units — population and housing remain concentrated in the region</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--up"><i class="ti ti-user-search"></i></div>
+                      <div><span class="impact-val impact-val--up">71%</span> of Emirati jobseekers are female, contrasting with the overall male-skewed population and labour force — a distinctive gender pattern among Emirati jobseekers</div>
+                    </div>
+                  </div>
+                  <div class="ai-footnote">
+                    <span class="ai-pill"><i class="ti ti-sparkles"></i>AI-generated</span>
+                    <span>Generated from confirmed Census 2025 figures.</span>
+                  </div>
+                </section>
+
+                <!-- ══════════════ NEWS ══════════════
+                     Ported from LaborMarketObservatory.html's News carousel
+                     (same .dg-carousel component, same three stock images) —
+                     every topic screen carries one. -->
+                <section id="cen-news">
+                  <div class="dg-carousel cen-news-carousel">
+                    <div class="cen-news-hdr">
+                      <div>
+                        <div class="section-hdr"><h2 class="cpi-section-title"><i class="ti ti-rss"></i>News</h2></div>
+                        <p class="section-hdr-sub" style="margin-bottom:0">Authoritative news and statistical briefings to support data-driven decisions across Abu Dhabi's population, workforce and built environment.</p>
+                      </div>
+                    </div>
+                    <div class="dg-track cen-news-track">
+                      <div class="obs-card dg-slide cen-news-card">
+                        <div class="cen-news-media" style="background-image:url('assets/News 1.jpg')" role="img" aria-label="Corporate office towers in Abu Dhabi"></div>
+                        <div class="cen-news-shade"></div>
+                        <div class="cen-news-inner">
+                          <div class="cen-news-top">
+                            <span class="cen-news-badge">POPULATION</span>
+                            <span class="cen-news-date">Jul 28 2026</span>
+                          </div>
+                          <div class="cen-news-foot">
+                            <h3 class="cen-news-title">Abu Dhabi's Population Passes 4.4 Million in 2025 Census</h3>
+                            <p class="cen-news-sum">Abu Dhabi's population reached 4.44 million in 2025, growing 7.4% on 2024, with Emiratis now accounting for 18.4% of residents…</p>
+                            <div class="cen-news-actions">
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('AI Summarize')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('Listen')"><i class="ti ti-volume"></i> Listen</button>
+                              <a class="cen-news-more" href="#" onclick="censusComingSoon('Read more'); return false;">Read more <i class="ti ti-arrow-right"></i></a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="obs-card dg-slide cen-news-card">
+                        <div class="cen-news-media" style="background-image:url('assets/News 2.avif')" role="img" aria-label="Professional woman working in a modern office"></div>
+                        <div class="cen-news-shade"></div>
+                        <div class="cen-news-inner">
+                          <div class="cen-news-top">
+                            <span class="cen-news-badge">LABOUR FORCE</span>
+                            <span class="cen-news-date">Jul 28 2026</span>
+                          </div>
+                          <div class="cen-news-foot">
+                            <h3 class="cen-news-title">Emirati Jobseekers Are Overwhelmingly Female, Census Shows</h3>
+                            <p class="cen-news-sum">71% of Abu Dhabi's 15,855 registered Emirati jobseekers are women — the reverse of the labour force's overall 78/22 male-skew…</p>
+                            <div class="cen-news-actions">
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('AI Summarize')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('Listen')"><i class="ti ti-volume"></i> Listen</button>
+                              <a class="cen-news-more" href="#" onclick="censusComingSoon('Read more'); return false;">Read more <i class="ti ti-arrow-right"></i></a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="obs-card dg-slide cen-news-card">
+                        <div class="cen-news-media" style="background-image:url('assets/News 3.jpg')" role="img" aria-label="Young professionals collaborating in a workplace"></div>
+                        <div class="cen-news-shade"></div>
+                        <div class="cen-news-inner">
+                          <div class="cen-news-top">
+                            <span class="cen-news-badge">REAL ESTATE</span>
+                            <span class="cen-news-date">Jul 28 2026</span>
+                          </div>
+                          <div class="cen-news-foot">
+                            <h3 class="cen-news-title">Abu Dhabi Region Dominates Real Estate, Census Confirms</h3>
+                            <p class="cen-news-sum">Housing units grew 2.9% year-on-year to 899,575, with 9 of the 10 largest districts by building count located in Abu Dhabi Region…</p>
+                            <div class="cen-news-actions">
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('AI Summarize')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('Listen')"><i class="ti ti-volume"></i> Listen</button>
+                              <a class="cen-news-more" href="#" onclick="censusComingSoon('Read more'); return false;">Read more <i class="ti ti-arrow-right"></i></a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="obs-card dg-slide cen-news-card">
+                        <div class="cen-news-media" style="background-image:url('assets/story-3.jpg')" role="img" aria-label="Aerial view of Abu Dhabi coastline and skyline"></div>
+                        <div class="cen-news-shade"></div>
+                        <div class="cen-news-inner">
+                          <div class="cen-news-top">
+                            <span class="cen-news-badge">LABOUR FORCE</span>
+                            <span class="cen-news-date">Jul 28 2026</span>
+                          </div>
+                          <div class="cen-news-foot">
+                            <h3 class="cen-news-title">Skilled Employment Growth Outpaces Blue-Collar Jobs</h3>
+                            <p class="cen-news-sum">White-collar employment grew 9.2% year-on-year, ahead of blue-collar's 6.6%, as Abu Dhabi's employed population reached 2.98 million…</p>
+                            <div class="cen-news-actions">
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('AI Summarize')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('Listen')"><i class="ti ti-volume"></i> Listen</button>
+                              <a class="cen-news-more" href="#" onclick="censusComingSoon('Read more'); return false;">Read more <i class="ti ti-arrow-right"></i></a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="obs-card dg-slide cen-news-card">
+                        <div class="cen-news-media" style="background-image:url('assets/story-4.jpg')" role="img" aria-label="Abu Dhabi residential district"></div>
+                        <div class="cen-news-shade"></div>
+                        <div class="cen-news-inner">
+                          <div class="cen-news-top">
+                            <span class="cen-news-badge">POPULATION</span>
+                            <span class="cen-news-date">Jul 28 2026</span>
+                          </div>
+                          <div class="cen-news-foot">
+                            <h3 class="cen-news-title">Non-Emirati Residents Drive Abu Dhabi's Gender Balance</h3>
+                            <p class="cen-news-sum">Abu Dhabi's population is 67.3% male overall, but the Emirati population alone is close to balanced at 50.1% male — the skew traces to the non-Emirati group…</p>
+                            <div class="cen-news-actions">
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('AI Summarize')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                              <button type="button" class="cen-news-act" onclick="censusComingSoon('Listen')"><i class="ti ti-volume"></i> Listen</button>
+                              <a class="cen-news-more" href="#" onclick="censusComingSoon('Read more'); return false;">Read more <i class="ti ti-arrow-right"></i></a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="dg-carousel-nav home-carousel-nav">
+                      <button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+                      <div class="home-carousel-dots"></div>
+                      <button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </main>
+
+            <!-- ════════════════════════════════════════════════
+                 CENSUS AI PANEL — right-side drawer, opened from the
+                 "Census AI" sidebar item. Mirrors index.html's
+                 #bayaan-ai-panel (same id/classes so the shared
+                 .obs-ai-split / .ai-panel rules in style.css apply
+                 with zero extra CSS), scoped down to a self-contained
+                 canned-reply version since this page is a standalone
+                 prototype with no shared BAI_CONTEXTS data layer.
+                 ════════════════════════════════════════════════ -->
+            <aside id="bayaan-ai-panel" class="ai-panel" role="complementary" aria-label="Bayaan AI Panel">
+              <div class="bai-header">
+                <div class="bai-header-left">
+                  <img class="bai-icon-wrap" src="assets/ai-chat-thumb.svg" alt="Bayaan AI" width="38" height="38">
+                  <div><div class="bai-header-title">Bayaan AI</div></div>
+                </div>
+                <div class="bai-header-right">
+                  <button class="bai-close-btn" type="button" onclick="closeBayaanAIPanel()" title="Close AI Panel"><i class="ti ti-x"></i></button>
+                </div>
+              </div>
+              <div class="bai-context-strip">
+                <span class="bai-ctx-label">Analysing</span>
+                <span class="bai-ctx-pill" id="bai-context-pill"><i class="ti ti-sparkles"></i><span id="bai-context-name">Census Observatory</span></span>
+                <span class="bai-ctx-dot"></span>
+                <span class="bai-ctx-dot-label">Generating</span>
+              </div>
+              <div class="bai-messages" id="bai-messages-container"></div>
+              <div class="bai-input-area">
+                <div class="bai-input-row">
+                  <textarea class="bai-input" id="bai-user-input" placeholder="Ask about Census data…" rows="2" onkeydown="baiHandleKeydown(event)"></textarea>
+                  <button class="bai-send-btn" type="button" onclick="baiSendFollowup()" title="Send"><i class="ti ti-send"></i></button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+        <div data-bayaan-footer></div>
+      </div>
+      <div class="cen-toast" id="censusToast"></div>
+    </div>
+
+    <script>
+      /* ============================================================
+         Standalone stubs — this page is intentionally isolated and
+         does NOT link back into the main application, matching the
+         convention used by CPI.html / observe.html.
+         ============================================================ */
+      function goTo() {}
+      function openGeoView(e) { if (e) e.preventDefault(); }
+      function openBayaanSpace(e) { if (e) e.preventDefault(); }
+      function openProducts(e) { if (e) e.preventDefault(); }
+      function openObservatories(e) { if (e) e.preventDefault(); }
+      function openWsDrp() {}
+      function onHeaderSearchClick() {}
+      function toast() {}
+
+      /* Placeholder destinations for this pass (Diagnose / Forecast /
+         Benchmark / Geo View / Census AI aren't built yet — see the
+         Census Observatory build plan). A quick toast beats a dead link. */
+      let censusToastTimer = null;
+      function censusComingSoon(label) {
+        const el = document.getElementById("censusToast");
+        if (!el) return;
+        el.textContent = label + " is coming soon.";
+        el.classList.add("is-visible");
+        clearTimeout(censusToastTimer);
+        censusToastTimer = setTimeout(() => el.classList.remove("is-visible"), 2200);
+      }
+
+      /* ============================================================
+         CENSUS AI PANEL — right-side drawer opened from the sidebar's
+         "Census AI" item. Self-contained (canned replies keyed off
+         keywords in the question) since this standalone page has no
+         access to index.html's shared BAI_CONTEXTS data layer; markup/
+         classes match #bayaan-ai-panel there so style.css's existing
+         .obs-ai-split / .ai-panel rules apply unchanged.
+         ============================================================ */
+      let censusAiHistory = [];
+
+      function openObsSidebarAI(el) {
+        /* Census AI is an overlay trigger, not a nav destination — leave
+           the other sidebar items' active/current-page state untouched. */
+        const panel = document.getElementById("bayaan-ai-panel");
+        const container = document.getElementById("bai-messages-container");
+        if (!panel || !container) return;
+
+        censusAiHistory = [];
+        container.innerHTML = "";
+        panel.classList.add("open");
+
+        const typingEl = censusAiTypingIndicator();
+        container.appendChild(typingEl);
+        censusAiScrollToBottom();
+
+        setTimeout(() => {
+          typingEl.remove();
+          censusAiAppendReply(
+            "Abu Dhabi's 2025 Census shows population at 3.79M (+3.4% YoY), with continued Emirati/non-Emirati composition shifts and a rising median age. Ask me about specific emirates, nationality mix, age structure, or what's changed since the last release.",
+            ["What changed this quarter?", "Break down by nationality", "Compare to GCC peers"]
+          );
+        }, 1000);
+      }
+
+      function closeBayaanAIPanel() {
+        const panel = document.getElementById("bayaan-ai-panel");
+        if (panel) panel.classList.remove("open");
+      }
+
+      function baiHandleKeydown(e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          baiSendFollowup();
+        }
+      }
+
+      function baiSendFollowup() {
+        const inp = document.getElementById("bai-user-input");
+        if (!inp) return;
+        const text = inp.value.trim();
+        if (!text) return;
+        inp.value = "";
+        censusAiAppendUserMessage(text);
+        censusAiGenerateReply(text);
+      }
+
+      function censusAiAppendUserMessage(text) {
+        const container = document.getElementById("bai-messages-container");
+        if (!container) return;
+        const el = document.createElement("div");
+        el.className = "bai-msg";
+        el.innerHTML = `
+    <div style="display:flex;justify-content:flex-end">
+      <div style="max-width:82%;background:#EFF6FF;border:1px solid #DBEAFE;border-radius:10px 10px 2px 10px;padding:10px 14px;font-size: var(--fs-sm);color:#0F172A;line-height:1.55;">
+        ${censusAiEscapeHTML(text)}
+      </div>
+    </div>`;
+        container.appendChild(el);
+        censusAiScrollToBottom();
+        censusAiHistory.push({ role: "user", text });
+      }
+
+      function censusAiGenerateReply(question) {
+        const container = document.getElementById("bai-messages-container");
+        if (!container) return;
+        const typingEl = censusAiTypingIndicator();
+        container.appendChild(typingEl);
+        censusAiScrollToBottom();
+
+        setTimeout(() => {
+          typingEl.remove();
+          const q = question.toLowerCase();
+          let text, followups;
+          if (q.includes("nationality") || q.includes("emirati") || q.includes("breakdown")) {
+            text = "Emiratis make up 19.1% of Abu Dhabi's population, with the remaining 80.9% non-Emirati — led by South Asian (41%) and other Arab (18%) nationality groups. The Emirati share has held broadly flat over the last three census cycles.";
+            followups = ["Show age structure by nationality", "Which emirate has the highest Emirati share?", "How has this changed since 2011?"];
+          } else if (q.includes("gcc") || q.includes("compare") || q.includes("peer")) {
+            text = "Against GCC peers, Abu Dhabi's population growth rate (+3.4% YoY) tracks close to Dubai's but ahead of Riyadh and Doha on the latest available comparable releases. Non-national share remains among the highest in the region, consistent with the broader GCC labour-migration pattern.";
+            followups = ["View GCC comparison chart", "What drives Dubai's growth?", "Show historical trend"];
+          } else if (q.includes("age") || q.includes("median")) {
+            text = "The median age in Abu Dhabi has risen to 32.4 years, up from 31.6 in the prior release, reflecting a maturing non-Emirati resident base alongside a still-young Emirati population pyramid.";
+            followups = ["Compare Emirati vs non-Emirati age pyramid", "What's the youth dependency ratio?", "Show working-age population share"];
+          } else if (q.includes("change") || q.includes("quarter") || q.includes("latest")) {
+            text = "Since the last release, total population grew +3.4% YoY to 3.79M, median age ticked up to 32.4 years, and Abu Dhabi City retained its position as the largest population centre. Al Dhafra recorded the fastest relative growth among the three regions.";
+            followups = ["Break down by nationality", "Which region grew fastest?", "What should policymakers watch?"];
+          } else {
+            text = `Bayaan AI is cross-referencing your question — <em>"${censusAiEscapeHTML(question)}"</em> — against the 2025 Census dataset. This indicator warrants continued monitoring; would you like a structured summary or a comparison against related metrics?`;
+            followups = ["Generate summary report", "Compare related metrics", "Break down by nationality"];
+          }
+          censusAiAppendReply(text, followups);
+        }, 900 + Math.random() * 500);
+      }
+
+      function censusAiAppendReply(text, followups) {
+        const container = document.getElementById("bai-messages-container");
+        if (!container) return;
+        const el = document.createElement("div");
+        el.className = "bai-msg bai-msg-ai";
+        const followupHTML = followups && followups.length
+          ? `<div class="bai-followup-section" style="margin-top:10px">
+      <div class="bai-followup-label">Ask a follow-up</div>
+      <div class="bai-chips-wrap">${followups.map((f) => `<button class="bai-followup-chip" onclick="censusAiHandleChip(this)"><i class="ti ti-arrow-narrow-right"></i>${f}</button>`).join("")}</div>
+    </div>`
+          : "";
+        el.innerHTML = `
+    <div class="bai-role-row">
+      <img class="bai-ai-avatar" src="assets/ai-chat-thumb.svg" alt="Bayaan AI" width="24" height="24" />
+      <span class="bai-role-name">Bayaan AI</span>
+      <span class="bai-role-time">${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+    </div>
+    <p class="bai-msg-text">${text}</p>
+    ${followupHTML}`;
+        container.appendChild(el);
+        censusAiScrollToBottom();
+        censusAiHistory.push({ role: "assistant", text });
+      }
+
+      function censusAiHandleChip(btn) {
+        const question = btn.textContent.trim();
+        const section = btn.closest(".bai-followup-section");
+        if (section) section.remove();
+        censusAiAppendUserMessage(question);
+        censusAiGenerateReply(question);
+      }
+
+      function censusAiTypingIndicator() {
+        const el = document.createElement("div");
+        el.className = "bai-msg bai-msg-ai";
+        el.innerHTML = `
+    <div class="bai-role-row">
+      <img class="bai-ai-avatar" src="assets/ai-chat-thumb.svg" alt="Bayaan AI" width="24" height="24" />
+      <span class="bai-role-name">Bayaan AI</span>
+    </div>
+    <div class="bai-typing">
+      <div class="bai-typing-dot"></div>
+      <div class="bai-typing-dot"></div>
+      <div class="bai-typing-dot"></div>
+    </div>`;
+        return el;
+      }
+
+      function censusAiScrollToBottom() {
+        const c = document.getElementById("bai-messages-container");
+        if (c) c.scrollTop = c.scrollHeight;
+      }
+
+      function censusAiEscapeHTML(str) {
+        return String(str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      /* ============================================================
+         AUDIO BRIEF — ported from CPI.html's initCpiBriefSpeech(),
+         renamed to the Census ids above. Narrates the hero headline +
+         summary via the Web Speech API: idle → speaking → paused.
+         ============================================================ */
+      function initCensusBriefSpeech() {
+        const button = document.getElementById("censusBriefListen");
+        const controls = document.getElementById("censusBriefSpeech");
+        const restartButton = document.getElementById("censusBriefRestart");
+        const stopButton = document.getElementById("censusBriefStop");
+        const status = document.getElementById("censusBriefSpeechStatus");
+        if (!button || !controls) return;
+
+        const label = button.querySelector(".brief-listen__text");
+        if (!("speechSynthesis" in window)) {
+          controls.hidden = true;
+          return;
+        }
+        const synth = window.speechSynthesis;
+        let utterance = null;
+        let state = "idle";
+
+        const setState = (next) => {
+          state = next;
+          button.dataset.state = next;
+          controls.classList.toggle("is-active", next !== "idle");
+          button.setAttribute("aria-pressed", String(next === "speaking"));
+          button.setAttribute(
+            "aria-label",
+            next === "speaking"
+              ? "Pause brief"
+              : next === "paused"
+                ? "Resume brief"
+                : "Listen to the Census brief"
+          );
+          if (label) {
+            label.textContent =
+              next === "speaking" ? "Pause" : next === "paused" ? "Resume" : "Audio brief";
+          }
+          if (status) {
+            status.textContent =
+              next === "speaking"
+                ? "Census brief is playing"
+                : next === "paused"
+                  ? "Census brief paused"
+                  : "Census brief stopped";
+          }
+        };
+
+        const getBriefText = () => {
+          const hero = button.closest(".cpi-hero");
+          const title = (hero.querySelector(".cpi-hero-title") || {}).textContent || "";
+          const sub = (hero.querySelector(".cpi-hero-sub") || {}).textContent || "";
+          return `${title.trim()}. ${sub.trim()}`;
+        };
+
+        const start = () => {
+          synth.cancel();
+          utterance = new SpeechSynthesisUtterance(getBriefText());
+          utterance.lang = "en-GB";
+          utterance.rate = 0.94;
+          utterance.pitch = 1;
+          utterance.onstart = () => setState("speaking");
+          utterance.onend = () => setState("idle");
+          utterance.onerror = (event) => {
+            if (event.error !== "canceled" && event.error !== "interrupted" && status) {
+              status.textContent = "Unable to play the Census brief";
+            }
+            setState("idle");
+          };
+          synth.speak(utterance);
+        };
+
+        button.addEventListener("click", () => {
+          if (state === "speaking") {
+            synth.pause();
+            setState("paused");
+          } else if (state === "paused") {
+            synth.resume();
+            setState("speaking");
+          } else {
+            start();
+          }
+        });
+
+        if (restartButton) restartButton.addEventListener("click", start);
+        if (stopButton) {
+          stopButton.addEventListener("click", () => {
+            synth.cancel();
+            setState("idle");
+          });
+        }
+        window.addEventListener("beforeunload", () => synth.cancel());
+      }
+
+      /* ── Boot ── */
+      /* ── News carousel — ported from LaborMarketObservatory.html's
+         initDgCarousel() verbatim: arrows + dots paging over a native
+         horizontal scroll track. ── */
+      function initDgCarousel(carousel) {
+        const track = carousel.querySelector(".dg-track");
+        const nav = carousel.querySelector(".dg-carousel-nav");
+        if (!track || !nav) return;
+        const dotsWrap = nav.querySelector(".home-carousel-dots");
+        const arrows = nav.querySelectorAll(".home-carousel-arrow");
+        if (!dotsWrap || arrows.length < 2) return;
+
+        const cards = () => [...track.children];
+        const gap = () => {
+          const s = getComputedStyle(track);
+          return parseFloat(s.columnGap || s.gap) || 14;
+        };
+        const step = () => {
+          const first = cards()[0];
+          return first ? first.offsetWidth + gap() : track.clientWidth;
+        };
+        const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
+        const pageCount = () => {
+          const ms = maxScroll();
+          if (ms <= 2) return 1;
+          return Math.ceil(ms / step()) + 1;
+        };
+        const currentPage = () => {
+          const s = step();
+          return s <= 0 ? 0 : Math.round(track.scrollLeft / s);
+        };
+
+        function sync() {
+          const pages = pageCount();
+          const page = Math.min(currentPage(), pages - 1);
+          nav.classList.toggle("is-single", pages <= 1);
+          const dots = dotsWrap.querySelectorAll(".home-carousel-dot");
+          if (dots.length !== pages) {
+            dotsWrap.innerHTML = Array.from({ length: pages }, (_, i) =>
+              `<button type="button" class="home-carousel-dot${i === page ? " active" : ""}" aria-label="Go to page ${i + 1}"></button>`
+            ).join("");
+            dotsWrap.querySelectorAll(".home-carousel-dot").forEach((dot, i) =>
+              dot.addEventListener("click", () => goTo(i))
+            );
+          } else {
+            dots.forEach((dot, i) => dot.classList.toggle("active", i === page));
+          }
+          const ms = maxScroll();
+          arrows[0].disabled = track.scrollLeft <= 2;
+          arrows[1].disabled = ms <= 2 || track.scrollLeft >= ms - 2;
+        }
+
+        function goTo(i) {
+          const pages = pageCount();
+          const page = Math.max(0, Math.min(i, pages - 1));
+          track.scrollTo({ left: Math.min(page * step(), maxScroll()), behavior: "smooth" });
+          requestAnimationFrame(sync);
+        }
+
+        arrows[0].addEventListener("click", () => goTo(currentPage() - 1));
+        arrows[1].addEventListener("click", () => goTo(currentPage() + 1));
+        let tick = 0;
+        track.addEventListener("scroll", () => {
+          if (tick) return;
+          tick = requestAnimationFrame(() => { tick = 0; sync(); });
+        }, { passive: true });
+
+        carousel._sync = sync;
+        sync();
+      }
+
+      /* ============================================================
+         REGIONAL PROFILE FILTER
+         Region/Citizenship/Gender pill filter for the table above, same
+         interaction pattern as the LMO floating filter panel
+         (lmo/lmo-sidenav.js's .lsb-fp-* component — ported as page-local
+         markup/CSS/JS here since this page doesn't share LMO's sidebar
+         shell that component is mounted into).
+
+         Population and Labour Force values are the confirmed region ×
+         citizenship × gender breakdowns from docs/census-data-reference.md
+         §1.3 and §2.4 (both checksum-verified in that doc — every
+         region+citizenship cell sums to its row/column total). Buildings
+         and Housing Units have no citizenship/gender split anywhere in
+         the Census dataset, so their values/percentages are fixed and
+         only the Region filter (row visibility) applies to them.
+         ============================================================ */
+      const CEN_REGIONS = ["Abu Dhabi Region", "Al Ain Region", "Al Dhafra Region"];
+      const CEN_REGION_DOT = { "Abu Dhabi Region": "#0073F0", "Al Ain Region": "#1B4F9E", "Al Dhafra Region": "#5B9BD5" };
+
+      const CEN_REGION_POPULATION = {
+        "Abu Dhabi Region": { All: { All: 3066635, Male: 2060355, Female: 1006285 }, Emirati: { All: 502635, Male: 252455, Female: 250180 }, "Non-Emirati": { All: 2564000, Male: 1807900, Female: 756105 } },
+        "Al Ain Region": { All: { All: 1020955, Male: 640385, Female: 380570 }, Emirati: { All: 272610, Male: 134210, Female: 138405 }, "Non-Emirati": { All: 748345, Male: 506180, Female: 242165 } },
+        "Al Dhafra Region": { All: { All: 353960, Male: 288210, Female: 65750 }, Emirati: { All: 41890, Male: 22795, Female: 19095 }, "Non-Emirati": { All: 312070, Male: 265415, Female: 46655 } },
+      };
+      const CEN_EMIRATE_POPULATION = { All: { All: 4441550, Male: 2988950, Female: 1452600 }, Emirati: { All: 817135, Male: 409460, Female: 407675 }, "Non-Emirati": { All: 3624415, Male: 2579490, Female: 1044925 } };
+
+      const CEN_REGION_LABOUR = {
+        "Abu Dhabi Region": { All: { All: 2047185, Male: 1605275, Female: 441910 }, Emirati: { All: 203850, Male: 114205, Female: 89645 }, "Non-Emirati": { All: 1843335, Male: 1491070, Female: 352265 } },
+        "Al Ain Region": { All: { All: 661245, Male: 479630, Female: 181615 }, Emirati: { All: 110525, Male: 63235, Female: 47290 }, "Non-Emirati": { All: 550720, Male: 416395, Female: 134325 } },
+        "Al Dhafra Region": { All: { All: 268090, Male: 242115, Female: 25975 }, Emirati: { All: 17860, Male: 11315, Female: 6545 }, "Non-Emirati": { All: 250230, Male: 230800, Female: 19430 } },
+      };
+      const CEN_EMIRATE_LABOUR = { All: { All: 2976520, Male: 2327020, Female: 649500 }, Emirati: { All: 332235, Male: 188755, Female: 143480 }, "Non-Emirati": { All: 2644285, Male: 2138265, Female: 506020 } };
+
+      /* Fixed — no citizenship/gender breakdown exists for these. */
+      const CEN_REGION_BUILDINGS = { "Abu Dhabi Region": 176905, "Al Ain Region": 117425, "Al Dhafra Region": 31805 };
+      const CEN_REGION_BUILDINGS_PCT = { "Abu Dhabi Region": "54.2", "Al Ain Region": "36.0", "Al Dhafra Region": "9.8" };
+      const CEN_REGION_HOUSING = { "Abu Dhabi Region": 624455, "Al Ain Region": 207205, "Al Dhafra Region": 67910 };
+      const CEN_REGION_HOUSING_PCT = { "Abu Dhabi Region": "69.4", "Al Ain Region": "23.0", "Al Dhafra Region": "7.5" };
+
+      const CEN_FILTER_SECTIONS = [
+        { id: "emirate", label: "Emirate", icon: "ti-map-pin", options: ["Abu Dhabi"] },
+        { id: "region", label: "Region", icon: "ti-map-2", options: ["All", "Abu Dhabi Region", "Al Ain Region", "Al Dhafra Region"] },
+        { id: "citizenship", label: "Citizenship", icon: "ti-world", options: ["All", "Emirati", "Non-Emirati"] },
+        { id: "gender", label: "Gender", icon: "ti-gender-bigender", options: ["All", "Male", "Female"] },
+      ];
+      const CEN_FILTER_DEFAULTS = { emirate: "Abu Dhabi", region: "All", citizenship: "All", gender: "All" };
+      let cenRegionFilter = { ...CEN_FILTER_DEFAULTS };
+      let cenRegionFilterOpen = false;
+
+      function cenRegionCountApplied() {
+        let n = 0;
+        if (cenRegionFilter.region !== "All") n++;
+        if (cenRegionFilter.citizenship !== "All") n++;
+        if (cenRegionFilter.gender !== "All") n++;
+        return n;
+      }
+
+      function cenRegionFilterPanelBody() {
+        return CEN_FILTER_SECTIONS.map((section) => {
+          const isEmirate = section.id === "emirate";
+          const pills = section.options
+            .map((opt) => {
+              const active = cenRegionFilter[section.id] === opt;
+              return `<button type="button" class="cen-fp-pill${active ? " act" : ""}" data-cen-fp-section="${section.id}" data-cen-fp-value="${opt}"${isEmirate ? " disabled" : ""}><span>${opt}</span></button>`;
+            })
+            .join("");
+          return `<div class="cen-fp-section">
+            <div class="cen-fp-section-hd"><i class="ti ${section.icon}"></i><span>${section.label}</span></div>
+            <div class="cen-fp-pills">${pills}</div>
+          </div>`;
+        }).join("");
+      }
+
+      function cenRegionSyncFilterUI() {
+        const n = cenRegionCountApplied();
+        const badge = document.getElementById("cenRegionFilterBadge");
+        const toggle = document.getElementById("cenRegionFilterToggle");
+        const panel = document.getElementById("cenRegionFilterPanel");
+        const countEl = document.getElementById("cenRegionFilterCount");
+        const resetBtn = document.getElementById("cenRegionFilterReset");
+        const body = document.getElementById("cenRegionFilterBody");
+        if (!toggle) return;
+
+        body.innerHTML = cenRegionFilterPanelBody();
+        badge.hidden = n === 0;
+        badge.textContent = String(n);
+        toggle.classList.toggle("is-active", cenRegionFilterOpen || n > 0);
+        toggle.setAttribute("aria-expanded", cenRegionFilterOpen ? "true" : "false");
+        panel.classList.toggle("open", cenRegionFilterOpen);
+        panel.setAttribute("aria-hidden", cenRegionFilterOpen ? "false" : "true");
+        countEl.hidden = n === 0;
+        countEl.textContent = n === 1 ? "1 filter applied" : n + " filters applied";
+        resetBtn.disabled = n === 0;
+      }
+
+      function cenRegionToggleFilter(open) {
+        cenRegionFilterOpen = typeof open === "boolean" ? open : !cenRegionFilterOpen;
+        cenRegionSyncFilterUI();
+      }
+
+      function cenRegionResetFilter() {
+        cenRegionFilter = { ...CEN_FILTER_DEFAULTS };
+        cenRegionSyncFilterUI();
+        cenRegionRenderTable();
+      }
+
+      function cenRegionSetFilter(sectionId, value) {
+        if (sectionId === "emirate") return;
+        cenRegionFilter[sectionId] = value;
+        cenRegionSyncFilterUI();
+        cenRegionRenderTable();
+      }
+
+      document.addEventListener("click", function (e) {
+        const wrap = document.getElementById("cenRegionFilterWrap");
+        if (!wrap) return;
+        if (wrap.contains(e.target)) {
+          const pill = e.target.closest("[data-cen-fp-section]");
+          if (pill && !pill.disabled) cenRegionSetFilter(pill.dataset.cenFpSection, pill.dataset.cenFpValue);
+          return;
+        }
+        if (cenRegionFilterOpen) cenRegionToggleFilter(false);
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && cenRegionFilterOpen) cenRegionToggleFilter(false);
+      });
+
+      function cenRegionPct(value, total) {
+        return (value / total * 100).toFixed(1);
+      }
+
+      function cenRegionRenderTable() {
+        const tbody = document.getElementById("cenRegionTableBody");
+        if (!tbody) return;
+        const { region, citizenship, gender } = cenRegionFilter;
+        const regions = region === "All" ? CEN_REGIONS : [region];
+
+        const popTotal = CEN_EMIRATE_POPULATION[citizenship][gender];
+        const lfTotal = CEN_EMIRATE_LABOUR[citizenship][gender];
+
+        // Keeps the bold "top" row meaningful even when Region narrows to
+        // a single row (that row trivially becomes "top" of what's shown).
+        let topRegion = regions[0];
+        regions.forEach((r) => {
+          if (CEN_REGION_POPULATION[r][citizenship][gender] > CEN_REGION_POPULATION[topRegion][citizenship][gender]) topRegion = r;
+        });
+
+        tbody.innerHTML = regions
+          .map((r) => {
+            const pop = CEN_REGION_POPULATION[r][citizenship][gender];
+            const lf = CEN_REGION_LABOUR[r][citizenship][gender];
+            const bld = CEN_REGION_BUILDINGS[r];
+            const hou = CEN_REGION_HOUSING[r];
+            const isTop = r === topRegion;
+            const cellCls = isTop ? ' class="cen-best"' : "";
+            return `<tr${isTop ? ' class="cen-compare-row--top"' : ""}>
+              <td><span class="cen-compare-dot" style="background:${CEN_REGION_DOT[r]}"></span>${r}</td>
+              <td${cellCls}>${pop.toLocaleString("en-US")} <span class="cen-compare-pct">(${cenRegionPct(pop, popTotal)}%)</span></td>
+              <td${cellCls}>${lf.toLocaleString("en-US")} <span class="cen-compare-pct">(${cenRegionPct(lf, lfTotal)}%)</span></td>
+              <td${cellCls}>${bld.toLocaleString("en-US")} <span class="cen-compare-pct">(${CEN_REGION_BUILDINGS_PCT[r]}%)</span></td>
+              <td${cellCls}>${hou.toLocaleString("en-US")} <span class="cen-compare-pct">(${CEN_REGION_HOUSING_PCT[r]}%)</span></td>
+            </tr>`;
+          })
+          .join("");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+        if (window.CensusGlobalFilter) CensusGlobalFilter.mount();
+        initCensusBriefSpeech();
+        document.querySelectorAll(".dg-carousel").forEach(initDgCarousel);
+
+        if (window.renderCensusDonutIcons) renderCensusDonutIcons();
+        cenRegionSyncFilterUI();
+        cenRegionRenderTable();
+
+        if (window.renderCensusRegionMap) {
+          renderCensusRegionMap(document.getElementById("cenMapInterpret"), {
+            uid: "interpret",
+            abudhabi: '<div class="cen-map-callout-pct"><span class="cen-pop">69%</span><span class="cen-sep">|</span><span class="cen-housing">69.4%</span></div><div class="cen-map-callout-name">Abu Dhabi Region</div>',
+            alain: '<div class="cen-map-callout-pct"><span class="cen-pop">23%</span><span class="cen-sep">|</span><span class="cen-housing">23.0%</span></div><div class="cen-map-callout-name">Al Ain Region</div>',
+            aldhafra: '<div class="cen-map-callout-pct"><span class="cen-pop">8%</span><span class="cen-sep">|</span><span class="cen-housing">7.5%</span></div><div class="cen-map-callout-name">Al Dhafra Region</div>',
+            tooltip: {
+              abudhabi: "Abu Dhabi Region\nPopulation: 3,066,635 (69.0%)\nLabour Force: 2,047,185 (68.8%)\nBuildings: 176,905 (54.2%)\nUnits: 624,455 (69.4%)",
+              alain: "Al Ain Region\nPopulation: 1,020,955 (23.0%)\nLabour Force: 661,245 (22.2%)\nBuildings: 117,425 (36.0%)\nUnits: 207,205 (23.0%)",
+              aldhafra: "Al Dhafra Region\nPopulation: 353,960 (8.0%)\nLabour Force: 268,090 (9.0%)\nBuildings: 31,805 (9.8%)\nUnits: 67,910 (7.5%)",
+            },
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

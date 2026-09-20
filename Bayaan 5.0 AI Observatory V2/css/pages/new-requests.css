@@ -1,0 +1,1288 @@
+/* ══════════════════════════════════════════════════════════════
+   NEW REQUESTS — approval workspace for submitted artifacts
+   ──────────────────────────────────────────────────────────────
+   Layout glue only. Cards, pills, buttons, steppers, comment
+   bubbles, empty states and status blocks are the existing
+   components from ai.css / style.css — this file positions them
+   and adds the status colour modifiers.
+   Scope: body.mode-ai #tv-requests
+   ══════════════════════════════════════════════════════════════ */
+
+body.mode-ai #tv-requests.active {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Left rail item ─────────────────────────────────────────── */
+
+body.mode-ai .sb-item--requests span {
+  text-align: center;
+}
+
+body.mode-ai .sb-item--requests .nav-notif-badge {
+  top: 6px;
+  right: 8px;
+}
+
+/* ══ QUEUE ══════════════════════════════════════════════════ */
+
+body.mode-ai #reqQueue {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body.mode-ai #reqQueue.is-hidden,
+body.mode-ai #reqReview.is-hidden {
+  display: none;
+}
+
+/* .req-inner mirrors .art-inner (32px 40px, own scroll) */
+body.mode-ai .req-inner {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px;
+}
+
+/* Toolbar — filter pills left, sort control right */
+body.mode-ai .req-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+body.mode-ai .req-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+/* .req-filter inherits every visual from .art-filter (ai.css) —
+   see the selector additions there. Only the count is new. */
+body.mode-ai .req-filter {
+  display: inline-flex;
+  align-items: center;
+}
+
+body.mode-ai .req-filter-count {
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+body.mode-ai .req-filter.active .req-filter-count {
+  opacity: 0.8;
+}
+
+/* Sort — reuses .prod-filter-dd from style.css, just sized down */
+body.mode-ai .req-sort .prod-filter-dd-trigger {
+  height: 32px;
+  min-width: 158px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: none;
+  border-color: var(--border-md);
+  color: var(--text-secondary);
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+body.mode-ai .req-sort .prod-filter-dd-trigger i {
+  font-size: 14px;
+}
+
+body.mode-ai .req-sort .prod-filter-dd-option {
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+body.mode-ai .req-sort .prod-filter-dd-option.is-active {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ── Request card — extends .art-card ───────────────────────── */
+
+body.mode-ai .req-card .art-name {
+  margin-bottom: 10px;
+}
+
+body.mode-ai .req-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Same divider idiom as .req-rail-divider, scoped to the card body
+   between the submitter row and the status row. */
+body.mode-ai .req-card-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 0;
+}
+
+body.mode-ai .req-age {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+body.mode-ai .req-age i {
+  font-size: 12px;
+}
+
+body.mode-ai .req-age--overdue {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+body.mode-ai .req-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+body.mode-ai .req-meta-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+body.mode-ai .req-meta-sep {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+body.mode-ai .req-meta-type {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  text-transform: capitalize;
+}
+
+/* Initials avatar — same treatment as .nav-avatar, sized for cards */
+body.mode-ai .req-av {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--avatar-bg, #d3dfec);
+  color: var(--avatar-text, #05264a);
+  font-weight: 600;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  font-size: 8.5px;
+  letter-spacing: 0.01em;
+}
+
+body.mode-ai .req-av--md {
+  width: 32px;
+  height: 32px;
+  font-size: 11px;
+}
+
+body.mode-ai .req-av--sm {
+  width: 24px;
+  height: 24px;
+  font-size: 9.5px;
+}
+
+body.mode-ai .req-av-stack {
+  display: inline-flex;
+  align-items: center;
+}
+
+body.mode-ai .req-av-stack .req-av {
+  margin-right: -6px;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+body.mode-ai .req-av-more {
+  margin-left: 12px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+/* Card footer — tags, then the review action on its own row so the
+   primary action always has room at four columns. */
+body.mode-ai .req-card .art-card-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  margin-top: 14px;
+  padding-top: 12px;
+}
+
+body.mode-ai .req-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* Card leaving the queue after a decision */
+body.mode-ai .req-card--leaving {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.24s ease, transform 0.24s ease;
+  pointer-events: none;
+}
+
+/* ── Status chips — modifiers on the existing .art-tag--status ─
+   Colours match the .gd-action-status--* family in style.css.
+   Shared by the New Requests grid and the Artifacts grid
+   (index.html buildArtGridCardHTML / ART_STATUS). */
+
+body.mode-ai .art-tag--status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+body.mode-ai .art-tag--status i {
+  font-size: 12px;
+  line-height: 1;
+}
+
+body.mode-ai .req-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+body.mode-ai .art-tag--blue {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+body.mode-ai .art-tag--amber {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+body.mode-ai .art-tag--orange {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fdba74;
+}
+
+body.mode-ai .art-tag--green {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+body.mode-ai .art-tag--red {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+body.mode-ai .art-tag--gray {
+  background: var(--surface2, #f3f4f6);
+  color: var(--text-secondary);
+  border-color: var(--border-md);
+}
+
+/* ── Skeleton — same formula as .hw-gen-sk-card ─────────────── */
+
+body.mode-ai .req-sk-card {
+  height: 186px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: linear-gradient(
+    110deg,
+    var(--surface2, #f1f5f9) 25%,
+    var(--bg, #e9eef5) 37%,
+    var(--surface2, #f1f5f9) 63%
+  );
+  background-size: 200% 100%;
+  animation: reqShimmer 1.4s ease infinite;
+  opacity: 0.55;
+}
+
+@keyframes reqShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Empty state reuses .search-empty-state wholesale; it is
+   display:none until .visible, and spans the grid. */
+body.mode-ai #tv-requests .search-empty-state {
+  padding: 48px 28px 54px;
+}
+
+/* ══ REVIEW ═════════════════════════════════════════════════ */
+
+body.mode-ai .req-review {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: reqViewIn 0.3s ease;
+}
+
+@keyframes reqViewIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.mode-ai .req-review-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 40px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+body.mode-ai .req-back {
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+body.mode-ai .req-crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  min-width: 0;
+}
+
+body.mode-ai .req-crumb i {
+  font-size: 13px;
+}
+
+body.mode-ai .req-crumb strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+body.mode-ai .req-review-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 40px 32px;
+}
+
+body.mode-ai .req-review-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Panels reuse the .art-card surface treatment */
+body.mode-ai .req-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.04);
+  padding: 20px 22px;
+}
+
+body.mode-ai .req-main .req-panel + .req-panel {
+  margin-top: 14px;
+}
+
+body.mode-ai .req-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+}
+
+/* Artifact identity header */
+body.mode-ai .req-detail-hd {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+body.mode-ai .req-detail-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+body.mode-ai .req-detail-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+
+body.mode-ai .req-detail-tagline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+body.mode-ai .req-summary {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+}
+
+/* Preview */
+body.mode-ai .req-preview {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  padding: 16px;
+}
+
+body.mode-ai .req-preview-canvas-wrap {
+  position: relative;
+  height: 240px;
+}
+
+body.mode-ai .req-preview-note {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+body.mode-ai .req-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+body.mode-ai .req-preview-table th {
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  padding: 0 10px 8px;
+  border-bottom: 1px solid var(--border-md);
+}
+
+body.mode-ai .req-preview-table td {
+  padding: 9px 10px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+body.mode-ai .req-preview-table tr:last-child td {
+  border-bottom: none;
+}
+
+body.mode-ai .req-preview-table td:first-child {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+body.mode-ai .req-preview-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+body.mode-ai .req-preview-text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+body.mode-ai .req-preview-text p + p {
+  margin-top: 10px;
+}
+
+/* Metadata grid */
+body.mode-ai .req-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px 20px;
+}
+
+body.mode-ai .req-meta-k {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+body.mode-ai .req-meta-v {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Rail sections */
+body.mode-ai .req-rail-h {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+body.mode-ai .req-rail-count {
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0;
+}
+
+body.mode-ai .req-assign-line {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+body.mode-ai .req-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+body.mode-ai .req-person-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+body.mode-ai .req-person-sub {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+body.mode-ai .req-rail-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+body.mode-ai .req-shared-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Comments — .msg / .bubble primitives, scoped tighter for the rail */
+body.mode-ai .req-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 14px;
+}
+
+body.mode-ai .req-thread::-webkit-scrollbar {
+  width: 3px;
+}
+
+body.mode-ai .req-thread::-webkit-scrollbar-thumb {
+  background: var(--border-md);
+  border-radius: 3px;
+}
+
+body.mode-ai .req-thread .msg {
+  display: flex;
+  gap: 8px;
+}
+
+body.mode-ai .req-thread .msg.user {
+  justify-content: flex-end;
+}
+
+body.mode-ai .req-thread .msg-body {
+  max-width: 240px;
+  min-width: 0;
+}
+
+body.mode-ai .req-thread .bubble {
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+body.mode-ai .req-thread .msg.ai .bubble {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-top-left-radius: 4px;
+}
+
+body.mode-ai .req-thread .msg.user .bubble {
+  background: var(--accent);
+  color: #fff;
+  border-top-right-radius: 4px;
+}
+
+body.mode-ai .req-msg-meta {
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+body.mode-ai .msg.user .req-msg-meta {
+  text-align: right;
+}
+
+body.mode-ai .req-thread-item {
+  animation: reqViewIn 0.3s ease;
+}
+
+/* Status events inside the thread reuse .gd-action-status */
+body.mode-ai .req-thread .gd-action-status {
+  margin-top: 0;
+}
+
+body.mode-ai #tv-requests .gd-action-status {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f9fafb;
+  border-left: 3px solid #d1d5db;
+}
+
+body.mode-ai #tv-requests .gd-action-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+body.mode-ai #tv-requests .gd-action-status-msg {
+  display: block;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+body.mode-ai #tv-requests .gd-action-status--comment {
+  background: #eff6ff;
+  border-left-color: #3b82f6;
+}
+body.mode-ai #tv-requests .gd-action-status--comment .gd-action-status-pill {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+body.mode-ai #tv-requests .gd-action-status--rejected {
+  background: #fef2f2;
+  border-left-color: #ef4444;
+}
+body.mode-ai #tv-requests .gd-action-status--rejected .gd-action-status-pill {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+body.mode-ai #tv-requests .gd-action-status--approval {
+  background: #fffbeb;
+  border-left-color: #f59e0b;
+}
+body.mode-ai #tv-requests .gd-action-status--approval .gd-action-status-pill {
+  background: #fef3c7;
+  color: #b45309;
+}
+body.mode-ai #tv-requests .gd-action-status--changes {
+  background: #fff7ed;
+  border-left-color: #f97316;
+}
+body.mode-ai #tv-requests .gd-action-status--changes .gd-action-status-pill {
+  background: #ffedd5;
+  color: #c2410c;
+}
+body.mode-ai #tv-requests .gd-action-status--approved {
+  background: #ecfdf5;
+  border-left-color: #10b981;
+}
+body.mode-ai #tv-requests .gd-action-status--approved .gd-action-status-pill {
+  background: #d1fae5;
+  color: #047857;
+}
+
+/* Comment composer */
+body.mode-ai .req-composer textarea {
+  width: 100%;
+  min-height: 68px;
+  resize: vertical;
+  padding: 9px 12px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--r-md);
+  font-size: 12.5px;
+  font-family: var(--font);
+  line-height: 1.55;
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+body.mode-ai .req-composer textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring, rgba(37, 99, 235, 0.12));
+}
+
+body.mode-ai .req-composer textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+body.mode-ai .req-composer textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg);
+}
+
+body.mode-ai .req-composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Activity stepper reuses .at-* from ai.css; it needs no chrome here */
+body.mode-ai .req-rail .at-card {
+  max-width: 100%;
+  margin-top: 0;
+  border: none;
+}
+
+body.mode-ai .req-rail .at-steps {
+  padding: 0;
+}
+
+/* ── Action bar ─────────────────────────────────────────────── */
+
+body.mode-ai .req-actionbar {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.04);
+}
+
+body.mode-ai .req-actionbar-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  min-width: 0;
+  transition: opacity 0.2s ease;
+}
+
+body.mode-ai .req-actionbar-note i {
+  font-size: 15px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+body.mode-ai .req-actionbar-note--ok i {
+  color: var(--success);
+}
+
+body.mode-ai .req-actionbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+body.mode-ai .req-actionbar .ag-btn {
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+body.mode-ai .req-actionbar .ag-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+body.mode-ai .req-spin {
+  display: inline-block;
+  animation: reqSpin 0.75s linear infinite;
+}
+
+@keyframes reqSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Inline retry bar on a failed action */
+body.mode-ai .req-error-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 40px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border-left: 3px solid #ef4444;
+  font-size: 12.5px;
+  color: #b91c1c;
+  animation: reqViewIn 0.25s ease;
+}
+
+body.mode-ai .req-error-bar i {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+body.mode-ai .req-error-bar .ag-btn {
+  margin-left: auto;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+/* ── Reason modal (reuses .modal-overlay / .modal) ──────────── */
+
+body.mode-ai #reqReasonModal .modal {
+  width: 480px;
+  max-width: 95vw;
+}
+
+body.mode-ai #reqReasonModal textarea {
+  width: 100%;
+  min-height: 104px;
+  resize: vertical;
+  padding: 10px 13px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-family: var(--font);
+  line-height: 1.6;
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+body.mode-ai #reqReasonModal textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring, rgba(37, 99, 235, 0.12));
+}
+
+body.mode-ai .req-modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 26px 22px;
+}
+
+body.mode-ai .req-modal-foot .ag-btn {
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+body.mode-ai .req-modal-foot .ag-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+body.mode-ai .req-modal-target {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  margin-bottom: 16px;
+}
+
+body.mode-ai .req-modal-target-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.mode-ai .req-modal-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 7px;
+  display: block;
+}
+
+/* ── Assign-to-someone-else modal (reuses .modal-overlay / .modal,
+   .req-modal-target / .req-modal-label / .req-modal-foot above) ── */
+
+body.mode-ai #reqAssignModal .modal {
+  width: 420px;
+  max-width: 95vw;
+}
+
+body.mode-ai .req-assign-search-wrap {
+  width: 100%;
+  max-width: none;
+  margin-bottom: 12px;
+}
+
+body.mode-ai .req-assign-results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 236px;
+  overflow-y: auto;
+}
+
+body.mode-ai .req-assign-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 9px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+body.mode-ai .req-assign-result:hover {
+  background: var(--surface2, #f3f4f6);
+}
+
+body.mode-ai .req-assign-result.is-active {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+body.mode-ai .req-assign-result-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.mode-ai .req-assign-result > i {
+  font-size: 15px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+body.mode-ai .req-assign-empty {
+  padding: 16px 4px;
+  font-size: 12.5px;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 1180px) {
+  body.mode-ai .req-review-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mode-ai .req-rail {
+    position: static;
+  }
+  body.mode-ai .req-thread .msg-body {
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 760px) {
+  body.mode-ai .req-inner,
+  body.mode-ai .req-review-body {
+    padding: 24px 20px;
+  }
+  body.mode-ai .req-review-top,
+  body.mode-ai .req-actionbar {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  body.mode-ai .req-error-bar {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+  body.mode-ai .req-actionbar-actions {
+    width: 100%;
+  }
+  body.mode-ai .req-actionbar-actions .ag-btn:last-child {
+    margin-left: auto;
+  }
+  body.mode-ai .req-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  body.mode-ai .req-sort,
+  body.mode-ai .req-sort .prod-filter-dd-trigger {
+    width: 100%;
+  }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  body.mode-ai .req-review,
+  body.mode-ai .req-thread-item,
+  body.mode-ai .req-error-bar,
+  body.mode-ai .req-sk-card {
+    animation: none;
+  }
+  body.mode-ai .req-spin {
+    animation-duration: 2s;
+  }
+  body.mode-ai .req-card--leaving {
+    transition: none;
+  }
+}
+
+/* ── Dark theme ─────────────────────────────────────────────── */
+
+[data-theme="dark"] body.mode-ai .req-panel {
+  background: var(--surface2, #1a2740);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+[data-theme="dark"] body.mode-ai .req-preview,
+[data-theme="dark"] body.mode-ai .req-modal-target {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] body.mode-ai .req-actionbar {
+  background: var(--surface);
+  box-shadow: none;
+}
+
+[data-theme="dark"] body.mode-ai .req-sk-card {
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.07) 37%,
+    rgba(255, 255, 255, 0.03) 63%
+  );
+  background-size: 200% 100%;
+}
+
+[data-theme="dark"] body.mode-ai .req-av {
+  background: var(--avatar-bg, #1a2438);
+  color: var(--avatar-text, #e8edf5);
+}
+
+[data-theme="dark"] body.mode-ai .art-tag--blue {
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.35);
+}
+[data-theme="dark"] body.mode-ai .art-tag--amber {
+  background: rgba(251, 191, 36, 0.14);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.3);
+}
+[data-theme="dark"] body.mode-ai .art-tag--gray {
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-color: var(--border-md);
+}
+[data-theme="dark"] body.mode-ai .art-tag--orange {
+  background: rgba(249, 115, 22, 0.15);
+  color: #fdba74;
+  border-color: rgba(249, 115, 22, 0.32);
+}
+[data-theme="dark"] body.mode-ai .art-tag--green {
+  background: rgba(52, 211, 153, 0.14);
+  color: #6ee7b7;
+  border-color: rgba(52, 211, 153, 0.32);
+}
+[data-theme="dark"] body.mode-ai .art-tag--red {
+  background: rgba(248, 113, 113, 0.14);
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.32);
+}
+
+[data-theme="dark"] body.mode-ai #tv-requests .gd-action-status {
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: var(--border-md);
+}
+[data-theme="dark"] body.mode-ai #tv-requests .gd-action-status-msg {
+  color: var(--text-secondary);
+}
+[data-theme="dark"] body.mode-ai #tv-requests .gd-action-status--comment {
+  background: rgba(59, 130, 246, 0.12);
+  border-left-color: #3b82f6;
+}
+[data-theme="dark"]
+  body.mode-ai
+  #tv-requests
+  .gd-action-status--comment
+  .gd-action-status-pill {
+  background: rgba(59, 130, 246, 0.22);
+  color: #93c5fd;
+}
+[data-theme="dark"] body.mode-ai #tv-requests .gd-action-status--rejected {
+  background: rgba(248, 113, 113, 0.12);
+  border-left-color: #ef4444;
+}
+[data-theme="dark"]
+  body.mode-ai
+  #tv-requests
+  .gd-action-status--rejected
+  .gd-action-status-pill {
+  background: rgba(248, 113, 113, 0.22);
+  color: #fca5a5;
+}
+[data-theme="dark"] body.mode-ai #tv-requests .gd-action-status--approval {
+  background: rgba(251, 191, 36, 0.12);
+  border-left-color: #f59e0b;
+}
+[data-theme="dark"]
+  body.mode-ai
+  #tv-requests
+  .gd-action-status--approval
+  .gd-action-status-pill {
+  background: rgba(251, 191, 36, 0.22);
+  color: #fbbf24;
+}
+[data-theme="dark"] body.mode-ai #tv-requests .gd-action-status--changes {
+  background: rgba(249, 115, 22, 0.12);
+  border-left-color: #f97316;
+}
+[data-theme="dark"]
+  body.mode-ai
+  #tv-requests
+  .gd-action-status--changes
+  .gd-action-status-pill {
+  background: rgba(249, 115, 22, 0.22);
+  color: #fdba74;
+}
+[data-theme="dark"] body.mode-ai #tv-requests .gd-action-status--approved {
+  background: rgba(52, 211, 153, 0.12);
+  border-left-color: #10b981;
+}
+[data-theme="dark"]
+  body.mode-ai
+  #tv-requests
+  .gd-action-status--approved
+  .gd-action-status-pill {
+  background: rgba(52, 211, 153, 0.22);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] body.mode-ai .req-error-bar {
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] body.mode-ai #tv-requests .product-cat-tag {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] body.mode-ai .req-sort .prod-filter-dd-trigger {
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-color: var(--border-md);
+}
+
+[data-theme="dark"] body.mode-ai .req-sort .prod-filter-dd-menu {
+  background: var(--surface);
+  border-color: var(--border-md);
+}
+
+[data-theme="dark"] body.mode-ai .req-sort .prod-filter-dd-option {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] body.mode-ai #tv-requests .search-empty-state {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: var(--border-md);
+  box-shadow: none;
+}
+
+[data-theme="dark"] body.mode-ai #tv-requests .search-empty-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] body.mode-ai #tv-requests .search-empty-text {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] body.mode-ai #tv-requests .search-empty-icon {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent);
+  box-shadow: none;
+}
+
+[data-theme="dark"] body.mode-ai #tv-requests .search-empty-clear {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent-mid);
+}

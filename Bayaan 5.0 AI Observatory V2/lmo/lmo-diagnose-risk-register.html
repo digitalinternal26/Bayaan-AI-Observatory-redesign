@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labour Market Observatory — Diagnose · Bayaan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../css/pages/lmo-common.css">
+<link rel="stylesheet" href="../style.css" />
+<link rel="stylesheet" href="../css/theme.css" />
+<script>
+  (function () {
+    var t = localStorage.getItem("bayaan-theme") || "light";
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  })();
+</script>
+<script src="../js/theme.js"></script>
+<script src="../js/header.js"></script>
+<script src="../js/lmo-chrome.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-diagnose.css">
+<script src="lmo-sidenav.js"></script>
+<script src="lmo-shared.js"></script>
+</head>
+<body class="lmo lmo--diagnose" data-lmo-active="diagnose" data-lmo-ai-onclick="openChat('What are the highest-probability workforce risks and recommended interventions?','Diagnose Overview')">
+
+<div id="screen-lmo-obs" class="ws-screen header-flush">
+<div data-bayaan-header></div>
+
+<div id="lmo-sidenav-mount"></div>
+
+<div class="app-shell">
+<div class="wrap">
+<div class="page">
+
+  <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+    <a href="#" data-lmo-bc="home">Home</a>
+    <span class="ind-bc-sep">›</span>
+    <a href="#" data-lmo-bc="observatory">Observatory</a>
+    <span class="ind-bc-sep">›</span>
+    <span class="ind-bc-current">Labour Market Observatory</span>
+  </nav>
+
+  <div class="ph">
+    <div class="ph-l">
+      <h1 class="ph-title">Diagnose</h1>
+      <div class="ph-meta">Workforce risk register · Emiratisation velocity · Q2 2025</div>
+    </div>
+    <div class="ph-r">
+      <button class="btn btn-ghost" type="button"><i class="ti ti-download" aria-hidden="true"></i> Export register</button>
+    </div>
+  </div>
+
+  <div class="sum-box">
+    <div class="sum-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Diagnostic summary</div>
+    <p class="sum-text">Three active risks on the register — one <strong>high</strong> (AI skills gap) and two <strong>medium</strong> (Emiratisation non-compliance, youth NEET). Overall Emiratisation at <strong>12.8%</strong> is on pace for the Q3 13.5% target, but construction (2.1%) and retail (8.3%) remain materially below sector thresholds.</p>
+  </div>
+
+  <div class="split2">
+    <div class="split2-col">
+      <div class="sec-hd"><div class="sec-title">Workforce Risk Register</div><a class="sec-link" href="#">Full register <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a></div>
+      <div class="risk-stack" id="rgrid"></div>
+    </div>
+    <div class="split2-col">
+      <div class="sec-hd"><div class="sec-title">Emiratisation Velocity</div><a class="sec-link" href="#">Full tracker <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a></div>
+      <div class="ev-card" onclick="openChat('Emiratisation velocity Q3 target achievability and sector breakdown','Emiratisation Velocity')">
+        <div class="ev-hd">
+          <div>
+            <div class="ev-title">Overall Rate: <span style="color:var(--ac)">12.8%</span></div>
+            <div class="ev-meta">Target 13.5% by Q3 2025 · 0.7pp gap · +0.2pp/qtr pace</div>
+          </div>
+          <div class="card-hd-tags">
+            <span class="tag b" style="font-size:10.5px">On Pace ✓</span>
+            <button type="button" class="ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="event.stopPropagation();openChat('Emiratisation velocity Q3 target achievability and sector breakdown','Emiratisation Velocity')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="ev-chart-body">
+          <div class="ev-sector-hd">Sector Breakdown vs 13.5% Target</div>
+          <div class="ev-sector-bars" id="ev-sector-bars"></div>
+          <div class="ev-legend" id="ev-legend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<aside class="cpanel ai-panel" id="cpanel" role="complementary" aria-label="Bayaan AI Panel">
+  <div class="bai-header">
+    <div class="bai-header-left">
+      <img class="bai-icon-wrap" src="../assets/ai-chat-thumb.svg" alt="Bayaan AI" width="38" height="38">
+      <div><div class="bai-header-title">Bayaan AI</div></div>
+    </div>
+    <div class="bai-header-right">
+      <button class="bai-close-btn" type="button" onclick="closeChat()" title="Close AI Panel"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+  <div class="bai-context-strip">
+    <span class="bai-ctx-label">Analysing</span>
+    <span class="bai-ctx-pill" id="ctx-val">Diagnose</span>
+    <span class="bai-ctx-dot"></span>
+    <span class="bai-ctx-dot-label">Generating</span>
+  </div>
+  <div class="bai-messages msgs" id="msgs"></div>
+  <div class="suggs" id="suggs"></div>
+  <div class="bai-input-area">
+    <div class="bai-input-row">
+      <textarea class="bai-input" id="cin" placeholder="Ask about this risk or metric…" rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendC()}"></textarea>
+      <button class="bai-send-btn" type="button" onclick="sendC()" title="Send"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</aside>
+</div>
+</div>
+
+<script src="lmo-shared.js"></script>
+<script>
+const RISKS=[
+  {lv:'h',t:'AI & Data Skills Gap Widening',d:'94-day avg time-to-fill for AI/ML roles. Demand growing 3× faster than supply. Risk to digital economy targets without 6-month intervention.',pr:78,pc:'#DC2626',ctx:'What are the fastest and most cost-effective options to close the AI skills gap',xt:'AI Skills Gap Risk'},
+  {lv:'m',t:'Emiratisation Non-Compliance — Construction & Retail',d:'Construction 2.1% vs 5% target; retail 8.3% vs 10%. 340+ establishments exposed to legal risk.',pr:62,pc:'#B45309',ctx:'What enforcement escalation tools exist and what are the tradeoffs',xt:'Emiratisation Compliance Risk'},
+  {lv:'m',t:'Youth NEET Rate Creeping Up',d:'Female youth NEET (20–24) +1.4pp this quarter. If trend persists two more quarters, structural unemployment risk emerges.',pr:44,pc:'#B45309',ctx:'Design an immediate intervention programme for the rising youth NEET rate',xt:'Youth NEET Risk'},
+];
+
+function renderRisks(){
+  document.getElementById('rgrid').innerHTML=RISKS.map(r=>`
+    <div class="rcard" onclick="openChat('${escAttr(r.ctx)}','${escAttr(r.xt)}')">
+      <div class="rcard-top">
+        <div class="rcard-ttl">${r.t}</div>
+        <div class="card-hd-tags">
+          <span class="rbadge ${r.lv}">${r.lv==='h'?'HIGH':r.lv==='m'?'MEDIUM':'LOW'}</span>
+          ${AIB(r.ctx,r.xt)}
+        </div>
+      </div>
+      <div class="rcard-desc">${r.d}</div>
+      <div class="prob-row">
+        <span class="prob-lbl">Probability</span>
+        <div class="prob-track"><div class="prob-fill" style="width:${r.pr}%;background:${r.pc}"></div></div>
+        <span class="prob-pct" style="color:${r.pc}">${r.pr}%</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderEmirCharts(){
+  const sectors=[
+    {name:'Finance',val:18.6,c:'#16A34A'},
+    {name:'Government',val:16.2,c:'#16A34A'},
+    {name:'Healthcare',val:14.8,c:'#16A34A'},
+    {name:'Education',val:13.1,c:'#B45309'},
+    {name:'Hospitality',val:9.4,c:'#B45309'},
+    {name:'Retail',val:8.3,c:'#DC2626'},
+    {name:'Construction',val:2.1,c:'#DC2626'},
+  ];
+  const target=13.5;
+  const maxVal=20;
+  const el=document.getElementById('ev-sector-bars');
+  if(!el) return;
+  el.innerHTML=sectors.map(s=>{
+    const pct=(s.val/maxVal*100).toFixed(1);
+    const tpct=(target/maxVal*100).toFixed(1);
+    const diff=s.val-target;
+    const diffStr=diff>=0?'+'+diff.toFixed(1)+'pp':diff.toFixed(1)+'pp';
+    const diffCol=diff>=0?'#16A34A':'#DC2626';
+    return `<div style="display:flex;align-items:center;gap:6px">
+      <div style="font-size:10px;color:var(--t2);width:72px;flex-shrink:0;text-align:right">${s.name}</div>
+      <div style="flex:1;height:11px;background:var(--sf3);border-radius:3px;position:relative;overflow:visible">
+        <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${s.c};border-radius:3px;transition:width .5s ease"></div>
+        <div style="position:absolute;left:${tpct}%;top:-3px;width:2px;height:17px;background:#DC2626;border-radius:1px;z-index:2"></div>
+      </div>
+      <div style="font-size:10px;font-weight:600;width:34px;color:${s.c}">${s.val}%</div>
+      <div style="font-size:9.5px;color:${diffCol};font-weight:500;width:36px">${diffStr}</div>
+    </div>`;
+  }).join('');
+  const legEl=document.getElementById('ev-legend');
+  if(legEl){
+    legEl.innerHTML=`<div style="width:12px;height:2px;background:#DC2626;border-radius:1px"></div>
+      <span>13.5% Q3 target line</span>
+      <span style="margin-left:8px;color:#16A34A">● Above target</span>
+      <span style="margin-left:4px;color:#DC2626">● Below target</span>`;
+  }
+}
+
+function openChat(ctx,title){
+  if(document.body.classList.contains('embed')&&window.parent!==window){
+    window.parent.postMessage({type:'lmo-chat',ctx,title:title||'Diagnose'},'*');return;
+  }
+  document.getElementById('ctx-val').textContent=title||'Diagnose';
+  document.getElementById('msgs').innerHTML='';
+  addMsg('ai','Diagnostic context for <strong>'+(title||'this item')+'</strong>: '+ctx+'. In production this connects to Bayaan AI with live risk scoring and policy playbooks.');
+  document.getElementById('suggs').innerHTML=['What is the fastest fix?','Which sectors are lagging most?','Compare to last quarter','What should policymakers do first?'].map(s=>`<button type="button" class="sugg" onclick="sendCT('${s}')">${s}</button>`).join('');
+  document.getElementById('cpanel').classList.add('open');
+}
+function closeChat(){document.getElementById('cpanel').classList.remove('open');}
+function addMsg(role,text){const ms=document.getElementById('msgs');const d=document.createElement('div');d.className='msg '+role;const b=document.createElement('div');b.className='bubble '+role;b.innerHTML=text;d.appendChild(b);ms.appendChild(d);ms.scrollTop=ms.scrollHeight;}
+function sendC(){const inp=document.getElementById('cin');const t=inp.value.trim();if(!t)return;sendCT(t);inp.value='';}
+function sendCT(text){addMsg('user',text);setTimeout(()=>addMsg('ai','Analysis for your diagnostic query is being prepared. In production this connects to Bayaan AI with live LFS and administrative data.'),700);}
+
+window.addEventListener('load',()=>{
+  LMO.initLmoEmbed();
+  renderRisks();
+  setTimeout(()=>{renderEmirCharts();LMO.reportEmbedHeight();},100);
+  setTimeout(LMO.reportEmbedHeight,500);
+});
+window.addEventListener('resize',()=>setTimeout(LMO.reportEmbedHeight,200));
+</script>
+</body>
+</html>

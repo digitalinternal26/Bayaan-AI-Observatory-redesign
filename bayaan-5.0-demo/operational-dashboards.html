@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bayaan — Operational dashboards</title>
+<link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="css/theme.css" />
+<link rel="stylesheet" href="css/components/bayaan-footer.css" />
+<link rel="stylesheet" href="css/pages/operational-dashboards.css" />
+<script>
+  (function () {
+    var t = localStorage.getItem("bayaan-theme") || "light";
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  })();
+</script>
+<script src="js/theme.js"></script>
+<script src="js/header.js"></script>
+<script src="js/footer.js"></script>
+</head>
+<body>
+
+<div id="screen-operational-dashboards" class="ws-screen header-flush active">
+  <div data-bayaan-header></div>
+
+  <main class="od-main">
+    <div class="od-wrap">
+      <header class="od-hero">
+        <h1>Baayan Admin Space</h1>
+        <p>A central hub for Baayan admin space</p>
+      </header>
+
+      <div class="od-grid">
+        <article class="od-card">
+          <div class="od-card-body">
+            <i class="ti ti-chart-histogram od-card-icon" aria-hidden="true"></i>
+            <h2>One dashboard</h2>
+            <p>A consolidated view of platform utilization — active users, adoption trends, and access coverage across entities and products.</p>
+          </div>
+          <button type="button" class="od-card-action">
+            Open dashboard
+            <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>
+        </article>
+
+        <article class="od-card od-card--teal">
+          <div class="od-card-body">
+            <i class="ti ti-shield-check od-card-icon" aria-hidden="true"></i>
+            <h2>Data governance</h2>
+            <p>Provides a centralized platform for managing data quality, security, and compliance. It ensures controlled access, policy enforcement, and seamless monitoring of data integrity across the organization.</p>
+          </div>
+          <button type="button" class="od-card-action">
+            Open dashboard
+            <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>
+        </article>
+
+        <article class="od-card od-card--amber">
+          <div class="od-card-body">
+            <i class="ti ti-users od-card-icon" aria-hidden="true"></i>
+            <h2>User Management</h2>
+            <p>Onboard and offboard users, assign roles, and manage permissions to control who can access Bayaan and what they can do.</p>
+          </div>
+          <button type="button" class="od-card-action">
+            Open dashboard
+            <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <div data-bayaan-footer></div>
+</div>
+
+<script>
+  (function () {
+    function bootOperationalDashboards() {
+      if (window.BayaanHeader) {
+        BayaanHeader.initScreenHeader("screen-operational-dashboards");
+      }
+      var nav = document.querySelector("#screen-operational-dashboards .topnav");
+      if (nav) {
+        var logo = nav.querySelector(".nav-logo");
+        if (logo) {
+          logo.setAttribute("href", "index.html");
+          logo.removeAttribute("onclick");
+        }
+        nav.querySelectorAll(".nav-link[data-nav]").forEach(function (link) {
+          link.setAttribute(
+            "href",
+            link.dataset.nav === "geo" ? "addp/index.html" : "index.html",
+          );
+          link.removeAttribute("onclick");
+        });
+      }
+      if (window.initBayaanFooter) initBayaanFooter();
+    }
+
+    window.onHeaderSearchClick = window.onHeaderSearchClick || function () {
+      window.location.href = "index.html";
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootOperationalDashboards);
+    } else {
+      bootOperationalDashboards();
+    }
+  })();
+</script>
+
+</body>
+</html>

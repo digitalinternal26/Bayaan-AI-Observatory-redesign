@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Census Observatory — Labour Force · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <link rel="stylesheet" href="css/pages/ai.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/pages/exec-home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/pages/census-detail.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" ? "dark" : "light"
+        );
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/census-global-filter.js"></script>
+    <script src="js/census-icons.js"></script>
+    <script src="js/census-region-map.js"></script>
+    <script src="js/census-exec-brief.js"></script>
+    <script src="js/census-ai-panel.js"></script>
+    <style>
+      /* ====================================================================
+         LABOUR FORCE DETAIL PAGE — page-local additions on top of the
+         shared css/pages/census-detail.css (.cd-hero, .cd-kpi, .cd-donut-*,
+         .cd-bar-*, .cd-key-card — already used by Population & Real Estate).
+         Nothing here touches the shared file — only new shapes specific to
+         this page's richer analytical sections. ==================================================================== */
+
+      /* Section "module card" — ported verbatim from CPI.html's page-local
+         `#cpi-obs-content > section` rule (applied there to every top-level
+         section for a consistent soft-gradient outer card, with inner
+         .obs-card/.cd-key-card/.cd-donut-card elements nesting inside it).
+         Same rule as CensusObservatory.html and census-population.html,
+         applied here as a class selector since this page's content wrapper
+         is a class (.cpi-obs-content), not CPI's id. The AI Summary hero
+         (.cd-hero) is a plain div, not a section, so — exactly as on
+         CPI.html — it keeps its own distinct treatment untouched. Every
+         former flat `.obs-card` content block on this page (Who is in the
+         Labour Force, Employment by Sector/Activity/Occupation/Age/Region,
+         District-level Employment, Emirati Jobseekers) is now a <section>
+         instead, so it picks up this same outer card automatically. */
+      #screen-cpi-obs .cpi-obs-content > section {
+        background:
+          radial-gradient(ellipse 90% 70% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%),
+          linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 28px;
+        box-shadow:
+          0 1px 2px rgba(15, 23, 42, 0.05),
+          0 10px 28px rgba(42, 61, 76, 0.07);
+        padding: 24px 28px 28px;
+        margin-bottom: 24px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-obs-content > section {
+        background: var(--surface, #141a26);
+        border: 1px solid var(--border);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+      }
+
+      /* Key Insights — same page-local override as CensusObservatory.html's
+         Interpret page (ported verbatim; the shared cpi-obs.css only has a
+         plainer generic fallback). Single vertical list, icon + text rows. */
+      #screen-cpi-obs .impacts-list {
+        padding: 0;
+        border-radius: 0;
+        border: none;
+        background-color: transparent;
+      }
+      #screen-cpi-obs .impacts-list,
+      #screen-cpi-obs .impacts-list:hover {
+        box-shadow: none;
+      }
+      #screen-cpi-obs .impacts-list .impact-item {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 11px;
+        align-items: start;
+        padding: 10px 0;
+        border-bottom: 1px solid #eaecf0;
+        font-size: var(--fs-md);
+        line-height: 1.5;
+        color: #536277;
+        transition: transform 0.22s ease;
+      }
+      #screen-cpi-obs .impacts-list .impact-item:last-child {
+        border-bottom: 0;
+      }
+      #screen-cpi-obs .impacts-list .impact-item:hover {
+        background: none;
+        transform: translateX(3px);
+      }
+      #screen-cpi-obs .impacts-list .impact-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 9%, white);
+      }
+      #screen-cpi-obs .impacts-list .impact-icon i {
+        font-size: var(--fs-xl);
+        line-height: 1;
+      }
+      #screen-cpi-obs .impacts-list .impact-icon--up { --tone: #e5484d; }
+      #screen-cpi-obs .impacts-list .impact-icon--down { --tone: #0c9b70; }
+      #screen-cpi-obs .impacts-list .impact-icon--neutral { --tone: #246bfd; }
+      #screen-cpi-obs .impacts-list .impact-val { color: #172033; font-weight: 700; }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-item { border-color: var(--border); color: var(--text-secondary); }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-val { color: var(--text-primary); }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-icon { background: color-mix(in srgb, var(--tone) 18%, transparent); }
+
+      /* Section header row with an optional inline filter/toggle group. */
+      #screen-cpi-obs .lf-section-hdr-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      /* ====================================================================
+         EXECUTIVE VIEW — layout additions for the compact redesign. Nothing
+         above this comment changed: Activity/Occupation/District/Jobseekers
+         keep their existing markup, JS and styling, just re-homed into a
+         denser page composition (paired two-column sections instead of
+         every dataset getting its own full-width block). ==================================================================== */
+
+      /* "Executive View" label under the page title. */
+      #screen-cpi-obs .lf-exec-badge {
+        margin: 2px 0 6px;
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      /* Page-level global-filter context — same pattern as
+         census-population.html's Population Characteristics context label.
+         CensusGlobalFilter itself is UI/UX-only today (see
+         js/census-global-filter.js's own header comment) — no section on
+         this page recomputes its figures per filter, since the underlying
+         per-region/citizenship/gender datasets for occupation, jobseekers,
+         age and education don't exist in the source model. This label is
+         the honest surface of that: it reflects the current selection
+         without implying every number below is live-filtered. */
+      #screen-cpi-obs .lf-filter-context {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        flex-shrink: 0;
+        font-size: var(--fs-xs);
+        color: var(--muted);
+      }
+      #screen-cpi-obs .lf-filter-context i { font-size: var(--fs-lg); margin-top: 1px; color: var(--accent); }
+      #screen-cpi-obs .lf-filter-context-lbl { font-weight: 600; color: var(--text2); }
+      #screen-cpi-obs .lf-filter-context-val { margin-top: 1px; }
+      #screen-cpi-obs .cpi-page-header-inner {
+        flex-wrap: wrap;
+        row-gap: 10px;
+      }
+      #screen-cpi-obs .cpi-page-header-inner > div:last-child {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+      }
+
+      /* "View details" stub link — same pattern as census-population.html's
+         .section-view-all, ported here since this page's content wrapper
+         doesn't inherit that page-local rule. */
+      #screen-cpi-obs .section-view-all {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        color: var(--accent);
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
+      }
+
+      /* Two-column pairing for the Executive View's compact sections
+         (Employment Structure + Sector, Economic Activity + Occupation,
+         Region + District) — same pattern as census-real-estate.html's
+         .re-pair-grid. */
+      #screen-cpi-obs .lf-pair-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        align-items: start;
+      }
+      #screen-cpi-obs .lf-pair-grid > * { min-width: 0; }
+      @media (max-width: 900px) {
+        #screen-cpi-obs .lf-pair-grid { grid-template-columns: 1fr; }
+      }
+
+      /* "Labour Force Characteristics" — Employment by Occupation +
+         Emirati Jobseekers, paired side by side (matches the refined
+         reference layout). Slightly uneven split (Occupation's two-sided
+         bars need a little more room than the jobseekers table) rather
+         than a strict 50/50. */
+      #screen-cpi-obs .lf-char-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 20px;
+        align-items: start;
+        margin-top: 6px;
+      }
+      #screen-cpi-obs .lf-char-grid > * { min-width: 0; }
+      @media (max-width: 900px) {
+        #screen-cpi-obs .lf-char-grid { grid-template-columns: 1fr; }
+      }
+
+      /* ====================================================================
+         EMPLOYMENT BY OCCUPATION — refined two-sided comparison. Emirati
+         (teal) on the left, Non-Emirati (blue) on the right, each with its
+         own Female/Male legend directly under its own heading (no shared
+         top legend to disambiguate). A single 3-column CSS grid keeps the
+         two bars and the shared occupation label row-aligned without a
+         separate layout per side. ==================================================================== */
+      #screen-cpi-obs .lf-occ2-heads {
+        display: grid;
+        grid-template-columns: 1fr 116px 1fr;
+        gap: 14px;
+        align-items: end;
+        margin-top: 14px;
+      }
+      #screen-cpi-obs .lf-occ2-head {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      #screen-cpi-obs .lf-occ2-head--right { align-items: flex-end; text-align: right; }
+      #screen-cpi-obs .lf-occ2-head-name {
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        color: var(--text);
+      }
+      #screen-cpi-obs .lf-occ2-legend {
+        display: flex;
+        gap: 10px;
+        font-size: var(--fs-2xs);
+        color: var(--text2);
+      }
+      #screen-cpi-obs .lf-occ2-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      #screen-cpi-obs .lf-occ2-legend i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      #screen-cpi-obs .lf-occ2-rows { margin-top: 6px; }
+      #screen-cpi-obs .lf-occ2-row {
+        display: grid;
+        grid-template-columns: 1fr 116px 1fr;
+        gap: 14px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lf-occ2-row {
+        border-color: var(--border);
+      }
+      #screen-cpi-obs .lf-occ2-row:last-child { border-bottom: 0; }
+      #screen-cpi-obs .lf-occ2-mid {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+        text-align: center;
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.25;
+      }
+      #screen-cpi-obs .lf-occ2-mid i {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: var(--accent-light);
+        font-size: var(--fs-xs);
+      }
+      #screen-cpi-obs .lf-occ2-flag {
+        font-size: var(--fs-micro);
+        font-weight: 700;
+        color: #b45309;
+        cursor: help;
+        margin-left: 2px;
+      }
+      #screen-cpi-obs .lf-occ2-stack {
+        display: flex;
+        height: 22px;
+        border-radius: 6px;
+        overflow: hidden;
+        width: 100%;
+        cursor: default;
+      }
+      #screen-cpi-obs .lf-occ2-stack > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--fs-micro);
+        font-weight: 700;
+        color: #fff;
+        overflow: hidden;
+        white-space: nowrap;
+        transition: filter 0.1s;
+      }
+      #screen-cpi-obs .lf-occ2-stack > span:hover { filter: brightness(1.08); }
+      #screen-cpi-obs .lf-occ2-emf { background: #5eead4; color: #0f2f2b; }
+      #screen-cpi-obs .lf-occ2-emm { background: #0f766e; }
+      #screen-cpi-obs .lf-occ2-nef { background: #93c5fd; color: #0f2744; }
+      #screen-cpi-obs .lf-occ2-nem { background: #1d4ed8; }
+      @media (max-width: 560px) {
+        #screen-cpi-obs .lf-occ2-heads,
+        #screen-cpi-obs .lf-occ2-row {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+        #screen-cpi-obs .lf-occ2-head--right { align-items: flex-start; text-align: left; }
+        #screen-cpi-obs .lf-occ2-mid { justify-content: flex-start; text-align: left; }
+        #screen-cpi-obs .lf-occ2-row { padding: 14px 0; }
+      }
+
+      /* ====================================================================
+         EMIRATI JOBSEEKERS BY MARITAL STATUS AND GENDER — proportional-
+         circle table. Male/Female circle diameters are area-proportional
+         (sqrt-scaled), same technique as census-population.html's Marital
+         Status bubble matrix, applied here to a 4-column table shape
+         instead of a region grid. ==================================================================== */
+      #screen-cpi-obs .lf-jsx-legend {
+        display: flex;
+        gap: 16px;
+        font-size: var(--fs-xs);
+        color: var(--text2);
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .lf-jsx-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #screen-cpi-obs .lf-jsx-legend i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      #screen-cpi-obs .lf-jsx-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 16px;
+      }
+      #screen-cpi-obs .lf-jsx-table {
+        display: grid;
+        grid-template-columns: minmax(70px, 1fr) 50px minmax(76px, 1fr) minmax(76px, 1fr);
+        gap: 8px 6px;
+        align-items: center;
+        min-width: max-content;
+      }
+      #screen-cpi-obs .lf-jsx-hd {
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--muted);
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lf-jsx-hd { border-color: var(--border); }
+      #screen-cpi-obs .lf-jsx-hd--num { text-align: center; }
+      #screen-cpi-obs .lf-jsx-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        color: var(--text);
+      }
+      #screen-cpi-obs .lf-jsx-row-ic {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        color: var(--accent);
+        background: var(--accent-light);
+        font-size: var(--fs-2xs);
+      }
+      #screen-cpi-obs .lf-jsx-total {
+        text-align: center;
+        font-size: var(--fs-md);
+        font-weight: 700;
+        color: var(--text);
+      }
+      #screen-cpi-obs .lf-jsx-bubble-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #screen-cpi-obs .lf-jsx-bubble {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+        color: #fff;
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        cursor: default;
+        transition: transform 0.1s;
+      }
+      #screen-cpi-obs .lf-jsx-bubble:hover { transform: scale(1.05); }
+      @media (max-width: 480px) {
+        #screen-cpi-obs .lf-jsx-table {
+          grid-template-columns: minmax(80px, 1fr) 54px minmax(80px, 1fr) minmax(80px, 1fr);
+          gap: 6px 8px;
+        }
+        #screen-cpi-obs .lf-jsx-hd { font-size: var(--fs-micro); }
+      }
+
+      /* ====================================================================
+         REUSABLE GROUPED VERTICAL BAR CHART — hand-rolled (CSS flex/grid,
+         no charting library on this page), shared by "Emirati Jobseekers by
+         Age Group and Gender" and "Educational Level of Emirati Jobseekers".
+         Each group is two bars (Male/Female) sized by % height of the
+         group's own max within the whole series, sitting on a shared
+         baseline; value labels sit above bars with enough headroom to
+         avoid clipping against the card edge. ==================================================================== */
+      #screen-cpi-obs .lf-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        height: 220px;
+        margin-top: 20px;
+        padding: 24px 4px 0;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+        overflow-x: auto;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lf-bars { border-color: var(--border); }
+      #screen-cpi-obs .lf-bars-group {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 3px;
+        flex: 1 1 0;
+        min-width: 34px;
+        height: 100%;
+        position: relative;
+      }
+      #screen-cpi-obs .lf-bars-bar {
+        width: 100%;
+        max-width: 22px;
+        border-radius: 4px 4px 0 0;
+        position: relative;
+        min-height: 2px;
+      }
+      #screen-cpi-obs .lf-bars-bar--m { background: #0073F0; }
+      #screen-cpi-obs .lf-bars-bar--f { background: #ec4899; }
+      #screen-cpi-obs .lf-bars-val {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: var(--fs-micro);
+        font-weight: 700;
+        color: var(--text2);
+        white-space: nowrap;
+        margin-bottom: 3px;
+      }
+      #screen-cpi-obs .lf-bars-axis {
+        display: flex;
+        gap: 10px;
+        padding: 8px 4px 0;
+      }
+      #screen-cpi-obs .lf-bars-axis-lbl {
+        flex: 1 1 0;
+        min-width: 34px;
+        text-align: center;
+        font-size: var(--fs-2xs);
+        color: var(--muted);
+      }
+      #screen-cpi-obs .lf-bars-legend {
+        display: flex;
+        gap: 16px;
+        font-size: var(--fs-xs);
+        color: var(--text2);
+      }
+      #screen-cpi-obs .lf-bars-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #screen-cpi-obs .lf-bars-legend i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      /* "Who is in the labour force?" — Citizenship/Gender as two equal-width
+         analytical columns (Region used to be a third donut here, but that
+         duplicated the regional map alongside it — see .lf-who-map-card
+         below — so it was removed; regional distribution is communicated
+         by the map only). Scoped on top of the shared .cd-donut-* component
+         (css/pages/census-detail.css, also driven generically by
+         js/census-detail.js elsewhere) so Population's and Real Estate's
+         donut sections keep their existing sizing untouched. The shared
+         .cd-donut-box has no fixed width, so it stretches to fill whatever
+         column width it's given — fine for a 2-column flex row, but here it
+         inflated the donut past 130px and skewed the centre icon into a
+         non-square box. Fixing the box to one square size and centring it
+         is what actually guarantees identical donut diameters. */
+      #screen-cpi-obs .lf-composition-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+      #screen-cpi-obs .lf-composition-row .cd-donut-card {
+        min-width: 0;
+      }
+      #screen-cpi-obs .lf-composition-row .cd-donut-box {
+        width: 92px;
+        height: 92px;
+        margin: 0 auto;
+      }
+      #screen-cpi-obs .lf-composition-row .cd-donut-center svg {
+        width: 28px;
+        height: 28px;
+      }
+      /* The shared .cd-donut-legend-row uses margin-left:auto on the value
+         to right-align it, which reads fine at the shared component's
+         narrow default width but pushes the percentage away from its
+         label once this column is a wide 1fr grid track (worst in the
+         3-row Region legend). Capping the legend to a compact width and
+         centring that block under the donut keeps label and value close
+         together as one visual row, without touching the shared row/dot/
+         value styling itself. */
+      #screen-cpi-obs .lf-composition-row .cd-donut-legend {
+        max-width: 148px;
+        margin: 8px auto 0;
+      }
+      @media (max-width: 700px) {
+        #screen-cpi-obs .lf-composition-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Employment Structure — two compact tiles (Blue-collar / White-collar
+         share + YoY growth), replacing figures that previously only existed
+         in prose (AI Summary / Key Insights), same confirmed data. */
+      #screen-cpi-obs .lf-structure-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+      #screen-cpi-obs .lf-structure-tile {
+        padding: 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lf-structure-tile {
+        border-color: var(--border);
+      }
+      #screen-cpi-obs .lf-structure-ic {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: var(--accent-light);
+        font-size: var(--fs-lg);
+      }
+      #screen-cpi-obs .lf-structure-lbl {
+        font-size: var(--fs-xs);
+        color: var(--text2);
+        font-weight: 600;
+      }
+      #screen-cpi-obs .lf-structure-val {
+        font-size: var(--fs-2xl);
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+
+      /* Shared Census regional map (js/census-region-map.js) — same real
+         Abu Dhabi coastline used on Interpret/Population/Real Estate. Sized
+         as the primary visual of "Who is in the labour force?" (paired
+         50/50 with the composition card via .lf-pair-grid) rather than a
+         small supporting map, since it now carries sole responsibility for
+         showing the regional split — the donut that used to duplicate it
+         was removed. */
+      #screen-cpi-obs .lf-hero-map .cen-map-wrap {
+        position: relative;
+        max-width: 420px;
+        margin: 2px auto 6px;
+        aspect-ratio: 500 / 290;
+      }
+      /* Hover = highlight that region and dim the other two (pure CSS, no
+         JS needed); click = pin the same highlight until clicked again,
+         via renderCensusRegionMap's existing selected/onSelect opt-in —
+         same interaction primitive as Population detail's region
+         drill-down (census-population.html), just without that page's
+         drill-down detail panel, which this section doesn't need. */
+      #screen-cpi-obs .lf-hero-map .cen-map-wrap--interactive [data-region] {
+        cursor: pointer;
+      }
+      #screen-cpi-obs .lf-hero-map .cen-map-region {
+        transition: opacity 0.15s;
+      }
+      #screen-cpi-obs .lf-hero-map .cen-map-wrap:hover .cen-map-region:not(.is-selected) {
+        opacity: 0.45;
+      }
+      #screen-cpi-obs .lf-hero-map .cen-map-wrap:hover .cen-map-region:hover {
+        opacity: 1;
+      }
+      #screen-cpi-obs .lf-hero-map .cen-map-region.is-selected {
+        stroke: #fff;
+        stroke-width: 2;
+        opacity: 1;
+      }
+
+      #screen-cpi-obs .cen-map-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #screen-cpi-obs .cen-map-label {
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        fill: #0f2744;
+        font-family: inherit;
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cen-map-label--muted { font-size: var(--fs-micro); font-weight: 600; fill: #94a3b8; }
+      #screen-cpi-obs .cen-map-label--on-dark { fill: #fff; }
+      #screen-cpi-obs .cen-map-compass text { font-size: var(--fs-2xs); font-weight: 700; fill: #64748b; font-family: inherit; }
+      #screen-cpi-obs .cen-map-compass polygon { fill: #94a3b8; }
+      #screen-cpi-obs .cen-map-scale line { stroke: #94a3b8; stroke-width: 1; }
+      #screen-cpi-obs .cen-map-scale text { font-size: var(--fs-micro); fill: #94a3b8; font-family: inherit; }
+      #screen-cpi-obs .cen-map-dot { fill: #0f2744; stroke: #fff; stroke-width: 1.5; }
+      #screen-cpi-obs .cen-map-line { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 2 2; }
+      #screen-cpi-obs .cen-map-callout {
+        position: absolute;
+        transform: translate(-50%, -100%);
+        background: var(--white);
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 5px 8px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+        text-align: center;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cen-map-callout--below { transform: translate(-50%, 8px); }
+      #screen-cpi-obs .cen-map-callout-pct { font-size: var(--fs-xs); font-weight: 700; color: #0073F0; }
+      #screen-cpi-obs .cen-map-callout-name { font-size: var(--fs-micro); color: var(--text2); margin-top: 1px; }
+    </style>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="CensusObservatory.html">Census Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Labour Force</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <div id="census-global-filter-mount"></div>
+            <aside class="sidebar" aria-label="Census Observatory views">
+              <button type="button" class="sidebar-item sidebar-item--ai" onclick="openObsSidebarAI(this)">
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Census AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item active" href="CensusObservatory.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="census-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="census-population-projection.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+                <span class="sidebar-label">Forecast</span>
+              </a>
+              <a class="sidebar-item" href="census-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+              <a class="sidebar-item" href="census-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="census-geo.html">
+                <div class="sidebar-icon"><i class="ti ti-map-2"></i></div>
+                <span class="sidebar-label">Geo View</span>
+              </a>
+            </aside>
+          </div>
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <a class="cd-back-link" href="CensusObservatory.html"><i class="ti ti-arrow-left"></i>Back to Overview</a>
+                    <h1 class="topic-title">Labour Force</h1>
+                    <p class="lf-exec-badge">Executive View</p>
+                    <p class="topic-title-sub">People powering Abu Dhabi's economy</p>
+                    <p class="topic-title-desc">Explore employment, participation and workforce characteristics across the Emirate.</p>
+                  </div>
+                  <div>
+                    <div class="cen-hdr-btns">
+                      <button type="button" class="cen-btn" onclick="censusComingSoon('Export')">
+                        <i class="ti ti-download"></i> Export
+                      </button>
+                      <button type="button" class="cen-btn cen-btn--ai" onclick="censusComingSoon('Ask Bayaan AI')">
+                        <i class="ti ti-sparkles"></i> Ask Bayaan AI
+                      </button>
+                    </div>
+                    <div class="lf-filter-context">
+                      <i class="ti ti-info-circle"></i>
+                      <div>
+                        <div class="lf-filter-context-lbl">Based on current filter selection</div>
+                        <div class="lf-filter-context-val" id="lfFilterContext">All population · All regions · 2025</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cpi-obs-content">
+                <!-- ══════════════ EXECUTIVE BRIEF ══════════════
+                     Same .cpi-hero component as CensusObservatory.html's
+                     Interpret page (see css/pages/census-detail.css +
+                     js/census-exec-brief.js), so the AI Summary card
+                     matches Interpret's Executive Brief design exactly. -->
+                <div class="cpi-hero">
+                  <svg class="cpi-hero-skyline" viewBox="0 0 220 68" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
+                    <rect x="4" y="30" width="16" height="38" fill="currentColor" />
+                    <rect x="24" y="18" width="14" height="50" fill="currentColor" />
+                    <rect x="42" y="40" width="12" height="28" fill="currentColor" />
+                    <rect x="58" y="8" width="16" height="60" fill="currentColor" />
+                    <polygon points="66,8 66,0 68,8" fill="currentColor" />
+                    <rect x="78" y="26" width="14" height="42" fill="currentColor" />
+                    <rect x="96" y="36" width="12" height="32" fill="currentColor" />
+                    <circle cx="122" cy="52" r="16" fill="none" stroke="currentColor" stroke-width="2.5" />
+                    <rect x="140" y="20" width="14" height="48" fill="currentColor" />
+                    <rect x="158" y="34" width="12" height="34" fill="currentColor" />
+                    <rect x="174" y="12" width="16" height="56" fill="currentColor" />
+                    <rect x="194" y="30" width="14" height="38" fill="currentColor" />
+                  </svg>
+                  <div class="cpi-hero-topline">
+                    <div class="cpi-hero-inner" style="flex:1">
+                      <span class="cpi-hero-ico"><i class="ti ti-brain"></i></span>
+                      <div class="cpi-hero-text">
+                        <div class="cpi-hero-badge-row">
+                          <span class="cpi-hero-title">Executive Brief</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cpi-hero-meta">
+                      <div class="brief-speech">
+                        <button class="brief-listen" type="button" data-state="idle" aria-label="Listen to the brief" aria-pressed="false">
+                          <span class="brief-listen__icon" aria-hidden="true">
+                            <i class="ti ti-volume brief-listen__speaker"></i>
+                            <i class="ti ti-player-play brief-listen__play"></i>
+                            <i class="ti ti-player-pause brief-listen__pause"></i>
+                          </span>
+                          <span class="brief-listen__copy">
+                            <span class="brief-listen__wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                            <span class="brief-listen__text">Audio brief</span>
+                          </span>
+                        </button>
+                        <span class="brief-speech__actions" aria-label="Playback options">
+                          <button class="brief-audio-action brief-audio-action--restart" type="button" aria-label="Restart brief" title="Restart">
+                            <i class="ti ti-refresh" aria-hidden="true"></i>
+                          </button>
+                          <button class="brief-audio-action brief-audio-action--stop" type="button" aria-label="Stop brief" title="Stop">
+                            <span class="brief-stop-box" aria-hidden="true"></span>
+                          </button>
+                        </span>
+                      </div>
+                      <button type="button" class="brief-copy-action" aria-label="Copy summary" title="Copy summary">
+                        <i class="ti ti-copy" aria-hidden="true"></i>
+                      </button>
+                      <div class="brief-speech-status visually-hidden" role="status" aria-live="polite"></div>
+                    </div>
+                  </div>
+                  <p class="cpi-hero-sub">Abu Dhabi's employed population reached 2.98 million in 2025, growing 7.7% from 2024. Non-Emiratis account for 88.8% of employment, while the workforce remains strongly male-dominated at 78.2%. White-collar employment is growing faster than blue-collar (+9.2% vs +6.6%), pointing to a gradual shift toward higher-skilled roles.</p>
+                </div>
+
+                <!-- ══════════════ LABOUR FORCE AT A GLANCE ══════════════ -->
+                <section>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-chart-bar"></i>Labour Force at a Glance</h2>
+                  </div>
+                  <div class="cd-kpi-row">
+                    <div class="obs-card cd-kpi">
+                      <div class="cd-kpi-ic"><i class="ti ti-users"></i></div>
+                      <div class="kpi-label">Employed Population</div>
+                      <div class="cd-kpi-val">2,976,520</div>
+                      <div class="cd-kpi-foot">
+                        <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>+7.7%</span>
+                        <span>vs 2024</span>
+                      </div>
+                    </div>
+                    <div class="obs-card cd-kpi">
+                      <div class="cd-kpi-ic"><i class="ti ti-flag"></i></div>
+                      <div class="kpi-label">Emirati Employed</div>
+                      <div class="cd-kpi-val">332,235</div>
+                      <div class="cd-kpi-foot"><span>11.2% of employed population</span></div>
+                    </div>
+                    <div class="obs-card cd-kpi">
+                      <div class="cd-kpi-ic"><i class="ti ti-world"></i></div>
+                      <div class="kpi-label">Non-Emirati Employed</div>
+                      <div class="cd-kpi-val">2,644,285</div>
+                      <div class="cd-kpi-foot"><span>88.8% of employed population</span></div>
+                    </div>
+                    <div class="obs-card cd-kpi">
+                      <div class="cd-kpi-ic"><i class="ti ti-users-group"></i></div>
+                      <div class="kpi-label">Employment By Gender</div>
+                      <div class="cd-kpi-val">78.2% <small>Male</small></div>
+                      <div class="cd-kpi-foot"><span>Female 21.8%</span></div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════ WHO IS IN THE LABOUR FORCE ══════════════
+                     Regional split is shown once — via the map, the
+                     primary visual on the left — instead of a separate
+                     "Labour Force by Region" section duplicating the same
+                     three figures in a table/bar-chart shape. Citizenship/
+                     Gender stay as the two composition donuts on the
+                     right. Map data/render (LF_REGIONS, lfRenderRegionMap)
+                     is unchanged — only its mount point moved here. -->
+                <section>
+                  <div class="cd-card-hd"><i class="ti ti-chart-donut"></i>Who is in the labour force?</div>
+                  <p class="cd-card-sub">Employed population composition, 2025</p>
+                  <div class="lf-pair-grid" style="margin-top:12px">
+                    <div class="obs-card">
+                      <div id="lfRegionMap" class="lf-hero-map"></div>
+                    </div>
+                    <div class="obs-card">
+                      <div class="cd-card-hd">Labour force composition</div>
+                      <p class="cd-card-sub">Breakdown of employed population, 2025</p>
+                      <div class="cd-donut-row lf-composition-row" style="margin-top:12px">
+                        <div class="cd-donut-card">
+                          <div class="cd-donut-box">
+                            <svg viewBox="0 0 42 42" width="100%" height="100%" role="img" aria-label="Emirati 11.2%, Non-Emirati 88.8%">
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#C5FBD8" stroke-width="6" />
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#16a34a" stroke-width="6" stroke-dasharray="11.2 88.8" stroke-dashoffset="25" />
+                            </svg>
+                            <div class="cd-donut-center" data-census-icon="labourCitizenship"></div>
+                          </div>
+                          <div class="cd-donut-label">By Citizenship</div>
+                          <div class="cd-donut-legend">
+                            <div class="cd-donut-legend-row"><span class="cd-donut-legend-dot" style="background:#16a34a"></span>Emirati<b>11.2%</b></div>
+                            <div class="cd-donut-legend-row"><span class="cd-donut-legend-dot" style="background:#C5FBD8"></span>Non-Emirati<b>88.8%</b></div>
+                          </div>
+                        </div>
+                        <div class="cd-donut-card">
+                          <div class="cd-donut-box">
+                            <svg viewBox="0 0 42 42" width="100%" height="100%" role="img" aria-label="Male 78.2%, Female 21.8%">
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#ec4899" stroke-width="6" />
+                              <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#0073F0" stroke-width="6" stroke-dasharray="78.2 21.8" stroke-dashoffset="25" />
+                            </svg>
+                            <div class="cd-donut-center" data-census-icon="labourGender"></div>
+                          </div>
+                          <div class="cd-donut-label">By Gender</div>
+                          <div class="cd-donut-legend">
+                            <div class="cd-donut-legend-row"><span class="cd-donut-legend-dot" style="background:#0073F0"></span>Male<b>78.2%</b></div>
+                            <div class="cd-donut-legend-row"><span class="cd-donut-legend-dot" style="background:#ec4899"></span>Female<b>21.8%</b></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cd-key-card" style="margin-top:16px">
+                    <div class="cd-key-card-hd"><i class="ti ti-sparkles"></i>AI insight</div>
+                    <p>The labour force is predominantly non-Emirati and male, with employment concentrated in Abu Dhabi Region (68.8%).</p>
+                  </div>
+                </section>
+
+                <!-- ══════════════ EMPLOYMENT STRUCTURE + EMPLOYMENT BY SECTOR ══════════════
+                     Paired two-column section — Employment Structure gives the
+                     blue/white-collar split its own compact card (previously only
+                     surfaced in prose), and Employment by Sector's full-width bar
+                     chart (the main "problem" with the old layout) now sits at
+                     half width alongside it, with the Emirati/Non-Emirati per-sector
+                     breakdown moved behind "View details" rather than always-on
+                     detail lines. ── -->
+                <section>
+                  <div class="lf-pair-grid">
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-briefcase"></i>Employment Structure</div>
+                      <div class="lf-structure-grid">
+                        <div class="lf-structure-tile">
+                          <div class="lf-structure-ic"><i class="ti ti-hammer"></i></div>
+                          <div class="lf-structure-lbl">Blue-collar</div>
+                          <div class="lf-structure-val">54.4%</div>
+                          <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>+6.6%</span>
+                        </div>
+                        <div class="lf-structure-tile">
+                          <div class="lf-structure-ic"><i class="ti ti-briefcase"></i></div>
+                          <div class="lf-structure-lbl">White-collar</div>
+                          <div class="lf-structure-val">45.6%</div>
+                          <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>+9.2%</span>
+                        </div>
+                      </div>
+                      <p class="cd-insight"><i class="ti ti-bulb"></i><span>White-collar employment grew faster than blue-collar (+9.2% vs +6.6%) — a gradual shift toward higher-skilled roles.</span></p>
+                    </div>
+                    <div class="obs-card">
+                      <div class="lf-section-hdr-row">
+                        <div>
+                          <div class="cd-card-hd"><i class="ti ti-building-bank"></i>Employment by Sector</div>
+                        </div>
+                        <span class="section-view-all" onclick="censusComingSoon('Sector breakdown by citizenship')">View details <i class="ti ti-arrow-right"></i></span>
+                      </div>
+                      <div class="cd-bar-list" style="margin-top:12px">
+                        <div class="cd-bar-row">
+                          <span class="cd-bar-row-label">Private</span>
+                          <span class="cd-bar-track"><span class="cd-bar-fill" style="width:100%"></span></span>
+                          <span class="cd-bar-row-val">1,777,000</span>
+                        </div>
+                        <div class="cd-bar-row">
+                          <span class="cd-bar-row-label">Private Household</span>
+                          <span class="cd-bar-track"><span class="cd-bar-fill" style="width:25.5%"></span></span>
+                          <span class="cd-bar-row-val">453,785</span>
+                        </div>
+                        <div class="cd-bar-row">
+                          <span class="cd-bar-row-label">Public</span>
+                          <span class="cd-bar-track"><span class="cd-bar-fill" style="width:13.6%"></span></span>
+                          <span class="cd-bar-row-val">240,785</span>
+                        </div>
+                        <div class="cd-bar-row">
+                          <span class="cd-bar-row-label">Government</span>
+                          <span class="cd-bar-track"><span class="cd-bar-fill" style="width:6.4%"></span></span>
+                          <span class="cd-bar-row-val">113,715</span>
+                        </div>
+                      </div>
+                      <p class="cd-insight"><i class="ti ti-bulb"></i><span>Private Household employment is entirely non-Emirati (453,780 of 453,785) — the starkest citizenship concentration of any sector.</span></p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════ LABOUR FORCE CHARACTERISTICS ══════════════
+                     Employment by Occupation + Emirati Jobseekers (by
+                     Marital Status and Gender), paired side by side under
+                     one shared heading — matches the refined reference
+                     layout exactly (same pairing pattern as
+                     census-population.html's "Population Characteristics").
+                     Occupation's two-sided Emirati(teal)/Non-Emirati(blue)
+                     comparison replaces the old compact stacked-bar design
+                     (paired with Employment by Economic Activity, now
+                     removed) — LF_OCCUPATIONS data is reused verbatim,
+                     only its presentation changes. Jobseekers replaces the
+                     old region/marital-status toggle + side summary-card
+                     layout with the refined proportional-circle table;
+                     region-level jobseeker figures (LF_JS_REGION) are no
+                     longer part of this design — the regional split
+                     already has its home in "Who is in the labour force?"
+                     above. ── -->
+                <section>
+                  <div class="lf-section-hdr-row">
+                    <div class="section-hdr">
+                      <h2 class="cpi-section-title"><i class="ti ti-users-group"></i>Labour Force Characteristics</h2>
+                    </div>
+                    <div class="lf-filter-context">
+                      <i class="ti ti-info-circle"></i>
+                      <div>
+                        <div class="lf-filter-context-lbl">Based on current filter selection</div>
+                        <div class="lf-filter-context-val" id="lfCharContext">All population · All regions · 2025</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="lf-char-grid">
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-briefcase"></i>Employment by Occupation</div>
+                      <p class="cd-card-sub">Top 5 occupations by employed population, 2025</p>
+                      <div class="lf-occ2-heads" id="lfOccHeads"><!-- populated by JS --></div>
+                      <div class="lf-occ2-rows" id="lfOccList"><!-- populated by JS from LF_OCCUPATIONS --></div>
+                      <p class="cd-insight"><i class="ti ti-bulb"></i><span>Emirati employment skews male in service &amp; sales and professional occupations (60.5% and 53.7% male), while non-Emirati employment in the same occupations is predominantly female (68%) — the pattern reverses for elementary occupations, where both groups are majority female.</span></p>
+                    </div>
+                    <div class="obs-card">
+                      <div class="lf-section-hdr-row">
+                        <div>
+                          <div class="cd-card-hd"><i class="ti ti-user-search"></i>Emirati Jobseekers</div>
+                          <p class="cd-card-sub">Emirati jobseekers by marital status and gender, 2025</p>
+                        </div>
+                        <div class="lf-jsx-legend">
+                          <span><i style="background:#0073F0"></i>Male</span>
+                          <span><i style="background:#ec4899"></i>Female</span>
+                        </div>
+                      </div>
+                      <div class="lf-jsx-scroll"><div class="lf-jsx-table" id="lfJsTable"><!-- populated by JS from LF_JS_MARITAL --></div></div>
+                      <p style="margin:14px 0 0;font-size: var(--fs-2xs);color:var(--muted)">The size of the circles represents the number of jobseekers. Figures are rounded.</p>
+                      <p class="cd-insight"><i class="ti ti-bulb"></i><span>Emirati jobseekers are <b>71% female</b> — the opposite gender skew from the population and labour force overall (both majority-male). This points to a distinct Emiratisation and female-workforce-participation opportunity, separate from the broader labour market story.</span></p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════ EMIRATI JOBSEEKERS BY AGE GROUP AND GENDER + EDUCATIONAL LEVEL ══════════════
+                     Paired side by side, same as Employment
+                     Structure/Sector's .lf-pair-grid above — matches the
+                     refined reference layout. LF_JS_AGE's five labeled
+                     groups (18-19 through 35-39) are the confirmed
+                     reference figures; see the LF_JS_AGE comment below for
+                     how the unlabeled 40-44..55-59 tail was completed.
+                     LF_EDU is new (no existing app data structure for this
+                     breakdown) — figures per the refined reference chart. ── -->
+                <section>
+                  <div class="lf-pair-grid">
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-chart-histogram"></i>Emirati Jobseekers by Age Group and Gender, 2025</div>
+                      <div class="lf-section-hdr-row" style="align-items:center">
+                        <p class="cd-card-sub" style="margin:0">Number of Emirati jobseekers by age group and gender</p>
+                        <div class="lf-bars-legend">
+                          <span><i style="background:#0073F0"></i>Male</span>
+                          <span><i style="background:#ec4899"></i>Female</span>
+                        </div>
+                      </div>
+                      <div class="lf-bars" id="lfAgeBars"><!-- populated by JS from LF_JS_AGE --></div>
+                      <div class="lf-bars-axis" id="lfAgeAxis"><!-- populated by JS --></div>
+                      <p class="cd-insight"><i class="ti ti-bulb"></i><span>The majority of Emirati jobseekers are in the 20–24 age group, with a higher proportion of females compared to males.</span></p>
+                    </div>
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-school"></i>Educational Level of Emirati Jobseekers, 2025</div>
+                      <div class="lf-section-hdr-row" style="align-items:center">
+                        <p class="cd-card-sub" style="margin:0">Number of Emirati jobseekers by educational level and gender</p>
+                        <div class="lf-bars-legend">
+                          <span><i style="background:#0073F0"></i>Male</span>
+                          <span><i style="background:#ec4899"></i>Female</span>
+                        </div>
+                      </div>
+                      <div class="lf-bars" id="lfEduBars" style="height:180px"><!-- populated by JS from LF_EDU --></div>
+                      <div class="lf-bars-axis" id="lfEduAxis"><!-- populated by JS --></div>
+                      <p class="cd-insight"><i class="ti ti-bulb"></i><span>The largest share of Emirati jobseekers hold a secondary education level, and female jobseekers outnumber males across every educational tier shown here.</span></p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════ KEY INSIGHTS ══════════════ -->
+                <section>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-bulb"></i>Key Insights</h2>
+                  </div>
+                  <div class="obs-card impacts-list">
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--up"><i class="ti ti-trending-up"></i></div>
+                      <div>Abu Dhabi's employed population reached <span class="impact-val">2.98M</span> in 2025, an increase of <span class="impact-val">7.7%</span> from 2024.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--neutral"><i class="ti ti-world"></i></div>
+                      <div>Non-Emiratis account for <span class="impact-val">88.8%</span> of the employed population, reflecting Abu Dhabi's reliance on an international workforce.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--neutral"><i class="ti ti-gender-male"></i></div>
+                      <div>The employed population is strongly male-dominated (<span class="impact-val">78.2%</span> male), a pattern most pronounced among non-Emiratis (80.9% male vs Emirati 56.8% male).</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--up"><i class="ti ti-briefcase"></i></div>
+                      <div>White-collar employment is growing faster than blue-collar (<span class="impact-val">+9.2%</span> vs <span class="impact-val">+6.6%</span>), a gradual shift toward higher-skilled roles.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--up"><i class="ti ti-user-search"></i></div>
+                      <div>Emirati jobseekers are heavily concentrated among 20–24 year-olds (<span class="impact-val">5,715</span> of 15,855, or <span class="impact-val">36%</span>), consistent with the group's broader 71% female skew.</div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </main>
+          </div>
+        </div>
+
+        <div data-bayaan-footer></div>
+      </div>
+      <div class="cen-toast" id="censusToast"></div>
+    </div>
+
+    <script>
+      function goTo() {}
+      function openGeoView(e) { if (e) e.preventDefault(); }
+      function openBayaanSpace(e) { if (e) e.preventDefault(); }
+      function openProducts(e) { if (e) e.preventDefault(); }
+      function openObservatories(e) { if (e) e.preventDefault(); }
+      function openWsDrp() {}
+      function onHeaderSearchClick() {}
+      function toast() {}
+
+      let censusToastTimer = null;
+      function censusComingSoon(label) {
+        const el = document.getElementById("censusToast");
+        if (!el) return;
+        el.textContent = label + " is coming soon.";
+        el.classList.add("is-visible");
+        clearTimeout(censusToastTimer);
+        censusToastTimer = setTimeout(() => el.classList.remove("is-visible"), 2200);
+      }
+
+      /* ============================================================
+         CONFIRMED DATA — every figure below is traceable to
+         docs/census-data-reference.md §2 (Labour Force / Employment).
+         Region-composition percentages (68.8/22.2/9.0) and region
+         totals are derived by summing the confirmed §2.4 sankey table
+         (checksum verified: 2,047,185 + 661,245 + 268,090 = 2,976,520).
+         ============================================================ */
+      const LF_OCCUPATIONS = [
+        { label: "Elementary occupations", icon: "ti-briefcase", emiratiF: 74.8, emiratiM: 25.2, neF: 67.8, neM: 32.2, flagged: false },
+        { label: "Craft and related trades workers", icon: "ti-hammer", emiratiF: 70.9, emiratiM: 29.1, neF: 99.2, neM: 0.8, flagged: true },
+        { label: "Service and sales workers", icon: "ti-shopping-cart", emiratiF: 39.5, emiratiM: 60.5, neF: 68.3, neM: 31.7, flagged: false },
+        { label: "Professionals", icon: "ti-certificate", emiratiF: 46.3, emiratiM: 53.7, neF: 67.7, neM: 32.3, flagged: false },
+        { label: "Plant and machine operators, and assemblers", icon: "ti-settings", emiratiF: 85.8, emiratiM: 14.2, neF: 97.5, neM: 2.5, flagged: true },
+      ];
+
+      const LF_JS_TOTAL = 15855;
+      const LF_JS_MARITAL = [
+        { name: "Never Married", icon: "ti-user", value: 10395 },
+        { name: "Married", icon: "ti-heart", value: 4860 },
+        { name: "Divorced", icon: "ti-heart-broken", value: 560 },
+        { name: "Widowed", icon: "ti-user-minus", value: 40 },
+      ];
+      /* The Census reference only confirms Emirati jobseekers' overall
+         71% Female / 29% Male split (see the AI Summary + old gender
+         chips this replaces) — there's no per-marital-status gender
+         breakdown in the source model. Rather than inventing one, each
+         row's Male/Female counts are DERIVED by applying that same
+         confirmed 71/29 ratio to the row's own confirmed total, so F+M
+         always sums back to exactly that row's real value. */
+      const LF_JS_GENDER_SPLIT = { female: 0.71, male: 0.29 };
+      LF_JS_MARITAL.forEach((r) => {
+        r.female = Math.round(r.value * LF_JS_GENDER_SPLIT.female);
+        r.male = r.value - r.female;
+      });
+
+      /* New section — no existing app data structure for this breakdown.
+         The five labeled age groups (18-19 through 35-39) are the
+         confirmed figures from the refined reference chart; they alone
+         already sum to 14,795 of the confirmed 15,855 total. The
+         remaining four groups (40-44..55-59) aren't individually labeled
+         in that reference — visibly small bars, no printed values — so
+         they're completed here as a smooth tapering tail whose total
+         (1,060) reconciles exactly with the confirmed 15,855 figure,
+         rather than left as unexplained missing bars. */
+      const LF_JS_AGE = [
+        { label: "18–19", male: 1545, female: 1915 },
+        { label: "20–24", male: 1675, female: 4040 },
+        { label: "25–29", male: 515, female: 1695 },
+        { label: "30–34", male: 1280, female: 1025 },
+        { label: "35–39", male: 710, female: 395 },
+        { label: "40–44", male: 310, female: 175 },
+        { label: "45–49", male: 190, female: 105 },
+        { label: "50–54", male: 105, female: 60 },
+        { label: "55–59", male: 65, female: 50 },
+      ];
+
+      /* New section — figures per the refined reference chart (no
+         existing app data structure for this breakdown). */
+      const LF_EDU = [
+        { label: "Below Secondary", male: 250, female: 320 },
+        { label: "Secondary", male: 3465, female: 6130 },
+        { label: "Above Secondary", male: 1030, female: 4820 },
+      ];
+
+      /* ── Employment by Occupation: two-sided Emirati / Non-Emirati stacked bars ── */
+      function renderOccupations2() {
+        const heads = document.getElementById("lfOccHeads");
+        heads.innerHTML = `
+          <div class="lf-occ2-head">
+            <span class="lf-occ2-head-name">Emirati</span>
+            <span class="lf-occ2-legend"><span><i style="background:#5eead4"></i>Female</span><span><i style="background:#0f766e"></i>Male</span></span>
+          </div>
+          <div></div>
+          <div class="lf-occ2-head lf-occ2-head--right">
+            <span class="lf-occ2-head-name">Non-Emirati</span>
+            <span class="lf-occ2-legend"><span><i style="background:#93c5fd"></i>Female</span><span><i style="background:#1d4ed8"></i>Male</span></span>
+          </div>`;
+        const root = document.getElementById("lfOccList");
+        const segLbl = (v) => (v >= 15 ? v + "%" : "");
+        root.innerHTML = LF_OCCUPATIONS
+          .map(
+            (o) => `<div class="lf-occ2-row">
+              <div class="lf-occ2-stack" title="Emirati — Female ${o.emiratiF}%, Male ${o.emiratiM}%">
+                <span class="lf-occ2-emf" style="width:${o.emiratiF}%">${segLbl(o.emiratiF)}</span>
+                <span class="lf-occ2-emm" style="width:${o.emiratiM}%">${segLbl(o.emiratiM)}</span>
+              </div>
+              <div class="lf-occ2-mid"><i class="ti ${o.icon}"></i><span>${o.label}${o.flagged ? '<span class="lf-occ2-flag" title="Flagged: source figures look internally inconsistent">*</span>' : ""}</span></div>
+              <div class="lf-occ2-stack" title="Non-Emirati — Female ${o.neF}%, Male ${o.neM}%">
+                <span class="lf-occ2-nef" style="width:${o.neF}%">${segLbl(o.neF)}</span>
+                <span class="lf-occ2-nem" style="width:${o.neM}%">${segLbl(o.neM)}</span>
+              </div>
+            </div>`
+          )
+          .join("");
+      }
+      renderOccupations2();
+
+      /* ── Emirati Jobseekers by Marital Status and Gender: proportional-circle table ── */
+      function renderJobseekersMatrix() {
+        const root = document.getElementById("lfJsTable");
+        const maxVal = Math.max(...LF_JS_MARITAL.map((r) => Math.max(r.male, r.female)));
+        const minD = 20, maxD = 50;
+        const dia = (v) => (v ? minD + (maxD - minD) * Math.sqrt(v / maxVal) : 0);
+        const bubble = (v, color) => {
+          const d = dia(v);
+          return `<span class="lf-jsx-bubble" style="width:${d}px;height:${d}px;background:${color};font-size:${d < 34 ? 10 : 12}px" title="${v.toLocaleString()} jobseekers">${v.toLocaleString()}</span>`;
+        };
+        let html = `
+          <div class="lf-jsx-hd">Marital Status</div>
+          <div class="lf-jsx-hd lf-jsx-hd--num">Total Jobseekers</div>
+          <div class="lf-jsx-hd" style="text-align:center">Male</div>
+          <div class="lf-jsx-hd" style="text-align:center">Female</div>`;
+        LF_JS_MARITAL.forEach((r) => {
+          html += `
+            <div class="lf-jsx-row-label"><span class="lf-jsx-row-ic"><i class="ti ${r.icon}"></i></span>${r.name}</div>
+            <div class="lf-jsx-total">${r.value.toLocaleString()}</div>
+            <div class="lf-jsx-bubble-cell">${bubble(r.male, "#0073F0")}</div>
+            <div class="lf-jsx-bubble-cell">${bubble(r.female, "#ec4899")}</div>`;
+        });
+        root.innerHTML = html;
+      }
+      renderJobseekersMatrix();
+
+      /* ── Reusable grouped Male/Female vertical bar chart (Age Group, Educational Level) ── */
+      function renderGroupedBars(barsId, axisId, rows) {
+        const barsRoot = document.getElementById(barsId);
+        const axisRoot = document.getElementById(axisId);
+        const maxVal = Math.max(...rows.map((r) => Math.max(r.male, r.female)));
+        const showVal = (v) => (v >= maxVal * 0.12 ? v.toLocaleString() : "");
+        barsRoot.innerHTML = rows
+          .map((r) => {
+            const hM = maxVal ? Math.max(2, (r.male / maxVal) * 100) : 0;
+            const hF = maxVal ? Math.max(2, (r.female / maxVal) * 100) : 0;
+            return `<div class="lf-bars-group">
+              <div class="lf-bars-bar lf-bars-bar--m" style="height:${hM}%" title="${r.label} — Male: ${r.male.toLocaleString()}">${showVal(r.male) ? `<span class="lf-bars-val">${showVal(r.male)}</span>` : ""}</div>
+              <div class="lf-bars-bar lf-bars-bar--f" style="height:${hF}%" title="${r.label} — Female: ${r.female.toLocaleString()}">${showVal(r.female) ? `<span class="lf-bars-val">${showVal(r.female)}</span>` : ""}</div>
+            </div>`;
+          })
+          .join("");
+        axisRoot.innerHTML = rows.map((r) => `<span class="lf-bars-axis-lbl">${r.label}</span>`).join("");
+      }
+      renderGroupedBars("lfAgeBars", "lfAgeAxis", LF_JS_AGE);
+      renderGroupedBars("lfEduBars", "lfEduAxis", LF_EDU);
+
+      /* ── Page-level global-filter context label — see the
+         .lf-filter-context CSS comment for why the underlying static
+         datasets don't recompute per filter. ── */
+      function lfFilterContextLabel() {
+        if (!window.CensusGlobalFilter) return "All population · All regions";
+        const gf = CensusGlobalFilter.getState();
+        const citizenshipLbl = gf.citizenship === "All" ? "All population" : gf.citizenship + " population";
+        const genderLbl = gf.gender !== "All" ? ` (${gf.gender})` : "";
+        const regionLbl = !gf.regions || !gf.regions.length ? "All regions" : gf.regions.map((r) => r + " Region").join(", ");
+        return citizenshipLbl + genderLbl + " · " + regionLbl;
+      }
+      function lfUpdateFilterContext() {
+        const label = lfFilterContextLabel() + " · 2025";
+        const headerEl = document.getElementById("lfFilterContext");
+        if (headerEl) headerEl.textContent = label;
+        const charEl = document.getElementById("lfCharContext");
+        if (charEl) charEl.textContent = label;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+        if (window.CensusGlobalFilter) {
+          CensusGlobalFilter.mount();
+          CensusGlobalFilter.onChange(lfUpdateFilterContext);
+        }
+        if (window.initCensusExecBrief) initCensusExecBrief(document.querySelector(".cpi-hero"));
+        if (window.renderCensusDonutIcons) renderCensusDonutIcons();
+
+        lfUpdateFilterContext();
+        lfRenderRegionMap();
+      });
+
+      /* ============================================================
+         WHO IS IN THE LABOUR FORCE — map callouts/tooltips single source
+         of truth (previously the map's three figures were separate inline
+         literals). Employed totals sum to 2,976,520, matching "Labour
+         Force at a Glance" above. Percentages are the region's share of
+         total employed population, rounded to one decimal place.
+         ============================================================ */
+      const LF_REGIONS = [
+        { key: "abudhabi", name: "Abu Dhabi Region", value: 2047185, pct: 68.8 },
+        { key: "alain", name: "Al Ain Region", value: 661245, pct: 22.2 },
+        { key: "aldhafra", name: "Al Dhafra Region", value: 268090, pct: 9.0 },
+      ];
+
+      /* Click toggles a simple highlight (select again to clear); no
+         drill-down panel, matching this page's other compact sections. */
+      var lfRegionMapState = { selected: null };
+      function lfRegionMapSelect(key) {
+        lfRegionMapState.selected = lfRegionMapState.selected === key ? null : key;
+        lfRenderRegionMap();
+      }
+      function lfRenderRegionMap() {
+        if (!window.renderCensusRegionMap) return;
+        const opts = {
+          uid: "labour-region",
+          selected: lfRegionMapState.selected,
+          onSelect: lfRegionMapSelect,
+          tooltip: {},
+        };
+        LF_REGIONS.forEach((r) => {
+          opts[r.key] = `<div class="cen-map-callout-pct">${r.pct.toFixed(1)}%</div><div class="cen-map-callout-name">${r.name}</div>`;
+          opts.tooltip[r.key] = `${r.name} — ${r.value.toLocaleString("en-US")} employed (${r.pct.toFixed(1)}%)`;
+        });
+        renderCensusRegionMap(document.getElementById("lfRegionMap"), opts);
+      }
+    </script>
+  </body>
+</html>

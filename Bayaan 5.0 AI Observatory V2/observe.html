@@ -1,0 +1,2616 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consumer Price Index — Observe · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <!-- Shared design system (same order as CPI.html / forecast.html) -->
+    <link rel="stylesheet" href="css/pages/ai.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/pages/exec-home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" ? "dark" : "light"
+        );
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <style>
+      /* ====================================================================
+         OBSERVE VIEW — the price-observation ledger for the CPI Observatory.
+         Layout-only additions on top of the existing design system; every
+         surface, colour, radius and type ramp below is taken from a component
+         that already ships:
+           • panel      → .dg-section / .dg-panel (CPI.html Diagnose)
+           • cards      → the home "subcard" recipe (.obs-card + --figma-subcard-*)
+           • table      → .dg-table (CPI.html Analytics)
+           • deltas     → .dg-stat-v.up / .down (plain tone on the value)
+           • pills      → .dg-pill / .dg-month / .kpi-badge
+           • dropdowns  → .prod-filter-dd (Products screen, mirrored as in
+                          forecast.html because the originals are scoped to
+                          #screen-products)
+           • search     → .fx-search / .dg-search
+           • buttons    → .cpi-btn--primary / --secondary
+         No new colour language is introduced; tone lives on values only.
+         ==================================================================== */
+
+      /* Subcard tokens — redeclared here because the originals are scoped to
+         .screen-home (same as CPI.html / forecast.html). */
+      #screen-cpi-obs {
+        --figma-subcard-bg: rgba(255, 255, 255, 0.6);
+        --figma-subcard-shadow: 0 24px 30px 0 rgba(42, 61, 76, 0.03);
+      }
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card {
+        background: var(--figma-subcard-bg);
+        border: 1px solid #eaecf0;
+        box-shadow: var(--figma-subcard-shadow);
+      }
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card:hover {
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-md);
+      }
+      /* Pre-existing: the light border shorthand in cpi-obs.css outranks the
+         dark `border-color` in theme.css, leaving pale edges on dark cards. */
+      html[data-theme="dark"] #screen-cpi-obs .obs-card {
+        border-color: var(--border);
+      }
+
+      /* No rule under the page title/subtitle — zero width rather than a colour
+         override, so the dark-theme border-bottom-color can't bring it back. */
+      #screen-cpi-obs .cpi-page-header-inner {
+        border-bottom: 0;
+      }
+
+      /* Breadcrumb sits outside .page-wrap, so it clears neither the 120px rail
+         nor the page gutter. Realign it with the content column. */
+      #screen-cpi-obs .crisis-scroll > .container {
+        --obs-rail-w: 120px;
+        padding-inline: calc(var(--obs-rail-w) + var(--page-gutter))
+          var(--page-gutter);
+      }
+
+      /* Sidebar on brand primary (--accent / #0066FF), mirroring #screen-topic
+         in css/pages/obs-sidebar.css. Dark theme already resolves to --accent. */
+      html:not([data-theme="dark"]) #screen-cpi-obs .sidebar-icon {
+        background: #ebf3ff;
+        color: var(--accent);
+      }
+      html:not([data-theme="dark"])
+        #screen-cpi-obs
+        .sidebar-item:hover:not(.active):not(.sidebar-item--ai)
+        .sidebar-icon {
+        background: #dbe9ff;
+      }
+      html:not([data-theme="dark"])
+        #screen-cpi-obs
+        .sidebar-item.active:not(.sidebar-item--ai)
+        .sidebar-icon {
+        background: var(--accent);
+        color: #fff;
+      }
+      /* AI entry point on the app's AI gradient — same fill as .ai-mode-btn. */
+      html #screen-cpi-obs .sidebar .sidebar-item--ai .sidebar-icon {
+        background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+        color: #fff;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        transition: transform 0.15s, box-shadow 0.2s;
+      }
+      html #screen-cpi-obs .sidebar .sidebar-item--ai:hover .sidebar-icon {
+        background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+        transform: scale(1.04);
+      }
+      /* Compact floating sidebar — fits all items below the top nav. */
+      #screen-cpi-obs .sidebar {
+        top: calc(50% + 34px);
+        padding: 14px 10px;
+        gap: 9px;
+      }
+      #screen-cpi-obs .sidebar-item {
+        padding: 4px 0;
+        gap: 5px;
+        font-size: 10.5px;
+      }
+      /* Sidebar items that navigate are anchors — strip the link underline so
+         they render identically to the button items. */
+      #screen-cpi-obs a.sidebar-item {
+        text-decoration: none;
+      }
+      #screen-cpi-obs .sidebar-icon {
+        width: 38px;
+        height: 38px;
+      }
+      #screen-cpi-obs .sidebar-icon i {
+        font-size: 17px;
+      }
+
+      /* === Standard expanding icon rail (shared across observatory views) ===
+         Icons only by default; hovering the pill reveals every label at once,
+         to the right of its icon. Price AI sits on top, split from the view
+         switcher by a divider that grows with the rail. */
+      #screen-cpi-obs .sidebar {
+        max-width: none;
+        border-radius: 999px;
+        align-items: stretch;
+        padding: 8px 10px;
+        transition: none;
+      }
+      #screen-cpi-obs .sidebar:hover {
+        border-radius: 28px;
+      }
+      #screen-cpi-obs .sidebar-item {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        padding: 4px 4px;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-item {
+        justify-content: flex-start;
+        gap: 10px;
+      }
+      #screen-cpi-obs .sidebar-label {
+        max-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        opacity: 0;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text2);
+        transition: max-width 0.22s ease, opacity 0.18s ease;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-label {
+        max-width: 120px;
+        opacity: 1;
+      }
+      #screen-cpi-obs .sidebar-item.active:not(.sidebar-item--ai) .sidebar-label {
+        color: #272829;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .sidebar-label {
+        color: #cdd6e0;
+      }
+      #screen-cpi-obs .sidebar-item--ai .sidebar-label {
+        color: #0066ff;
+      }
+      #screen-cpi-obs .sidebar-divider {
+        width: 16px;
+        height: 2px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        margin: 1px 0 1px 15px;
+        align-self: flex-start;
+        transition: width 0.22s ease, margin-left 0.22s ease;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-divider {
+        width: calc(100% - 12px);
+        margin-left: 6px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .sidebar-divider {
+        background: #3a4453;
+      }
+
+      /* ── Content stack ── */
+      #screen-cpi-obs #cpi-observe-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      /* ====================================================================
+         TABLE-HEADER CONTROLS — view switcher · scope · date · search · filters
+         Filter controls are the application's standard .prod-filter-dd, copied
+         verbatim from #screen-products in style.css (same approach as
+         forecast.html). Keep in sync with the original.
+         ==================================================================== */
+      #screen-cpi-obs .prod-filter-dd {
+        position: relative;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 168px;
+        max-width: 240px;
+        height: 44px;
+        padding: 0 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        color: #0f2744;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger > span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger i.ti-chevron-down {
+        font-size: 15px;
+        color: #9ca3af;
+        flex-shrink: 0;
+        transition: transform 0.15s;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger.is-open i.ti-chevron-down {
+        transform: rotate(180deg);
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger:hover:not(:disabled),
+      #screen-cpi-obs .prod-filter-dd-trigger.is-open {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .prod-filter-dd-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        z-index: 9000;
+        min-width: 100%;
+        width: max-content;
+        max-width: min(320px, calc(100vw - 32px));
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 12px 40px rgba(11, 28, 61, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+        padding: 6px;
+        animation: govEntityDropIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      #screen-cpi-obs .prod-filter-dd-menu--right {
+        left: auto;
+        right: 0;
+      }
+      #screen-cpi-obs .prod-filter-dd-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 9px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 500;
+        color: #0f2744;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.12s, color 0.12s;
+      }
+      #screen-cpi-obs .prod-filter-dd-option .ti-check {
+        margin-left: auto;
+        color: var(--accent);
+        font-size: 15px;
+        opacity: 0;
+      }
+      #screen-cpi-obs .prod-filter-dd-option.is-active .ti-check {
+        opacity: 1;
+      }
+      #screen-cpi-obs .prod-filter-dd-option:hover {
+        background: #f8fbff;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .prod-filter-dd-option.is-active {
+        background: #eff6ff;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger {
+        background: var(--surface);
+        border-color: var(--border-md);
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger:hover:not(:disabled),
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger.is-open {
+        border-color: var(--accent);
+        color: var(--accent-mid);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-menu {
+        background: var(--surface);
+        border-color: var(--border-md);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option {
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option:hover,
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option.is-active {
+        background: var(--accent-light);
+        color: var(--accent-mid);
+      }
+
+      /* Date selector — the standard trigger carrying the .dg-scan icon chip and
+         a two-line reading of the observation date. */
+      #screen-cpi-obs .ob-dd-ic {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        background: var(--accent-light);
+        color: var(--accent);
+        font-size: 17px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-dd-ic {
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+      }
+      #screen-cpi-obs .ob-date-trigger {
+        min-width: 0;
+        gap: 12px;
+      }
+      #screen-cpi-obs .ob-date-txt {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        line-height: 1.05;
+      }
+      #screen-cpi-obs .ob-date-day {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: var(--text2);
+        text-transform: uppercase;
+      }
+      #screen-cpi-obs .ob-date-year {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger:hover .ob-date-year,
+      #screen-cpi-obs .prod-filter-dd-trigger.is-open .ob-date-year {
+        color: inherit;
+      }
+
+      /* Search — the Diagnose view's .dg-search, sized to the control row. */
+      #screen-cpi-obs .ob-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 1 240px;
+        min-width: 180px;
+        height: 44px;
+        padding: 0 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border, #eaecf0);
+        background: var(--white, #fff);
+        color: var(--text2);
+        font-size: 13px;
+      }
+      #screen-cpi-obs .ob-search > i {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .ob-search input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        outline: none;
+        background: none;
+        font-family: inherit;
+        font-size: 13px;
+        color: var(--text);
+      }
+      #screen-cpi-obs .ob-search input::placeholder {
+        color: var(--muted);
+      }
+      #screen-cpi-obs .ob-search:focus-within {
+        border-color: var(--accent);
+      }
+      #screen-cpi-obs .ob-kbd {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--accent-light);
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-search {
+        background: var(--surface);
+        border-color: var(--border-md);
+      }
+
+      /* ── KPI strip — three subcards: icon chip · value · label · as-of ── */
+      #screen-cpi-obs .ob-kpis {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      #screen-cpi-obs .ob-kpi {
+        --tone: var(--accent);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        border-radius: 16px;
+        padding: 16px 18px 18px;
+        min-width: 0;
+        transition: box-shadow 0.22s ease, border-color 0.22s ease,
+          transform 0.22s ease, background 0.22s ease;
+      }
+      /* Reference layout — the icon sits beside a stacked block of the eyebrow
+         label above the value; the caption drops to the card's bottom edge. */
+      #screen-cpi-obs .ob-kpi .kpi-label {
+        margin: 0;
+      }
+      #screen-cpi-obs .ob-kpi-idblock {
+        display: flex;
+        flex-direction: column;
+        gap: 8px; /* label → number */
+        min-width: 0;
+      }
+      #screen-cpi-obs .ob-kpi:hover {
+        transform: translateY(-1px);
+      }
+      #screen-cpi-obs .ob-kpi--varieties {
+        --tone: #0f9d76;
+      }
+      #screen-cpi-obs .ob-kpi--observations {
+        --tone: #7c5cff;
+      }
+      #screen-cpi-obs .ob-kpi-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      #screen-cpi-obs .ob-kpi-ic {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 10%, white);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-kpi-ic {
+        background: color-mix(in srgb, var(--tone) 20%, transparent);
+      }
+      #screen-cpi-obs .ob-kpi-ic i {
+        font-size: 18px;
+        line-height: 1;
+      }
+      #screen-cpi-obs .ob-kpi-val {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+      }
+      /* Caption pinned to the card's bottom edge, aligned across all three
+         cards (the grid stretches them to equal height). */
+      #screen-cpi-obs .ob-kpi-asof {
+        margin-top: auto;
+        padding-top: 2px;
+        font-size: 11.5px;
+        color: var(--text2);
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .ob-kpi-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      /* Status chips — .dg-pill geometry, semantic tones only. */
+      #screen-cpi-obs .ob-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding: 3px 9px;
+        border-radius: 100px;
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .ob-chip i {
+        font-size: 12px;
+      }
+      #screen-cpi-obs .ob-chip--info {
+        background: var(--accent-light);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ob-chip--good {
+        background: #e1f5ee;
+        color: #0f6e56;
+      }
+      #screen-cpi-obs .ob-chip--warn {
+        background: #fdf0d5;
+        color: #b5730a;
+      }
+      #screen-cpi-obs .ob-chip--bad {
+        background: #fceded;
+        color: #c02626;
+      }
+      #screen-cpi-obs .ob-chip--neutral {
+        background: rgba(102, 112, 133, 0.1);
+        color: var(--text2);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-chip--good {
+        background: color-mix(in srgb, var(--down) 22%, transparent);
+        color: #34c99a;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-chip--warn {
+        background: color-mix(in srgb, #f5a623 20%, transparent);
+        color: #f0b25a;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-chip--bad {
+        background: color-mix(in srgb, var(--up) 22%, transparent);
+        color: #ff6b6b;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-chip--info {
+        background: color-mix(in srgb, var(--accent) 22%, transparent);
+        color: var(--accent-mid);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-chip--neutral {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-secondary);
+      }
+
+      /* ── Date range — a from/to pair replacing the old range slider. Shell
+         matches the app's .prod-filter-dd-trigger; each field opens its own
+         native calendar popup on click (indicator hidden, showPicker on click). ── */
+      /* ── Date range — a compact trigger that opens a custom dual-month range
+         calendar (same control as the Trade page), themed on --accent. State
+         lives in two hidden inputs; the popover is anchored to the trigger. ── */
+      #screen-cpi-obs .ob-datepick {
+        position: relative;
+        display: inline-flex;
+      }
+      #screen-cpi-obs .ob-datepick-trigger {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        height: 38px;
+        padding: 0 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 9px;
+        background: #fff;
+        color: #0f2744;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      #screen-cpi-obs .ob-datepick-trigger:hover,
+      #screen-cpi-obs .ob-datepick-trigger.is-open {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+      }
+      #screen-cpi-obs .ob-datepick-trigger > .ti-calendar-event {
+        color: var(--accent);
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-right: 4px;
+      }
+      #screen-cpi-obs .ob-datepick-value {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      #screen-cpi-obs .ob-datepick-sep {
+        width: 8px;
+        height: 1.5px;
+        border-radius: 1px;
+        background: var(--muted);
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .ob-datepick-caret {
+        color: var(--muted);
+        font-size: 15px;
+        margin-left: 4px;
+        transition: transform 0.15s;
+      }
+      #screen-cpi-obs .ob-datepick-trigger.is-open .ob-datepick-caret {
+        transform: rotate(180deg);
+      }
+
+      /* Popover ─────────────────────────────────────────────────────────── */
+      #screen-cpi-obs .ob-cal {
+        --ob-band: #ebf3ff;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        z-index: 60;
+        width: 468px;
+        max-width: min(92vw, 468px);
+        padding: 14px;
+        background: #fff;
+        border: 1px solid #eaecf0;
+        border-radius: 14px;
+        box-shadow: 0 18px 44px -10px rgba(15, 23, 42, 0.24);
+        animation: obCalIn 0.14s ease-out;
+      }
+      @keyframes obCalIn {
+        from { opacity: 0; transform: translateY(-4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      #screen-cpi-obs .ob-cal[hidden] { display: none; }
+
+      #screen-cpi-obs .ob-cal-readout {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        height: 40px;
+        padding: 0 12px;
+        margin-bottom: 14px;
+        border: 1.5px solid var(--accent);
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #0f2744;
+      }
+      #screen-cpi-obs .ob-cal-readout .ti-calendar-event {
+        color: var(--accent);
+        font-size: 16px;
+      }
+      #screen-cpi-obs .ob-cal-range {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #screen-cpi-obs .ob-cal-range .ti { color: var(--accent); font-size: 14px; }
+      #screen-cpi-obs .ob-cal-ph { color: var(--muted); font-weight: 500; }
+
+      #screen-cpi-obs .ob-cal-months {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+      }
+      #screen-cpi-obs .ob-cal-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      #screen-cpi-obs .ob-cal-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #0f2744;
+      }
+      #screen-cpi-obs .ob-cal-arrow,
+      #screen-cpi-obs .ob-cal-arrow-ph {
+        width: 26px;
+        height: 26px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .ob-cal-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 17px;
+        cursor: pointer;
+        transition: background 0.12s, color 0.12s;
+      }
+      #screen-cpi-obs .ob-cal-arrow:hover {
+        background: #f1f5f9;
+        color: #0f2744;
+      }
+
+      #screen-cpi-obs .ob-cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        row-gap: 3px;
+      }
+      #screen-cpi-obs .ob-cal-dow {
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        padding: 4px 0 6px;
+      }
+      #screen-cpi-obs .ob-cal-day {
+        position: relative;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        background: transparent;
+        font-family: inherit;
+        cursor: pointer;
+      }
+      #screen-cpi-obs .ob-cal-num {
+        position: relative;
+        z-index: 1;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 500;
+        color: #0f2744;
+      }
+      #screen-cpi-obs button.ob-cal-day:hover .ob-cal-num {
+        background: var(--ob-band);
+      }
+      #screen-cpi-obs .ob-cal-day.is-muted {
+        cursor: default;
+      }
+      #screen-cpi-obs .ob-cal-day.is-muted .ob-cal-num {
+        color: #cbd5e1;
+      }
+      #screen-cpi-obs .ob-cal-day.is-range,
+      #screen-cpi-obs .ob-cal-day.is-start,
+      #screen-cpi-obs .ob-cal-day.is-end {
+        background: var(--ob-band);
+      }
+      #screen-cpi-obs .ob-cal-day.is-start {
+        background: linear-gradient(to right, transparent 50%, var(--ob-band) 50%);
+      }
+      #screen-cpi-obs .ob-cal-day.is-end {
+        background: linear-gradient(to left, transparent 50%, var(--ob-band) 50%);
+      }
+      #screen-cpi-obs .ob-cal-day.is-start.is-end {
+        background: transparent;
+      }
+      #screen-cpi-obs .ob-cal-day.is-start .ob-cal-num,
+      #screen-cpi-obs .ob-cal-day.is-end .ob-cal-num {
+        background: var(--accent);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      #screen-cpi-obs .ob-cal-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid #eef0f3;
+      }
+      #screen-cpi-obs .ob-cal-count {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #0f2744;
+      }
+      #screen-cpi-obs .ob-cal-actions {
+        display: flex;
+        gap: 8px;
+      }
+      #screen-cpi-obs .ob-cal-btn {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.12s, border-color 0.12s, filter 0.12s;
+      }
+      #screen-cpi-obs .ob-cal-btn--ghost {
+        background: #fff;
+        border-color: #e5e7eb;
+        color: #475569;
+      }
+      #screen-cpi-obs .ob-cal-btn--ghost:hover {
+        background: #f8fafc;
+        border-color: #d5dae1;
+      }
+      #screen-cpi-obs .ob-cal-btn--primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      #screen-cpi-obs .ob-cal-btn--primary:hover { filter: brightness(0.95); }
+
+      /* Dark theme ──────────────────────────────────────────────────────── */
+      html[data-theme="dark"] #screen-cpi-obs .ob-datepick-trigger {
+        background: var(--surface);
+        border-color: var(--border-md);
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal {
+        --ob-band: rgba(0, 102, 255, 0.22);
+        background: var(--surface);
+        border-color: var(--border);
+        box-shadow: 0 18px 44px -10px rgba(0, 0, 0, 0.55);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-readout,
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-title,
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-count,
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-num {
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-day.is-muted .ob-cal-num {
+        color: #475569;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-arrow:hover {
+        background: rgba(255, 255, 255, 0.07);
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-foot {
+        border-top-color: var(--border);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-btn--ghost {
+        background: transparent;
+        border-color: var(--border-md);
+        color: var(--text-secondary, #94a3b8);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-cal-btn--ghost:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      /* ── Products panel — the section module shell used by every other
+         Observatory section (.dg-section). ── */
+      #screen-cpi-obs .ob-panel {
+        padding: 18px 20px 20px;
+        border-radius: 20px;
+      }
+      /* The table now sits on its own card surface (same recipe as the KPI
+         subcards), so it reads as a distinct container rather than floating on
+         the page. Light-theme only — theme.css owns the dark surface. */
+      html:not([data-theme="dark"]) #screen-cpi-obs .ob-panel {
+        background: #fff;
+        border: 1px solid #eaecf0;
+        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.04);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+      }
+      /* Header splits into a left cluster (view switcher · scope) and a right
+         cluster (date · search · actions), wrapping gracefully when tight. */
+      #screen-cpi-obs .ob-panel-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px 16px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      #screen-cpi-obs .ob-hdr-left,
+      #screen-cpi-obs .ob-hdr-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        min-width: 0;
+      }
+      #screen-cpi-obs .ob-hdr-right {
+        flex: 1 1 auto;
+        justify-content: flex-end;
+      }
+      #screen-cpi-obs .ob-count {
+        font-weight: 500;
+        color: var(--text2);
+        margin-left: 6px;
+      }
+      #screen-cpi-obs .ob-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      /* Icon actions — Download is the primary fill (.cpi-btn--primary),
+         Watchlist the secondary surface (.cpi-btn--secondary). */
+      #screen-cpi-obs .ob-icon-btn {
+        position: relative;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .ob-icon-btn i {
+        font-size: 18px;
+      }
+      #screen-cpi-obs .ob-icon-btn--primary {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      #screen-cpi-obs .ob-icon-btn--primary:hover {
+        background: var(--accent-dark, #0052cc);
+        border-color: var(--accent-dark, #0052cc);
+      }
+      #screen-cpi-obs .ob-icon-btn--ghost {
+        background: var(--white, #fff);
+        color: var(--text2);
+        border-color: var(--border, #eaecf0);
+      }
+      #screen-cpi-obs .ob-icon-btn--ghost:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      #screen-cpi-obs .ob-icon-btn--ghost.is-on {
+        background: var(--accent-light);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-icon-btn--ghost {
+        background: var(--surface);
+        border-color: var(--border-md);
+        color: var(--text-secondary);
+      }
+      /* Kebab overflow — no bordered circle, just the 3-dot icon; a soft accent
+         disc appears only on hover/open. */
+      #screen-cpi-obs .ob-kebab.ob-icon-btn--ghost,
+      html[data-theme="dark"] #screen-cpi-obs .ob-kebab.ob-icon-btn--ghost {
+        background: transparent;
+        border-color: transparent;
+      }
+      #screen-cpi-obs .ob-kebab.ob-icon-btn--ghost:hover,
+      #screen-cpi-obs .ob-kebab.ob-icon-btn--ghost[aria-expanded="true"] {
+        background: var(--accent-light);
+        border-color: transparent;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ob-badge-count {
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
+        border-radius: 100px;
+        background: var(--up, #dc2626);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 17px;
+        text-align: center;
+        border: 0;
+        box-sizing: border-box;
+      }
+      /* Filters — the secondary button shape, sized to the icon buttons. */
+      #screen-cpi-obs .ob-filter-trigger {
+        height: 44px;
+        min-width: 0;
+        border-radius: 10px;
+      }
+
+      /* ── Table — .dg-table, widened for the observation ledger and
+         left-aligned (this is a catalogue, not a figures table). ── */
+      #screen-cpi-obs .ob-table-wrap {
+        overflow-x: auto;
+        border-top: 1px solid var(--border, #eaecf0);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-table-wrap {
+        border-color: var(--border);
+      }
+      #screen-cpi-obs .ob-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1280px;
+      }
+      #screen-cpi-obs .ob-table th {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text2);
+        text-align: left;
+        padding: 13px 14px;
+        border-bottom: 1px solid var(--border, #eaecf0);
+        white-space: nowrap;
+        vertical-align: middle;
+      }
+      #screen-cpi-obs .ob-table th .ti-info-circle {
+        font-size: 12px;
+        color: var(--muted);
+        margin-left: 3px;
+        vertical-align: -1px;
+      }
+      #screen-cpi-obs .ob-th-sort {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border: 0;
+        background: none;
+        padding: 0;
+        font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        color: inherit;
+        cursor: pointer;
+      }
+      #screen-cpi-obs .ob-th-sort:hover {
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ob-th-sort i {
+        font-size: 12px;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ob-table td {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        text-align: left;
+        padding: 11px 14px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        white-space: nowrap;
+        vertical-align: middle;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-table td {
+        border-color: color-mix(in srgb, var(--border) 60%, transparent);
+      }
+      #screen-cpi-obs .ob-table tbody tr {
+        transition: background 0.15s ease;
+      }
+      #screen-cpi-obs .ob-table tbody tr.ob-row:hover {
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .ob-table td.ob-td-exp {
+        width: 40px;
+        padding-right: 0;
+      }
+      #screen-cpi-obs .ob-table td.ob-td-act {
+        width: 52px;
+        text-align: right;
+      }
+
+      /* Expand control — chevron rotates open, as on the app's disclosure rows. */
+      #screen-cpi-obs .ob-exp {
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text2);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s, transform 0.15s;
+      }
+      #screen-cpi-obs .ob-exp i {
+        font-size: 16px;
+        transition: transform 0.15s ease;
+      }
+      #screen-cpi-obs .ob-exp:hover {
+        background: var(--accent-light);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ob-exp.is-open i {
+        transform: rotate(90deg);
+      }
+      #screen-cpi-obs .ob-exp.is-open {
+        color: var(--accent);
+      }
+
+      /* Product cell */
+      #screen-cpi-obs .ob-prod {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+      #screen-cpi-obs .ob-prod-ic {
+        font-size: 17px;
+        color: var(--muted);
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .ob-prod-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        white-space: normal;
+        line-height: 1.35;
+      }
+      #screen-cpi-obs .ob-table td.ob-td-prod {
+        white-space: normal;
+        min-width: 300px;
+        max-width: 420px;
+      }
+
+      /* Deltas — tone on the value only (.dg-stat-v.up / .down). */
+      #screen-cpi-obs .ob-delta {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        font-size: 12.5px;
+        font-weight: 600;
+      }
+      #screen-cpi-obs .ob-delta i {
+        font-size: 14px;
+      }
+      #screen-cpi-obs .ob-delta--up {
+        color: var(--up, #dc2626);
+      }
+      #screen-cpi-obs .ob-delta--down {
+        color: var(--down, #16a34a);
+      }
+      #screen-cpi-obs .ob-delta--flat {
+        color: var(--text2);
+      }
+      #screen-cpi-obs .ob-none {
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      /* Price range — value plus a rail showing where the observed prices sit. */
+      #screen-cpi-obs .ob-range {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 118px;
+      }
+      #screen-cpi-obs .ob-range-val {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--text);
+      }
+      #screen-cpi-obs .ob-range-rail {
+        position: relative;
+        height: 3px;
+        border-radius: 100px;
+        background: rgba(15, 23, 42, 0.08);
+      }
+      #screen-cpi-obs .ob-range-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 3px;
+        border-radius: 100px;
+        background: var(--accent);
+        opacity: 0.35;
+      }
+      #screen-cpi-obs .ob-range-dot {
+        position: absolute;
+        top: 50%;
+        width: 6px;
+        height: 6px;
+        margin-left: -3px;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-range-rail {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      #screen-cpi-obs .ob-muted {
+        color: var(--text2);
+        font-weight: 500;
+      }
+
+      /* Watch toggle in the action column */
+      #screen-cpi-obs .ob-watch {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s, border-color 0.15s;
+      }
+      #screen-cpi-obs .ob-watch i {
+        font-size: 17px;
+      }
+      #screen-cpi-obs .ob-watch:hover {
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .ob-watch.is-on {
+        color: #fff;
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* Expanded detail row — the variety breakdown behind a product. */
+      #screen-cpi-obs tr.ob-detail > td {
+        padding: 0 14px 0 54px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        background: rgba(15, 23, 42, 0.015);
+      }
+      html[data-theme="dark"] #screen-cpi-obs tr.ob-detail > td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      #screen-cpi-obs .ob-detail-inner {
+        padding: 12px 0 16px;
+      }
+      #screen-cpi-obs .ob-detail-hd {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text2);
+        margin-bottom: 8px;
+      }
+      #screen-cpi-obs .ob-var-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-width: 720px;
+      }
+      #screen-cpi-obs .ob-var {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border, #eaecf0);
+        background: var(--white, #fff);
+        font-size: 12.5px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-var {
+        background: var(--surface);
+        border-color: var(--border-md);
+      }
+      #screen-cpi-obs .ob-var-name {
+        font-weight: 600;
+        color: var(--text);
+        flex: 1;
+        min-width: 0;
+      }
+      #screen-cpi-obs .ob-var-outlet {
+        color: var(--text2);
+        width: 150px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .ob-var-price {
+        font-weight: 600;
+        color: var(--text);
+        width: 90px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .ob-var-delta {
+        width: 84px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+
+      /* Table foot — result count on the left, pagination on the right. */
+      #screen-cpi-obs .ob-tfoot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-top: 14px;
+        font-size: 12px;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .ob-tfoot-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      /* Pagination — muted text Prev/Next at the ends, numbered pages in the
+         middle with the current page filled in the accent. */
+      #screen-cpi-obs .ob-pager {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+      #screen-cpi-obs .ob-pager-nav,
+      #screen-cpi-obs .ob-pager-page {
+        height: 32px;
+        min-width: 32px;
+        padding: 0 9px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text2);
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        transition: background 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .ob-pager-nav i {
+        font-size: 15px;
+      }
+      #screen-cpi-obs .ob-pager-nav:hover:not(:disabled),
+      #screen-cpi-obs .ob-pager-page:hover:not(.is-active) {
+        background: var(--accent-light);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ob-pager-page.is-active {
+        background: var(--accent);
+        color: #fff;
+      }
+      #screen-cpi-obs .ob-pager-nav:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      #screen-cpi-obs .ob-pager-ellipsis {
+        min-width: 22px;
+        text-align: center;
+        color: var(--muted);
+        user-select: none;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-pager-page.is-active {
+        color: #fff;
+      }
+      #screen-cpi-obs .ob-empty {
+        padding: 34px 14px;
+        text-align: center;
+        color: var(--text2);
+        font-size: 13px;
+      }
+
+      /* Filters menu — standard dropdown surface with grouped option rows
+         (.prod-filter-dd-option), the same control the app's other dropdowns
+         use. Scrolls when the stacked groups exceed the viewport. */
+      #screen-cpi-obs .ob-filter-menu {
+        width: 244px;
+        padding: 6px;
+        max-height: min(70vh, 520px);
+        overflow-y: auto;
+      }
+      #screen-cpi-obs .ob-filter-group + .ob-filter-group {
+        margin-top: 6px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border, #eaecf0);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-filter-group + .ob-filter-group {
+        border-color: var(--border-md);
+      }
+      #screen-cpi-obs .ob-filter-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text2);
+        margin: 4px 8px 4px;
+      }
+      /* Actions overflow (kebab) menu — icon + label rows. */
+      #screen-cpi-obs .ob-actions-menu {
+        min-width: 200px;
+        padding: 6px;
+      }
+      #screen-cpi-obs .ob-actions-menu .prod-filter-dd-option i:first-child {
+        font-size: 16px;
+        color: var(--text2);
+      }
+
+      /* View switcher — segmented control mirroring the Diagnose Analytics
+         table's .dg-view-toggle (CPI.html): pill track, active tab lifts onto
+         a white chip in the accent colour. */
+      #screen-cpi-obs .ob-view-toggle {
+        display: inline-flex;
+        gap: 2px;
+        padding: 3px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.05);
+      }
+      #screen-cpi-obs .ob-view-toggle button {
+        width: 36px;
+        height: 34px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text2);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        transition: color 0.15s, background 0.15s, box-shadow 0.15s;
+      }
+      #screen-cpi-obs .ob-view-toggle button:hover:not(.is-active) {
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ob-view-toggle button.is-active {
+        background: var(--white, #fff);
+        color: var(--accent);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-view-toggle {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-view-toggle button.is-active {
+        background: var(--surface-2, #0f141d);
+      }
+      #screen-cpi-obs .ob-filter-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      #screen-cpi-obs .ob-filter-chip {
+        padding: 5px 11px;
+        border-radius: 100px;
+        border: 1px solid var(--border, #eaecf0);
+        background: var(--white, #fff);
+        color: var(--text2);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.12s, color 0.12s, border-color 0.12s;
+      }
+      #screen-cpi-obs .ob-filter-chip:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ob-filter-chip.is-active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-filter-chip {
+        background: var(--surface);
+        border-color: var(--border-md);
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .ob-filter-chip.is-active {
+        background: var(--accent);
+        color: #fff;
+      }
+      #screen-cpi-obs .ob-filter-foot {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 1100px) {
+        #screen-cpi-obs .ob-kpis {
+          grid-template-columns: 1fr;
+        }
+        #screen-cpi-obs .ob-search {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==================== SCREEN: CPI OBSERVATORY — OBSERVE (standalone) ==================== -->
+    <div id="screen-cpi-obs" class="screen ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="#" onclick="goTo('screen-home'); return false;">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="openObservatories(event); return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="CPI.html">Consumer Price Index</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Observe</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <aside class="sidebar" aria-label="CPI views">
+              <button
+                type="button"
+                class="sidebar-item sidebar-item--ai"
+                onclick="openObsSidebarAI(this, 'bayaan-ai', 'Price AI', 'ti-sparkles')"
+              >
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Price AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <!-- Interpret and Diagnose are panes on CPI.html; Forecast and
+                   Benchmark are their own pages — real links, so they work
+                   without JS and support open-in-new-tab. -->
+              <a class="sidebar-item" href="CPI.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="CPI.html#diagnose">
+                <div class="sidebar-icon"><i class="ti ti-search"></i></div>
+                <span class="sidebar-label">Diagnose</span>
+              </a>
+              <a class="sidebar-item" href="forecast.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+                <span class="sidebar-label">Forecast</span>
+              </a>
+              <a class="sidebar-item" href="benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+              <button type="button" class="sidebar-item active" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </button>
+              <a class="sidebar-item" href="trade.html">
+                <div class="sidebar-icon"><i class="ti ti-arrows-exchange"></i></div>
+                <span class="sidebar-label">Trade</span>
+              </a>
+            </aside>
+          </div>
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <h1 class="topic-title">CPI Observe</h1>
+                    <p class="topic-title-sub">Abu Dhabi · Price observations as of Jul 14, 2026</p>
+                  </div>
+                </div>
+              </div>
+
+              <div id="cpi-observe-content" class="cpi-obs-content">
+                <!-- ── KPI summary ── -->
+                <div class="ob-kpis">
+                  <div class="obs-card ob-kpi ob-kpi--products">
+                    <div class="ob-kpi-head">
+                      <div class="ob-kpi-ic"><i class="ti ti-box"></i></div>
+                      <div class="ob-kpi-idblock">
+                        <div class="kpi-label">Products</div>
+                        <div class="ob-kpi-val">642</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="obs-card ob-kpi ob-kpi--varieties">
+                    <div class="ob-kpi-head">
+                      <div class="ob-kpi-ic"><i class="ti ti-stack-2"></i></div>
+                      <div class="ob-kpi-idblock">
+                        <div class="kpi-label">Varieties</div>
+                        <div class="ob-kpi-val">859,829</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="obs-card ob-kpi ob-kpi--observations">
+                    <div class="ob-kpi-head">
+                      <div class="ob-kpi-ic"><i class="ti ti-eye"></i></div>
+                      <div class="ob-kpi-idblock">
+                        <div class="kpi-label">Observations</div>
+                        <div class="ob-kpi-val">31,213,627</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── Products table ── -->
+                <section class="dg-section ob-panel" aria-label="Products">
+                  <div class="ob-panel-hdr">
+                    <div class="ob-hdr-left">
+                      <!-- View switcher — segmented control, mirroring the
+                           Diagnose Analytics table's view toggle (.dg-view-toggle). -->
+                      <div class="ob-view-toggle" role="group" aria-label="View">
+                        <button type="button" class="is-active" aria-pressed="true" title="Charts" aria-label="Charts" onclick="setObView(this)">
+                          <i class="ti ti-chart-histogram" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" aria-pressed="false" title="Table" aria-label="Table" onclick="setObView(this)">
+                          <i class="ti ti-table" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" aria-pressed="false" title="Heatmap" aria-label="Heatmap" onclick="setObView(this)">
+                          <i class="ti ti-layout-grid" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div><!-- /.ob-hdr-left -->
+
+                    <div class="ob-hdr-right">
+                    <!-- Product search (first) -->
+                    <div class="ob-search">
+                      <i class="ti ti-search" aria-hidden="true"></i>
+                      <input
+                        type="search"
+                        id="obSearch"
+                        placeholder="Search products…"
+                        aria-label="Search products"
+                      />
+                      <span class="ob-kbd">Ctrl+K</span>
+                    </div>
+
+                    <!-- Observation date range — compact trigger opening a dual-month range calendar -->
+                    <div class="ob-datepick" id="obDatepick">
+                      <button
+                        type="button"
+                        class="ob-datepick-trigger"
+                        id="obDateTrigger"
+                        aria-haspopup="dialog"
+                        aria-expanded="false"
+                        aria-label="Observation date range"
+                        onclick="toggleObCal()"
+                      >
+                        <i class="ti ti-calendar-event" aria-hidden="true"></i>
+                        <span class="ob-datepick-value">
+                          <span id="obDateFromLabel">18 Dec 2025</span>
+                          <span class="ob-datepick-sep" aria-hidden="true"></span>
+                          <span id="obDateToLabel">14 Jul 2026</span>
+                        </span>
+                        <i class="ti ti-chevron-down ob-datepick-caret" aria-hidden="true"></i>
+                      </button>
+                      <input type="hidden" id="obDateFrom" value="2025-12-18" />
+                      <input type="hidden" id="obDateTo" value="2026-07-14" />
+
+                      <div class="ob-cal" id="obCal" role="dialog" aria-label="Select observation date range" hidden onclick="event.stopPropagation()">
+                        <div class="ob-cal-readout" id="obCalReadout"></div>
+                        <div class="ob-cal-months" id="obCalMonths"></div>
+                        <div class="ob-cal-foot">
+                          <span class="ob-cal-count" id="obCalCount"></span>
+                          <div class="ob-cal-actions">
+                            <button type="button" class="ob-cal-btn ob-cal-btn--ghost" onclick="closeObCal()">Cancel</button>
+                            <button type="button" class="ob-cal-btn ob-cal-btn--primary" onclick="applyObCal()">Done</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Filters — standard option-row menu. The former Products
+                         scope selector (Show) and the Group selector are folded
+                         in here alongside the table filters. -->
+                    <div class="prod-filter-dd" id="obFiltersDd">
+                      <button
+                        type="button"
+                        class="prod-filter-dd-trigger ob-filter-trigger"
+                        id="obFiltersTrigger"
+                        aria-expanded="false"
+                        aria-controls="obFiltersMenu"
+                        onclick="toggleObDropdown('filters')"
+                      >
+                        <i class="ti ti-filter" aria-hidden="true"></i>
+                        <span>Filters</span>
+                        <i class="ti ti-chevron-down" aria-hidden="true"></i>
+                      </button>
+                      <div
+                        class="prod-filter-dd-menu prod-filter-dd-menu--right ob-filter-menu"
+                        id="obFiltersMenu"
+                        aria-label="Filters"
+                        hidden
+                      >
+                        <div class="ob-filter-group" data-filter="show">
+                          <div class="ob-filter-label">Show</div>
+                          <button type="button" class="prod-filter-dd-option is-active" data-value="Products">Products <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Varieties">Varieties <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Outlets">Outlets <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Watchlist">Watchlist <i class="ti ti-check" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="ob-filter-group" data-filter="group">
+                          <div class="ob-filter-label">Group</div>
+                          <button type="button" class="prod-filter-dd-option is-active" data-value="all">All Groups <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Food &amp; Beverages">Food &amp; Beverages <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Transport">Transport <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Housing &amp; Utilities">Housing &amp; Utilities <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Health">Health <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Clothing &amp; Footwear">Clothing &amp; Footwear <i class="ti ti-check" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="ob-filter-group" data-filter="type">
+                          <div class="ob-filter-label">Type</div>
+                          <button type="button" class="prod-filter-dd-option is-active" data-value="all">All <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Goods">Goods <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Service">Service <i class="ti ti-check" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="ob-filter-group" data-filter="basket">
+                          <div class="ob-filter-label">Basket</div>
+                          <button type="button" class="prod-filter-dd-option is-active" data-value="all">All <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Overall">Overall <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="Essential">Essential <i class="ti ti-check" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="ob-filter-group" data-filter="stock">
+                          <div class="ob-filter-label">Availability</div>
+                          <button type="button" class="prod-filter-dd-option is-active" data-value="all">All <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="in">In stock <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="partial">Partial <i class="ti ti-check" aria-hidden="true"></i></button>
+                          <button type="button" class="prod-filter-dd-option" data-value="oos">Out of stock <i class="ti ti-check" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="ob-filter-foot">
+                          <button type="button" class="cpi-btn cpi-btn--secondary" onclick="clearObFilters()">
+                            Clear all
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Overflow actions — Download and the watchlist view are
+                         tucked into a 3-dot menu to keep the header uncluttered. -->
+                    <div class="prod-filter-dd" id="obActionsDd">
+                      <button
+                        type="button"
+                        class="ob-icon-btn ob-icon-btn--ghost ob-kebab"
+                        id="obActionsTrigger"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        aria-controls="obActionsMenu"
+                        title="More actions"
+                        aria-label="More actions"
+                        onclick="toggleObDropdown('actions')"
+                      >
+                        <i class="ti ti-dots-vertical" aria-hidden="true"></i>
+                      </button>
+                      <div
+                        class="prod-filter-dd-menu prod-filter-dd-menu--right ob-actions-menu"
+                        id="obActionsMenu"
+                        aria-label="Table actions"
+                        hidden
+                      >
+                        <button type="button" class="prod-filter-dd-option" role="menuitem" onclick="downloadObserveCsv(); closeAllObDropdowns();">
+                          <i class="ti ti-download" aria-hidden="true"></i> Download table
+                        </button>
+                        <button type="button" class="prod-filter-dd-option" role="menuitem" id="obWatchOnly" aria-pressed="false" onclick="toggleWatchOnly(this)">
+                          <i class="ti ti-eye" aria-hidden="true"></i> Show watchlist only <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    </div><!-- /.ob-hdr-right -->
+                  </div>
+
+                  <div class="ob-table-wrap">
+                    <table class="ob-table">
+                      <thead>
+                        <tr>
+                          <th scope="col"><span class="sr-only-x"></span></th>
+                          <th scope="col">
+                            <button type="button" class="ob-th-sort" id="obSortProduct" onclick="toggleObSort()">
+                              Product <i class="ti ti-caret-up-filled" id="obSortIcon" aria-hidden="true"></i>
+                            </button>
+                          </th>
+                          <th scope="col">W/W % <i class="ti ti-info-circle" title="Week-on-week price change"></i></th>
+                          <th scope="col">D/D % <i class="ti ti-info-circle" title="Day-on-day price change"></i></th>
+                          <th scope="col">Price % <i class="ti ti-info-circle" title="Change since the window start"></i></th>
+                          <th scope="col">OOS <i class="ti ti-info-circle" title="Varieties out of stock"></i></th>
+                          <th scope="col">OOS % <i class="ti ti-info-circle" title="Share of varieties out of stock"></i></th>
+                          <th scope="col">Price Range <i class="ti ti-info-circle" title="Lowest to highest observed price (AED)"></i></th>
+                          <th scope="col">Type</th>
+                          <th scope="col">Basket</th>
+                          <th scope="col">Varieties <i class="ti ti-info-circle" title="Distinct varieties tracked"></i></th>
+                          <th scope="col">Tags</th>
+                          <th scope="col"><span class="ob-none">·</span></th>
+                        </tr>
+                      </thead>
+                      <tbody id="obTbody"></tbody>
+                    </table>
+                  </div>
+                  <div class="ob-tfoot">
+                    <div class="ob-tfoot-left">
+                      <i class="ti ti-list-details" aria-hidden="true"></i>
+                      <span id="obFootText">Showing 1–10 of 22 products</span>
+                    </div>
+                    <nav class="ob-pager" id="obPager" aria-label="Table pagination"></nav>
+                  </div>
+                </section>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ============================================================
+         Standalone stubs — this page is isolated and does NOT link
+         back into the main application. The shared top navigation and
+         breadcrumb are kept for visual parity; their cross-screen
+         actions are no-ops here (same contract as CPI.html).
+         ============================================================ */
+      function goTo() {}
+      function openGeoView(e) { if (e) e.preventDefault(); }
+      function openBayaanSpace(e) { if (e) e.preventDefault(); }
+      function openProducts(e) { if (e) e.preventDefault(); }
+      function openObservatories(e) { if (e) e.preventDefault(); }
+      function openWsDrp() {}
+      function onHeaderSearchClick() {}
+      function openObsSidebarAI(el) { activateSidebar(el); }
+      function toast() {}
+
+      function activateSidebar(el) {
+        const sidebar = el.closest(".sidebar");
+        (sidebar || document)
+          .querySelectorAll(".sidebar-item")
+          .forEach((s) => s.classList.remove("active"));
+        el.classList.add("active");
+        /* Interpret, Diagnose, Forecast and Benchmark are links to their own
+           pages and never reach this handler; Trade has no content yet, so
+           selecting it only moves the highlight. */
+      }
+
+      /* ============================================================
+         DROPDOWNS — the standard filter dropdown behaviour, mirroring
+         toggleProdFilterDropdown() on the Products screen: one menu open
+         at a time, aria-expanded + .is-open on the trigger (which rotates
+         the chevron), and a check mark on the active option.
+         ============================================================ */
+      const OB_DROPDOWNS = {
+        filters: ["obFiltersMenu", "obFiltersTrigger", null],
+        actions: ["obActionsMenu", "obActionsTrigger", null],
+      };
+
+      function toggleObDropdown(which, force) {
+        const [menuId, triggerId] = OB_DROPDOWNS[which] || [];
+        const menu = document.getElementById(menuId);
+        const trigger = document.getElementById(triggerId);
+        if (!menu || !trigger) return;
+        const open =
+          typeof force === "boolean" ? force : menu.hasAttribute("hidden");
+        if (open) {
+          if (typeof closeObCal === "function") closeObCal();
+          Object.keys(OB_DROPDOWNS).forEach((key) => {
+            if (key !== which) toggleObDropdown(key, false);
+          });
+        }
+        menu.hidden = !open;
+        trigger.setAttribute("aria-expanded", open ? "true" : "false");
+        trigger.classList.toggle("is-open", open);
+      }
+
+      function closeAllObDropdowns() {
+        Object.keys(OB_DROPDOWNS).forEach((k) => toggleObDropdown(k, false));
+      }
+
+      function initObDropdowns() {
+        Object.entries(OB_DROPDOWNS).forEach(([which, [menuId, , labelId]]) => {
+          const menu = document.getElementById(menuId);
+          if (!menu) return;
+          /* Only label dropdowns (date) use the generic option handler. The
+             Filters menu is multi-group (initObFilters) and the actions kebab
+             carries its own item handlers — both are left untouched here. */
+          if (!labelId) return;
+          menu.querySelectorAll(".prod-filter-dd-option").forEach((opt) => {
+            opt.addEventListener("click", () => {
+              menu
+                .querySelectorAll(".prod-filter-dd-option")
+                .forEach((o) => o.classList.remove("is-active"));
+              opt.classList.add("is-active");
+              const text = opt.textContent.trim();
+              if (which === "date") {
+                /* "14 Jul 2026" → day line + year line */
+                const parts = text.split(" ");
+                document.getElementById("obDateDay").textContent =
+                  parts.slice(0, 2).join(" ");
+                document.getElementById("obDateYear").textContent = parts[2] || "";
+              } else if (labelId) {
+                const label = document.getElementById(labelId);
+                if (label) label.textContent = text;
+              }
+              /* The catalogue on this page is a single published extract, so
+                 no option re-hydrates the dataset — only the label moves. */
+              toggleObDropdown(which, false);
+            });
+          });
+        });
+
+        /* Click-away and Escape close, as on the Products filter bar. */
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest(".ob-datepick")) closeObCal();
+          if (e.target.closest(".prod-filter-dd")) return;
+          closeAllObDropdowns();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            closeAllObDropdowns();
+            closeObCal();
+          }
+        });
+      }
+
+      /* View switcher — segmented control; the active tab is cosmetic on this
+         single published extract (same contract as the old Charts dropdown). */
+      function setObView(btn) {
+        const group = btn.closest(".ob-view-toggle");
+        if (!group) return;
+        group.querySelectorAll("button").forEach((b) => {
+          b.classList.remove("is-active");
+          b.setAttribute("aria-pressed", "false");
+        });
+        btn.classList.add("is-active");
+        btn.setAttribute("aria-pressed", "true");
+      }
+
+      /* ============================================================
+         OBSERVATION LEDGER
+         One row per product; `oos` carries the stock reading, `range`
+         the observed price band (single value when only one variety is
+         priced). `dot` is where the modal price sits inside the band.
+         ============================================================ */
+      const OB_ROWS = [
+        {
+          name: "Accessories (rings, chains, etc.)",
+          ww: -10.32, dd: -1.03, price: -8.91,
+          oos: { kind: "partial", label: "41/5780" }, oosPct: 0,
+          range: [1.0, 315.0], dot: 0.08,
+          type: "Goods", basket: "Overall", varieties: 5780, tags: [],
+        },
+        {
+          name: "Adhesive and non-adhesive bandages, gauze, and wound plasters",
+          ww: null, dd: null, price: 0,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [1.88], dot: null,
+          type: "Goods", basket: "Overall", varieties: 1, tags: [],
+        },
+        {
+          name: "Africa excl. Arab countries (hotel + airfare)",
+          ww: null, dd: null, price: null,
+          oos: { kind: "oos", label: "OOS" }, oosPct: 100,
+          range: null, dot: null,
+          type: "Service", basket: "Overall", varieties: 1, tags: [],
+        },
+        {
+          name: "Agal",
+          ww: null, dd: null, price: 1.18,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [35.0, 100.0], dot: 0.45,
+          type: "Goods", basket: "Overall", varieties: 3, tags: [],
+        },
+        {
+          name: "Air Conditioner Maintenance",
+          ww: null, dd: null, price: 19.84,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [200.0, 500.0], dot: 0.5,
+          type: "Service", basket: "Overall", varieties: 2, tags: [],
+          watched: true,
+        },
+        {
+          name: "Air Conditioners (Various Types)",
+          ww: 0.48, dd: -0.15, price: 2.38,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [119.0, 6550.0], dot: 0.24,
+          type: "Goods", basket: "Overall", varieties: 256, tags: [],
+        },
+        {
+          name: "Air Fryers",
+          ww: 0.28, dd: 0.08, price: 0.47,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [118.0, 1249.0], dot: 0.18,
+          type: "Goods", basket: "Overall", varieties: 189, tags: [],
+        },
+        {
+          name: "Air Transport (Africa Excluding Arab Countries)",
+          ww: -9.2, dd: 191.08, price: -35.67,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [4570.0], dot: null,
+          type: "Service", basket: "Overall", varieties: 1, tags: [],
+        },
+        {
+          name: "Air Transport (Americas)",
+          ww: 5.46, dd: -19.28, price: 53.07,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [9460.0], dot: null,
+          type: "Service", basket: "Overall", varieties: 1, tags: [],
+        },
+        {
+          name: "Air Transport (Arab Countries)",
+          ww: 63.32, dd: -26.35, price: 41.07,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [2328.0], dot: null,
+          type: "Service", basket: "Essential", varieties: 1, tags: ["Essential"],
+        },
+        {
+          name: "Air Transport (Asia Excluding Arab Countries)",
+          ww: 162.05, dd: 38.27, price: 56.29,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [5600.0], dot: null,
+          type: "Service", basket: "Essential", varieties: 1, tags: ["Essential"],
+        },
+        {
+          name: "Air Transport (Australia)",
+          ww: 88.73, dd: -7.04, price: 14.28,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [8571.99], dot: null,
+          type: "Service", basket: "Overall", varieties: 1, tags: [],
+        },
+        {
+          name: "Air Transport (Europe)",
+          ww: 168.68, dd: 115.45, price: -17.33,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [4546.0], dot: null,
+          type: "Service", basket: "Essential", varieties: 1, tags: ["Essential"],
+        },
+        {
+          name: "Alcoholic Aperitifs",
+          ww: -0.82, dd: -0.85, price: 0,
+          oos: { kind: "partial", label: "93/1312" }, oosPct: 2,
+          range: [1.0, 529.0], dot: 0.1,
+          type: "Goods", basket: "Essential", varieties: 1310, tags: ["Essential"],
+        },
+        {
+          name: "Alcoholic Beverages Mixed with Water, Cola, etc.",
+          ww: 0, dd: 0, price: 2.2,
+          oos: { kind: "partial", label: "4/98" }, oosPct: 4,
+          range: [35.0, 212.0], dot: 0.3,
+          type: "Goods", basket: "Essential", varieties: 97, tags: ["Essential"],
+        },
+        {
+          name: "Almonds and Mixed Nuts",
+          ww: 1.42, dd: 0.11, price: 6.03,
+          oos: { kind: "partial", label: "18/642" }, oosPct: 3,
+          range: [7.5, 189.0], dot: 0.22,
+          type: "Goods", basket: "Essential", varieties: 640, tags: ["Essential", "Vital"],
+        },
+        {
+          name: "All-Purpose Wheat Flour",
+          ww: -0.31, dd: 0.0, price: -1.14,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [4.25, 46.0], dot: 0.16,
+          type: "Goods", basket: "Essential", varieties: 214, tags: ["Essential", "Vital"],
+        },
+        {
+          name: "Aluminium Foil and Cling Film",
+          ww: 0.0, dd: 0.0, price: 0.0,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [3.0, 58.5], dot: 0.28,
+          type: "Goods", basket: "Overall", varieties: 132, tags: [],
+        },
+        {
+          name: "Ambulance and Emergency Transport Services",
+          ww: null, dd: null, price: 0.0,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [350.0, 1200.0], dot: 0.4,
+          type: "Service", basket: "Essential", varieties: 4, tags: ["Essential"],
+        },
+        {
+          name: "Antiseptics and Disinfectants",
+          ww: 2.06, dd: 0.42, price: 4.88,
+          oos: { kind: "partial", label: "7/311" }, oosPct: 2,
+          range: [5.0, 96.0], dot: 0.2,
+          type: "Goods", basket: "Overall", varieties: 311, tags: [],
+        },
+        {
+          name: "Apartment Rent (2 Bedroom)",
+          ww: 0.14, dd: 0.0, price: 3.72,
+          oos: { kind: "in", label: "In Stock" }, oosPct: 0,
+          range: [48000.0, 165000.0], dot: 0.36,
+          type: "Service", basket: "Essential", varieties: 58, tags: ["Essential", "Vital"],
+        },
+        {
+          name: "Apples (Fresh, All Varieties)",
+          ww: -3.44, dd: -0.62, price: -5.19,
+          oos: { kind: "partial", label: "12/486" }, oosPct: 2,
+          range: [3.75, 42.0], dot: 0.26,
+          type: "Goods", basket: "Essential", varieties: 486, tags: ["Essential", "Promo"],
+        },
+      ];
+
+      /* Variety detail behind each expand control — a representative sample of
+         the observations that roll up into the row. */
+      const OB_VARIETIES = {
+        default: [
+          { name: "Variety 1 · 500 g pack", outlet: "Hypermarket — Al Wahda", price: null, delta: 0.0 },
+          { name: "Variety 2 · Standard unit", outlet: "Supermarket — Khalidiyah", price: null, delta: 0.0 },
+          { name: "Variety 3 · Economy pack", outlet: "Cooperative — Mussafah", price: null, delta: 0.0 },
+        ],
+      };
+
+      const OB_PAGE_SIZE = 10;
+      const OB_STATE = {
+        sort: "asc",
+        query: "",
+        show: "Products",
+        group: "all",
+        type: "all",
+        basket: "all",
+        stock: "all",
+        watchOnly: false,
+        page: 1,
+        expanded: new Set(),
+        watched: new Set(
+          OB_ROWS.filter((r) => r.watched).map((r) => r.name)
+        ),
+      };
+
+      const obNum = (n, d = 2) =>
+        n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+      /* Delta cell — tone on the value only, arrow for direction, em dash when
+         the product has no comparable observation in the window. */
+      function obDelta(v) {
+        if (v === null || v === undefined) return '<span class="ob-none">—</span>';
+        if (v === 0) return '<span class="ob-delta ob-delta--flat">0.00%</span>';
+        const up = v > 0;
+        const cls = up ? "ob-delta--up" : "ob-delta--down";
+        const icon = up ? "ti-arrow-narrow-up" : "ti-arrow-narrow-down";
+        return `<span class="ob-delta ${cls}"><i class="ti ${icon}" aria-hidden="true"></i>${obNum(Math.abs(v))}%</span>`;
+      }
+
+      function obStock(o) {
+        const cls =
+          o.kind === "in" ? "ob-chip--good" : o.kind === "oos" ? "ob-chip--bad" : "ob-chip--warn";
+        return `<span class="ob-chip ${cls}">${o.label}</span>`;
+      }
+
+      function obStockPct(p) {
+        const cls = p === 0 ? "ob-chip--good" : p >= 100 ? "ob-chip--bad" : "ob-chip--warn";
+        return `<span class="ob-chip ${cls}">${p}%</span>`;
+      }
+
+      function obRange(r, dot) {
+        if (!r) return '<span class="ob-none">—</span>';
+        if (r.length === 1) {
+          return `<div class="ob-range"><span class="ob-range-val">${obNum(r[0])}</span></div>`;
+        }
+        const pos = Math.round((dot ?? 0.25) * 100);
+        return `<div class="ob-range">
+  <span class="ob-range-val">${obNum(r[0])} – ${obNum(r[1])}</span>
+  <span class="ob-range-rail">
+    <span class="ob-range-fill" style="width:${pos}%"></span>
+    <span class="ob-range-dot" style="left:${pos}%"></span>
+  </span>
+</div>`;
+      }
+
+      function obTags(tags) {
+        if (!tags || !tags.length) return '<span class="ob-none">—</span>';
+        return tags
+          .map((t) => {
+            const cls =
+              t === "Essential" ? "ob-chip--good" : t === "Promo" ? "ob-chip--info" : "ob-chip--warn";
+            return `<span class="ob-chip ${cls}"><i class="ti ti-circle-check" aria-hidden="true"></i>${t.toUpperCase()}</span>`;
+          })
+          .join(" ");
+      }
+
+      function obVarietyRows(row) {
+        const base = OB_VARIETIES[row.name] || OB_VARIETIES.default;
+        const low = row.range ? row.range[0] : 0;
+        const high = row.range ? row.range[row.range.length - 1] : 0;
+        const deltas = [row.ww ?? 0, row.price ?? 0, row.dd ?? 0];
+        return base
+          .map((v, i) => {
+            const price = v.price ?? low + ((high - low) * (i + 1)) / (base.length + 1);
+            return `<div class="ob-var">
+  <span class="ob-var-name">${v.name}</span>
+  <span class="ob-var-outlet">${v.outlet}</span>
+  <span class="ob-var-price">${obNum(price)}</span>
+  <span class="ob-var-delta">${obDelta(deltas[i] ?? 0)}</span>
+</div>`;
+          })
+          .join("");
+      }
+
+      function obVisibleRows() {
+        const q = OB_STATE.query.trim().toLowerCase();
+        const rows = OB_ROWS.filter((r) => {
+          if (q && !r.name.toLowerCase().includes(q)) return false;
+          if (OB_STATE.type !== "all" && r.type !== OB_STATE.type) return false;
+          if (OB_STATE.basket !== "all" && r.basket !== OB_STATE.basket) return false;
+          if (OB_STATE.stock !== "all" && r.oos.kind !== OB_STATE.stock) return false;
+          if (OB_STATE.watchOnly && !OB_STATE.watched.has(r.name)) return false;
+          return true;
+        });
+        rows.sort((a, b) =>
+          OB_STATE.sort === "asc"
+            ? a.name.localeCompare(b.name)
+            : b.name.localeCompare(a.name)
+        );
+        return rows;
+      }
+
+      function renderObTable() {
+        const tbody = document.getElementById("obTbody");
+        if (!tbody) return;
+        const rows = obVisibleRows();
+        const total = rows.length;
+        const totalPages = Math.max(1, Math.ceil(total / OB_PAGE_SIZE));
+        OB_STATE.page = Math.min(Math.max(1, OB_STATE.page), totalPages);
+        const pageStart = (OB_STATE.page - 1) * OB_PAGE_SIZE;
+        const pageRows = rows.slice(pageStart, pageStart + OB_PAGE_SIZE);
+
+        if (!total) {
+          tbody.innerHTML = `<tr><td colspan="13" class="ob-empty">No products match the current filters.</td></tr>`;
+        } else {
+          tbody.innerHTML = pageRows
+            .map((r) => {
+              const open = OB_STATE.expanded.has(r.name);
+              const watched = OB_STATE.watched.has(r.name);
+              return `<tr class="ob-row" data-name="${r.name.replace(/"/g, "&quot;")}">
+  <td class="ob-td-exp">
+    <button type="button" class="ob-exp${open ? " is-open" : ""}" aria-expanded="${open}"
+      aria-label="${open ? "Collapse" : "Expand"} ${r.name}" onclick="toggleObRow(this)">
+      <i class="ti ti-chevron-right" aria-hidden="true"></i>
+    </button>
+  </td>
+  <td class="ob-td-prod">
+    <span class="ob-prod">
+      <i class="ti ti-box ob-prod-ic" aria-hidden="true"></i>
+      <span class="ob-prod-name">${r.name}</span>
+    </span>
+  </td>
+  <td>${obDelta(r.ww)}</td>
+  <td>${obDelta(r.dd)}</td>
+  <td>${obDelta(r.price)}</td>
+  <td>${obStock(r.oos)}</td>
+  <td>${obStockPct(r.oosPct)}</td>
+  <td>${obRange(r.range, r.dot)}</td>
+  <td class="ob-muted">${r.type}</td>
+  <td class="ob-muted">${r.basket}</td>
+  <td>${r.varieties.toLocaleString("en-US")}</td>
+  <td>${obTags(r.tags)}</td>
+  <td class="ob-td-act">
+    <button type="button" class="ob-watch${watched ? " is-on" : ""}" aria-pressed="${watched}"
+      aria-label="${watched ? "Remove from" : "Add to"} watchlist" onclick="toggleObWatch(this)">
+      <i class="ti ti-eye" aria-hidden="true"></i>
+    </button>
+  </td>
+</tr>${
+                open
+                  ? `<tr class="ob-detail"><td colspan="13">
+  <div class="ob-detail-inner">
+    <div class="ob-detail-hd">Varieties observed · ${r.varieties.toLocaleString("en-US")} tracked</div>
+    <div class="ob-var-list">${obVarietyRows(r)}</div>
+  </div>
+</td></tr>`
+                  : ""
+              }`;
+            })
+            .join("");
+        }
+
+        const foot = document.getElementById("obFootText");
+        if (foot) {
+          foot.textContent = total
+            ? `Showing ${pageStart + 1}–${pageStart + pageRows.length} of ${total} products`
+            : "No products to show";
+        }
+        renderObPager(totalPages, OB_STATE.page);
+        const count = document.getElementById("obScopeCount");
+        if (count) count.textContent = rows.length === OB_ROWS.length ? "642" : String(rows.length);
+      }
+
+      /* Page-number list with first/last always shown and an ellipsis across
+         any gap around the current page (1 2 3 … 67 68). */
+      function obPageItems(total, cur) {
+        const win = 1;
+        const keep = [];
+        for (let i = 1; i <= total; i++) {
+          if (i === 1 || i === total || (i >= cur - win && i <= cur + win)) keep.push(i);
+        }
+        const out = [];
+        let prev = 0;
+        keep.forEach((p) => {
+          if (prev && p - prev > 1) out.push("…");
+          out.push(p);
+          prev = p;
+        });
+        return out;
+      }
+
+      function renderObPager(totalPages, current) {
+        const pager = document.getElementById("obPager");
+        if (!pager) return;
+        /* Nothing to page through — hide the control entirely. */
+        if (totalPages <= 1) {
+          pager.innerHTML = "";
+          pager.hidden = true;
+          return;
+        }
+        pager.hidden = false;
+        const pages = obPageItems(totalPages, current)
+          .map((p) =>
+            p === "…"
+              ? `<span class="ob-pager-ellipsis" aria-hidden="true">…</span>`
+              : `<button type="button" class="ob-pager-page${
+                  p === current ? " is-active" : ""
+                }" ${p === current ? 'aria-current="page"' : ""} onclick="obGoPage(${p})">${p}</button>`
+          )
+          .join("");
+        pager.innerHTML = `
+          <button type="button" class="ob-pager-nav" ${
+            current <= 1 ? "disabled" : ""
+          } onclick="obGoPage(${current - 1})">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i> Previous
+          </button>
+          ${pages}
+          <button type="button" class="ob-pager-nav" ${
+            current >= totalPages ? "disabled" : ""
+          } onclick="obGoPage(${current + 1})">
+            Next <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>`;
+      }
+
+      function obGoPage(p) {
+        OB_STATE.page = p;
+        renderObTable();
+      }
+
+      /* Result-set changes reset to the first page; row-level toggles don't. */
+      function obResetPage() {
+        OB_STATE.page = 1;
+      }
+
+      function toggleObRow(btn) {
+        const name = btn.closest("tr").dataset.name;
+        if (OB_STATE.expanded.has(name)) OB_STATE.expanded.delete(name);
+        else OB_STATE.expanded.add(name);
+        renderObTable();
+      }
+
+      function toggleObWatch(btn) {
+        const name = btn.closest("tr").dataset.name;
+        if (OB_STATE.watched.has(name)) OB_STATE.watched.delete(name);
+        else OB_STATE.watched.add(name);
+        renderObTable();
+      }
+
+      function toggleWatchOnly(btn) {
+        OB_STATE.watchOnly = !OB_STATE.watchOnly;
+        /* Now a menu item in the kebab — reflect state with the option check. */
+        btn.classList.toggle("is-active", OB_STATE.watchOnly);
+        btn.setAttribute("aria-pressed", String(OB_STATE.watchOnly));
+        obResetPage();
+        renderObTable();
+      }
+
+      function toggleObSort() {
+        OB_STATE.sort = OB_STATE.sort === "asc" ? "desc" : "asc";
+        const icon = document.getElementById("obSortIcon");
+        if (icon)
+          icon.className =
+            OB_STATE.sort === "asc" ? "ti ti-caret-up-filled" : "ti ti-caret-down-filled";
+        obResetPage();
+        renderObTable();
+      }
+
+      /* Reset every filter group to its first (default) option. */
+      function clearObFilters() {
+        document
+          .querySelectorAll("#obFiltersMenu .ob-filter-group[data-filter]")
+          .forEach((group) => {
+            const key = group.dataset.filter;
+            const opts = group.querySelectorAll(".prod-filter-dd-option");
+            opts.forEach((o, i) => o.classList.toggle("is-active", i === 0));
+            if (opts[0]) OB_STATE[key] = opts[0].dataset.value;
+          });
+        obResetPage();
+        renderObTable();
+      }
+
+      /* Filters — standard option rows grouped by section. One active option
+         per group; only Type/Basket/Availability narrow this sample extract
+         (Show and Group are label-only, as the extract carries no such field). */
+      function initObFilters() {
+        document
+          .querySelectorAll("#obFiltersMenu .ob-filter-group[data-filter]")
+          .forEach((group) => {
+            const key = group.dataset.filter;
+            group.querySelectorAll(".prod-filter-dd-option").forEach((opt) => {
+              opt.addEventListener("click", () => {
+                group
+                  .querySelectorAll(".prod-filter-dd-option")
+                  .forEach((o) => o.classList.remove("is-active"));
+                opt.classList.add("is-active");
+                OB_STATE[key] = opt.dataset.value;
+                obResetPage();
+                renderObTable();
+              });
+            });
+          });
+
+        const search = document.getElementById("obSearch");
+        if (search) {
+          search.addEventListener("input", () => {
+            OB_STATE.query = search.value;
+            obResetPage();
+            renderObTable();
+          });
+        }
+        /* Ctrl+K focuses the product search, matching the hint on the field. */
+        document.addEventListener("keydown", (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+            e.preventDefault();
+            if (search) search.focus();
+          }
+        });
+      }
+
+      /* Download — the visible rows as CSV, so the button does what it says. */
+      function downloadObserveCsv() {
+        const cols = [
+          "Product", "W/W %", "D/D %", "Price %", "OOS", "OOS %",
+          "Price Range", "Type", "Basket", "Varieties", "Tags",
+        ];
+        const cell = (v) => `"${String(v).replace(/"/g, '""')}"`;
+        const lines = [cols.map(cell).join(",")];
+        obVisibleRows().forEach((r) => {
+          lines.push(
+            [
+              r.name,
+              r.ww ?? "",
+              r.dd ?? "",
+              r.price ?? "",
+              r.oos.label,
+              r.oosPct + "%",
+              r.range ? r.range.map((n) => obNum(n)).join(" - ") : "",
+              r.type,
+              r.basket,
+              r.varieties,
+              (r.tags || []).join(" / "),
+            ]
+              .map(cell)
+              .join(",")
+          );
+        });
+        const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "cpi-observe-2026-07-14.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      /* ============================================================
+         DATE RANGE — a compact trigger opening a custom dual-month range
+         calendar (same control as the Trade page). Committed dates live in
+         the hidden #obDateFrom / #obDateTo inputs; OB_CAL holds the in-flight
+         selection while the popover is open.
+         ============================================================ */
+      const OB_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const OB_MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const OB_DOW = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+      const OB_CAL = { view: null, from: null, to: null };
+
+      const obPad = (n) => String(n).padStart(2, "0");
+      const obISO = (d) => `${d.getFullYear()}-${obPad(d.getMonth() + 1)}-${obPad(d.getDate())}`;
+      const obParse = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+      const obFmt = (d) => `${d.getDate()} ${OB_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+      const obSameDay = (a, b) =>
+        a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+      /* Refresh the trigger labels from the committed hidden inputs. */
+      function syncObDateRange() {
+        const from = document.getElementById("obDateFrom");
+        const to = document.getElementById("obDateTo");
+        if (!from || !to) return;
+        const fl = document.getElementById("obDateFromLabel");
+        const tl = document.getElementById("obDateToLabel");
+        if (fl && from.value) fl.textContent = obFmt(obParse(from.value));
+        if (tl && to.value) tl.textContent = obFmt(obParse(to.value));
+      }
+
+      function openObCal() {
+        const cal = document.getElementById("obCal");
+        const trig = document.getElementById("obDateTrigger");
+        if (!cal || !trig) return;
+        if (typeof closeAllObDropdowns === "function") closeAllObDropdowns();
+        const f = document.getElementById("obDateFrom").value;
+        const t = document.getElementById("obDateTo").value;
+        OB_CAL.from = f ? obParse(f) : null;
+        OB_CAL.to = t ? obParse(t) : null;
+        const base = OB_CAL.from || new Date();
+        OB_CAL.view = new Date(base.getFullYear(), base.getMonth(), 1);
+        renderObCal();
+        cal.hidden = false;
+        trig.classList.add("is-open");
+        trig.setAttribute("aria-expanded", "true");
+      }
+
+      function closeObCal() {
+        const cal = document.getElementById("obCal");
+        const trig = document.getElementById("obDateTrigger");
+        if (cal) cal.hidden = true;
+        if (trig) {
+          trig.classList.remove("is-open");
+          trig.setAttribute("aria-expanded", "false");
+        }
+      }
+
+      function toggleObCal() {
+        const cal = document.getElementById("obCal");
+        if (cal && cal.hidden) openObCal();
+        else closeObCal();
+      }
+
+      function obCalNav(delta) {
+        if (!OB_CAL.view) return;
+        OB_CAL.view = new Date(OB_CAL.view.getFullYear(), OB_CAL.view.getMonth() + delta, 1);
+        renderObCal();
+      }
+
+      /* Range logic: first pick sets the start (clears the end), second pick
+         sets the end (swapping if it lands before the start), then it cycles. */
+      function obCalPick(iso) {
+        const d = obParse(iso);
+        if (!OB_CAL.from || OB_CAL.to) {
+          OB_CAL.from = d;
+          OB_CAL.to = null;
+        } else if (d < OB_CAL.from) {
+          OB_CAL.to = OB_CAL.from;
+          OB_CAL.from = d;
+        } else {
+          OB_CAL.to = d;
+        }
+        renderObCal();
+      }
+
+      function obMonthHtml(year, month, side) {
+        const offset = (new Date(year, month, 1).getDay() + 6) % 7; // Monday-first
+        const start = new Date(year, month, 1 - offset);
+        const prev = `<button type="button" class="ob-cal-arrow" aria-label="Previous month" onclick="obCalNav(-1)"><i class="ti ti-chevron-left" aria-hidden="true"></i></button>`;
+        const next = `<button type="button" class="ob-cal-arrow" aria-label="Next month" onclick="obCalNav(1)"><i class="ti ti-chevron-right" aria-hidden="true"></i></button>`;
+        const ph = `<span class="ob-cal-arrow-ph" aria-hidden="true"></span>`;
+        const nav = `<div class="ob-cal-nav">${side === "left" ? prev : ph}<span class="ob-cal-title">${OB_MONTHS_LONG[month]} ${year}</span>${side === "right" ? next : ph}</div>`;
+
+        let cells = OB_DOW.map((d) => `<span class="ob-cal-dow">${d}</span>`).join("");
+        for (let i = 0; i < 42; i++) {
+          const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+          if (d.getMonth() !== month) {
+            cells += `<span class="ob-cal-day is-muted"><span class="ob-cal-num">${d.getDate()}</span></span>`;
+            continue;
+          }
+          const isStart = obSameDay(d, OB_CAL.from);
+          const isEnd = obSameDay(d, OB_CAL.to);
+          const inRange = OB_CAL.from && OB_CAL.to && d > OB_CAL.from && d < OB_CAL.to;
+          let cls = "ob-cal-day";
+          if (inRange) cls += " is-range";
+          if (isStart) cls += " is-start";
+          if (isEnd) cls += " is-end";
+          cells += `<button type="button" class="${cls}" onclick="obCalPick('${obISO(d)}')"><span class="ob-cal-num">${d.getDate()}</span></button>`;
+        }
+        return `<div class="ob-cal-month">${nav}<div class="ob-cal-grid">${cells}</div></div>`;
+      }
+
+      function renderObCal() {
+        const v = OB_CAL.view;
+        const nx = new Date(v.getFullYear(), v.getMonth() + 1, 1);
+        document.getElementById("obCalMonths").innerHTML =
+          obMonthHtml(v.getFullYear(), v.getMonth(), "left") +
+          obMonthHtml(nx.getFullYear(), nx.getMonth(), "right");
+
+        const f = OB_CAL.from, t = OB_CAL.to;
+        document.getElementById("obCalReadout").innerHTML =
+          `<span class="ob-cal-range">` +
+          `<span class="${f ? "" : "ob-cal-ph"}">${f ? obFmt(f) : "Start date"}</span>` +
+          `<span class="ob-datepick-sep" aria-hidden="true"></span>` +
+          `<span class="${t ? "" : "ob-cal-ph"}">${t ? obFmt(t) : "End date"}</span>` +
+          `</span><i class="ti ti-calendar-event" aria-hidden="true"></i>`;
+
+        const cnt = document.getElementById("obCalCount");
+        if (f && t) {
+          const days = Math.round((t - f) / 86400000);
+          cnt.textContent = `${days} day${days === 1 ? "" : "s"}`;
+        } else {
+          cnt.textContent = "Select an end date";
+        }
+      }
+
+      /* Done — commit the in-flight selection to the hidden inputs. */
+      function applyObCal() {
+        if (OB_CAL.from && OB_CAL.to) {
+          document.getElementById("obDateFrom").value = obISO(OB_CAL.from);
+          document.getElementById("obDateTo").value = obISO(OB_CAL.to);
+          syncObDateRange();
+        }
+        closeObCal();
+      }
+
+      /* ── Boot ── */
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        initObDropdowns();
+        initObFilters();
+        syncObDateRange();
+        renderObTable();
+      });
+    </script>
+  </body>
+</html>

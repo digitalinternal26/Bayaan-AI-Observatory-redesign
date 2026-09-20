@@ -1,0 +1,57 @@
+/* Favourites page — layout only. All card/tab/toggle/empty-state visuals
+   come from style.css + css/theme.css via the existing `.screen-home`
+   component scope (this page's root carries that class on purpose, see
+   favourites.html) — nothing here re-declares colours, radii or shadows
+   for those pieces. The hero block below mirrors the Products page hero
+   (#screen-products .prod-hero / h1 / .prod-hero-sub) values, since that
+   selector is scoped to a screen this page doesn't have. */
+
+/* style.css sets `html, body { height: 100%; overflow: hidden }` for the
+   main SPA (index.html), which scrolls inside a nested `.home-main` panel
+   instead of the body. This standalone page has no such nested panel — its
+   content sits directly under #favouritesPage — so without its own scroll
+   container here, content past one viewport height (e.g. the footer) is
+   simply clipped and the page can't be scrolled at all. */
+/* Matches the page background every other standalone page in this app uses
+   (#screen-cpi-obs, body.lmo) — #f8fafc in light, #0B1220 in dark — instead
+   of the global body --bg (#EFF4F7), which only this page was showing. */
+#favouritesPage {
+  height: 100vh;
+  overflow-y: auto;
+  --bg: #f8fafc;
+  background: var(--bg);
+}
+
+[data-theme="dark"] #favouritesPage {
+  --bg: #0B1220;
+}
+
+.fav-hero {
+  text-align: center;
+  padding: 56px 24px 40px;
+  background: transparent;
+}
+
+.fav-hero h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+}
+
+.fav-hero-sub {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.fav-page-container {
+  padding-block: 24px 48px;
+}
+
+.fav-page-container .prod-browse-toggles {
+  margin-bottom: 18px;
+}

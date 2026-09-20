@@ -1,0 +1,1682 @@
+{
+  "meta": {
+    "year": 2025,
+    "source": "D:\\ADDP2\\ADDP2\\population_dashboard\\hybrid-dashboard\\public\\data\\population.json",
+    "districtCount": 166,
+    "unmatchedSourceNames": [
+      "Al Dhannah City",
+      "Al Mizn",
+      "Al Ruwaydat & Jabal Hafeet",
+      "Bateen Liwa&Al Mirayr",
+      "Central Al Dhafra",
+      "Delma and Surrounding Islands",
+      "Qarn Al Yah",
+      "Saadiyat Island",
+      "Um Laylah&Al Zarraf&Al Bday'Ah",
+      "Yaw Al Ghadar & Al Hamra & Al Shuweehat",
+      "Unknown"
+    ]
+  },
+  "districts": {
+    "Abu Dhabi Industrial City": {
+      "district": "Abu Dhabi Industrial City",
+      "sourceName": "Abu Dhabi Industrial City",
+      "year": 2025,
+      "total": 73636,
+      "citizens": 260,
+      "nonCitizens": 73376,
+      "male": 70843,
+      "female": 2793
+    },
+    "Abu Dhabi Islands": {
+      "district": "Abu Dhabi Islands",
+      "sourceName": "Abu Dhabi Islands A",
+      "year": 2025,
+      "total": 37884,
+      "citizens": 523,
+      "nonCitizens": 37361,
+      "male": 28703,
+      "female": 9181
+    },
+    "Abu Mreikhah": {
+      "district": "Abu Mreikhah",
+      "sourceName": "Abu Mreikhah",
+      "year": 2025,
+      "total": 981,
+      "citizens": 150,
+      "nonCitizens": 831,
+      "male": 701,
+      "female": 280
+    },
+    "Abu Qrayn": {
+      "district": "Abu Qrayn",
+      "sourceName": "Abu Qrayn",
+      "year": 2025,
+      "total": 1097,
+      "citizens": 41,
+      "nonCitizens": 1056,
+      "male": 1032,
+      "female": 65
+    },
+    "Abu Samrah": {
+      "district": "Abu Samrah",
+      "sourceName": "Abu Samrah",
+      "year": 2025,
+      "total": 2094,
+      "citizens": 454,
+      "nonCitizens": 1640,
+      "male": 1493,
+      "female": 601
+    },
+    "Ain Al Faydah": {
+      "district": "Ain Al Faydah",
+      "sourceName": "Ain Al Faydah",
+      "year": 2025,
+      "total": 15889,
+      "citizens": 8110,
+      "nonCitizens": 7779,
+      "male": 7736,
+      "female": 8153
+    },
+    "Al 'Adlah": {
+      "district": "Al 'Adlah",
+      "sourceName": "Al 'Adlah",
+      "year": 2025,
+      "total": 17059,
+      "citizens": 3349,
+      "nonCitizens": 13710,
+      "male": 14637,
+      "female": 2422
+    },
+    "Al 'Ajban": {
+      "district": "Al 'Ajban",
+      "sourceName": "Al 'Ajban",
+      "year": 2025,
+      "total": 4516,
+      "citizens": 569,
+      "nonCitizens": 3947,
+      "male": 3870,
+      "female": 646
+    },
+    "Al 'Arad": {
+      "district": "Al 'Arad",
+      "sourceName": "Al 'Arad",
+      "year": 2025,
+      "total": 2624,
+      "citizens": 372,
+      "nonCitizens": 2252,
+      "male": 2254,
+      "female": 370
+    },
+    "Al 'Asheesh": {
+      "district": "Al 'Asheesh",
+      "sourceName": "Al 'Asheesh",
+      "year": 2025,
+      "total": 3630,
+      "citizens": 53,
+      "nonCitizens": 3577,
+      "male": 3547,
+      "female": 83
+    },
+    "Al 'Iqabiyyah": {
+      "district": "Al 'Iqabiyyah",
+      "sourceName": "Al 'Iqabiyyah",
+      "year": 2025,
+      "total": 8279,
+      "citizens": 3362,
+      "nonCitizens": 4917,
+      "male": 4254,
+      "female": 4025
+    },
+    "Al Aamerah": {
+      "district": "Al Aamerah",
+      "sourceName": "Al Aamerah",
+      "year": 2025,
+      "total": 54834,
+      "citizens": 24806,
+      "nonCitizens": 30028,
+      "male": 28864,
+      "female": 25970
+    },
+    "Al Aflaj": {
+      "district": "Al Aflaj",
+      "sourceName": "Al Aflaj",
+      "year": 2025,
+      "total": 468,
+      "citizens": 51,
+      "nonCitizens": 417,
+      "male": 328,
+      "female": 140
+    },
+    "Al Ain International Airport": {
+      "district": "Al Ain International Airport",
+      "sourceName": "Al Ain International Airport",
+      "year": 2025,
+      "total": 2339,
+      "citizens": 232,
+      "nonCitizens": 2107,
+      "male": 2066,
+      "female": 273
+    },
+    "Al 'Azeezah": {
+      "district": "Al 'Azeezah",
+      "sourceName": "Al Azeezah",
+      "year": 2025,
+      "total": 12302,
+      "citizens": 612,
+      "nonCitizens": 11690,
+      "male": 11540,
+      "female": 762
+    },
+    "Al Bahyah": {
+      "district": "Al Bahyah",
+      "sourceName": "Al Bahyah",
+      "year": 2025,
+      "total": 43173,
+      "citizens": 16520,
+      "nonCitizens": 26653,
+      "male": 23801,
+      "female": 19372
+    },
+    "Al Bateen": {
+      "district": "Al Bateen",
+      "sourceName": "Al Bateen",
+      "year": 2025,
+      "total": 7399,
+      "citizens": 3605,
+      "nonCitizens": 3794,
+      "male": 3727,
+      "female": 3672
+    },
+    "Al Bihouth": {
+      "district": "Al Bihouth",
+      "sourceName": "Al Bihouth",
+      "year": 2025,
+      "total": 30953,
+      "citizens": 1293,
+      "nonCitizens": 29660,
+      "male": 29816,
+      "female": 1137
+    },
+    "Al Danah": {
+      "district": "Al Danah",
+      "sourceName": "Al Danah",
+      "year": 2025,
+      "total": 316269,
+      "citizens": 20569,
+      "nonCitizens": 295700,
+      "male": 186965,
+      "female": 129304
+    },
+    "Al Dhahir": {
+      "district": "Al Dhahir",
+      "sourceName": "Al Dhahir",
+      "year": 2025,
+      "total": 33299,
+      "citizens": 16571,
+      "nonCitizens": 16728,
+      "male": 17284,
+      "female": 16015
+    },
+    "Al Dhahrah": {
+      "district": "Al Dhahrah",
+      "sourceName": "Al Dhahrah",
+      "year": 2025,
+      "total": 4787,
+      "citizens": 1248,
+      "nonCitizens": 3539,
+      "male": 3507,
+      "female": 1280
+    },
+    "Al Dhannah City": {
+      "district": "Al Dhannah City",
+      "sourceName": "Al Dhannah City",
+      "year": 2025,
+      "total": 44709,
+      "citizens": 4840,
+      "nonCitizens": 39869,
+      "male": 31475,
+      "female": 13234
+    },
+    "Al Falah": {
+      "district": "Al Falah",
+      "sourceName": "Al Falah",
+      "year": 2025,
+      "total": 60659,
+      "citizens": 32040,
+      "nonCitizens": 28619,
+      "male": 28523,
+      "female": 32136
+    },
+    "Al Faqa'": {
+      "district": "Al Faqa'",
+      "sourceName": "Al Faqa'",
+      "year": 2025,
+      "total": 3112,
+      "citizens": 780,
+      "nonCitizens": 2332,
+      "male": 2343,
+      "female": 769
+    },
+    "Al Fayah": {
+      "district": "Al Fayah",
+      "sourceName": "Al Fayah",
+      "year": 2025,
+      "total": 1794,
+      "citizens": 49,
+      "nonCitizens": 1745,
+      "male": 1699,
+      "female": 95
+    },
+    "Al Fou'ah": {
+      "district": "Al Fou'ah",
+      "sourceName": "Al Fou'ah",
+      "year": 2025,
+      "total": 18812,
+      "citizens": 8883,
+      "nonCitizens": 9929,
+      "male": 9914,
+      "female": 8898
+    },
+    "Al Ghuweifat": {
+      "district": "Al Ghuweifat",
+      "sourceName": "Al Ghuweifat",
+      "year": 2025,
+      "total": 1558,
+      "citizens": 222,
+      "nonCitizens": 1336,
+      "male": 1355,
+      "female": 203
+    },
+    "Al Hadwaniyyah": {
+      "district": "Al Hadwaniyyah",
+      "sourceName": "Al Hadwaniyyah",
+      "year": 2025,
+      "total": 0,
+      "citizens": 0,
+      "nonCitizens": 0,
+      "male": 0,
+      "female": 0
+    },
+    "Al Haffar": {
+      "district": "Al Haffar",
+      "sourceName": "Al Haffar",
+      "year": 2025,
+      "total": 722,
+      "citizens": 178,
+      "nonCitizens": 544,
+      "male": 550,
+      "female": 172
+    },
+    "Al Harmiyyah": {
+      "district": "Al Harmiyyah",
+      "sourceName": "Al Harmiyyah",
+      "year": 2025,
+      "total": 697,
+      "citizens": 151,
+      "nonCitizens": 546,
+      "male": 566,
+      "female": 131
+    },
+    "Al Hisn": {
+      "district": "Al Hisn",
+      "sourceName": "Al Hisn",
+      "year": 2025,
+      "total": 61365,
+      "citizens": 2136,
+      "nonCitizens": 59229,
+      "male": 36443,
+      "female": 24922
+    },
+    "Al Hiyar": {
+      "district": "Al Hiyar",
+      "sourceName": "Al Hiyar",
+      "year": 2025,
+      "total": 16243,
+      "citizens": 4216,
+      "nonCitizens": 12027,
+      "male": 11763,
+      "female": 4480
+    },
+    "Al Jahili": {
+      "district": "Al Jahili",
+      "sourceName": "Al Jahili",
+      "year": 2025,
+      "total": 9904,
+      "citizens": 448,
+      "nonCitizens": 9456,
+      "male": 6134,
+      "female": 3770
+    },
+    "Al Jimi": {
+      "district": "Al Jimi",
+      "sourceName": "Al Jimi",
+      "year": 2025,
+      "total": 44168,
+      "citizens": 4447,
+      "nonCitizens": 39721,
+      "male": 24737,
+      "female": 19431
+    },
+    "Al Jubail Island": {
+      "district": "Al Jubail Island",
+      "sourceName": "Al Jubail Island",
+      "year": 2025,
+      "total": 1982,
+      "citizens": 41,
+      "nonCitizens": 1941,
+      "male": 1886,
+      "female": 96
+    },
+    "Al Kasir": {
+      "district": "Al Kasir",
+      "sourceName": "Al Kasir",
+      "year": 2025,
+      "total": 3591,
+      "citizens": 926,
+      "nonCitizens": 2665,
+      "male": 1852,
+      "female": 1739
+    },
+    "Al Khalidiyah": {
+      "district": "Al Khalidiyah",
+      "sourceName": "Al Khalidiyah",
+      "year": 2025,
+      "total": 30481,
+      "citizens": 3022,
+      "nonCitizens": 27459,
+      "male": 17547,
+      "female": 12934
+    },
+    "Al Khatm": {
+      "district": "Al Khatm",
+      "sourceName": "Al Khatm",
+      "year": 2025,
+      "total": 3102,
+      "citizens": 913,
+      "nonCitizens": 2189,
+      "male": 2009,
+      "female": 1093
+    },
+    "Al Khaznah": {
+      "district": "Al Khaznah",
+      "sourceName": "Al Khaznah",
+      "year": 2025,
+      "total": 8145,
+      "citizens": 1660,
+      "nonCitizens": 6485,
+      "male": 5489,
+      "female": 2656
+    },
+    "Al Kheeran": {
+      "district": "Al Kheeran",
+      "sourceName": "Al Kheeran",
+      "year": 2025,
+      "total": 3365,
+      "citizens": 449,
+      "nonCitizens": 2916,
+      "male": 2455,
+      "female": 910
+    },
+    "Al Khibeesi": {
+      "district": "Al Khibeesi",
+      "sourceName": "Al Khibeesi",
+      "year": 2025,
+      "total": 27084,
+      "citizens": 4925,
+      "nonCitizens": 22159,
+      "male": 14385,
+      "female": 12699
+    },
+    "Al Layyan": {
+      "district": "Al Layyan",
+      "sourceName": "Al Layyan",
+      "year": 2025,
+      "total": 6448,
+      "citizens": 642,
+      "nonCitizens": 5806,
+      "male": 4520,
+      "female": 1928
+    },
+    "Al Ma'mourah": {
+      "district": "Al Ma'mourah",
+      "sourceName": "Al Ma`mourah",
+      "year": 2025,
+      "total": 5384,
+      "citizens": 226,
+      "nonCitizens": 5158,
+      "male": 4820,
+      "female": 564
+    },
+    "Al Manhal": {
+      "district": "Al Manhal",
+      "sourceName": "Al Manhal",
+      "year": 2025,
+      "total": 43600,
+      "citizens": 6681,
+      "nonCitizens": 36919,
+      "male": 23721,
+      "female": 19879
+    },
+    "Al Maqam": {
+      "district": "Al Maqam",
+      "sourceName": "Al Maqam",
+      "year": 2025,
+      "total": 19721,
+      "citizens": 5603,
+      "nonCitizens": 14118,
+      "male": 10461,
+      "female": 9260
+    },
+    "Al Marfa": {
+      "district": "Al Marfa",
+      "sourceName": "Al Marfa",
+      "year": 2025,
+      "total": 13294,
+      "citizens": 3368,
+      "nonCitizens": 9926,
+      "male": 8378,
+      "female": 4916
+    },
+    "Al Markhaniyyah": {
+      "district": "Al Markhaniyyah",
+      "sourceName": "Al Markhaniyyah",
+      "year": 2025,
+      "total": 12464,
+      "citizens": 4093,
+      "nonCitizens": 8371,
+      "male": 6577,
+      "female": 5887
+    },
+    "Al Maryah Island": {
+      "district": "Al Maryah Island",
+      "sourceName": "Al Maryah Island",
+      "year": 2025,
+      "total": 3449,
+      "citizens": 180,
+      "nonCitizens": 3269,
+      "male": 2188,
+      "female": 1261
+    },
+    "Al Mas'oudi": {
+      "district": "Al Mas'oudi",
+      "sourceName": "Al Mas'oudi",
+      "year": 2025,
+      "total": 9527,
+      "citizens": 3347,
+      "nonCitizens": 6180,
+      "male": 5121,
+      "female": 4406
+    },
+    "Al Matar": {
+      "district": "Al Matar",
+      "sourceName": "Al Matar",
+      "year": 2025,
+      "total": 13336,
+      "citizens": 1668,
+      "nonCitizens": 11668,
+      "male": 9671,
+      "female": 3665
+    },
+    "Al Mi'rad": {
+      "district": "Al Mi'rad",
+      "sourceName": "Al Mi'rad",
+      "year": 2025,
+      "total": 1035,
+      "citizens": 50,
+      "nonCitizens": 985,
+      "male": 947,
+      "female": 88
+    },
+    "Al Mizn": {
+      "district": "Al Mizn",
+      "sourceName": "Al Mizn",
+      "year": 2025,
+      "total": 2795,
+      "citizens": 842,
+      "nonCitizens": 1953,
+      "male": 1758,
+      "female": 1037
+    },
+    "Al Mu'tarid": {
+      "district": "Al Mu'tarid",
+      "sourceName": "Al Mu'tarid",
+      "year": 2025,
+      "total": 22035,
+      "citizens": 1220,
+      "nonCitizens": 20815,
+      "male": 13628,
+      "female": 8407
+    },
+    "Al Muntazah": {
+      "district": "Al Muntazah",
+      "sourceName": "Al Muntazah",
+      "year": 2025,
+      "total": 22202,
+      "citizens": 6823,
+      "nonCitizens": 15379,
+      "male": 12440,
+      "female": 9762
+    },
+    "Al Mushrif": {
+      "district": "Al Mushrif",
+      "sourceName": "Al Mushrif",
+      "year": 2025,
+      "total": 34853,
+      "citizens": 5475,
+      "nonCitizens": 29378,
+      "male": 20904,
+      "female": 13949
+    },
+    "Al Mutaw'ah": {
+      "district": "Al Mutaw'ah",
+      "sourceName": "Al Mutaw'ah",
+      "year": 2025,
+      "total": 4671,
+      "citizens": 181,
+      "nonCitizens": 4490,
+      "male": 2963,
+      "female": 1708
+    },
+    "Al Muwaij'i": {
+      "district": "Al Muwaij'i",
+      "sourceName": "Al Muwaij'i",
+      "year": 2025,
+      "total": 31608,
+      "citizens": 3752,
+      "nonCitizens": 27856,
+      "male": 17243,
+      "female": 14365
+    },
+    "Al Nabbagh": {
+      "district": "Al Nabbagh",
+      "sourceName": "Al Nabbagh",
+      "year": 2025,
+      "total": 2509,
+      "citizens": 850,
+      "nonCitizens": 1659,
+      "male": 1807,
+      "female": 702
+    },
+    "Al Nahdah": {
+      "district": "Al Nahdah",
+      "sourceName": "Al Nahdah",
+      "year": 2025,
+      "total": 16025,
+      "citizens": 6221,
+      "nonCitizens": 9804,
+      "male": 8724,
+      "female": 7301
+    },
+    "Al Nahyan": {
+      "district": "Al Nahyan",
+      "sourceName": "Al Nahyan",
+      "year": 2025,
+      "total": 115422,
+      "citizens": 7233,
+      "nonCitizens": 108189,
+      "male": 74294,
+      "female": 41128
+    },
+    "Al Noud": {
+      "district": "Al Noud",
+      "sourceName": "Al Noud",
+      "year": 2025,
+      "total": 52549,
+      "citizens": 3879,
+      "nonCitizens": 48670,
+      "male": 47663,
+      "female": 4886
+    },
+    "Al Nouf": {
+      "district": "Al Nouf",
+      "sourceName": "Al Nouf",
+      "year": 2025,
+      "total": 4294,
+      "citizens": 244,
+      "nonCitizens": 4050,
+      "male": 4006,
+      "female": 288
+    },
+    "Al Qattarah": {
+      "district": "Al Qattarah",
+      "sourceName": "Al Qattarah",
+      "year": 2025,
+      "total": 8478,
+      "citizens": 1785,
+      "nonCitizens": 6693,
+      "male": 5241,
+      "female": 3237
+    },
+    "Al Qisees": {
+      "district": "Al Qisees",
+      "sourceName": "Al Qisees",
+      "year": 2025,
+      "total": 159,
+      "citizens": 11,
+      "nonCitizens": 148,
+      "male": 136,
+      "female": 23
+    },
+    "Al Qou'": {
+      "district": "Al Qou'",
+      "sourceName": "Al Qou'",
+      "year": 2025,
+      "total": 21259,
+      "citizens": 7312,
+      "nonCitizens": 13947,
+      "male": 13225,
+      "female": 8034
+    },
+    "Al Qurm": {
+      "district": "Al Qurm",
+      "sourceName": "Al Qurm-Al Muzoun-Al Bateen",
+      "year": 2025,
+      "total": 59532,
+      "citizens": 12014,
+      "nonCitizens": 47518,
+      "male": 32538,
+      "female": 26994
+    },
+    "Al Rahah": {
+      "district": "Al Rahah",
+      "sourceName": "Al Rahah",
+      "year": 2025,
+      "total": 34600,
+      "citizens": 5259,
+      "nonCitizens": 29341,
+      "male": 19201,
+      "female": 15399
+    },
+    "Al Rahbah": {
+      "district": "Al Rahbah",
+      "sourceName": "Al Rahbah",
+      "year": 2025,
+      "total": 18513,
+      "citizens": 7858,
+      "nonCitizens": 10655,
+      "male": 9619,
+      "female": 8894
+    },
+    "Al Ras Al Akhdar": {
+      "district": "Al Ras Al Akhdar",
+      "sourceName": "Al Ras Al Akhdar",
+      "year": 2025,
+      "total": 853,
+      "citizens": 41,
+      "nonCitizens": 812,
+      "male": 694,
+      "female": 159
+    },
+    "Al Rawdah": {
+      "district": "Al Rawdah",
+      "sourceName": "Al Rawdah",
+      "year": 2025,
+      "total": 33538,
+      "citizens": 11036,
+      "nonCitizens": 22502,
+      "male": 20362,
+      "female": 13176
+    },
+    "Al Rawdah Al Sharqiyah": {
+      "district": "Al Rawdah Al Sharqiyah",
+      "sourceName": "Al Rawdah Al Sharqiyah",
+      "year": 2025,
+      "total": 13270,
+      "citizens": 6371,
+      "nonCitizens": 6899,
+      "male": 6603,
+      "female": 6667
+    },
+    "Al Reef": {
+      "district": "Al Reef",
+      "sourceName": "Al Reef",
+      "year": 2025,
+      "total": 20173,
+      "citizens": 1617,
+      "nonCitizens": 18556,
+      "male": 13573,
+      "female": 6600
+    },
+    "Al Reem Island": {
+      "district": "Al Reem Island",
+      "sourceName": "Al Reem Island",
+      "year": 2025,
+      "total": 60143,
+      "citizens": 2987,
+      "nonCitizens": 57156,
+      "male": 33086,
+      "female": 27057
+    },
+    "Al Rideem": {
+      "district": "Al Rideem",
+      "sourceName": "Al Rideem",
+      "year": 2025,
+      "total": 501,
+      "citizens": 53,
+      "nonCitizens": 448,
+      "male": 395,
+      "female": 106
+    },
+    "Al Ruwaydat & Jabal Hafeet": {
+      "district": "Al Ruwaydat & Jabal Hafeet",
+      "sourceName": "Al Ruwaydat & Jabal Hafeet",
+      "year": 2025,
+      "total": 3844,
+      "citizens": 1635,
+      "nonCitizens": 2209,
+      "male": 2716,
+      "female": 1128
+    },
+    "Al Sa'adah": {
+      "district": "Al Sa'adah",
+      "sourceName": "Al Sa'adah",
+      "year": 2025,
+      "total": 27287,
+      "citizens": 4256,
+      "nonCitizens": 23031,
+      "male": 15642,
+      "female": 11645
+    },
+    "Al Sad": {
+      "district": "Al Sad",
+      "sourceName": "Al Sad",
+      "year": 2025,
+      "total": 21193,
+      "citizens": 1742,
+      "nonCitizens": 19451,
+      "male": 17350,
+      "female": 3843
+    },
+    "Al Sader": {
+      "district": "Al Sader",
+      "sourceName": "Al Sader",
+      "year": 2025,
+      "total": 8956,
+      "citizens": 3560,
+      "nonCitizens": 5396,
+      "male": 5160,
+      "female": 3796
+    },
+    "Al Salamat": {
+      "district": "Al Salamat",
+      "sourceName": "Al Salamat",
+      "year": 2025,
+      "total": 15145,
+      "citizens": 7461,
+      "nonCitizens": 7684,
+      "male": 7745,
+      "female": 7400
+    },
+    "Al Samhah": {
+      "district": "Al Samhah",
+      "sourceName": "Al Samhah",
+      "year": 2025,
+      "total": 24578,
+      "citizens": 9217,
+      "nonCitizens": 15361,
+      "male": 14388,
+      "female": 10190
+    },
+    "Al Sammaliyyah Island": {
+      "district": "Al Sammaliyyah Island",
+      "sourceName": "Al Sammaliyyah Island",
+      "year": 2025,
+      "total": 182,
+      "citizens": 2,
+      "nonCitizens": 180,
+      "male": 174,
+      "female": 8
+    },
+    "Al Sarouj": {
+      "district": "Al Sarouj",
+      "sourceName": "Al Sarouj",
+      "year": 2025,
+      "total": 31239,
+      "citizens": 8305,
+      "nonCitizens": 22934,
+      "male": 17402,
+      "female": 13837
+    },
+    "Al Shahamah": {
+      "district": "Al Shahamah",
+      "sourceName": "Al Shahamah",
+      "year": 2025,
+      "total": 10831,
+      "citizens": 3343,
+      "nonCitizens": 7488,
+      "male": 6950,
+      "female": 3881
+    },
+    "Al Shamkhah": {
+      "district": "Al Shamkhah",
+      "sourceName": "Al Shamkhah",
+      "year": 2025,
+      "total": 79591,
+      "citizens": 34796,
+      "nonCitizens": 44795,
+      "male": 38188,
+      "female": 41403
+    },
+    "Al Shawamekh": {
+      "district": "Al Shawamekh",
+      "sourceName": "Al Shawamekh",
+      "year": 2025,
+      "total": 32726,
+      "citizens": 13780,
+      "nonCitizens": 18946,
+      "male": 16224,
+      "female": 16502
+    },
+    "Al Shinayin": {
+      "district": "Al Shinayin",
+      "sourceName": "Al Shinayin",
+      "year": 2025,
+      "total": 1144,
+      "citizens": 137,
+      "nonCitizens": 1007,
+      "male": 875,
+      "female": 269
+    },
+    "Al Shiwayb": {
+      "district": "Al Shiwayb",
+      "sourceName": "Al Shiwayb",
+      "year": 2025,
+      "total": 5784,
+      "citizens": 2253,
+      "nonCitizens": 3531,
+      "male": 3697,
+      "female": 2087
+    },
+    "Al Shuwaymah": {
+      "district": "Al Shuwaymah",
+      "sourceName": "Al Shuwaymah",
+      "year": 2025,
+      "total": 816,
+      "citizens": 51,
+      "nonCitizens": 765,
+      "male": 671,
+      "female": 145
+    },
+    "Al Sila'": {
+      "district": "Al Sila'",
+      "sourceName": "Al Sila'",
+      "year": 2025,
+      "total": 10917,
+      "citizens": 3190,
+      "nonCitizens": 7727,
+      "male": 7194,
+      "female": 3723
+    },
+    "Al Smeeh": {
+      "district": "Al Smeeh",
+      "sourceName": "Al Smeeh",
+      "year": 2025,
+      "total": 201,
+      "citizens": 5,
+      "nonCitizens": 196,
+      "male": 192,
+      "female": 9
+    },
+    "Al Sout": {
+      "district": "Al Sout",
+      "sourceName": "Al Sout",
+      "year": 2025,
+      "total": 859,
+      "citizens": 95,
+      "nonCitizens": 764,
+      "male": 791,
+      "female": 68
+    },
+    "Al Taf Al Gharbi": {
+      "district": "Al Taf Al Gharbi",
+      "sourceName": "Al Taf Al Gharbi",
+      "year": 2025,
+      "total": 1053,
+      "citizens": 34,
+      "nonCitizens": 1019,
+      "male": 978,
+      "female": 75
+    },
+    "Al Taweelah": {
+      "district": "Al Taweelah",
+      "sourceName": "Al Taweelah",
+      "year": 2025,
+      "total": 1070,
+      "citizens": 70,
+      "nonCitizens": 1000,
+      "male": 936,
+      "female": 134
+    },
+    "Al Tiwayya": {
+      "district": "Al Tiwayya",
+      "sourceName": "Al Tiwayya",
+      "year": 2025,
+      "total": 23155,
+      "citizens": 8524,
+      "nonCitizens": 14631,
+      "male": 11914,
+      "female": 11241
+    },
+    "Al Wathbah": {
+      "district": "Al Wathbah",
+      "sourceName": "Al Wathbah",
+      "year": 2025,
+      "total": 52168,
+      "citizens": 5023,
+      "nonCitizens": 47145,
+      "male": 45596,
+      "female": 6572
+    },
+    "Al Wiqan": {
+      "district": "Al Wiqan",
+      "sourceName": "Al Wiqan",
+      "year": 2025,
+      "total": 15415,
+      "citizens": 4437,
+      "nonCitizens": 10978,
+      "male": 10621,
+      "female": 4794
+    },
+    "Al Wuhaydah": {
+      "district": "Al Wuhaydah",
+      "sourceName": "Al Wuhaydah",
+      "year": 2025,
+      "total": 579,
+      "citizens": 69,
+      "nonCitizens": 510,
+      "male": 507,
+      "female": 72
+    },
+    "Al Zahiyah": {
+      "district": "Al Zahiyah",
+      "sourceName": "Al Zahiyah",
+      "year": 2025,
+      "total": 131437,
+      "citizens": 9572,
+      "nonCitizens": 121865,
+      "male": 82819,
+      "female": 48618
+    },
+    "'Asharij": {
+      "district": "'Asharij",
+      "sourceName": "Asharij",
+      "year": 2025,
+      "total": 17877,
+      "citizens": 2377,
+      "nonCitizens": 15500,
+      "male": 9518,
+      "female": 8359
+    },
+    "Bad' Al Mutaw'Ah": {
+      "district": "Bad' Al Mutaw'Ah",
+      "sourceName": "Bad' Al Mutaw'Ah",
+      "year": 2025,
+      "total": 1364,
+      "citizens": 439,
+      "nonCitizens": 925,
+      "male": 881,
+      "female": 483
+    },
+    "Bad' Bint Sa'oud": {
+      "district": "Bad' Bint Sa'oud",
+      "sourceName": "Bad' Bint Sa'oud",
+      "year": 2025,
+      "total": 3772,
+      "citizens": 851,
+      "nonCitizens": 2921,
+      "male": 2918,
+      "female": 854
+    },
+    "Bani Yas": {
+      "district": "Bani Yas",
+      "sourceName": "Bani Yas",
+      "year": 2025,
+      "total": 107918,
+      "citizens": 29661,
+      "nonCitizens": 78257,
+      "male": 60564,
+      "female": 47354
+    },
+    "Barakah": {
+      "district": "Barakah",
+      "sourceName": "Barakah",
+      "year": 2025,
+      "total": 6238,
+      "citizens": 883,
+      "nonCitizens": 5355,
+      "male": 5079,
+      "female": 1159
+    },
+    "Bateen Liwa&Al Mirayr": {
+      "district": "Bateen Liwa&Al Mirayr",
+      "sourceName": "Bateen Liwa&Al Mirayr",
+      "year": 2025,
+      "total": 3827,
+      "citizens": 316,
+      "nonCitizens": 3511,
+      "male": 3428,
+      "female": 399
+    },
+    "Bilji'An": {
+      "district": "Bilji'An",
+      "sourceName": "Bilji'An",
+      "year": 2025,
+      "total": 750,
+      "citizens": 32,
+      "nonCitizens": 718,
+      "male": 715,
+      "female": 35
+    },
+    "Bu Kirayyah": {
+      "district": "Bu Kirayyah",
+      "sourceName": "Bu Kirayyah",
+      "year": 2025,
+      "total": 3016,
+      "citizens": 655,
+      "nonCitizens": 2361,
+      "male": 2327,
+      "female": 689
+    },
+    "Central Al Dhafra": {
+      "district": "Central Al Dhafra",
+      "sourceName": "Central Al Dhafra",
+      "year": 2025,
+      "total": 44964,
+      "citizens": 1312,
+      "nonCitizens": 43652,
+      "male": 42978,
+      "female": 1986
+    },
+    "Central District": {
+      "district": "Central District",
+      "sourceName": "Central District",
+      "year": 2025,
+      "total": 59134,
+      "citizens": 3916,
+      "nonCitizens": 55218,
+      "male": 39282,
+      "female": 19852
+    },
+    "Delma and Surrounding Islands": {
+      "district": "Delma and Surrounding Islands",
+      "sourceName": "Delma and Surrounding Islands",
+      "year": 2025,
+      "total": 41029,
+      "citizens": 1898,
+      "nonCitizens": 39131,
+      "male": 38320,
+      "female": 2709
+    },
+    "Dhaharat Al Teeb": {
+      "district": "Dhaharat Al Teeb",
+      "sourceName": "Dhaharat Al Teeb",
+      "year": 2025,
+      "total": 2230,
+      "citizens": 402,
+      "nonCitizens": 1828,
+      "male": 1819,
+      "female": 411
+    },
+    "Dihan": {
+      "district": "Dihan",
+      "sourceName": "Dihan",
+      "year": 2025,
+      "total": 3631,
+      "citizens": 565,
+      "nonCitizens": 3066,
+      "male": 2920,
+      "female": 711
+    },
+    "Eastern Mahadir": {
+      "district": "Eastern Mahadir",
+      "sourceName": "Eastern Mahadir",
+      "year": 2025,
+      "total": 5857,
+      "citizens": 927,
+      "nonCitizens": 4930,
+      "male": 4758,
+      "female": 1099
+    },
+    "Falaj Hazza'": {
+      "district": "Falaj Hazza'",
+      "sourceName": "Falaj Hazza'",
+      "year": 2025,
+      "total": 19829,
+      "citizens": 7703,
+      "nonCitizens": 12126,
+      "male": 9933,
+      "female": 9896
+    },
+    "Ghadeer Al Tayr": {
+      "district": "Ghadeer Al Tayr",
+      "sourceName": "Ghadeer Al Tayr",
+      "year": 2025,
+      "total": 971,
+      "citizens": 150,
+      "nonCitizens": 821,
+      "male": 748,
+      "female": 223
+    },
+    "Ghanadhah": {
+      "district": "Ghanadhah",
+      "sourceName": "Ghanadhah",
+      "year": 2025,
+      "total": 280,
+      "citizens": 3,
+      "nonCitizens": 277,
+      "male": 263,
+      "female": 17
+    },
+    "Ghantout": {
+      "district": "Ghantout",
+      "sourceName": "Ghantout",
+      "year": 2025,
+      "total": 776,
+      "citizens": 39,
+      "nonCitizens": 737,
+      "male": 621,
+      "female": 155
+    },
+    "Ghireebah": {
+      "district": "Ghireebah",
+      "sourceName": "Ghireebah",
+      "year": 2025,
+      "total": 595,
+      "citizens": 205,
+      "nonCitizens": 390,
+      "male": 370,
+      "female": 225
+    },
+    "Ghiyathi": {
+      "district": "Ghiyathi",
+      "sourceName": "Ghiyathi",
+      "year": 2025,
+      "total": 67951,
+      "citizens": 5074,
+      "nonCitizens": 62877,
+      "male": 60347,
+      "female": 7604
+    },
+    "Ghnaymah": {
+      "district": "Ghnaymah",
+      "sourceName": "Ghnaymah",
+      "year": 2025,
+      "total": 6841,
+      "citizens": 3792,
+      "nonCitizens": 3049,
+      "male": 3494,
+      "female": 3347
+    },
+    "Hadbat Al Za'faranah": {
+      "district": "Hadbat Al Za'faranah",
+      "sourceName": "Hadbat Al Za'faranah",
+      "year": 2025,
+      "total": 31518,
+      "citizens": 4941,
+      "nonCitizens": 26577,
+      "male": 17668,
+      "female": 13850
+    },
+    "Hameem": {
+      "district": "Hameem",
+      "sourceName": "Hameem",
+      "year": 2025,
+      "total": 6041,
+      "citizens": 1629,
+      "nonCitizens": 4412,
+      "male": 3224,
+      "female": 2817
+    },
+    "Hili": {
+      "district": "Hili",
+      "sourceName": "Hili",
+      "year": 2025,
+      "total": 40844,
+      "citizens": 13485,
+      "nonCitizens": 27359,
+      "male": 23241,
+      "female": 17603
+    },
+    "Industrial Area": {
+      "district": "Industrial Area",
+      "sourceName": "Industrial Area",
+      "year": 2025,
+      "total": 55066,
+      "citizens": 539,
+      "nonCitizens": 54527,
+      "male": 51997,
+      "female": 3069
+    },
+    "Industrial City": {
+      "district": "Industrial City",
+      "sourceName": "Industrial City",
+      "year": 2025,
+      "total": 10448,
+      "citizens": 29,
+      "nonCitizens": 10419,
+      "male": 10155,
+      "female": 293
+    },
+    "Jarn Yafour": {
+      "district": "Jarn Yafour",
+      "sourceName": "Jarn Yafour",
+      "year": 2025,
+      "total": 159103,
+      "citizens": 142,
+      "nonCitizens": 158961,
+      "male": 157678,
+      "female": 1425
+    },
+    "Khalifa City": {
+      "district": "Khalifa City",
+      "sourceName": "Khalifa City",
+      "year": 2025,
+      "total": 106899,
+      "citizens": 33530,
+      "nonCitizens": 73369,
+      "male": 54703,
+      "female": 52196
+    },
+    "Khalifa Industrial": {
+      "district": "Khalifa Industrial",
+      "sourceName": "Khalifa Industrial",
+      "year": 2025,
+      "total": 2606,
+      "citizens": 308,
+      "nonCitizens": 2298,
+      "male": 1923,
+      "female": 683
+    },
+    "Khatm Al Shiklah": {
+      "district": "Khatm Al Shiklah",
+      "sourceName": "Khatm Al Shiklah",
+      "year": 2025,
+      "total": 1075,
+      "citizens": 57,
+      "nonCitizens": 1018,
+      "male": 1008,
+      "female": 67
+    },
+    "Madinat Al Riyad": {
+      "district": "Madinat Al Riyad",
+      "sourceName": "Madinat Al Riyad",
+      "year": 2025,
+      "total": 58379,
+      "citizens": 26896,
+      "nonCitizens": 31483,
+      "male": 31656,
+      "female": 26723
+    },
+    "Malaqit": {
+      "district": "Malaqit",
+      "sourceName": "Malaqit",
+      "year": 2025,
+      "total": 2477,
+      "citizens": 171,
+      "nonCitizens": 2306,
+      "male": 2289,
+      "female": 188
+    },
+    "Masakin": {
+      "district": "Masakin",
+      "sourceName": "Masakin",
+      "year": 2025,
+      "total": 3827,
+      "citizens": 468,
+      "nonCitizens": 3359,
+      "male": 3244,
+      "female": 583
+    },
+    "Mazyad": {
+      "district": "Mazyad",
+      "sourceName": "Mazyad",
+      "year": 2025,
+      "total": 12214,
+      "citizens": 4898,
+      "nonCitizens": 7316,
+      "male": 6938,
+      "female": 5276
+    },
+    "Mbazzarah Al Khadra": {
+      "district": "Mbazzarah Al Khadra",
+      "sourceName": "Mbazzarah Al Khadra",
+      "year": 2025,
+      "total": 22298,
+      "citizens": 11627,
+      "nonCitizens": 10671,
+      "male": 10889,
+      "female": 11409
+    },
+    "Mohamed Bin Zayed City": {
+      "district": "Mohamed Bin Zayed City",
+      "sourceName": "Mohamed Bin Zayed City",
+      "year": 2025,
+      "total": 209691,
+      "citizens": 32819,
+      "nonCitizens": 176872,
+      "male": 125282,
+      "female": 84409
+    },
+    "Mshayrif": {
+      "district": "Mshayrif",
+      "sourceName": "Mshayrif",
+      "year": 2025,
+      "total": 5734,
+      "citizens": 1205,
+      "nonCitizens": 4529,
+      "male": 4227,
+      "female": 1507
+    },
+    "Musaffah": {
+      "district": "Musaffah",
+      "sourceName": "Musaffah",
+      "year": 2025,
+      "total": 356918,
+      "citizens": 860,
+      "nonCitizens": 356058,
+      "male": 345597,
+      "female": 11321
+    },
+    "Muwaylih": {
+      "district": "Muwaylih",
+      "sourceName": "Muwaylih",
+      "year": 2025,
+      "total": 3357,
+      "citizens": 429,
+      "nonCitizens": 2928,
+      "male": 2683,
+      "female": 674
+    },
+    "Mzeer\u02bbAh": {
+      "district": "Mzeer\u02bbAh",
+      "sourceName": "Mzeer\u02bbAh",
+      "year": 2025,
+      "total": 8711,
+      "citizens": 1202,
+      "nonCitizens": 7509,
+      "male": 6886,
+      "female": 1825
+    },
+    "Nahil": {
+      "district": "Nahil",
+      "sourceName": "Nahil",
+      "year": 2025,
+      "total": 6427,
+      "citizens": 2650,
+      "nonCitizens": 3777,
+      "male": 3823,
+      "female": 2604
+    },
+    "Ni'mah": {
+      "district": "Ni'mah",
+      "sourceName": "Ni'mah",
+      "year": 2025,
+      "total": 10784,
+      "citizens": 4857,
+      "nonCitizens": 5927,
+      "male": 5615,
+      "female": 5169
+    },
+    "Niqa Al Dheeb": {
+      "district": "Niqa Al Dheeb",
+      "sourceName": "Niqa Al Dheeb",
+      "year": 2025,
+      "total": 2049,
+      "citizens": 209,
+      "nonCitizens": 1840,
+      "male": 1884,
+      "female": 165
+    },
+    "Qarn Al Yah": {
+      "district": "Qarn Al Yah",
+      "sourceName": "Qarn Al Yah",
+      "year": 2025,
+      "total": 215,
+      "citizens": 6,
+      "nonCitizens": 209,
+      "male": 209,
+      "female": 6
+    },
+    "Rabdan": {
+      "district": "Rabdan",
+      "sourceName": "Rabdan",
+      "year": 2025,
+      "total": 34713,
+      "citizens": 12014,
+      "nonCitizens": 22699,
+      "male": 19310,
+      "female": 15403
+    },
+    "Ramlat Sweihan": {
+      "district": "Ramlat Sweihan",
+      "sourceName": "Ramlat Sweihan",
+      "year": 2025,
+      "total": 2098,
+      "citizens": 369,
+      "nonCitizens": 1729,
+      "male": 1625,
+      "female": 473
+    },
+    "Ras Ghumeis": {
+      "district": "Ras Ghumeis",
+      "sourceName": "Ras Ghumeis",
+      "year": 2025,
+      "total": 235,
+      "citizens": 61,
+      "nonCitizens": 174,
+      "male": 181,
+      "female": 54
+    },
+    "Rawdat Al Reef": {
+      "district": "Rawdat Al Reef",
+      "sourceName": "Rawdat Al Reef",
+      "year": 2025,
+      "total": 4484,
+      "citizens": 573,
+      "nonCitizens": 3911,
+      "male": 3127,
+      "female": 1357
+    },
+    "Rimah": {
+      "district": "Rimah",
+      "sourceName": "Rimah",
+      "year": 2025,
+      "total": 12840,
+      "citizens": 2227,
+      "nonCitizens": 10613,
+      "male": 10317,
+      "female": 2523
+    },
+    "Sa'": {
+      "district": "Sa'",
+      "sourceName": "Sa'",
+      "year": 2025,
+      "total": 1458,
+      "citizens": 340,
+      "nonCitizens": 1118,
+      "male": 1177,
+      "female": 281
+    },
+    "Saadiyat Island": {
+      "district": "Saadiyat Island",
+      "sourceName": "Saadiyat Island",
+      "year": 2025,
+      "total": 34776,
+      "citizens": 4301,
+      "nonCitizens": 30475,
+      "male": 24141,
+      "female": 10635
+    },
+    "Shakhbout City": {
+      "district": "Shakhbout City",
+      "sourceName": "Shakhbout City",
+      "year": 2025,
+      "total": 47074,
+      "citizens": 20592,
+      "nonCitizens": 26482,
+      "male": 23232,
+      "female": 23842
+    },
+    "Shi'bat Al Wutah": {
+      "district": "Shi'bat Al Wutah",
+      "sourceName": "Shi'bat Al Wutah",
+      "year": 2025,
+      "total": 7830,
+      "citizens": 4060,
+      "nonCitizens": 3770,
+      "male": 3805,
+      "female": 4025
+    },
+    "Shiab Al Ashkhar": {
+      "district": "Shiab Al Ashkhar",
+      "sourceName": "Shiab Al Ashkhar",
+      "year": 2025,
+      "total": 10218,
+      "citizens": 5060,
+      "nonCitizens": 5158,
+      "male": 5195,
+      "female": 5023
+    },
+    "Sweihan": {
+      "district": "Sweihan",
+      "sourceName": "Sweihan",
+      "year": 2025,
+      "total": 8723,
+      "citizens": 1582,
+      "nonCitizens": 7141,
+      "male": 6868,
+      "female": 1855
+    },
+    "Tarif": {
+      "district": "Tarif",
+      "sourceName": "Tarif",
+      "year": 2025,
+      "total": 1255,
+      "citizens": 100,
+      "nonCitizens": 1155,
+      "male": 1156,
+      "female": 99
+    },
+    "Um Al Zumoul": {
+      "district": "Um Al Zumoul",
+      "sourceName": "Um Al Zumoul",
+      "year": 2025,
+      "total": 3051,
+      "citizens": 247,
+      "nonCitizens": 2804,
+      "male": 2789,
+      "female": 262
+    },
+    "Um Ghafah": {
+      "district": "Um Ghafah",
+      "sourceName": "Um Ghafah",
+      "year": 2025,
+      "total": 16648,
+      "citizens": 8298,
+      "nonCitizens": 8350,
+      "male": 8675,
+      "female": 7973
+    },
+    "Um Laylah&Al Zarraf&Al Bday'Ah": {
+      "district": "Um Laylah&Al Zarraf&Al Bday'Ah",
+      "sourceName": "Um Laylah&Al Zarraf&Al Bday'Ah",
+      "year": 2025,
+      "total": 1846,
+      "citizens": 621,
+      "nonCitizens": 1225,
+      "male": 1560,
+      "female": 286
+    },
+    "Um Yifeenah Island": {
+      "district": "Um Yifeenah Island",
+      "sourceName": "Um Yifeenah Island",
+      "year": 2025,
+      "total": 377,
+      "citizens": 12,
+      "nonCitizens": 365,
+      "male": 302,
+      "female": 75
+    },
+    "Western Mahadir": {
+      "district": "Western Mahadir",
+      "sourceName": "Western Mahadir",
+      "year": 2025,
+      "total": 4378,
+      "citizens": 737,
+      "nonCitizens": 3641,
+      "male": 3495,
+      "female": 883
+    },
+    "Yas Island": {
+      "district": "Yas Island",
+      "sourceName": "Yas Island",
+      "year": 2025,
+      "total": 39401,
+      "citizens": 10659,
+      "nonCitizens": 28742,
+      "male": 21216,
+      "female": 18185
+    },
+    "Yaw Al Ghadar & Al Hamra & Al Shuweehat": {
+      "district": "Yaw Al Ghadar & Al Hamra & Al Shuweehat",
+      "sourceName": "Yaw Al Ghadar & Al Hamra & Al Shuweehat",
+      "year": 2025,
+      "total": 1225,
+      "citizens": 289,
+      "nonCitizens": 936,
+      "male": 951,
+      "female": 274
+    },
+    "Yaw Al Nadhrah": {
+      "district": "Yaw Al Nadhrah",
+      "sourceName": "Yaw Al Nadhrah",
+      "year": 2025,
+      "total": 2947,
+      "citizens": 544,
+      "nonCitizens": 2403,
+      "male": 2092,
+      "female": 855
+    },
+    "Zakhir": {
+      "district": "Zakhir",
+      "sourceName": "Zakhir",
+      "year": 2025,
+      "total": 48702,
+      "citizens": 18527,
+      "nonCitizens": 30175,
+      "male": 27023,
+      "female": 21679
+    },
+    "Zayed City": {
+      "district": "Zayed City",
+      "sourceName": "Zayed City",
+      "year": 2025,
+      "total": 74703,
+      "citizens": 12520,
+      "nonCitizens": 62183,
+      "male": 52831,
+      "female": 21872
+    },
+    "Zayed Port": {
+      "district": "Zayed Port",
+      "sourceName": "Zayed Port",
+      "year": 2025,
+      "total": 5939,
+      "citizens": 231,
+      "nonCitizens": 5708,
+      "male": 5417,
+      "female": 522
+    },
+    "Unknown": {
+      "district": "Unknown",
+      "sourceName": "Unknown",
+      "year": 2025,
+      "total": 925,
+      "citizens": 420,
+      "nonCitizens": 505,
+      "male": 518,
+      "female": 407
+    }
+  }
+}

@@ -1,0 +1,3971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labour Market Observatory — Briefing Desk · Bayaan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../css/pages/lmo-common.css">
+<link rel="stylesheet" href="../style.css" />
+<link rel="stylesheet" href="../css/theme.css" />
+<script>
+  (function () {
+    var t = localStorage.getItem("bayaan-theme") || "light";
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  })();
+</script>
+<script src="../js/theme.js"></script>
+<script src="../js/header.js"></script>
+<script src="../js/lmo-chrome.js"></script>
+<script src="../js/favourites-shared.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-briefing.css">
+<link rel="stylesheet" href="../css/pages/home-widgets.css">
+<script src="https://cdn.jsdelivr.net/npm/highcharts@11.4.8/highcharts.js"></script>
+<script src="../js/section-scroll-spy.js"></script>
+<script src="lmo-sidenav.js"></script>
+<script src="lmo-shared.js"></script>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+#view-briefing {
+  --text: var(--t1);
+  --text2: var(--t2);
+  --text-secondary: var(--t3);
+  --text-primary: var(--t1);
+  --accent: var(--ac);
+  --accent-light: var(--acbg);
+  --border: var(--bd);
+  --muted: var(--t3);
+  --navy: #0f2744;
+  --down: var(--up);
+  --up: var(--dn);
+  --white: var(--sf);
+  --gray-300: var(--bd2, #CBD5E1);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --text-tertiary: var(--t3);
+  --surface: var(--sf);
+  --surface-2: var(--sf2);
+  --figma-subcard-bg: rgba(255,255,255,.6);
+  --figma-subcard-shadow: 0 24px 30px 0 rgba(42,61,76,.03);
+}
+#view-briefing .aib-hd-controls { display:flex; align-items:center; gap:12px; flex-shrink:0; margin-left:auto; }
+#view-briefing .aib-hd-sep { color:#cbd5e1; font-size:14px; font-weight:300; user-select:none; }
+#view-briefing .aib-card { --brief-blue:#246bfd; --brief-red:#e5484d; }
+
+      /* Section headings styled like the home page module titles: bold black
+         title + prominent accent icon (replaces the section pip).
+         Mirrors .screen-home .home-module-title / .home-module-title-icon. */
+      /* Section containers styled like home-page modules — gradient card,
+         radius, soft shadow, padding. Values mirror .home-section-module. */
+      #view-briefing #briefing-desk-sections > section {
+        background: radial-gradient(ellipse 90% 70% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%), linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 28px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(42, 61, 76, 0.07);
+        padding: 24px 28px 28px;
+        margin-bottom: 24px;
+      }
+      html[data-theme="dark"] #view-briefing #briefing-desk-sections > section {
+        background: var(--card-gradient);
+        border-color: var(--border);
+        box-shadow: var(--shadow-sm);
+      }
+      html[data-theme="dark"] #view-briefing .aib-hd-sep {
+        color: var(--text-tertiary);
+      }
+      html[data-theme="dark"] #view-briefing .aib-card .brief-speech {
+        background: linear-gradient(120deg, rgba(30, 58, 95, 0.95), rgba(20, 30, 50, 0.9));
+        box-shadow: inset 0 0 0 1px var(--border-md), 0 4px 12px rgba(0, 0, 0, 0.25);
+      }
+      html[data-theme="dark"] #view-briefing .aib-card .brief-listen {
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #view-briefing .aib-card .brief-listen__text {
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #view-briefing .aib-card .brief-audio-action:hover {
+        background: var(--surface-elevated, var(--surface));
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      }
+      html[data-theme="dark"] #view-briefing .aib-card .brief-audio-action--stop:hover {
+        background: color-mix(in srgb, var(--down) 15%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-dl-modal {
+        background: var(--surface);
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-dl-fmt {
+        background: var(--surface-elevated, var(--surface));
+      }
+      #view-briefing .section-hdr {
+        margin-bottom: 20px;
+      }
+
+      /* Header ↔ banner spacing: tighten the title's line-height and drop the
+         divider + bottom padding so the hero sits neatly below the subtitle. */
+      #view-briefing .topic-title {
+        line-height: 1.2;
+      }
+      #view-briefing .cpi-page-header-inner {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      #view-briefing .aib-card .brief-speech {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: fit-content;
+        height: 36px;
+        padding: 2px 3px 2px 2px;
+        border-radius: 50px;
+        background: linear-gradient(120deg, rgba(237, 244, 255, 0.95), rgba(255, 255, 255, 0.9));
+        box-shadow: inset 0 0 0 1px rgba(185, 205, 232, 0.72), 0 4px 12px rgba(36, 76, 130, 0.08);
+        transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      #view-briefing .aib-card .brief-speech::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: linear-gradient(110deg, rgba(36, 107, 253, 0.22), transparent 42%);
+        opacity: 0;
+        z-index: -1;
+        transition: 0.3s;
+      }
+      #view-briefing .aib-card .brief-speech.is-active {
+        box-shadow: inset 0 0 0 1px rgba(120, 166, 236, 0.55), 0 5px 14px rgba(36, 107, 253, 0.13);
+      }
+      #view-briefing .aib-card .brief-speech.is-active::before {
+        opacity: 1;
+      }
+      #view-briefing .aib-card .brief-listen {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 10px 0 1px;
+        border: 0;
+        border-radius: 13px;
+        background: transparent;
+        color: #28415f;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: 0.22s ease;
+      }
+      #view-briefing .aib-card .brief-listen:hover .brief-listen__icon {
+        transform: scale(1.06);
+        box-shadow: 0 5px 12px rgba(36, 107, 253, 0.32);
+      }
+      #view-briefing .aib-card .brief-listen:focus-visible,
+      #view-briefing .aib-card .brief-audio-action:focus-visible {
+        outline: 3px solid rgba(36, 107, 253, 0.17);
+        outline-offset: 2px;
+      }
+      #view-briefing .aib-card .brief-listen__icon {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: #fff;
+        background: linear-gradient(145deg, #1f5ef0, #5b97f8);
+        box-shadow: 0 3px 8px rgba(36, 107, 253, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+        transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+      }
+      #view-briefing .aib-card .brief-listen__icon::after {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border: 1px solid rgba(36, 107, 253, 0.22);
+        border-radius: 50%;
+        transform: scale(0.84);
+        opacity: 0;
+      }
+      #view-briefing .aib-card .brief-listen__speaker,
+      #view-briefing .aib-card .brief-listen__play,
+      #view-briefing .aib-card .brief-listen__pause {
+        grid-area: 1 / 1;
+        font-size: 12px;
+        line-height: 1;
+        transition: opacity 0.15s, transform 0.15s;
+      }
+      #view-briefing .aib-card .brief-listen__play {
+        margin-left: 1px;
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #view-briefing .aib-card .brief-listen__pause {
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #view-briefing .aib-card .brief-listen__speaker {
+        opacity: 1;
+        transform: scale(1);
+      }
+      #view-briefing .aib-card .brief-listen[data-state="speaking"] .brief-listen__speaker,
+      #view-briefing .aib-card .brief-listen[data-state="paused"] .brief-listen__speaker {
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #view-briefing .aib-card .brief-listen[data-state="speaking"] .brief-listen__pause {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+      #view-briefing .aib-card .brief-listen[data-state="paused"] .brief-listen__play {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+      #view-briefing .aib-card .brief-listen[data-state="paused"] .brief-listen__icon {
+        background: linear-gradient(145deg, #3b7af5, #7aafff);
+      }
+      #view-briefing .aib-card .brief-listen[data-state="speaking"] .brief-listen__icon::after {
+        animation: brief-voice-ring 1.8s ease-out infinite;
+      }
+      #view-briefing .aib-card .brief-listen__copy {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+        line-height: 1.05;
+      }
+      #view-briefing .aib-card .brief-listen__text {
+        color: #2b4462;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+      }
+      #view-briefing .aib-card .brief-listen[data-state="speaking"] .brief-listen__text,
+      #view-briefing .aib-card .brief-listen[data-state="paused"] .brief-listen__text {
+        display: none;
+      }
+      #view-briefing .aib-card .brief-listen__wave {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        height: 14px;
+        color: var(--brief-blue);
+      }
+      #view-briefing .aib-card .brief-listen__wave i {
+        display: block;
+        width: 2px;
+        height: 5px;
+        border-radius: 2px;
+        background: currentColor;
+        animation: brief-wave 0.72s ease-in-out infinite;
+      }
+      #view-briefing .aib-card .brief-listen__wave i:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+      #view-briefing .aib-card .brief-listen__wave i:nth-child(3) {
+        animation-delay: 0.24s;
+      }
+      #view-briefing .aib-card .brief-listen__wave i:nth-child(4) {
+        animation-delay: 0.36s;
+      }
+      #view-briefing .aib-card .brief-listen[data-state="speaking"] .brief-listen__wave,
+      #view-briefing .aib-card .brief-listen[data-state="paused"] .brief-listen__wave {
+        display: inline-flex;
+      }
+      #view-briefing .aib-card .brief-listen[data-state="paused"] .brief-listen__wave i {
+        height: 8px;
+        animation-play-state: paused;
+      }
+      #view-briefing .aib-card .brief-speech__actions {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateX(-6px);
+        transition: max-width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s, transform 0.3s;
+      }
+      #view-briefing .aib-card .brief-speech.is-active .brief-speech__actions {
+        max-width: 56px;
+        opacity: 1;
+        transform: none;
+      }
+      #view-briefing .aib-card .brief-speech__actions::before {
+        content: "";
+        width: 1px;
+        height: 14px;
+        margin: 0 2px 0 0;
+        background: #d7e2f0;
+      }
+      #view-briefing .aib-card .brief-audio-action {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: #6d7f95;
+        font-size: 12px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+      #view-briefing .aib-card .brief-audio-action:hover {
+        color: var(--brief-blue);
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(36, 75, 125, 0.1);
+        transform: scale(1.06);
+      }
+      #view-briefing .aib-card .brief-stop-box {
+        display: block;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: currentColor;
+      }
+      #view-briefing .aib-card .brief-audio-action--stop:hover {
+        color: var(--brief-red);
+        background: #fff5f5;
+      }
+      #view-briefing .aib-card .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      @keyframes brief-wave {
+        0%,
+        100% {
+          height: 5px;
+        }
+        50% {
+          height: 14px;
+        }
+      }
+      @keyframes brief-voice-ring {
+        0% {
+          transform: scale(0.82);
+          opacity: 0.8;
+        }
+        80%,
+        100% {
+          transform: scale(1.35);
+          opacity: 0;
+        }
+      }
+
+      /* Page-header actions (right side): date picker + download button.
+         Date pill mirrors the sibling pages' .tr-datepick; download uses the
+         brand primary fill. */
+      #view-briefing .cpi-hdr-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      #view-briefing .cpi-hdr-search {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        min-width: 240px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--white);
+        color: var(--text2);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        font-size: 13px;
+        cursor: text;
+        transition: border-color 0.15s;
+      }
+      #view-briefing .cpi-hdr-search[hidden] {
+        display: none;
+      }
+      #view-briefing .cpi-hdr-search:hover,
+      #view-briefing .cpi-hdr-search:focus-within {
+        border-color: var(--accent);
+      }
+      #view-briefing .cpi-hdr-search > i {
+        font-size: 16px;
+        color: var(--text2);
+        flex-shrink: 0;
+      }
+      #view-briefing .cpi-hdr-kbd {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--accent-light);
+        color: var(--accent);
+      }
+      #view-briefing .cpi-hdr-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--white);
+        color: var(--text);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        font-size: 13px;
+        font-weight: 600;
+        transition: border-color 0.15s;
+      }
+      #view-briefing .cpi-hdr-date:hover,
+      #view-briefing .cpi-hdr-date:focus-within {
+        border-color: var(--accent);
+      }
+      #view-briefing .cpi-hdr-date > i {
+        color: var(--accent);
+        font-size: 17px;
+        flex-shrink: 0;
+      }
+      #view-briefing .cpi-hdr-date input {
+        border: 0;
+        outline: none;
+        background: none;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        color: inherit;
+        cursor: pointer;
+      }
+      #view-briefing .cpi-hdr-date input::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        display: none;
+      }
+      #view-briefing .cpi-hdr-download {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        height: 40px;
+        padding: 0 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--white);
+        color: var(--text);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+      }
+      #view-briefing .cpi-hdr-download:hover {
+        border-color: var(--accent);
+        background: var(--bg);
+      }
+      #view-briefing .cpi-hdr-download i {
+        font-size: 16px;
+        color: var(--accent);
+      }
+      #view-briefing .section-hdr h2.cpi-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #000;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+      }
+      #view-briefing .section-hdr h2.cpi-section-title i {
+        font-size: 21px;
+        line-height: 1;
+        color: var(--accent);
+      }
+      html[data-theme="dark"] #view-briefing .section-hdr h2.cpi-section-title {
+        color: var(--text);
+      }
+
+      /* Overview — wireframe-accurate grouped metric cards, composed from the
+         app's existing tokens/components. Layout-only additions; no changes to
+         the shared design system. */
+      #view-briefing .cpi-overview-grid {
+        display: grid;
+        /* Equal thirds — the Inflation internals are sized down to fit rather
+           than the track being widened to accommodate them. */
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        align-items: stretch;
+      }
+      /* Cards inside each section — matched to the home page "subcard" recipe
+         (:is(.screen-home, …) .exec-subcard / .product-card in style.css).
+         Tokens redeclared here because the originals are scoped to .screen-home. */
+      #view-briefing {
+        --figma-subcard-bg: rgba(255, 255, 255, 0.6);
+        --figma-subcard-shadow: 0 24px 30px 0 rgba(42, 61, 76, 0.03);
+      }
+      #view-briefing .obs-card {
+        border-radius: 16px;
+        transition:
+          box-shadow 0.22s ease,
+          border-color 0.22s ease,
+          transform 0.22s ease,
+          background 0.22s ease;
+      }
+      /* Surface colours are light-theme only — dark theme already restyles
+         .obs-card in css/theme.css and must be left to win. */
+      html:not([data-theme="dark"]) #view-briefing .obs-card {
+        background: var(--figma-subcard-bg);
+        border: 1px solid #eaecf0;
+        box-shadow: var(--figma-subcard-shadow);
+      }
+      html:not([data-theme="dark"]) #view-briefing .obs-card:hover {
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-md);
+      }
+      /* Pre-existing: the light border shorthand in cpi-obs.css outranks the
+         dark `border-color` in theme.css, leaving pale edges on dark cards. */
+      html[data-theme="dark"] #view-briefing .obs-card {
+        border-color: var(--border);
+      }
+
+      /* Inflation card — icon chip + large value + muted unit, so the card
+         carries the same weight as its sparkline-bearing neighbours instead of
+         trailing off into empty space. Icon treatment matches the Key Impacts
+         rows below (and the home Daily Brief points they came from). */
+      #view-briefing .infl-rows {
+        display: flex;
+        flex-direction: column;
+        margin-top: 4px;
+      }
+      #view-briefing .infl-row {
+        --tone: #8b93a7;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 0;
+        min-width: 0;
+      }
+      /* Tighter gutters than the other two cards — this one packs an icon and
+         two text runs per metric, so it needs the horizontal room. */
+      #view-briefing .kpi-card--infl .ov-metric {
+        padding: 0 10px;
+      }
+      #view-briefing .kpi-card--infl .ov-metric:first-child {
+        padding-left: 0;
+      }
+      #view-briefing .kpi-card--infl .ov-metric:last-child {
+        padding-right: 0;
+      }
+      /* Same reasoning for CPI by — three tracks sharing one card, and its
+         26px figures are the widest content in the row. */
+      #view-briefing .kpi-card--essentials .ov-metric {
+        padding: 0 8px;
+      }
+      #view-briefing .kpi-card--essentials .ov-metric:first-child {
+        padding-left: 0;
+      }
+      #view-briefing .kpi-card--essentials .ov-metric:last-child {
+        padding-right: 0;
+      }
+      /* Value and unit sit inline, but wrap instead of overflowing when the
+         column is tight — these metrics live in a narrow grid track. */
+      #view-briefing .infl-figure {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 1px 5px;
+        min-width: 0;
+      }
+      #view-briefing .infl-row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+      #view-briefing .infl-row--up {
+        --tone: #e5484d;
+      }
+      #view-briefing .infl-row--down {
+        --tone: #0c9b70;
+      }
+      #view-briefing .infl-icon {
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        flex-shrink: 0;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 9%, white);
+      }
+      #view-briefing .infl-icon i {
+        font-size: 13px;
+        line-height: 1;
+      }
+      #view-briefing .infl-val {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--tone);
+      }
+      #view-briefing .infl-unit {
+        font-size: 10px;
+        font-weight: 500;
+        color: #8492a6;
+      }
+      html[data-theme="dark"] #view-briefing .infl-row {
+        border-color: var(--border);
+      }
+      html[data-theme="dark"] #view-briefing .infl-icon {
+        background: color-mix(in srgb, var(--tone) 18%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .infl-unit {
+        color: var(--text-secondary);
+      }
+
+      /* No rule under the page title/subtitle. Zero width rather than a colour
+         override, so the dark-theme border-bottom-color in css/theme.css can't
+         bring it back. The padding-bottom stays as spacing. */
+      #view-briefing .cpi-page-header-inner {
+        border-bottom: 0;
+      }
+
+      /* Driver date badge as a standard pill — geometry from the page's own
+         .kpi-badge (css/pages/cpi-obs.css): flat, inline-flex, fully rounded,
+         no border. Single line, so the rounded-rect + <br> version is gone. */
+      #view-briefing .dc-date {
+        display: inline-flex;
+        align-items: center;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 9px;
+        border: 0;
+        border-radius: 100px;
+        background: var(--accent-light);
+        color: var(--accent);
+        line-height: 1.5;
+        white-space: nowrap;
+        text-align: initial;
+      }
+
+      /* Key Impacts — matched to the home page Daily Brief summary points
+         (.brief-point in css/pages/daily-brief.css). Tone lives on the icon;
+         the copy stays neutral with bold dark emphasis, as in the reference.
+         Laid out as a 2×2 grid with a horizontal rule between the rows only. */
+      #view-briefing .impacts-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      #view-briefing .impacts-list .impact-item {
+        display: grid;
+        grid-template-columns: 34px 1fr auto;
+        gap: 11px;
+        align-items: start;
+        padding: 12px 18px;
+        border-bottom: 1px solid #edf1f6;
+        font-size: 12.5px;
+        line-height: 1.55;
+        color: #536277;
+        transition: transform 0.22s ease;
+      }
+      /* Bottom row carries no horizontal rule. */
+      #view-briefing .impacts-list .impact-item:nth-last-child(-n + 2) {
+        border-bottom: 0;
+      }
+      #view-briefing .impacts-list .impact-item:hover {
+        background: none;
+        transform: translateX(3px);
+      }
+
+      #view-briefing .impacts-list .impact-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 9%, white);
+      }
+      #view-briefing .impacts-list .impact-icon i {
+        font-size: 17px;
+        line-height: 1;
+      }
+      #view-briefing .impacts-list .impact-icon--up {
+        --tone: #e5484d;
+      }
+      #view-briefing .impacts-list .impact-icon--down {
+        --tone: #0c9b70;
+      }
+      #view-briefing .impacts-list .impact-icon--neutral {
+        --tone: #246bfd;
+      }
+      #view-briefing .impacts-list .impact-body {
+        min-width: 0;
+        padding-top: 7px;
+      }
+      #view-briefing .impacts-list .impact-ai {
+        margin-top: 4px;
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: transparent;
+        color: #0073f0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        flex-shrink: 0;
+        border-radius: 8px;
+      }
+      #view-briefing .impacts-list .impact-ai i {
+        font-size: 16px;
+        animation: sparkleGlow 2.4s ease-in-out infinite;
+      }
+      #view-briefing .impacts-list .impact-ai:hover {
+        background: rgba(0, 115, 240, 0.08);
+        opacity: 0.9;
+      }
+
+      /* Reference emphasis is bold ink, not a tone colour. */
+      #view-briefing .impacts-list .impact-val {
+        color: #172033;
+        font-weight: 700;
+      }
+
+      html[data-theme="dark"] #view-briefing .impacts-list .impact-item {
+        border-color: var(--border);
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #view-briefing .impacts-list .impact-val {
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #view-briefing .impacts-list .impact-icon {
+        background: color-mix(in srgb, var(--tone) 18%, transparent);
+      }
+      @media (max-width: 720px) {
+        #view-briefing .impacts-list { grid-template-columns: 1fr; }
+        #view-briefing .impacts-list .impact-item { border-bottom: 1px solid #edf1f6; }
+        #view-briefing .impacts-list .impact-item:last-child { border-bottom: 0; }
+      }
+
+      /* Card sparklines — mirrors .brief-kpi__spark-area / -line
+         (css/pages/daily-brief.css) from the home page cards. */
+      #view-briefing .obs-spark-area {
+        opacity: 1;
+      }
+      #view-briefing .obs-spark-line {
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* Single trend line — a compact sparkline height is enough now that the
+         five separated year-lines are gone. */
+      #view-briefing .cpiby-spark,
+      #view-briefing .cpiby-spark svg,
+      #view-briefing .dc-spark,
+      #view-briefing .dc-spark svg {
+        height: 44px;
+      }
+
+      /* Year x-axis — five evenly-spaced ticks under the chart, spanning its
+         full width (first tick at the left edge, last at the right). */
+      #view-briefing .obs-year-axis {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 7px;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        color: #9aa7b8;
+      }
+      html[data-theme="dark"] #view-briefing .obs-year-axis {
+        color: var(--text-tertiary);
+      }
+      /* Lift on hover for grid cards only — full-width list cards stay put,
+         same as the home page's list modules. */
+      #view-briefing .obs-card:not(.impacts-list):hover {
+        transform: translateY(-1px);
+      }
+      /* Home subcards have no coloured top rule. */
+      #view-briefing .kpi-card::before {
+        display: none;
+      }
+      #view-briefing .ov-card-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #view-briefing .ov-card-title i {
+        font-size: 15px;
+        color: var(--accent);
+      }
+      #view-briefing .ov-metrics {
+        display: grid;
+        gap: 0;
+      }
+      #view-briefing .ov-metrics.cols-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      #view-briefing .ov-metrics.cols-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      #view-briefing .ov-metric {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+        padding: 0 14px;
+      }
+      #view-briefing .ov-metric:first-child {
+        padding-left: 0;
+      }
+      #view-briefing .ov-metric:last-child {
+        padding-right: 0;
+      }
+      #view-briefing .ov-metric + .ov-metric {
+        border-left: 1px solid rgba(15, 23, 42, 0.06);
+      }
+
+      /* ── Overview — responsive metric cards ───────────────────────────────
+         Dual cohort row (Emirati | Non Emirati) + Total spotlight footer.
+         Trending icons; all Y/Y deltas green. Auto-wrapping grid for laptops. */
+      #view-briefing .lmo-ov-sub {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: -8px 0 16px;
+        font-size: 12px;
+        color: var(--text2);
+      }
+      #view-briefing .lmo-ov-year {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 12%, white);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+      }
+      #view-briefing .lmo-ov-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        align-items: stretch;
+      }
+      /* Overview cards — CPI diagnose (dg-card) colour theme */
+      #view-briefing .lmo-ov-card--compact {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+        min-width: 0;
+        overflow: hidden;
+        isolation: isolate;
+        transform-style: preserve-3d;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      }
+      html:not([data-theme="dark"]) #view-briefing .lmo-ov-card--compact {
+        box-shadow: 0 5px 15px rgba(25, 48, 75, 0.05), inset 0 1px #fff;
+      }
+      #view-briefing .obs-card.lmo-ov-card--compact:hover {
+        transform: translateY(-4px) rotateX(1deg);
+        border-color: #c7d2e1;
+        box-shadow: 0 18px 34px rgba(32, 56, 84, 0.09);
+      }
+      html[data-theme="dark"] #view-briefing .obs-card.lmo-ov-card--compact:hover {
+        border-color: var(--border);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+      }
+      #view-briefing .lmo-ov-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        min-width: 0;
+        padding: 12px 12px 10px 14px;
+      }
+      #view-briefing .lmo-ov-ico {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        font-size: 15px;
+        line-height: 1;
+        color: #405775;
+        background: linear-gradient(145deg, #f8fafc, #edf2f7);
+        box-shadow: inset 0 0 0 1px #e8edf3;
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-ico {
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: inset 0 0 0 1px var(--border);
+        color: var(--text-secondary);
+      }
+      #view-briefing .lmo-ov-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.5;
+        letter-spacing: -0.01em;
+        padding-top: 3px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      #view-briefing .lmo-ov-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      #view-briefing .lmo-ov-hdr .cpi-section-title { margin: 0; }
+      #view-briefing .lmo-ov-card-dl {
+        margin-left: auto;
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+      }
+      #view-briefing .lmo-ov-card-dl i { font-size: 14px; }
+
+      /* Overview download modal */
+      #view-briefing .lmo-dl-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.45);
+      }
+      #view-briefing .lmo-dl-backdrop.is-open { display: flex; }
+      #view-briefing .lmo-dl-modal {
+        width: min(420px, 100%);
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 24px 48px rgba(15, 23, 42, 0.22);
+        padding: 18px 20px 20px;
+        border: 1px solid var(--border);
+        overflow: visible;
+      }
+      #view-briefing .lmo-dl-hd {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+      #view-briefing .lmo-dl-hd h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #view-briefing .lmo-dl-close {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+      }
+      #view-briefing .lmo-dl-close:hover {
+        background: var(--bg);
+        color: var(--text);
+      }
+      #view-briefing .lmo-dl-years {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 10px;
+        align-items: end;
+        margin-bottom: 14px;
+        overflow: visible;
+      }
+      #view-briefing .lmo-dl-field {
+        position: relative;
+        min-width: 0;
+      }
+      #view-briefing .lmo-dl-field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text2);
+        margin-bottom: 4px;
+      }
+      #view-briefing .lmo-dl-dd {
+        position: relative;
+        width: 100%;
+      }
+      #view-briefing .lmo-dl-dd-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        width: 100%;
+        height: 38px;
+        padding: 0 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        color: #0f2744;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: border-color 0.15s, color 0.15s;
+      }
+      #view-briefing .lmo-dl-dd-trigger span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+        margin-right: auto;
+      }
+      #view-briefing .lmo-dl-dd-trigger > i.ti-chevron-down {
+        font-size: 15px;
+        color: #9ca3af;
+        flex-shrink: 0;
+        transition: transform 0.15s;
+      }
+      #view-briefing .lmo-dl-dd-trigger.is-open > i.ti-chevron-down {
+        transform: rotate(180deg);
+      }
+      #view-briefing .lmo-dl-dd-trigger:hover,
+      #view-briefing .lmo-dl-dd-trigger.is-open {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      #view-briefing .lmo-dl-dd-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        z-index: 50;
+        min-width: 100%;
+        width: max-content;
+        max-width: min(240px, calc(100vw - 48px));
+        max-height: 220px;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 12px 40px rgba(11, 28, 61, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+        padding: 6px;
+      }
+      #view-briefing .lmo-dl-dd-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 9px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 500;
+        color: #0f2744;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.12s, color 0.12s;
+      }
+      #view-briefing .lmo-dl-dd-option .ti-check {
+        margin-left: auto;
+        color: var(--accent);
+        font-size: 15px;
+        opacity: 0;
+      }
+      #view-briefing .lmo-dl-dd-option.is-active .ti-check {
+        opacity: 1;
+      }
+      #view-briefing .lmo-dl-dd-option:hover {
+        background: #f8fbff;
+        color: var(--accent);
+      }
+      #view-briefing .lmo-dl-dd-option.is-active {
+        background: #eff6ff;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      #view-briefing .lmo-dl-years-sep {
+        padding-bottom: 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      #view-briefing .lmo-dl-tnc {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 16px;
+        font-size: 12px;
+        line-height: 1.45;
+        color: var(--text2);
+      }
+      #view-briefing .lmo-dl-tnc input { margin-top: 2px; }
+      #view-briefing .lmo-dl-tnc a {
+        color: var(--accent);
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      #view-briefing .lmo-dl-as {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 10px;
+      }
+      #view-briefing .lmo-dl-formats {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
+      }
+      #view-briefing .lmo-dl-fmt {
+        min-width: 48px;
+        padding: 6px 8px 5px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: #fff;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      }
+      #view-briefing .lmo-dl-fmt i { font-size: 16px; }
+      #view-briefing .lmo-dl-fmt-lbl {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text2);
+        line-height: 1;
+      }
+      #view-briefing .lmo-dl-fmt[data-fmt="pdf"] i { color: #dc2626; }
+      #view-briefing .lmo-dl-fmt[data-fmt="excel"] i { color: #16a34a; }
+      #view-briefing .lmo-dl-fmt[data-fmt="image"] i { color: #64748b; }
+      #view-briefing .lmo-dl-fmt:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.1);
+      }
+      #view-briefing .lmo-dl-formats.is-disabled .lmo-dl-fmt,
+      #view-briefing .lmo-dl-fmt:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+      /* Dual cohort strip — Emirati | Non Emirati */
+      #view-briefing .lmo-ov-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        margin: 0 10px;
+        padding: 9px 9px 7px;
+        border: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(248, 250, 252, 0.67);
+      }
+      #view-briefing .lmo-ov-cohort {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 9px 10px;
+        min-width: 0;
+      }
+      #view-briefing .lmo-ov-cohort + .lmo-ov-cohort {
+        border-left: 1px solid rgba(15, 23, 42, 0.06);
+      }
+      #view-briefing .lmo-ov-cohort-lbl {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
+        font-weight: 700;
+        color: #8996a9;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        line-height: 1.2;
+      }
+      #view-briefing .lmo-ov-flag {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        object-fit: contain;
+      }
+      #view-briefing .lmo-ov-cohort-val {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+      }
+      #view-briefing .lmo-ov-chg {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        width: fit-content;
+        margin-top: 2px;
+        font-size: 10.5px;
+        font-weight: 700;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      #view-briefing .lmo-ov-chg--pos {
+        color: #0c9b70;
+      }
+      #view-briefing .lmo-ov-chg--neg {
+        color: #e5484d;
+      }
+      #view-briefing .lmo-ov-chg i { font-size: 12px; }
+      /* Total spotlight footer */
+      #view-briefing .lmo-ov-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 7px;
+        padding: 2px 12px 12px 14px;
+        background: transparent;
+        border-top: 0;
+      }
+      #view-briefing .lmo-ov-total-lead {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+      #view-briefing .lmo-ov-total-lbl {
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #8996a9;
+      }
+      #view-briefing .lmo-ov-total-val {
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+      }
+      #view-briefing .lmo-ov-total .lmo-ov-chg {
+        flex-shrink: 0;
+        padding: 3px 8px;
+        border-radius: 100px;
+        font-size: 11px;
+      }
+      #view-briefing .lmo-ov-total .lmo-ov-chg--pos {
+        background: #e6f8ef;
+        color: #087b4b;
+        box-shadow: inset 0 0 0 1px #c8ead9;
+      }
+      #view-briefing .lmo-ov-total .lmo-ov-chg--neg {
+        background: #ffe7e9;
+        color: #b4232d;
+        box-shadow: inset 0 0 0 1px #f6c9cd;
+      }
+      @keyframes lmoOvIn {
+        from { opacity: 0; transform: translateY(10px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      #view-briefing .lmo-ov-card--compact {
+        animation: lmoOvIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      #view-briefing .lmo-ov-card--compact:nth-child(1) { animation-delay: 0.03s; }
+      #view-briefing .lmo-ov-card--compact:nth-child(2) { animation-delay: 0.06s; }
+      #view-briefing .lmo-ov-card--compact:nth-child(3) { animation-delay: 0.09s; }
+      #view-briefing .lmo-ov-card--compact:nth-child(4) { animation-delay: 0.12s; }
+      #view-briefing .lmo-ov-card--compact:nth-child(5) { animation-delay: 0.15s; }
+      #view-briefing .lmo-ov-card--compact:nth-child(6) { animation-delay: 0.18s; }
+      #view-briefing .lmo-ov-card--compact:nth-child(7) { animation-delay: 0.21s; }
+      @media (prefers-reduced-motion: reduce) {
+        #view-briefing .lmo-ov-card--compact { animation: none; }
+        #view-briefing .lmo-ov-card--compact:hover { transform: none; }
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-card--compact {
+        background: linear-gradient(150deg, var(--surface, #141a26) 0%, var(--surface, #141a26) 66%, rgba(255, 255, 255, 0.02) 100%);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.18), inset 0 1px rgba(255, 255, 255, 0.04);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-split {
+        background: rgba(255, 255, 255, 0.04);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-cohort + .lmo-ov-cohort {
+        border-color: var(--border);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-cohort-lbl,
+      html[data-theme="dark"] #view-briefing .lmo-ov-total-lbl {
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-chg--pos {
+        color: #34c99a;
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-chg--neg {
+        color: #ff6b6b;
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-total .lmo-ov-chg--pos {
+        background: color-mix(in srgb, #0c9b70 22%, transparent);
+        color: #34c99a;
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, #0c9b70 32%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-total .lmo-ov-chg--neg {
+        background: color-mix(in srgb, #e5484d 22%, transparent);
+        color: #ff8a8a;
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, #e5484d 35%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ov-year {
+        background: color-mix(in srgb, var(--accent) 22%, transparent);
+      }
+      /* Tablet → phone wrap (desktop stays at 5 cols) */
+      @media (max-width: 1199px) {
+        #view-briefing .lmo-ov-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 899px) {
+        #view-briefing .lmo-ov-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 540px) {
+        #view-briefing .lmo-ov-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ── Emiratization section ─────────────────────────────────────────────
+         Built from the page's existing atoms — .obs-card, the .ov-metric
+         divided-column pattern, .section-hdr, .driver-grid, buildObsSparkline —
+         plus the --up/--down semantic pair and accent tokens. Tone helpers
+         .lmo-pos/.lmo-neg map positive→green(var(--down)), negative→red(var(--up)).
+         Layout only; no shared files touched. */
+      #view-briefing .lmo-emir {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      #view-briefing .lmo-emir-hdr .section-hdr {
+        margin-bottom: 6px;
+      }
+      #view-briefing .lmo-emir-sub {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text2);
+        line-height: 1.5;
+      }
+      #view-briefing .lmo-subhdr {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.01em;
+      }
+      #view-briefing .lmo-pos { color: var(--down); }
+      #view-briefing .lmo-neg { color: var(--up); }
+
+      /* Executive Overview KPI cards — additive slots on the .lmo-kpi component:
+         a title eyebrow, an optional secondary caption, and a bottom-aligned
+         sector-chip footer. Tokens mirror existing .lmo-kpi-label / .lmo-tag. */
+      #view-briefing .lmo-subhdr i { font-size: 17px; color: var(--accent); }
+      #view-briefing .lmo-ovv-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.3;
+      }
+      #view-briefing .lmo-ovv-caption {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      #view-briefing .lmo-ovv-foot {
+        margin-top: auto; /* pin chip to the bottom so all cards align */
+        padding-top: 4px;
+      }
+      /* Keep the top-right status pill centred with the icon chip. */
+      #view-briefing .lmo-ovv .lmo-kpi-top .lmo-badge {
+        margin-top: 0;
+        align-self: center;
+      }
+      /* Executive Overview KPI cards are static — no click/hover affordance.
+         Neutralize the global .obs-card hover lift + shadow and any pointer. */
+      #view-briefing .lmo-ovv { cursor: default; }
+      #view-briefing .lmo-ovv:hover { transform: none; }
+      html:not([data-theme="dark"]) #view-briefing .lmo-ovv:hover {
+        border-color: #eaecf0;
+        box-shadow: var(--figma-subcard-shadow);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-ovv:hover {
+        border-color: var(--border);
+        box-shadow: none;
+      }
+
+      /* ── Workforce Localization Progress by Sector — subsection header with
+         carousel actions + insight cards. Reuses .lmo-subhdr, .lmo-qa, the
+         home-carousel nav, .dg-card, and the .lmo-bar progress bar. ── */
+      #view-briefing .lmo-subhdr-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      #view-briefing .lmo-subhdr-lead .lmo-subhdr { margin-bottom: 4px; }
+      #view-briefing .lmo-subhdr-sub {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text2);
+        line-height: 1.5;
+      }
+      #view-briefing .lmo-subhdr-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      /* Header-mounted carousel nav — drop the default centred/margin layout
+         and the dots (the header exposes only prev/next). */
+      /* Compound selector so margin-top:0 beats the base .dg-carousel-nav's
+         14px (the header nav sits inline with the AI/Download actions, not
+         below a track). */
+      #view-briefing .dg-carousel-nav.lmo-hdr-nav {
+        margin-top: 0;
+        gap: 2px;
+      }
+      /* Keep the header prev/next arrows visible even when nothing currently
+         overflows (compound selector outranks the base .dg-carousel-nav.is-single
+         display:none). Arrows enable/disable per scroll position via the app's
+         carousel controller. */
+      #view-briefing .dg-carousel-nav.lmo-hdr-nav.is-single { display: flex; }
+      #view-briefing .lmo-hdr-nav .home-carousel-dots { display: none; }
+
+      /* 3 cards per view (the shared .dg-slide is 2-up; scope the override). */
+      #view-briefing .lmo-loc-track .dg-slide {
+        flex: 0 0 calc((100% - 28px) / 3);
+      }
+      #view-briefing .lmo-loc-card { gap: 12px; }
+      #view-briefing .lmo-loc-valrow {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      #view-briefing .lmo-loc-val {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+      }
+      #view-briefing .lmo-loc-insight {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text2);
+      }
+      #view-briefing .lmo-loc-foot { gap: 4px; }
+
+      /* ── Localization cards (Sector + Domain carousels) adopt the home-page
+         indicator (.product-card) look: category pill + actions, bold name,
+         large value, coloured change, a sparkline graph (replacing the old
+         progress bar) and a footer AI insight. Scoped to .lmo-ind-card so the
+         Key Indicators cards (which share .lmo-loc-card) are untouched. The
+         shared .product-card rules in style.css only apply under a
+         .products-grid ancestor, so the recipe is restated here. ── */
+      #view-briefing .lmo-ind-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 14px 16px;
+      }
+      #view-briefing .lmo-ind-card .product-card-toprow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      #view-briefing .lmo-ind-card .product-cat-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: #6b7280;
+        background: #f3f4f6;
+        border-radius: 5px;
+        padding: 2px 8px;
+        max-width: 70%;
+      }
+      #view-briefing .lmo-ind-card .product-cat-tag i { font-size: 11px; }
+      html[data-theme="dark"] #view-briefing .lmo-ind-card .product-cat-tag {
+        background: var(--surface2, var(--sf3));
+        color: var(--text-secondary);
+      }
+      #view-briefing .lmo-ind-card .product-cat-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #view-briefing .lmo-ind-card .product-actions {
+        display: flex;
+        gap: 1px;
+        color: #9ca3af;
+        flex-shrink: 0;
+      }
+      #view-briefing .lmo-ind-card .product-actions i {
+        font-size: 15px;
+        cursor: pointer;
+        padding: 3px;
+      }
+      #view-briefing .lmo-ind-card .product-actions i:hover { color: var(--accent); }
+      #view-briefing .lmo-ind-card .product-name-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 2px;
+      }
+      #view-briefing .lmo-ind-card .product-name {
+        font-size: 14px;
+        font-weight: 600;
+        min-height: 0;
+        color: var(--text);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.3;
+      }
+      #view-briefing .lmo-ind-card .product-val {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.1;
+        margin-top: 2px;
+      }
+      /* Key Indicators keep the "Good" status badge inline beside the value. */
+      #view-briefing .lmo-ind-card .lmo-key-valrow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      #view-briefing .lmo-ind-card .product-change {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-top: 2px;
+        margin-bottom: 6px;
+      }
+      #view-briefing .lmo-ind-card .product-change i { font-size: 13px; }
+      #view-briefing .lmo-ind-card .product-change.val-green { color: #059669; }
+      #view-briefing .lmo-ind-card .product-change.val-red { color: #dc2626; }
+      #view-briefing .lmo-ind-card .product-viz {
+        width: 100%;
+        height: 92px;
+        position: relative;
+        margin-bottom: 2px;
+      }
+      #view-briefing .lmo-ind-card .product-viz svg,
+      #view-briefing .lmo-ind-card .product-viz .highcharts-container {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+      }
+      #view-briefing .lmo-ind-card .product-viz .highcharts-container {
+        overflow: visible !important;
+      }
+      /* Highcharts injects the axis labels, so hide the static fallback axis
+         once a chart mounts (matches the home page's data-hc-axis behaviour). */
+      #view-briefing .lmo-ind-card[data-hc-axis="1"] .product-axis {
+        display: none !important;
+      }
+      #view-briefing .lmo-ind-card .product-axis {
+        display: flex;
+        justify-content: space-between;
+        font-size: 9.5px;
+        color: #9ca3af;
+        margin-bottom: 10px;
+      }
+      #view-briefing .lmo-ind-card .product-ai-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 5px;
+        font-size: 11px;
+        color: var(--text2);
+        line-height: 1.5;
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px solid var(--border);
+      }
+      #view-briefing .lmo-ind-card .product-ai-row .ti-bulb {
+        font-size: 12px;
+        color: var(--accent);
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      @media (max-width: 1080px) {
+        #view-briefing .lmo-loc-track .dg-slide { flex: 0 0 calc((100% - 14px) / 2); }
+      }
+      @media (max-width: 620px) {
+        #view-briefing .lmo-loc-track .dg-slide { flex: 0 0 100%; }
+        #view-briefing .lmo-subhdr-row { flex-direction: column; }
+      }
+
+      /* ── Key Indicators — same insight-card carousel, 4-up, with a section
+         header (matching the app's 20px .cpi-section-title) + reused actions. */
+      #view-briefing .lmo-key-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      /* 4 cards per view (3 gaps of 14px). */
+      #view-briefing .lmo-key-track .dg-slide {
+        flex: 0 0 calc((100% - 42px) / 4);
+      }
+      #view-briefing .lmo-key-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      #view-briefing .lmo-key-top .lmo-badge {
+        margin-top: 0;
+        align-self: center;
+      }
+      #view-briefing .lmo-key-title { min-height: 2.5em; }
+      @media (max-width: 1080px) {
+        #view-briefing .lmo-key-track .dg-slide { flex: 0 0 calc((100% - 14px) / 2); }
+      }
+      @media (max-width: 620px) {
+        #view-briefing .lmo-key-track .dg-slide { flex: 0 0 100%; }
+        #view-briefing .lmo-key-hdr { flex-direction: column; align-items: flex-start; }
+      }
+
+      /* ── Built for every stakeholder / What can we do? — informational card
+         rows. Shared 4-up responsive grid (same 1080/620 breakpoints as the
+         KPI band); .obs-card shell; icon-chip recipe. Stakeholder cards read
+         lighter (circular tinted icon + categorical accent + subtle base line);
+         solution cards read more functional (solid accent tile). ── */
+      #view-briefing .lmo-quad {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        align-items: stretch;
+      }
+      #view-briefing .lmo-persona,
+      #view-briefing .lmo-solution {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px;
+      }
+      /* Stakeholder — circular tinted icon + categorical accent. */
+      #view-briefing .lmo-persona { position: relative; overflow: hidden; }
+      #view-briefing .lmo-persona--a { --persona-accent: var(--accent); }
+      #view-briefing .lmo-persona--b { --persona-accent: #16a34a; }
+      #view-briefing .lmo-persona--c { --persona-accent: #b5730a; }
+      #view-briefing .lmo-persona--d { --persona-accent: #7c3aed; }
+      #view-briefing .lmo-persona-ic {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--persona-accent, var(--accent));
+        background: color-mix(in srgb, var(--persona-accent, var(--accent)) 12%, white);
+      }
+      #view-briefing .lmo-persona-ic i { font-size: 22px; }
+      #view-briefing .lmo-persona::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        background: color-mix(in srgb, var(--persona-accent, var(--accent)) 55%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-persona-ic {
+        background: color-mix(in srgb, var(--persona-accent, var(--accent)) 22%, transparent);
+      }
+      /* Solution — solid accent tile (rounded square) for a functional feel. */
+      #view-briefing .lmo-solution { cursor: pointer; }
+      #view-briefing .lmo-solution-ic {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: var(--accent);
+      }
+      #view-briefing .lmo-solution-ic i { font-size: 22px; }
+      /* Shared text styles. */
+      #view-briefing .lmo-persona-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      #view-briefing .lmo-persona-desc {
+        margin: 0;
+        font-size: 12.5px;
+        line-height: 1.5;
+        color: var(--text2);
+      }
+      @media (max-width: 1080px) {
+        #view-briefing .lmo-quad { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 620px) {
+        #view-briefing .lmo-quad { grid-template-columns: 1fr; }
+      }
+
+      /* Shared quick-action icon button — the app's subtle icon control. */
+      #view-briefing .lmo-qa {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+      }
+      #view-briefing .lmo-qa:hover {
+        background: var(--accent-light);
+        color: var(--accent);
+        border-color: #bfdbfe;
+      }
+      #view-briefing .lmo-qa i { font-size: 15px; }
+
+      /* Standard home-page section AI button — mirrors .home-module-sparkle in
+         style.css: a transparent Figma-navy sparkle with the continuous
+         sparkleGlow pulse. Used for every "Ask Bayaan AI" action here. */
+      #view-briefing .home-module-sparkle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        color: #0073f0;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+      }
+      #view-briefing .home-module-sparkle i {
+        font-size: 20px;
+        animation: sparkleGlow 2.4s ease-in-out infinite;
+      }
+      #view-briefing .home-module-sparkle:hover { opacity: 0.8; }
+      @keyframes sparkleGlow {
+        0%,
+        100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.75; transform: scale(1.18) rotate(12deg); }
+      }
+
+      /* KPI headline band — separate stat cards, each with a mini sparkline. */
+      #view-briefing .lmo-kpi-band {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+      }
+      #view-briefing .lmo-kpi {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 16px 18px;
+      }
+      #view-briefing .lmo-kpi-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      #view-briefing .lmo-kpi-ico {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 9%, white);
+      }
+      #view-briefing .lmo-kpi-ico i { font-size: 16px; }
+      #view-briefing .lmo-kpi-chg {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11.5px;
+        font-weight: 700;
+      }
+      #view-briefing .lmo-kpi-chg i { font-size: 13px; }
+      /* Emirati Hires (YTD) growth chip only. */
+      #view-briefing .lmo-kpi--hires .lmo-kpi-chg.lmo-pos {
+        color: #0c9b70;
+      }
+      #view-briefing .lmo-kpi-val {
+        margin-top: 2px;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #view-briefing .lmo-kpi-val i {
+        font-size: 22px;
+        line-height: 1;
+      }
+      #view-briefing .lmo-kpi-val.lmo-pos {
+        color: var(--success, #0c9b70);
+      }
+      #view-briefing .lmo-kpi-label {
+        font-size: 11.5px;
+        color: var(--text2);
+        line-height: 1.35;
+      }
+      #view-briefing .lmo-kpi-spark { height: 30px; margin-top: 4px; }
+      #view-briefing .lmo-kpi-spark svg { width: 100%; height: 100%; }
+
+      /* Two-column analytical split (bar chart + donut / brief + movers). */
+      #view-briefing .lmo-split {
+        display: grid;
+        grid-template-columns: 1.55fr 1fr;
+        gap: 12px;
+        align-items: stretch;
+      }
+      #view-briefing .lmo-panel {
+        display: flex;
+        flex-direction: column;
+        padding: 18px 20px;
+      }
+      #view-briefing .lmo-panel-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      #view-briefing .lmo-panel-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #view-briefing .lmo-panel-title i { font-size: 16px; color: var(--accent); }
+      #view-briefing .lmo-panel-note {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        background: var(--bg);
+        border-radius: 100px;
+        padding: 3px 10px;
+      }
+
+      /* Ranked horizontal bar chart. */
+      #view-briefing .lmo-bars { display: flex; flex-direction: column; gap: 16px; }
+      #view-briefing .lmo-bar-row {
+        display: grid;
+        grid-template-columns: minmax(120px, 210px) 1fr auto;
+        align-items: center;
+        gap: 14px;
+      }
+      #view-briefing .lmo-bar-name {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      #view-briefing .lmo-bar-ico {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 9%, white);
+      }
+      #view-briefing .lmo-bar-ico i { font-size: 14px; }
+      #view-briefing .lmo-bar-track {
+        height: 8px;
+        border-radius: 100px;
+        background: #edf1f6;
+        overflow: hidden;
+      }
+      #view-briefing .lmo-bar-fill { display: block; height: 100%; border-radius: 100px; }
+      #view-briefing .lmo-fill-pos { background: var(--down); }
+      #view-briefing .lmo-fill-neg { background: var(--up); }
+      #view-briefing .lmo-fill-flat { background: var(--muted); }
+      #view-briefing .lmo-bar-figs {
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-end;
+        gap: 8px;
+        min-width: 116px;
+      }
+      #view-briefing .lmo-bar-pct {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      #view-briefing .lmo-bar-chg {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      #view-briefing .lmo-bar-chg.lmo-flat { color: var(--muted); }
+      #view-briefing .lmo-bar-chg i { font-size: 12px; }
+
+      /* Donut composition card. */
+      #view-briefing .lmo-panel--donut { --lmo-donut-track: #e6ebf2; }
+      #view-briefing .lmo-donut-wrap {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex: 1;
+      }
+      #view-briefing .lmo-donut-svg { width: 116px; height: 116px; flex-shrink: 0; }
+      #view-briefing .lmo-donut-num {
+        text-anchor: middle;
+        font-size: 8px;
+        font-weight: 700;
+        fill: var(--text);
+        letter-spacing: -0.02em;
+      }
+      #view-briefing .lmo-donut-lbl {
+        text-anchor: middle;
+        font-size: 3.4px;
+        font-weight: 600;
+        fill: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      #view-briefing .lmo-donut-legend { display: flex; flex-direction: column; gap: 8px; }
+      #view-briefing .lmo-legend-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--text2);
+      }
+      #view-briefing .lmo-legend-row b { margin-left: auto; padding-left: 10px; color: var(--text); }
+      #view-briefing .lmo-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+      #view-briefing .lmo-donut-insight {
+        margin: 16px 0 0;
+        padding-top: 14px;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text2);
+      }
+      #view-briefing .lmo-donut-insight b { color: var(--text); }
+
+      /* Executive-summary briefing + spotlight movers row. */
+      #view-briefing .lmo-split--brief { grid-template-columns: 1.15fr 1fr; }
+      #view-briefing .lmo-brief {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 18px 20px;
+      }
+      #view-briefing .lmo-brief-hdr { display: flex; align-items: center; gap: 11px; }
+      #view-briefing .lmo-brief-ico {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 10%, white);
+      }
+      #view-briefing .lmo-brief-ico i { font-size: 17px; }
+      #view-briefing .lmo-brief-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+      #view-briefing .lmo-brief-sub { font-size: 11px; color: var(--muted); }
+      #view-briefing .lmo-brief-text {
+        margin: 0;
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--text2);
+      }
+      #view-briefing .lmo-brief-text b { color: var(--text); font-weight: 700; }
+      #view-briefing .lmo-brief-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+      #view-briefing .lmo-tag {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--accent);
+        background: var(--accent-light);
+        border-radius: 100px;
+        padding: 3px 10px;
+      }
+
+      /* Spotlight "mover" cards. */
+      #view-briefing .lmo-spot-stack { display: flex; flex-direction: column; gap: 12px; }
+      #view-briefing .lmo-spot {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 16px 18px;
+        flex: 1;
+      }
+      #view-briefing .lmo-spot-ico {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        color: var(--down);
+        background: color-mix(in srgb, var(--down) 12%, white);
+      }
+      #view-briefing .lmo-spot-ico i { font-size: 20px; }
+      #view-briefing .lmo-spot-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      #view-briefing .lmo-spot-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+      }
+      #view-briefing .lmo-spot-val {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      #view-briefing .lmo-spot-val i { font-size: 17px; }
+      #view-briefing .lmo-spot-desc { font-size: 12px; color: var(--text2); line-height: 1.4; }
+
+      /* Shared badge pill — Stable status in light green. */
+      #view-briefing .lmo-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        align-self: flex-start;
+        max-width: 100%;
+        margin-top: 4px;
+        padding: 3px 9px;
+        border-radius: 100px;
+        font-size: 10.5px;
+        font-weight: 600;
+        color: #059669;
+        background: #ECFDF5;
+      }
+      #view-briefing .lmo-badge i { font-size: 12px; flex-shrink: 0; }
+      #view-briefing .lmo-badge span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      html[data-theme="dark"] #view-briefing .lmo-badge {
+        background: color-mix(in srgb, #16a34a 24%, transparent);
+        color: #34d399;
+      }
+
+      /* Scrollspy dot rail — lane + AI panel offset */
+      body.lmo {
+        --home-rail-inset: 24px;
+        --home-rail-w: 28px;
+        --home-rail-gap: 12px;
+        --home-rail-lane: calc(var(--home-rail-inset) + var(--home-rail-w) + var(--home-rail-gap));
+      }
+
+      @media (min-width: 901px) {
+        body.lmo .page {
+          padding-right: var(--home-rail-lane);
+        }
+      }
+
+      body.lmo:has(.cpanel.open) .lmo-briefing-dots-rail {
+        right: calc(var(--chat-w, 400px) + var(--home-rail-inset, 24px));
+      }
+
+      body.lmo .lmo-briefing-dots-rail {
+        z-index: 200;
+      }
+
+      body.lmo .lmo-briefing-dots-rail[hidden] {
+        display: none !important;
+      }
+
+      /* Dark theme — tracks/tints/dividers defer to the page's dark tokens. */
+      html[data-theme="dark"] #view-briefing .lmo-bar-track,
+      html[data-theme="dark"] #view-briefing .lmo-panel-note {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-panel--donut { --lmo-donut-track: rgba(255, 255, 255, 0.12); }
+      html[data-theme="dark"] #view-briefing .lmo-donut-insight { border-color: var(--border); }
+      html[data-theme="dark"] #view-briefing .lmo-kpi-ico,
+      html[data-theme="dark"] #view-briefing .lmo-bar-ico,
+      html[data-theme="dark"] #view-briefing .lmo-brief-ico {
+        background: color-mix(in srgb, var(--accent) 20%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .lmo-spot-ico { background: color-mix(in srgb, var(--down) 22%, transparent); }
+
+      /* Responsive. */
+      @media (max-width: 1100px) {
+        #view-briefing .lmo-kpi-band { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        #view-briefing .lmo-split,
+        #view-briefing .lmo-split--brief { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 620px) {
+        #view-briefing .lmo-kpi-band { grid-template-columns: 1fr; }
+        #view-briefing .lmo-bar-row { grid-template-columns: 1fr auto; }
+        #view-briefing .lmo-bar-track { grid-column: 1 / -1; order: 3; }
+      }
+      /* Raised from 1100px: with equal thirds, three cards side by side need
+         ~1250px before CPI-by's 26px figures start colliding with their track. */
+      @media (max-width: 1250px) {
+        #view-briefing .cpi-overview-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* The breadcrumb sits outside .page-wrap, so it clears neither the 120px
+         sidebar rail nor the page gutter — it falls back to the global
+         .container inline padding of 32px. Realign it with the content column
+         (rail + --page-gutter on the left, --page-gutter on the right). */
+      #view-briefing .crisis-scroll > .container {
+        /* mirrors .sidebar-rail min-width in css/pages/obs-sidebar.css */
+        --obs-rail-w: 120px;
+        padding-inline: calc(var(--obs-rail-w) + var(--page-gutter))
+          var(--page-gutter);
+      }
+
+      /* ====================================================================
+         DIAGNOSE VIEW
+         Styled to the CPI page's own design system: neutral .obs-card surfaces,
+         the shared section-module shell, .kpi-label typography, the --up/--down
+         semantic tones, and the app's home-carousel navigation for every
+         overflow row. No new colour language is introduced — tone lives only on
+         values, the risk pill, and header/insight icons.
+         ==================================================================== */
+      #view-briefing #cpi-diagnose-content {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+      /* The view containers carry `display` rules that would otherwise beat the
+         [hidden] attribute the tab switch toggles — restore hide behaviour with
+         a higher-specificity rule (id + attribute). */
+      #view-briefing #cpi-obs-content[hidden],
+      #view-briefing #cpi-diagnose-content[hidden] {
+        display: none;
+      }
+
+      /* ── View header ── */
+      #view-briefing .dg-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      #view-briefing .dg-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      #view-briefing .dg-scan {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: var(--accent-light);
+        color: var(--accent);
+        font-size: 21px;
+        flex-shrink: 0;
+      }
+      #view-briefing .dg-month {
+        display: inline-flex;
+        align-items: center;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 3px 9px;
+        border-radius: 100px;
+        background: var(--accent-light);
+        color: var(--accent);
+        line-height: 1.4;
+      }
+      #view-briefing .dg-title-col {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      #view-briefing .dg-h1 {
+        font-size: 21px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+        line-height: 1.1;
+      }
+      #view-briefing .dg-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 240px;
+        padding: 9px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border, #eaecf0);
+        background: var(--surface, #fff);
+        color: var(--text2);
+        font-size: 13px;
+      }
+      #view-briefing .dg-search i {
+        font-size: 16px;
+      }
+      #view-briefing .dg-search .dg-kbd {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--accent-light);
+        color: var(--accent);
+      }
+
+      /* ── Two-panel row — each panel is a section module (same shell as the
+         Analytics section and the Interpret view's sections). ── */
+      #view-briefing .dg-panels {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+      }
+      /* Raised from 640px: each panel carries an AI Summary plus a category
+         carousel, so two side by side start clipping their cards well before
+         640px. Stack them (Stable & optimized drops below Needs attention)
+         once the content column tightens. */
+      @media (max-width: 1024px) {
+        #view-briefing .dg-panels {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Section body — the AI Summary stacked above the category carousel
+         (full width), mirroring the Briefing Desk content order. */
+      #view-briefing .dg-body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      #view-briefing .dg-indicators {
+        min-width: 0;
+      }
+
+      /* AI Summary callout — the app's AI-insight treatment: blue→violet
+         gradient tint, sparkle + "AI Summary" header. Ref: .hw-ai-insight in
+         css/pages/built-widget-module.css. */
+      #view-briefing .dg-aisummary {
+        position: relative;
+        padding: 0;
+        border-radius: 14px;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.06), rgba(124, 58, 237, 0.04));
+        border: 1px solid rgba(0, 102, 255, 0.12);
+      }
+      /* Text spans the full width so the summary height is driven purely by the
+         copy — this keeps the taller "Needs attention" box in step with the
+         shorter "Stable" one instead of the art squeezing the text into extra
+         wrapped lines. A right pad reserves room for the overlaid illustration. */
+      #view-briefing .dg-aisummary-text {
+        padding: 15px 88px 15px 18px;
+      }
+      /* Illustration is taken out of flow and anchored to the top/bottom/right
+         edges, so it fills the summary height without inflating it. No fixed
+         dimensions: width is a share of the summary, height follows the box. */
+      #view-briefing .dg-aisummary-art {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 30%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center right;
+      }
+      /* "Needs attention" copy is longer, so its art is narrowed to leave room
+         for the text on single lines — this keeps the box the same height as the
+         shorter "Stable" summary instead of wrapping into a taller block.
+         The magnifier illustration is near-square, so it's contained (not
+         cover-cropped) to keep the whole icon in frame. */
+      #view-briefing .dg-panel--warn .dg-aisummary-art {
+        width: 20%;
+        object-fit: contain;
+        object-position: top right;
+      }
+      /* Extra right-pad reserves room for the enlarged magnifier so the copy
+         still clears it (the summary grows a little taller as a result). */
+      #view-briefing .dg-panel--warn .dg-aisummary-text {
+        padding-right: 92px;
+      }
+      /* On narrow screens the summary is too tight for the overlaid art without
+         cropping it or pushing it out of place, so drop it and let the copy
+         reclaim the full width. */
+      @media (max-width: 768px) {
+        #view-briefing .dg-aisummary-art {
+          display: none;
+        }
+        #view-briefing .dg-aisummary-text,
+        #view-briefing .dg-panel--warn .dg-aisummary-text {
+          padding-right: 18px;
+        }
+      }
+      #view-briefing .dg-aisummary-hd {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent, #0066ff);
+        margin-bottom: 8px;
+      }
+      #view-briefing .dg-aisummary-hd i {
+        font-size: 14px;
+      }
+      html[data-theme="dark"] #view-briefing .dg-aisummary {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.12), rgba(124, 58, 237, 0.10));
+        border-color: rgba(0, 102, 255, 0.25);
+      }
+      /* In the "Needs attention" panel the AI Summary reads as an alert, so it
+         takes the red chip tint (matches .dg-pill--accel) instead of the blue
+         AI gradient. The "Stable & optimized" panel keeps the blue treatment. */
+      #view-briefing .dg-panel--warn .dg-aisummary {
+        background: color-mix(in srgb, var(--up, #e5484d) 10%, white);
+        border-color: color-mix(in srgb, var(--up, #e5484d) 20%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .dg-panel--warn .dg-aisummary {
+        background: color-mix(in srgb, var(--up, #e5484d) 22%, transparent);
+        border-color: color-mix(in srgb, var(--up, #e5484d) 35%, transparent);
+      }
+      /* "Stable & optimized" panel — AI Summary takes the green chip tint
+         (matches .dg-pill--stable / --down) to read as healthy. */
+      #view-briefing .dg-panel--ok .dg-aisummary {
+        background: color-mix(in srgb, var(--down, #0c9b70) 12%, white);
+        border-color: color-mix(in srgb, var(--down, #0c9b70) 22%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .dg-panel--ok .dg-aisummary {
+        background: color-mix(in srgb, var(--down, #0c9b70) 22%, transparent);
+        border-color: color-mix(in srgb, var(--down, #0c9b70) 35%, transparent);
+      }
+      #view-briefing .dg-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: #718198;
+        margin-bottom: 12px;
+      }
+      html[data-theme="dark"] #view-briefing .dg-eyebrow {
+        color: var(--text-secondary);
+      }
+
+      /* Summary points — compact text rows: a tone-coloured bold label followed
+         by the copy, no icon and no dividers. */
+      #view-briefing .dg-points {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      #view-briefing .dg-point {
+        --tone: #246bfd;
+        font-size: 12px;
+        line-height: 1.55;
+        color: #536277;
+      }
+      #view-briefing .dg-point--critical {
+        --tone: var(--up, #e5484d);
+      }
+      #view-briefing .dg-point--good {
+        --tone: var(--down, #0c9b70);
+      }
+      #view-briefing .dg-point--info {
+        --tone: var(--text-primary, #0f172a);
+      }
+      #view-briefing .dg-point-tx b {
+        color: var(--tone);
+        font-weight: 700;
+      }
+      html[data-theme="dark"] #view-briefing .dg-point {
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #view-briefing .dg-point-tx b {
+        color: var(--text-primary);
+      }
+      #view-briefing .dg-panel,
+      #view-briefing .dg-section {
+        background:
+          linear-gradient(-76deg, #f3fbff 1.2%, rgba(255, 255, 255, 0) 40%),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
+        border-radius: 28px;
+        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.03);
+        padding: 24px 28px 28px;
+      }
+      html[data-theme="dark"] #view-briefing .dg-panel,
+      html[data-theme="dark"] #view-briefing .dg-section {
+        background: var(--surface, #141a26);
+        border: 1px solid var(--border);
+      }
+      #view-briefing .dg-panel-hdr {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #view-briefing .dg-panel-hdr .dg-lead {
+        font-size: 21px;
+        line-height: 1;
+        color: var(--accent);
+      }
+      #view-briefing .dg-panel--warn .dg-lead {
+        color: var(--up, #e5484d);
+      }
+      #view-briefing .dg-panel--ok .dg-lead {
+        color: var(--down, #0c9b70);
+      }
+      #view-briefing .dg-panel-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      #view-briefing .dg-panel-sub {
+        font-size: 12.5px;
+        color: var(--text2);
+        margin: 4px 0 16px 31px;
+      }
+
+      /* ── Insight / status callout — neutral obs-card surface, tone only on the
+         icon chip so it reads as advisory, not alarming. ── */
+      #view-briefing .dg-insight {
+        position: relative;
+        display: flex;
+        gap: 11px;
+        align-items: flex-start;
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: var(--text2);
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid var(--border, #eaecf0);
+        box-shadow: 0 24px 30px 0 rgba(42, 61, 76, 0.03);
+      }
+      html[data-theme="dark"] #view-briefing .dg-insight {
+        background: color-mix(in srgb, var(--accent) 6%, transparent);
+        border-color: var(--border);
+        color: var(--text-secondary);
+      }
+      #view-briefing .dg-insight-ic {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        margin-top: 1px;
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #view-briefing .dg-insight--warn .dg-insight-ic {
+        color: var(--up, #e5484d);
+        background: color-mix(in srgb, var(--up, #e5484d) 10%, white);
+      }
+      #view-briefing .dg-insight--ok .dg-insight-ic {
+        color: var(--down, #0c9b70);
+        background: color-mix(in srgb, var(--down, #0c9b70) 10%, white);
+      }
+      html[data-theme="dark"] #view-briefing .dg-insight--warn .dg-insight-ic {
+        background: color-mix(in srgb, var(--up, #e5484d) 20%, transparent);
+      }
+      html[data-theme="dark"] #view-briefing .dg-insight--ok .dg-insight-ic {
+        background: color-mix(in srgb, var(--down, #0c9b70) 20%, transparent);
+      }
+      #view-briefing .dg-insight b {
+        color: var(--text);
+        font-weight: 700;
+      }
+      html[data-theme="dark"] #view-briefing .dg-insight b {
+        color: var(--text-primary);
+      }
+
+      /* ── Carousel — reuses the app's home-carousel nav. The track is a scroll
+         row with the scrollbar hidden; paging is driven by the arrows/dots. ── */
+      #view-briefing .dg-carousel {
+        position: relative;
+      }
+      #view-briefing .dg-track {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        padding: 2px 2px 4px;
+      }
+      #view-briefing .dg-track::-webkit-scrollbar {
+        display: none;
+      }
+      /* 2 cards per view — the rest page through the carousel. */
+      #view-briefing .dg-slide {
+        flex: 0 0 calc((100% - 14px) / 2);
+        box-sizing: border-box;
+        min-width: 0;
+      }
+      #view-briefing .dg-carousel-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 14px;
+      }
+      #view-briefing .dg-carousel-nav.is-single {
+        display: none;
+      }
+      #view-briefing .home-carousel-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text2);
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.15s, background 0.15s;
+      }
+      #view-briefing .home-carousel-arrow:hover:not(:disabled) {
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #view-briefing .home-carousel-arrow:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+      #view-briefing .home-carousel-arrow i {
+        font-size: 16px;
+      }
+      #view-briefing .home-carousel-dots {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      #view-briefing .home-carousel-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 3px;
+        background: #d3dfec;
+        flex-shrink: 0;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+        transition: width 0.2s, background 0.2s;
+      }
+      #view-briefing .home-carousel-dot.active {
+        width: 16px;
+        background: var(--accent);
+      }
+
+      /* ── Category card — standard obs-card; tone only on values + risk pill. ── */
+      #view-briefing .dg-card {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+        border-radius: 16px;
+        padding: 14px;
+      }
+      #view-briefing .dg-card-id {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        min-width: 0;
+      }
+      #view-briefing .dg-card-ic {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        color: var(--text2);
+        background: rgba(15, 23, 42, 0.045);
+      }
+      html[data-theme="dark"] #view-briefing .dg-card-ic {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-secondary);
+      }
+      #view-briefing .dg-card-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.25;
+      }
+      #view-briefing .dg-card-tag {
+        font-size: 10.5px;
+        color: var(--text2);
+        margin-top: 1px;
+      }
+      #view-briefing .dg-pill {
+        display: inline-flex;
+        align-self: flex-start;
+        align-items: center;
+        gap: 3px;
+        flex-shrink: 0;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 3px 8px;
+        border-radius: 100px;
+      }
+      #view-briefing .dg-pill i {
+        font-size: 11px;
+      }
+      #view-briefing .dg-pill--moderate {
+        background: #fdf0d5;
+        color: #b5730a;
+      }
+      #view-briefing .dg-pill--stable {
+        background: color-mix(in srgb, var(--down, #0c9b70) 12%, white);
+        color: var(--down, #0c9b70);
+      }
+      html[data-theme="dark"] #view-briefing .dg-pill--moderate {
+        background: color-mix(in srgb, #f5a623 20%, transparent);
+        color: #f0b25a;
+      }
+      html[data-theme="dark"] #view-briefing .dg-pill--stable {
+        background: color-mix(in srgb, var(--down, #0c9b70) 22%, transparent);
+        color: #34c99a;
+      }
+      #view-briefing .dg-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px 10px;
+      }
+      #view-briefing .dg-stat-k {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text2);
+        margin-bottom: 2px;
+      }
+      #view-briefing .dg-stat-v {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #view-briefing .dg-stat-v.up {
+        color: var(--up, #e5484d);
+      }
+      #view-briefing .dg-stat-v.down {
+        color: var(--down, #0c9b70);
+      }
+      #view-briefing .dg-card-foot {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        margin-top: auto;
+        border-top: 1px solid var(--border, #edf1f6);
+        padding-top: 11px;
+      }
+      #view-briefing .dg-pill--accel {
+        background: color-mix(in srgb, var(--up, #e5484d) 10%, white);
+        color: var(--up, #e5484d);
+      }
+      html[data-theme="dark"] #view-briefing .dg-pill--accel {
+        background: color-mix(in srgb, var(--up, #e5484d) 22%, transparent);
+        color: #ff6b6b;
+      }
+      html[data-theme="dark"] #view-briefing .dg-card-foot {
+        border-color: var(--border);
+      }
+
+      /* ── Analytics section header + table ── */
+      #view-briefing .dg-analytics-hdr {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      #view-briefing .dg-view-toggle {
+        display: inline-flex;
+        gap: 2px;
+        padding: 3px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.05);
+        margin-left: auto;
+      }
+      #view-briefing .dg-view-toggle button {
+        width: 30px;
+        height: 28px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text2);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+      }
+      #view-briefing .dg-view-toggle button.active {
+        background: var(--surface, #fff);
+        color: var(--accent);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+      }
+      html[data-theme="dark"] #view-briefing .dg-view-toggle {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      html[data-theme="dark"] #view-briefing .dg-view-toggle button.active {
+        background: var(--surface-2, #0f141d);
+      }
+      #view-briefing .dg-analytics-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #view-briefing .dg-analytics-title i {
+        font-size: 20px;
+        color: var(--accent);
+      }
+      #view-briefing .dg-table-wrap {
+        overflow-x: auto;
+      }
+      #view-briefing .dg-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 640px;
+      }
+      #view-briefing .dg-table th {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text2);
+        text-align: right;
+        padding: 0 16px 12px;
+        border-bottom: 1px solid var(--border, #eaecf0);
+        white-space: nowrap;
+      }
+      #view-briefing .dg-table th:first-child,
+      #view-briefing .dg-table td:first-child {
+        text-align: left;
+        padding-left: 4px;
+      }
+      #view-briefing .dg-table td {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        text-align: right;
+        padding: 13px 16px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        white-space: nowrap;
+      }
+      html[data-theme="dark"] #view-briefing .dg-table td {
+        border-color: color-mix(in srgb, var(--border) 60%, transparent);
+      }
+      #view-briefing .dg-table tbody tr {
+        transition: background 0.15s ease;
+      }
+      #view-briefing .dg-table tbody tr:hover {
+        background: var(--accent-light);
+      }
+      #view-briefing .dg-cat-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+      #view-briefing .dg-cat-cell i {
+        font-size: 17px;
+        color: var(--text2);
+      }
+      #view-briefing .dg-risk {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      #view-briefing .dg-risk--moderate {
+        color: #b5730a;
+      }
+      #view-briefing .dg-risk--stable {
+        color: var(--down, #0c9b70);
+      }
+      #view-briefing .dg-cell {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 7px;
+        font-weight: 600;
+        font-size: 12.5px;
+      }
+      #view-briefing .dg-cell--up {
+        color: var(--up, #e5484d);
+        background: color-mix(in srgb, var(--up, #e5484d) 9%, transparent);
+      }
+      #view-briefing .dg-cell--down {
+        color: var(--down, #0c9b70);
+        background: color-mix(in srgb, var(--down, #0c9b70) 9%, transparent);
+      }
+      #view-briefing .dg-cell--flat {
+        color: var(--text2);
+        background: rgba(102, 112, 133, 0.08);
+      }
+      .aib-ttl {
+        margin-bottom: 4px;
+      }
+    
+</style>
+</head>
+<body class="lmo" data-lmo-nav-mode="shell" data-lmo-active="briefing">
+
+<div id="screen-lmo-obs" class="ws-screen header-flush">
+<div data-bayaan-header></div>
+
+<div id="lmo-sidenav-mount"></div>
+
+<div class="app-shell">
+<div class="wrap">
+
+<div id="view-briefing" class="view-panel">
+<div class="page">
+
+  <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+    <a href="#" data-lmo-bc="home">Home</a>
+    <span class="ind-bc-sep">›</span>
+    <a href="#" data-lmo-bc="observatory">Observatory</a>
+    <span class="ind-bc-sep">›</span>
+    <span class="ind-bc-current">Labour Market Observatory</span>
+  </nav>
+  <div class="ph">
+    <div class="ph-l">
+      <h1 class="ph-title">Labour Market Observatory (LMO) — Briefing Desk</h1>
+      <div class="ph-meta">Abu Dhabi · Q2 2025 data · Methodology under active refinement</div>
+    </div>
+    <div class="ph-r">
+      <button class="btn btn-ghost">
+        <i class="ti ti-download" aria-hidden="true"></i> Export
+      </button>
+      <button class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Generate Report
+      </button>
+    </div>
+  </div>
+
+  <div class="sec" id="exec-brief">
+    <div class="aib-card">
+      <div class="aib-hd">
+        <div class="aib-hd-main">
+          <div class="aib-ico" aria-hidden="true"><i class="ti ti-brain"></i></div>
+          <div class="aib-hd-text">
+            <div class="aib-ttl">Executive Brief</div>
+            <div class="aib-sub brief-asof" id="brief-asof">Latest brief · Generated 07 Jun 2025, 06:00 GST</div>
+          </div>
+        </div>
+        <div class="aib-hd-controls">
+          <div class="brief-speech" id="lmoBriefSpeech">
+            <button class="brief-listen" id="lmoBriefListen" type="button" data-state="idle" aria-label="Listen to the labour market brief" aria-pressed="false">
+              <span class="brief-listen__icon" aria-hidden="true">
+                <i class="ti ti-volume brief-listen__speaker"></i>
+                <i class="ti ti-player-play brief-listen__play"></i>
+                <i class="ti ti-player-pause brief-listen__pause"></i>
+              </span>
+              <span class="brief-listen__copy">
+                <span class="brief-listen__wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="brief-listen__text">Audio brief</span>
+              </span>
+            </button>
+            <span class="brief-speech__actions" aria-label="Playback options">
+              <button class="brief-audio-action" id="lmoBriefRestart" type="button" aria-label="Restart labour market brief" title="Restart">
+                <i class="ti ti-refresh" aria-hidden="true"></i>
+              </button>
+              <button class="brief-audio-action brief-audio-action--stop" id="lmoBriefStop" type="button" aria-label="Stop labour market brief" title="Stop">
+                <span class="brief-stop-box" aria-hidden="true"></span>
+              </button>
+            </span>
+          </div>
+          <span class="aib-hd-sep" aria-hidden="true">|</span>
+          <label class="intel-engine-date">
+            <span class="intel-engine-date-label">Date</span>
+            <input type="date" class="intel-engine-date-input" id="brief-date-input" aria-label="Brief as of date" />
+          </label>
+        </div>
+      </div>
+      <div class="aib-body" id="aib-body"></div>
+      <div id="lmoBriefSpeechStatus" role="status" aria-live="polite" class="visually-hidden"></div>
+    </div>
+  </div>
+
+  <div id="briefing-desk-sections"></div>
+
+  <div class="lmo-dl-backdrop" id="lmoDlBackdrop" hidden aria-hidden="true">
+    <div class="lmo-dl-modal" role="dialog" aria-modal="true" aria-labelledby="lmoDlTitle">
+      <div class="lmo-dl-hd">
+        <h4 id="lmoDlTitle">Download</h4>
+        <button type="button" class="lmo-dl-close" id="lmoDlClose" aria-label="Close download dialog"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="lmo-dl-years">
+        <div class="lmo-dl-field">
+          <label id="lmoDlFromLbl">From year</label>
+          <input type="hidden" id="lmoDlFromYear" value="2020">
+          <div class="lmo-dl-dd" id="lmoDlFromDd">
+            <button type="button" class="lmo-dl-dd-trigger" id="lmoDlFromTrigger" aria-expanded="false" aria-controls="lmoDlFromMenu" aria-labelledby="lmoDlFromLbl">
+              <span id="lmoDlFromLabel">2020</span>
+              <i class="ti ti-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="lmo-dl-dd-menu" id="lmoDlFromMenu" role="listbox" aria-label="From year" hidden></div>
+          </div>
+        </div>
+        <span class="lmo-dl-years-sep">to</span>
+        <div class="lmo-dl-field">
+          <label id="lmoDlToLbl">To year</label>
+          <input type="hidden" id="lmoDlToYear" value="2025">
+          <div class="lmo-dl-dd" id="lmoDlToDd">
+            <button type="button" class="lmo-dl-dd-trigger" id="lmoDlToTrigger" aria-expanded="false" aria-controls="lmoDlToMenu" aria-labelledby="lmoDlToLbl">
+              <span id="lmoDlToLabel">2025</span>
+              <i class="ti ti-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="lmo-dl-dd-menu" id="lmoDlToMenu" role="listbox" aria-label="To year" hidden></div>
+          </div>
+        </div>
+      </div>
+      <label class="lmo-dl-tnc">
+        <input type="checkbox" id="lmoDlTnc">
+        <span>I accept the <a href="#" id="lmoDlTncLink">terms and conditions</a> for downloading the documents</span>
+      </label>
+      <div class="lmo-dl-as">Download as</div>
+      <div class="lmo-dl-formats is-disabled" id="lmoDlFormats">
+        <button type="button" class="lmo-dl-fmt" data-fmt="pdf" disabled title="PDF" aria-label="Download as PDF"><i class="ti ti-file-type-pdf"></i><span class="lmo-dl-fmt-lbl">PDF</span></button>
+        <button type="button" class="lmo-dl-fmt" data-fmt="excel" disabled title="Excel" aria-label="Download as Excel"><i class="ti ti-file-spreadsheet"></i><span class="lmo-dl-fmt-lbl">Excel</span></button>
+        <button type="button" class="lmo-dl-fmt" data-fmt="image" disabled title="PNG" aria-label="Download as PNG"><i class="ti ti-photo"></i><span class="lmo-dl-fmt-lbl">PNG</span></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="home-module-rail lmo-briefing-dots-rail">
+  <nav id="lmoBriefingDots" class="home-module-dots" aria-label="Briefing sections" hidden></nav>
+</div>
+
+<div id="view-forecasting" class="view-panel" hidden>
+  <iframe id="forecasting-frame" title="Labour Market Forecasting Hub" src="about:blank"></iframe>
+</div>
+
+<div id="view-observe" class="view-panel" hidden>
+  <iframe id="observe-frame" title="Labour Market Observe Layer" src="about:blank"></iframe>
+</div>
+
+<div id="view-diagnose" class="view-panel" hidden>
+  <iframe id="diagnose-frame" title="Labour Market Diagnose Layer" src="about:blank"></iframe>
+</div>
+
+<div id="view-simulation" class="view-panel" hidden>
+  <iframe id="simulation-frame" title="Labour Market Simulations" src="about:blank"></iframe>
+</div>
+
+</div>
+
+<aside class="cpanel ai-panel" id="cpanel" role="complementary" aria-label="Bayaan AI Panel">
+  <div class="bai-header">
+    <div class="bai-header-left">
+      <img class="bai-icon-wrap" src="../assets/ai-chat-thumb.svg" alt="Bayaan AI" width="38" height="38">
+      <div><div class="bai-header-title">Bayaan AI</div></div>
+    </div>
+    <div class="bai-header-right">
+      <button class="bai-close-btn" type="button" onclick="closeChat()" title="Close AI Panel"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+  <div class="bai-context-strip">
+    <span class="bai-ctx-label">Analysing</span>
+    <span class="bai-ctx-pill" id="ctx-val">Labour Market Overview</span>
+    <span class="bai-ctx-dot"></span>
+    <span class="bai-ctx-dot-label">Generating</span>
+  </div>
+  <div class="bai-messages msgs" id="msgs"></div>
+  <div class="suggs" id="suggs"></div>
+  <div class="bai-input-area">
+    <div class="bai-input-row">
+      <textarea class="bai-input" id="cin" placeholder="Ask about this indicator…" rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendC()}"></textarea>
+      <button class="bai-send-btn" type="button" onclick="sendC()" title="Send"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</aside>
+</div>
+</div>
+
+<script>
+/* Daily Brief */
+const BRIEF_TITLE = "Executive Brief";
+const BRIEF_BODY = `Abu Dhabi's labor market shows robust overall performance, with employment rates among residents reaching <strong>96.2%</strong> in 2025 and non-Emiratis at <strong>96.7%</strong>. Emirati employment rates surged to <strong>92.4% (+7.6 pp)</strong>, yet private sector Emiratization remains well below the 10% target at <strong>2.75%</strong>. Labor force participation, especially among Emirati females (<strong>45.3%</strong>), and skills mismatches among youth and graduates are ongoing headwinds. To achieve sustainability and diversification targets, Abu Dhabi must accelerate private sector nationalization and address structural gender and skills gaps.`;
+
+const BRIEFS = [
+  { date: "2025-06-07", body: BRIEF_BODY },
+  { date: "2025-06-06", body: `Friday's desk view shows <strong>steady labor demand</strong> with employment rates holding at <strong>96.1%</strong>. Emirati employment improved to <strong>92.2%</strong> while private sector Emiratization ticked to <strong>2.71%</strong>. Female participation among Emiratis reached <strong>45.1%</strong>. Skills mismatches in digital roles remain a watch item.` },
+  { date: "2025-06-05", body: `Mid-week signals remain <strong>broadly positive</strong>. Total employment reached <strong>2.68M (+3.4%)</strong> with unemployment at <strong>2.9%</strong>. Emirati workforce growth at <strong>+5.1%</strong> outpaces the overall market. Private sector nationalization gaps persist in construction and retail.` },
+  { date: "2025-06-04", body: `Abu Dhabi's labor market shows robust overall performance, with employment rates among residents reaching <strong>96.2%</strong> in 2025 and non-Emiratis at <strong>96.7%</strong>. Emirati employment rates surged to <strong>92.4% (+7.6 pp)</strong>, yet private sector Emiratization remains well below the 10% target at <strong>2.75%</strong>. Labor force participation, especially among Emirati females (<strong>45.3%</strong>), and skills mismatches among youth and graduates are ongoing headwinds. To achieve sustainability and diversification targets, Abu Dhabi must accelerate private sector nationalization and address structural gender and skills gaps.` },
+  { date: "2025-06-03", body: `Weekly flash estimate unchanged: employment rate <strong>96.2%</strong>, unemployment <strong>2.9%</strong>. Women's workforce participation doubled over five years. Youth account for <strong>54.9%</strong> of Abu Dhabi's workforce in 2025.` },
+  { date: "2025-06-02", body: `Week open: labor market conditions <strong>consistent with 2025 baseline</strong>. FDI inflows supporting an estimated 13,800 new jobs. Emirati employment surged <strong>+14.1% YoY</strong> though private sector share remains low at <strong>2.75%</strong>.` },
+  { date: "2025-06-01", body: `June opens on a <strong>consolidation note</strong>. Key indicators confirmed: employment at <strong>96.2%</strong>, Emirati employment at <strong>92.4%</strong>, private Emiratization at <strong>2.75%</strong>. Desk focus: sector localization carousels and skills-gap monitoring.` },
+];
+const briefByDate = Object.fromEntries(BRIEFS.map((b) => [b.date, b]));
+
+function todayISO() {
+  const t = new Date();
+  return [t.getFullYear(), String(t.getMonth() + 1).padStart(2, "0"), String(t.getDate()).padStart(2, "0")].join("-");
+}
+function fmtBriefDate(iso) {
+  const d = new Date(iso + "T12:00:00");
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+function briefIdxForDate(iso) {
+  if (briefByDate[iso]) return BRIEFS.indexOf(briefByDate[iso]);
+  let h = 0;
+  for (let i = 0; i < iso.length; i++) h = (h * 31 + iso.charCodeAt(i)) >>> 0;
+  return h % BRIEFS.length;
+}
+function getBriefForDate(iso) {
+  return BRIEFS[briefIdxForDate(iso)];
+}
+function renderBriefByDate(iso) {
+  const b = getBriefForDate(iso);
+  const body = document.getElementById("aib-body");
+  const ttl = document.querySelector(".aib-ttl");
+  const isToday = iso === todayISO();
+  const asof = document.getElementById("brief-asof");
+  if (ttl) ttl.textContent = BRIEF_TITLE;
+  asof.textContent = isToday
+    ? `Latest brief · Generated ${fmtBriefDate(iso)}, 06:00 GST`
+    : `Archived brief · Generated ${fmtBriefDate(iso)}, 06:00 GST`;
+  asof.classList.toggle("hist", !isToday);
+  body.classList.add("loading");
+  setTimeout(() => {
+    body.innerHTML = b.body;
+    body.classList.remove("loading");
+  }, 120);
+}
+function initBriefDatePicker() {
+  const input = document.getElementById("brief-date-input");
+  if (!input) return;
+  const today = todayISO();
+  input.value = today;
+  input.max = today;
+  input.min = BRIEFS[BRIEFS.length - 1].date;
+  input.addEventListener("change", () => {
+    if (input.value) renderBriefByDate(input.value);
+  });
+  renderBriefByDate(today);
+}
+
+function initBriefSpeech() {
+  const button = document.getElementById("lmoBriefListen");
+  const controls = document.getElementById("lmoBriefSpeech");
+  const restartButton = document.getElementById("lmoBriefRestart");
+  const stopButton = document.getElementById("lmoBriefStop");
+  const status = document.getElementById("lmoBriefSpeechStatus");
+  if (!button || !controls) return;
+  const label = button.querySelector(".brief-listen__text");
+  if (!("speechSynthesis" in window)) {
+    controls.hidden = true;
+    return;
+  }
+  const synth = window.speechSynthesis;
+  let utterance = null;
+  let state = "idle";
+  const setState = (next) => {
+    state = next;
+    button.dataset.state = next;
+    controls.classList.toggle("is-active", next !== "idle");
+    button.setAttribute("aria-pressed", String(next === "speaking"));
+    button.setAttribute(
+      "aria-label",
+      next === "speaking" ? "Pause brief" : next === "paused" ? "Resume brief" : "Listen to the labour market brief"
+    );
+    if (label) label.textContent = next === "speaking" ? "Pause" : next === "paused" ? "Resume" : "Audio brief";
+    if (status) {
+      status.textContent =
+        next === "speaking" ? "Labour market brief is playing" : next === "paused" ? "Labour market brief paused" : "Labour market brief stopped";
+    }
+  };
+  const getBriefText = () => {
+    const card = button.closest(".aib-card");
+    const title = (card.querySelector(".aib-ttl") || {}).textContent || "";
+    const sub = (card.querySelector("#aib-body") || {}).textContent || "";
+    return `${title.trim()}. ${sub.trim()}`;
+  };
+  const start = () => {
+    synth.cancel();
+    utterance = new SpeechSynthesisUtterance(getBriefText());
+    utterance.lang = "en-GB";
+    utterance.rate = 0.94;
+    utterance.pitch = 1;
+    utterance.onstart = () => setState("speaking");
+    utterance.onend = () => setState("idle");
+    utterance.onerror = (event) => {
+      if (event.error !== "canceled" && event.error !== "interrupted" && status) {
+        status.textContent = "Unable to play the labour market brief";
+      }
+      setState("idle");
+    };
+    synth.speak(utterance);
+  };
+  button.addEventListener("click", () => {
+    if (state === "speaking") { synth.pause(); setState("paused"); }
+    else if (state === "paused") { synth.resume(); setState("speaking"); }
+    else start();
+  });
+  if (restartButton) restartButton.addEventListener("click", start);
+  if (stopButton) stopButton.addEventListener("click", () => { synth.cancel(); setState("idle"); });
+  window.addEventListener("beforeunload", () => synth.cancel());
+}
+
+function buildObsSectionHdr(title, icon) {
+  return `<div class="section-hdr"><h2 class="cpi-section-title"><i class="ti ${icon || "ti-circle"}" aria-hidden="true"></i>${title}</h2></div>`;
+}
+
+function buildLmoOvDonut(segments, centerNum, centerLbl) {
+  const R = 15.9154943;
+  const gap = segments.length > 1 ? 6 : 0;
+  let start = 0;
+  const arcs = segments.map((s) => {
+    const len = Math.max(s.pct - gap, 0.5);
+    const off = 25 - (start + gap / 2);
+    start += s.pct;
+    return `<circle class="lmo-ov-seg" cx="21" cy="21" r="${R}" fill="none" style="stroke:${s.color}" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="${len} ${100 - len}" stroke-dashoffset="${off}" data-val="${s.val}" data-lbl="${s.lbl}" onmouseenter="lmoOvSegHover(this,true)" onmouseleave="lmoOvSegHover(this,false)"><title>${s.lbl}: ${s.val}</title></circle>`;
+  }).join("");
+  return `<svg viewBox="0 0 42 42" class="lmo-donut-svg" role="img" aria-label="${centerNum} ${centerLbl}" data-cnum="${centerNum}" data-clbl="${centerLbl}">${arcs}<text x="21" y="20.5" class="lmo-donut-num">${centerNum}</text><text x="21" y="26" class="lmo-donut-lbl">${centerLbl}</text></svg>`;
+}
+
+function lmoOvSegHover(seg, on) {
+  const svg = seg.closest("svg");
+  if (!svg) return;
+  const num = svg.querySelector(".lmo-donut-num");
+  const lbl = svg.querySelector(".lmo-donut-lbl");
+  if (!num || !lbl) return;
+  num.textContent = on ? seg.getAttribute("data-val") : svg.getAttribute("data-cnum");
+  lbl.textContent = on ? seg.getAttribute("data-lbl") : svg.getAttribute("data-clbl");
+}
+
+/* Every card fills the same five slots — title, value, caption, support, chip —
+   so the four cards in the band share one baseline grid and no card is left
+   with a hollow footer. */
+const lmoKpis = [
+  { icon: "ti-award", title: "Highest Emiratization", value: "67.11%", caption: "Emiratization rate, 2025", support: "Sector: Public administration & defence", status: { text: "Leading", icon: "ti-circle-check" }, chip: "Public administration & defence" },
+  { icon: "ti-trending-up", title: "Fastest Improvement", value: "183.13 pp", valueIcon: "ti-arrow-up", valueTone: "pos", caption: "Growth vs 2024", support: "Sector: Agriculture, forestry & fishing", chip: "Agriculture, forestry & fishing" },
+  { icon: "ti-target", title: "2025 Target", value: "70%", caption: "Emiratization National Target", support: "", chip: "" },
+  { icon: "ti-users-group", title: "Emirati Workforce", value: "274K", caption: "Total employed Emiratis, 2025", support: "Counted across every reporting sector", chip: "All sectors" },
+  { icon: "ti-user-plus", title: "Emirati Hires (YTD)", value: "274K", caption: "New Emirati hires, 2025", support: "Year to date, all reporting sectors", growth: { text: "14.09% vs 2024" }, chip: "All sectors · YTD", cardClass: "lmo-kpi--hires" },
+];
+
+function favAttr(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+function favSlug(s) {
+  return String(s == null ? "" : s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function buildLmoKpi(k) {
+  const topRight = k.status
+    ? `<span class="lmo-badge"><i class="ti ${k.status.icon}"></i><span>${k.status.text}</span></span>`
+    : k.growth
+    ? `<span class="lmo-kpi-chg lmo-pos"><i class="ti ti-arrow-up"></i>${k.growth.text}</span>`
+    : "";
+  const valTone = k.valueTone === "pos" ? " lmo-pos" : k.valueTone === "neg" ? " lmo-neg" : "";
+  const valIcon = k.valueIcon ? `<i class="ti ${k.valueIcon}" aria-hidden="true"></i>` : "";
+  const cardClass = k.cardClass ? ` ${k.cardClass}` : "";
+  return `<div class="obs-card lmo-kpi lmo-ovv${cardClass}"><div class="lmo-kpi-top"><span class="lmo-kpi-ico"><i class="ti ${k.icon}"></i></span>${topRight}</div><div class="lmo-ovv-title">${k.title}</div><div class="lmo-kpi-val${valTone}">${valIcon}${k.value}</div>${k.caption ? `<div class="lmo-ovv-caption">${k.caption}</div>` : ""}<div class="lmo-kpi-label">${k.support}</div><div class="lmo-ovv-foot">${k.chip ? `<span class="lmo-tag">${k.chip}</span>` : ""}</div></div>`;
+}
+
+const LMO_LOC_YEARS = ["2020", "2021", "2022", "2023", "2024", "2025"];
+const lmoLocSectors = [
+  { icon: "ti-building-bank", cat: "Government", name: "Government", pct: "54.34%", pctNum: 54.34, dir: "pos", chg: "1.44%", chart: "area", chartColor: "#0066FF", series: [48.1, 49.6, 49.0, 51.8, 53.6, 54.34], insight: "A 43.34% Emiratization rate in Abu Dhabi's government sector indicates strong national workforce presence, highlighting significant progress compared to private sector localization levels in the region." },
+  { icon: "ti-building-community", cat: "Joint sector", name: "Joint (Government & Private)", pct: "22.1%", pctNum: 22.1, dir: "neg", chg: "6.99%", chart: "column", chartColor: "#0066FF", series: [26.4, 25.5, 24.6, 23.8, 23.0, 22.1], insight: "Abu Dhabi Emirati female Emiratization rate stands at 55.37% across both government and private sectors, signaling strong public sector representation but challenges in private sector inclusion persist." },
+  { icon: "ti-heart-handshake", cat: "Non-profit", name: "Non Profit Organization", pct: "15.17%", pctNum: 15.17, dir: "pos", chg: "44.75%", chart: "line", chartColor: "#0066FF", series: [7.9, 9.1, 10.6, 12.2, 13.8, 15.17], insight: "In Abu Dhabi's non-profit organizations, the Emiratization rate among all female employees reached 100.00% in 2025, indicating total national workforce localization in this segment." },
+];
+const lmoDomains = [
+  { icon: "ti-shield", cat: "Public sector", name: "Public administration & defence; compulsory social security", pct: "67.11%", pctNum: 67.11, dir: "neg", chg: "7.13%", chart: "column", chartColor: "#0066FF", series: [74.2, 72.4, 71.0, 69.3, 68.1, 67.11], insight: "In Abu Dhabi's public administration and defence sector, the Emiratization rate stands at 67.11%, reflecting strong national representation but highlighting further scope for private sector alignment." },
+  { icon: "ti-pick", cat: "Industry", name: "Mining and quarrying", pct: "25.45%", pctNum: 25.45, dir: "pos", chg: "21.25%", chart: "area", chartColor: "#0066FF", series: [17.8, 19.4, 21.0, 22.6, 24.0, 25.45], insight: "The Emiratization rate in mining and quarrying reached 25.45% for Emiratis in Abu Dhabi, indicating strong localization progress and robust integration of nationals in this sector." },
+  { icon: "ti-school", cat: "Education", name: "Education", pct: "20.26%", pctNum: 20.26, dir: "pos", chg: "10.11%", chart: "line", chartColor: "#0066FF", series: [16.1, 17.0, 18.0, 18.9, 19.6, 20.26], insight: "In Abu Dhabi's education sector for 2025, Emiratis account for a 20.26% Emiratization rate, indicating strong progress and expanded national employment opportunities." },
+];
+
+function buildLmoLocCard(c) {
+  const arrow = c.dir === "pos" ? "ti-arrow-up" : "ti-arrow-down";
+  const chgCls = c.dir === "pos" ? "val-green" : "val-red";
+  const cfg = { type: c.chart || "area", data: c.series, categories: LMO_LOC_YEARS, baseColor: c.chartColor || "#0066FF" };
+  const favId = "lmoloc-" + favSlug(c.cat + "-" + c.name);
+  const bookmark = `<i class="ti ti-bookmark" data-fav-toggle data-fav-store="indicators" data-fav-id="${favId}" data-fav-name="${favAttr(c.name)}" data-fav-val="${favAttr(c.pct)}" data-fav-change="${favAttr(c.chg + " vs 2024")}" data-fav-change-class="${favAttr(chgCls)}" data-fav-cat="${favAttr(c.cat)}" data-fav-cat-icon="${favAttr(c.icon)}" data-fav-ai="${favAttr(c.insight)}"></i>`;
+  return `<div class="obs-card dg-card dg-slide lmo-loc-card lmo-ind-card" data-lmo-chart='${JSON.stringify(cfg).replace(/'/g, "&#39;")}'><div class="product-card-toprow"><span class="product-cat-tag"><i class="ti ${c.icon}"></i> <span class="product-cat-text">${c.cat}</span></span><div class="product-actions">${bookmark}<i class="ti ti-arrow-up-right" title="Expand"></i></div></div><div class="product-name-row"><div class="product-name">${c.name}</div></div><div class="product-val">${c.pct}</div><div class="product-change ${chgCls}"><i class="ti ${arrow}"></i>${c.chg} vs 2024</div><div class="product-viz"></div><div class="product-axis">${LMO_LOC_YEARS.map((y) => `<span>${y}</span>`).join("")}</div><div class="product-ai-row"><i class="ti ti-bulb"></i><span><span class="product-ai-lbl">AI Summary</span> <span class="product-ai-text">${c.insight}</span></span></div></div>`;
+}
+
+function buildEmiratizationSection() {
+  return `<section class="lmo-emir" id="emiratization"><div class="lmo-emir-hdr">${buildObsSectionHdr("Emiratization", "ti-user-star")}<p class="lmo-emir-sub">National workforce localization intelligence across government, private, and priority economic domains.</p></div><div class="lmo-subsection"><div class="lmo-subhdr">Executive Overview</div><div class="lmo-kpi-band">${lmoKpis.map(buildLmoKpi).join("")}</div></div><div class="lmo-subsection"><div class="dg-carousel lmo-loc-carousel"><div class="lmo-subhdr-row"><div class="lmo-subhdr-lead"><div class="lmo-subhdr">Workforce Localization Progress by Sector</div><p class="lmo-subhdr-sub">Percentages represent workforce localization by sector (2025 vs 2024).</p></div><div class="lmo-subhdr-actions"><button type="button" class="lmo-qa" data-dl-scope="emiratization" title="Download" aria-label="Download"><i class="ti ti-download"></i></button></div></div><div class="dg-track lmo-loc-track">${lmoLocSectors.map(buildLmoLocCard).join("")}</div><div class="dg-carousel-nav home-carousel-nav"><button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button><div class="home-carousel-dots"></div><button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button></div></div></div><div class="lmo-subsection"><div class="dg-carousel lmo-loc-carousel"><div class="lmo-subhdr-row"><div class="lmo-subhdr-lead"><div class="lmo-subhdr">Emiratization By Domain</div><p class="lmo-subhdr-sub">Percentages represent Emiratization by domain (2025 vs 2024).</p></div><div class="lmo-subhdr-actions"><button type="button" class="lmo-qa" data-dl-scope="emiratization" title="Download" aria-label="Download"><i class="ti ti-download"></i></button></div></div><div class="dg-track lmo-loc-track">${lmoDomains.map(buildLmoLocCard).join("")}</div><div class="dg-carousel-nav home-carousel-nav"><button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button><div class="home-carousel-dots"></div><button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button></div></div></div></section>`;
+}
+
+const lmoKeyIndicators = [
+  { icon: "ti-user-x", status: "Stable", title: "Total Workforce, Abu Dhabi - Unemployment", value: "-17.4%", cmp: "vs 2025", arrow: "down", tone: "pos", chart: "column", chartColor: "#0066FF", series: [100, 96.2, 93.1, 90.4, 87.6, 82.6], insight: "Unemployment among all workers in Abu Dhabi fell significantly, indicating improved job opportunities across the emirate." },
+  { icon: "ti-coin", status: "Stable", title: "Total Workforce, Abu Dhabi - Wages and Income (AED)", value: "9.8%", cmp: "vs 2025", arrow: "up", tone: "pos", chart: "area", chartColor: "#0066FF", series: [100, 101.8, 103.9, 105.7, 107.9, 109.8], insight: "Total wage income for all workers in Abu Dhabi grew, indicating broad income improvement across the emirate's workforce." },
+  { icon: "ti-users-group", status: "Stable", title: "Total Workforce, Abu Dhabi - Labor Force", value: "9.5%", cmp: "vs 2025", arrow: "up", tone: "pos", chart: "line", chartColor: "#0066FF", series: [100, 101.6, 103.2, 105.1, 107.2, 109.5], insight: "All genders and citizenships saw Abu Dhabi's total labor force increase, supporting overall economic expansion." },
+  { icon: "ti-briefcase", status: "Stable", title: "Total Workforce, Abu Dhabi - Employment", value: "10.9%", cmp: "vs 2025", arrow: "up", tone: "pos", chart: "column", chartColor: "#0066FF", series: [100, 102.2, 104.6, 107.0, 108.9, 110.9], insight: "Total employment for all citizens and genders in Abu Dhabi rose significantly, indicating broad-based labor market expansion." },
+];
+
+function buildLmoKeyCard(k) {
+  const chgCls = k.tone === "pos" ? "val-green" : "val-red";
+  const cfg = { type: k.chart || "area", data: k.series, categories: LMO_LOC_YEARS, baseColor: k.chartColor || "#0066FF", valueSuffix: "" };
+  const title = k.title.replace(/^Total Workforce, Abu Dhabi - /, "");
+  const favId = "lmokey-" + favSlug(k.title);
+  const bookmark = `<i class="ti ti-bookmark" data-fav-toggle data-fav-store="indicators" data-fav-id="${favId}" data-fav-name="${favAttr(k.title)}" data-fav-val="${favAttr(k.value)}" data-fav-change="${favAttr(k.cmp)}" data-fav-change-class="${favAttr(chgCls)}" data-fav-cat="${favAttr(title)}" data-fav-cat-icon="${favAttr(k.icon)}" data-fav-ai="${favAttr(k.insight)}"></i>`;
+  return `<div class="obs-card dg-card dg-slide lmo-loc-card lmo-key-card lmo-ind-card" data-lmo-chart='${JSON.stringify(cfg).replace(/'/g, "&#39;")}'><div class="product-card-toprow"><span class="product-cat-tag"><i class="ti ${k.icon}"></i> <span class="product-cat-text">${title}</span></span><div class="product-actions">${bookmark}<i class="ti ti-arrow-up-right" title="Expand"></i></div></div><div class="product-name-row"><div class="product-name">${k.title}</div></div><div class="lmo-key-valrow"><span class="product-val">${k.value}</span><span class="lmo-badge"><i class="ti ti-circle-check"></i><span>${k.status}</span></span></div><div class="product-change ${chgCls}"><i class="ti ti-arrow-${k.arrow}"></i>${k.cmp}</div><div class="product-viz"></div><div class="product-axis">${LMO_LOC_YEARS.map((y) => `<span>${y}</span>`).join("")}</div><div class="product-ai-row"><i class="ti ti-bulb"></i><span><span class="product-ai-lbl">AI Summary</span> <span class="product-ai-text">${k.insight}</span></span></div></div>`;
+}
+
+/* Key Impacts — briefing-relevant takeaways tied to Emiratization + Key Indicators. */
+const lmoKeyImpacts = [
+  { icon: "ti-shield", tone: "neutral", text: 'Public administration &amp; defence leads Emiratization at <span class="impact-val">67.11%</span>, anchoring national workforce presence in the public sector.', ctx: "What drives the leading Emiratization rate in public administration and defence and how can other domains catch up", title: "Public Admin Emiratization Lead" },
+  { icon: "ti-building-bank", tone: "down", text: 'Government sector localization holds at <span class="impact-val">54.34%</span> (+1.44% vs 2024), remaining the strongest sector for Emirati employment.', ctx: "How is government workforce localization progressing and what explains the 54.34% rate", title: "Government Localization" },
+  { icon: "ti-pick", tone: "down", text: 'Mining and quarrying Emiratization rose <span class="impact-val">+21.25%</span> YoY to 25.45%, the fastest domain improvement on this desk.', ctx: "What is driving the fast Emiratization improvement in mining and quarrying", title: "Mining Emiratization Gain" },
+  { icon: "ti-building-community", tone: "up", text: 'Joint (government &amp; private) localization slipped to <span class="impact-val">22.1%</span> (−6.99% vs 2024), signalling private-sector inclusion pressure.', ctx: "Why is joint sector Emiratization declining and what policy levers can reverse it", title: "Joint Sector Watch" },
+  { icon: "ti-user-x", tone: "down", text: 'Total unemployment improved <span class="impact-val">−17.4%</span> vs 2025, confirming broader job absorption across Abu Dhabi.', ctx: "What is driving the unemployment improvement and which cohorts still face risk", title: "Unemployment Improvement" },
+  { icon: "ti-briefcase", tone: "down", text: 'Total employment expanded <span class="impact-val">+10.9%</span> and wages <span class="impact-val">+9.8%</span>, with labour force growth of <span class="impact-val">+9.5%</span> supporting a stable expansion path.', ctx: "How sustainable is Abu Dhabi employment and wage growth and what should policymakers watch next", title: "Employment & Wage Expansion" },
+];
+
+function buildKeyImpactsSection() {
+  const esc = (s) => String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  const items = lmoKeyImpacts.map((i) => `
+    <div class="impact-item">
+      <div class="impact-icon impact-icon--${i.tone}"><i class="ti ${i.icon}" aria-hidden="true"></i></div>
+      <div class="impact-body">${i.text}</div>
+      <button type="button" class="impact-ai" title="Ask Bayaan AI" aria-label="Ask Bayaan AI about ${i.title.replace(/"/g, "&quot;")}" onclick="event.stopPropagation();openChat('${esc(i.ctx)}','${esc(i.title)}')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+    </div>`).join("");
+  return `<section class="lmo-impacts" id="key-impacts"><div class="section-hdr"><h2 class="cpi-section-title"><i class="ti ti-bolt" aria-hidden="true"></i> Key Impacts</h2></div><div class="obs-card impacts-list">${items}</div></section>`;
+}
+
+const LMO_CHART_BASE_COLOR = "#0066FF";
+function lmoHcTheme() {
+  return window.LMO && typeof LMO.chartAxes === "function"
+    ? LMO.chartAxes()
+    : { hcLabel: "#9CA3AF", pointBorder: "#fff" };
+}
+function lmoBuildAreaZoneFill(color) {
+  return {
+    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+    stops: [
+      [0, Highcharts.color(color).setOpacity(0.22).get("rgba")],
+      [1, Highcharts.color(color).setOpacity(0).get("rgba")],
+    ],
+  };
+}
+function lmoMountProductHighchart(viz, cfg) {
+  if (!viz || typeof Highcharts === "undefined") return null;
+  const cats = cfg.categories || LMO_LOC_YEARS;
+  const chartType = cfg.type === "bar" ? "column" : (cfg.type || "area");
+  const isColumn = chartType === "column";
+  const isLine = chartType === "line" || chartType === "spline";
+  const lineColor = cfg.lineColor || cfg.baseColor || LMO_CHART_BASE_COLOR;
+  const hc = lmoHcTheme();
+  const pointData = (cfg.data || []).map((v, i) => ({
+    y: typeof v === "object" && v != null ? v.y : v,
+    color: isColumn ? (cfg.colors ? cfg.colors[i % cfg.colors.length] : Highcharts.color(lineColor).brighten((i - 3) * 0.08).get()) : lineColor
+  }));
+  if (viz._hc) { try { viz._hc.destroy(); } catch (e) {} viz._hc = null; }
+  viz.innerHTML = "";
+  let series;
+  if (isColumn) {
+    series = { type: "column", data: pointData, name: "Value", colorByPoint: true };
+  } else if (isLine) {
+    series = { type: "spline", data: pointData.map((p) => ({ y: p.y })), color: lineColor, marker: { enabled: true, radius: 3, symbol: "circle", fillColor: hc.pointBorder, lineWidth: 2, lineColor: lineColor }, lineWidth: 2 };
+  } else {
+    series = { type: "areaspline", data: pointData.map((p) => ({ y: p.y, marker: { enabled: false } })), color: lineColor, fillColor: lmoBuildAreaZoneFill(lineColor) };
+  }
+  const chart = Highcharts.chart(viz, {
+    chart: { type: isColumn ? "column" : (isLine ? "spline" : "areaspline"), backgroundColor: "transparent", margin: [6, 2, 22, 2], height: 92, style: { fontFamily: "Inter, sans-serif" } },
+    title: { text: null }, credits: { enabled: false }, legend: { enabled: false },
+    tooltip: { enabled: true, outside: true, headerFormat: '<span style="font-size:11px">{point.key}</span><br/>', pointFormat: `<b>{point.y}${cfg.valueSuffix != null ? cfg.valueSuffix : "%"}</b>` },
+    xAxis: { categories: cats, lineWidth: 0, tickLength: 0, tickWidth: 0, gridLineWidth: 0, labels: { enabled: true, style: { fontSize: "9.5px", color: hc.hcLabel, fontFamily: "Inter, sans-serif" }, y: 14, autoRotation: false, overflow: "allow" } },
+    yAxis: { visible: false, title: { text: null }, gridLineWidth: 0 },
+    plotOptions: {
+      series: { animation: false, enableMouseTracking: true, states: { hover: { enabled: true } } },
+      column: { borderWidth: 0, borderRadius: 3, pointPadding: 0.12, groupPadding: 0.08, colorByPoint: true },
+      areaspline: { fillOpacity: 0.18, lineWidth: 2, marker: { enabled: false, radius: 3, lineWidth: 0, states: { hover: { enabled: true, radius: 4 } } } },
+      spline: { lineWidth: 2, marker: { enabled: true, radius: 3, symbol: "circle", fillColor: hc.pointBorder, lineWidth: 2, lineColor: null, states: { hover: { enabled: true, radius: 4 } } } }
+    },
+    series: [series],
+  });
+  viz._hc = chart;
+  return chart;
+}
+function initLmoLocCharts(root) {
+  (root || document).querySelectorAll(".lmo-ind-card[data-lmo-chart]").forEach((card) => {
+    const viz = card.querySelector(".product-viz");
+    if (!viz) return;
+    let cfg;
+    try { cfg = JSON.parse(card.getAttribute("data-lmo-chart")); } catch (e) { return; }
+    if (typeof Highcharts !== "undefined") {
+      lmoMountProductHighchart(viz, cfg);
+      const axisEl = card.querySelector(".product-axis");
+      if (axisEl) axisEl.style.display = "none";
+      card.setAttribute("data-hc-axis", "1");
+    }
+  });
+}
+
+function initDgCarousel(carousel) {
+  const track = carousel.querySelector(".dg-track");
+  const nav = carousel.querySelector(".dg-carousel-nav");
+  if (!track || !nav) return;
+  const dotsWrap = nav.querySelector(".home-carousel-dots");
+  const arrows = nav.querySelectorAll(".home-carousel-arrow");
+  if (!dotsWrap || arrows.length < 2) return;
+  const cards = () => [...track.children];
+  const gap = () => parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 14;
+  const step = () => { const first = cards()[0]; return first ? first.offsetWidth + gap() : track.clientWidth; };
+  const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
+  const pageCount = () => { const ms = maxScroll(); return ms <= 2 ? 1 : Math.ceil(ms / step()) + 1; };
+  const currentPage = () => { const s = step(); return s <= 0 ? 0 : Math.round(track.scrollLeft / s); };
+  function sync() {
+    const pages = pageCount();
+    const page = Math.min(currentPage(), pages - 1);
+    nav.classList.toggle("is-single", pages <= 1);
+    const dots = dotsWrap.querySelectorAll(".home-carousel-dot");
+    if (dots.length !== pages) {
+      dotsWrap.innerHTML = Array.from({ length: pages }, (_, i) => `<button type="button" class="home-carousel-dot${i === page ? " active" : ""}" aria-label="Go to page ${i + 1}"></button>`).join("");
+      dotsWrap.querySelectorAll(".home-carousel-dot").forEach((dot, i) => dot.addEventListener("click", () => goTo(i)));
+    } else dots.forEach((dot, i) => dot.classList.toggle("active", i === page));
+    const ms = maxScroll();
+    arrows[0].disabled = track.scrollLeft <= 2;
+    arrows[1].disabled = ms <= 2 || track.scrollLeft >= ms - 2;
+  }
+  function goTo(i) {
+    const pages = pageCount();
+    const page = Math.max(0, Math.min(i, pages - 1));
+    track.scrollTo({ left: Math.min(page * step(), maxScroll()), behavior: "smooth" });
+    requestAnimationFrame(sync);
+  }
+  arrows[0].addEventListener("click", () => goTo(currentPage() - 1));
+  arrows[1].addEventListener("click", () => goTo(currentPage() + 1));
+  let tick = 0;
+  track.addEventListener("scroll", () => { if (tick) return; tick = requestAnimationFrame(() => { tick = 0; sync(); }); }, { passive: true });
+  carousel._sync = sync;
+  sync();
+}
+
+function renderBriefingDesk() {
+  const root = document.getElementById("briefing-desk-sections");
+  if (!root || root.dataset.ready) return;
+  root.dataset.ready = "1";
+  const laborMetrics = [
+    { label: "Employment", icon: "ti-briefcase",
+      total: { val: "2.89M", chg: "+10.90%", dir: "up" },
+      emi: { val: "0.27M", chg: "+14.10%", dir: "up" },
+      non: { val: "2.62M", chg: "+10.60%", dir: "up" } },
+    { label: "Unemployment", icon: "ti-user-x",
+      total: { val: "0.11M", chg: "−17.40%", dir: "down" },
+      emi: { val: "0.02M", chg: "−47.50%", dir: "down" },
+      non: { val: "0.09M", chg: "−3.50%", dir: "down" } },
+    { label: "Outside Labor Force", icon: "ti-user-off",
+      total: { val: "0.80M", chg: "+7.10%", dir: "up" },
+      emi: { val: "0.25M", chg: "+14.60%", dir: "up" },
+      non: { val: "0.54M", chg: "+8.30%", dir: "up" } },
+    { label: "Wages and Income (AED)", icon: "ti-coin",
+      total: { val: "5.13K", chg: "+9.80%", dir: "up" },
+      emi: { val: "20.01K", chg: "+20.20%", dir: "up" },
+      non: { val: "4.17K", chg: "−6.10%", dir: "down" } },
+    { label: "Employment Rate", icon: "ti-percentage",
+      total: { val: "96.20%", chg: "+1.30%", dir: "up" },
+      emi: { val: "92.40%", chg: "−9.00%", dir: "down" },
+      non: { val: "96.70%", chg: "+0.50%", dir: "up" } },
+    { label: "Unemployment Rate", icon: "ti-user-minus",
+      total: { val: "3.80%", chg: "−24.00%", dir: "down" },
+      emi: { val: "7.60%", chg: "−50.00%", dir: "down" },
+      non: { val: "3.30%", chg: "−13.20%", dir: "down" } },
+    { label: "Labor Force", icon: "ti-users-group",
+      total: { val: "3.00M", chg: "+9.50%", dir: "up" },
+      emi: { val: "0.30M", chg: "+4.70%", dir: "up" },
+      non: { val: "2.71M", chg: "+10.10%", dir: "up" } },
+  ];
+  window.LMO_OVERVIEW_METRICS = laborMetrics;
+  const ovChgSign = (c) => {
+    const s = String(c.chg).trim();
+    return s.startsWith("−") || s.startsWith("-") ? "neg" : "pos";
+  };
+  const ovTrend = (d) => `<i class="ti ti-trending-${d === "down" ? "down" : "up"}"></i>`;
+  const buildChg = (c) => `<span class="lmo-ov-chg lmo-ov-chg--${ovChgSign(c)}">${ovTrend(c.dir)}${c.chg}</span>`;
+  const emiIcon = `<img class="lmo-ov-flag" src="../assets/emirati.svg" alt="" aria-hidden="true">`;
+  const nonIcon = `<img class="lmo-ov-flag" src="../assets/non-emirati.svg" alt="" aria-hidden="true">`;
+  const buildOvCard = (m) => `<div class="obs-card lmo-ov-card lmo-ov-card--compact"><div class="lmo-ov-head"><span class="lmo-ov-ico"><i class="ti ${m.icon}"></i></span><span class="lmo-ov-title">${m.label}</span><button type="button" class="lmo-qa lmo-ov-card-dl" data-dl-scope="overview-metric" data-dl-metric="${m.label}" title="Download" aria-label="Download ${m.label}"><i class="ti ti-download"></i></button></div><div class="lmo-ov-split"><div class="lmo-ov-cohort"><span class="lmo-ov-cohort-lbl">${emiIcon}Emirati</span><span class="lmo-ov-cohort-val">${m.emi.val}</span>${buildChg(m.emi)}</div><div class="lmo-ov-cohort"><span class="lmo-ov-cohort-lbl">${nonIcon}Non Emirati</span><span class="lmo-ov-cohort-val">${m.non.val}</span>${buildChg(m.non)}</div></div><div class="lmo-ov-total"><div class="lmo-ov-total-lead"><span class="lmo-ov-total-lbl">Total</span><span class="lmo-ov-total-val">${m.total.val}</span></div>${buildChg(m.total)}</div></div>`;
+  const overviewCards = `<div class="lmo-ov-grid">${laborMetrics.map(buildOvCard).join("")}</div>`;
+  const overviewHdr = `<div class="section-hdr lmo-ov-hdr"><h2 class="cpi-section-title"><i class="ti ti-layout-grid" aria-hidden="true"></i>Overview</h2><div class="lmo-subhdr-actions"><button type="button" class="lmo-qa" data-dl-scope="overview" title="Download" aria-label="Download all Overview data"><i class="ti ti-download"></i></button></div></div>`;
+  root.innerHTML = `<section class="lmo-ov" id="overview">${overviewHdr}<p class="lmo-ov-sub"><span class="lmo-ov-year">2025</span> Comparing to Y/Y</p>${overviewCards}</section>${buildEmiratizationSection()}<section class="lmo-key" id="key-indicators"><div class="dg-carousel lmo-loc-carousel lmo-key-carousel"><div class="section-hdr lmo-key-hdr"><h2 class="cpi-section-title"><i class="ti ti-chart-dots"></i> Key Indicators</h2><div class="lmo-subhdr-actions"><button type="button" class="lmo-qa" data-dl-scope="key-indicators" title="Download" aria-label="Download"><i class="ti ti-download"></i></button></div></div><div class="dg-track lmo-key-track">${lmoKeyIndicators.map(buildLmoKeyCard).join("")}</div><div class="dg-carousel-nav home-carousel-nav"><button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button><div class="home-carousel-dots"></div><button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button></div></div></section>${buildKeyImpactsSection()}`;
+}
+
+
+/* ── AI CHAT ── */
+const RESPONSES={
+  'employment':    "<strong>Three sectors</strong> are driving Abu Dhabi's 94.2% employment rate: <strong>Financial Services</strong> (ADGM expansion adding 8,400 roles), <strong>Tech & ICT</strong> (+5,200 roles from digital transformation demand), and <strong>Hospitality</strong> (+12.4% vacancy growth ahead of mega-events). Sustainability is good for the first two — they're structurally driven. Hospitality is more cyclical. Key constraint: digital role demand is outpacing the skills pipeline.",
+  'unemployment':  "The residual 5.8% is largely <strong>structural, not cyclical</strong>. Three cohorts: <strong>(1) Skill-mismatched</strong> workers — qualifications don't match open roles; <strong>(2) Geographic mismatch</strong> — workers outside Abu Dhabi City face fewer opportunities; <strong>(3) Youth in transition</strong> — recent graduates not yet absorbed. It's unlikely to fall below 4.5% without active skills bridging programmes.",
+  'neet':          "The 20–24 female NEET spike has three causes: <strong>(1)</strong> Education-to-work friction — graduates not moving into roles within 90 days; <strong>(2)</strong> Skills mismatch; <strong>(3)</strong> Geographic concentration of opportunities. Fastest reversal: a structured 90-day bridge programme with mentoring, targeting 2,000 young women in Q3, linked to employer NAFIS incentives.",
+  'ai skills':     "This is the <strong>most urgent issue on this desk</strong>. Three parallel tracks: <strong>Short-term (0–6M):</strong> fast-track reskilling 800 data professionals in adjacent roles. <strong>Medium-term (6–18M):</strong> government-industry STEM bootcamp for Emirati graduates. <strong>Long-term:</strong> ADEK curriculum reform to increase CS graduates from 420 to 1,400 by 2027. Cost of inaction: estimated AED 340M in delayed digital economy projects.",
+  'female':        "The 52.3% female record has three structural drivers: <strong>(1)</strong> Growth of remote-eligible professional roles in finance and tech; <strong>(2)</strong> NAFIS bridge programme effectiveness for female job-seekers; <strong>(3)</strong> Childcare infrastructure expansion enabling re-entry. Economic contribution: AED 2.4B annually. To sustain: expand flexible work mandates and increase childcare subsidies.",
+  'emir':          "Emiratisation is progressing +0.2pp per quarter. Q3 target of 13.5% has a <strong>76% probability</strong>. Key risk: construction and retail dragging the average. If those sectors don't improve, the overall rate could plateau at 13.2%. Recommended: escalate enforcement notices to non-compliant establishments with a 60-day cure period.",
+  'forecast':      "Q3 2025 outlook is <strong>cautiously positive</strong>. Leading indicators — job posting volumes (+8.2%), PMI at 54.1, STEM enrollment (+12.1%) — all point upward. Main downside: construction permit deceleration. If permits don't recover by August, a Q4 lag of 4,000–6,000 roles is likely. Projection: employment 1.88–1.91M, unemployment 5.4–5.6%.",
+  'gcc':           "Abu Dhabi leads the GCC on most labour indicators: employment rate (#1 at 94.2%), female participation (highest in region at 52.3%), and real wage growth (positive, unlike KSA and Kuwait). <strong>Areas where UAE lags OECD:</strong> skill mismatch index (54% vs 80% OECD avg) and youth NEET rate management. GCC comparison chart available on the Benchmarking page.",
+  'default':       "Abu Dhabi's labour market is in a <strong>positive trajectory overall</strong>. Employment at 1.84M, unemployment at 5.8%, and record female participation reflect genuine structural improvement. The most actionable priorities: <strong>(1)</strong> AI skills gap — immediate intervention needed; <strong>(2)</strong> Construction monitoring — 6-month window; <strong>(3)</strong> Youth NEET programme — Q3 activation. What would you like to explore?"
+};
+const SUGGS={
+  'Employment Rate':['Which sectors are growing fastest?','Is 94% near the structural ceiling?','Compare to GCC peers'],
+  'Unemployment Rate':['Who is still unemployed?','What keeps it from falling below 5%?','Long-term unemployment trend'],
+  'AI Skills Gap Risk':['What is the fastest fix?','How much is this costing?','Which projects are blocked?'],
+  'Finance Momentum':['What roles are growing in BFSI?','Is the wage growth sustainable?','ADGM expansion impact'],
+  'Female Participation':['What policy drove this record?','Economic value per 1pp gain?','How to sustain momentum?'],
+  default:['What is the most urgent issue?','Compare to last quarter','What should a policymaker do first?','Show me the Q3 forecast']
+};
+
+function openChat(ctx,title){
+  document.getElementById('ctx-val').textContent=title;
+  const ms=document.getElementById('msgs');
+  ms.innerHTML='';
+  const lc=(ctx+' '+title).toLowerCase();
+  let resp=RESPONSES.default;
+  if(lc.includes('employment')&&!lc.includes('female')&&!lc.includes('neet'))resp=RESPONSES.employment;
+  else if(lc.includes('unemploy'))resp=RESPONSES.unemployment;
+  else if(lc.includes('neet')||lc.includes('youth'))resp=RESPONSES.neet;
+  else if(lc.includes('ai')&&(lc.includes('skill')||lc.includes('gap')||lc.includes('fast')))resp=RESPONSES['ai skills'];
+  else if(lc.includes('female')||lc.includes('women')||lc.includes('gender'))resp=RESPONSES.female;
+  else if(lc.includes('emir'))resp=RESPONSES.emir;
+  else if(lc.includes('forecast')||lc.includes('q3')||lc.includes('outlook'))resp=RESPONSES.forecast;
+  else if(lc.includes('gcc')||lc.includes('benchmark')||lc.includes('compare'))resp=RESPONSES.gcc;
+  addMsg('ai',resp);
+  const sg=SUGGS[title]||SUGGS.default;
+  document.getElementById('suggs').innerHTML=sg.map(s=>`<button class="sugg" onclick="sendCT('${s.replace(/'/g,"\'")}')">${s}</button>`).join('');
+  document.getElementById('cpanel').classList.add('open');
+}
+function closeChat(){
+  document.getElementById('cpanel').classList.remove('open');
+}
+function addMsg(role,text){
+  const ms=document.getElementById('msgs');
+  const d=document.createElement('div');d.className='msg '+role;
+  const b=document.createElement('div');b.className='bubble '+role;b.innerHTML=text;
+  d.appendChild(b);ms.appendChild(d);ms.scrollTop=ms.scrollHeight;
+}
+function sendC(){
+  const inp=document.getElementById('cin');
+  const t=inp.value.trim();if(!t)return;
+  sendCT(t);inp.value='';
+}
+function sendCT(text){
+  addMsg('user',text);
+  document.getElementById('suggs').innerHTML='';
+  const ms=document.getElementById('msgs');
+  const td=document.createElement('div');td.className='msg ai';td.id='typi';
+  td.innerHTML='<div class="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
+  ms.appendChild(td);ms.scrollTop=ms.scrollHeight;
+  setTimeout(()=>{
+    document.getElementById('typi')?.remove();
+    const lc=text.toLowerCase();
+    let r=RESPONSES.default;
+    if(lc.includes('skill')||lc.includes('ai ')||lc.includes('gap'))r=RESPONSES['ai skills'];
+    else if(lc.includes('neet')||lc.includes('youth'))r=RESPONSES.neet;
+    else if(lc.includes('unemploy'))r=RESPONSES.unemployment;
+    else if(lc.includes('female')||lc.includes('women'))r=RESPONSES.female;
+    else if(lc.includes('emir')||lc.includes('nation'))r=RESPONSES.emir;
+    else if(lc.includes('forecast')||lc.includes('q3')||lc.includes('next')||lc.includes('future'))r=RESPONSES.forecast;
+    else if(lc.includes('gcc')||lc.includes('benchmark')||lc.includes('compare')||lc.includes('peer'))r=RESPONSES.gcc;
+    else if(lc.includes('employ')||lc.includes('sector')||lc.includes('grow'))r=RESPONSES.employment;
+    else if(lc.includes('wage')||lc.includes('salary'))r="Wage growth at <strong>4.7% YoY</strong> is the highest since 2018, led by BFSI at 7.2% and Tech at 6.8%. Real wage growth (after CPI) is <strong>+2.1pp</strong> — meaningful purchasing power improvement. Sustainability: good for 2 more quarters if inflation stays below 3%. Structural risk: if AI talent scarcity pushes BFSI wages above 10%, broader compensation benchmarks could be disrupted.";
+    addMsg('ai',r);ms.scrollTop=ms.scrollHeight;
+  },1400);
+}
+
+/* ── BRIEFING SCROLLSPY DOTS ── */
+let lmoBriefingDotsApi = null;
+
+function hideLmoBriefingDots() {
+  lmoBriefingDotsApi?.destroy();
+  lmoBriefingDotsApi = null;
+  const rail = document.querySelector(".lmo-briefing-dots-rail");
+  if (rail) rail.hidden = true;
+}
+
+function initLmoBriefingDots() {
+  const briefing = document.getElementById("view-briefing");
+  const rail = document.querySelector(".lmo-briefing-dots-rail");
+  if (!briefing || briefing.hidden) {
+    hideLmoBriefingDots();
+    return;
+  }
+
+  const sections = [
+    { id: "exec-brief", label: "Executive Brief", el: briefing.querySelector("#exec-brief") },
+    { id: "overview", label: "Overview", el: briefing.querySelector("#overview") },
+    { id: "emiratization", label: "Emiratization", el: briefing.querySelector("#emiratization") },
+    { id: "key-indicators", label: "Key Indicators", el: briefing.querySelector("#key-indicators") },
+    { id: "key-impacts", label: "Key Impacts", el: briefing.querySelector("#key-impacts") },
+  ].filter((item) => item.el);
+
+  lmoBriefingDotsApi?.destroy();
+  lmoBriefingDotsApi = window.BayaanSectionScrollSpy.mountSectionDots({
+    navId: "lmoBriefingDots",
+    sections,
+    scrollFnName: "scrollToLmoBriefingSection",
+    config: { heroId: "exec-brief" },
+  });
+  if (rail) rail.hidden = sections.length < 2;
+  requestAnimationFrame(() => lmoBriefingDotsApi?.sync());
+}
+
+function showLmoBriefingDots() {
+  const rail = document.querySelector(".lmo-briefing-dots-rail");
+  if (rail) rail.hidden = false;
+  initLmoBriefingDots();
+}
+
+function syncLmoBriefingDots() {
+  lmoBriefingDotsApi?.sync();
+}
+
+/* ── VIEW SWITCHER ── */
+const FORECASTING_SRC='lmo-forecasting_v2.html?embed=1';
+const OBSERVE_SRC='lmo-observe.html?embed=1';
+const DIAGNOSE_SRC='lmo-diagnose.html?embed=1';
+const SIMULATION_SRC='lmo-simulation.html?embed=1';
+
+function switchView(view){
+  /* Chrome blocks nested file:// iframes (unique origins per file). Navigate top-level instead. */
+  const FILE_VIEWS={
+    forecasting:'lmo-forecasting_v2.html',
+    observe:'lmo-observe.html',
+    geospatial:'lmo-geospatial.html',
+    diagnose:'lmo-diagnose.html',
+    simulation:'lmo-simulation.html'
+  };
+  if(FILE_VIEWS[view]==='lmo-geospatial.html'){
+    location.href=FILE_VIEWS[view];
+    return;
+  }
+  if(location.protocol==='file:'&&FILE_VIEWS[view]){
+    location.href=FILE_VIEWS[view];
+    return;
+  }
+  const briefing=document.getElementById('view-briefing');
+  const forecasting=document.getElementById('view-forecasting');
+  const observe=document.getElementById('view-observe');
+  const diagnose=document.getElementById('view-diagnose');
+  const simulation=document.getElementById('view-simulation');
+  const frame=document.getElementById('forecasting-frame');
+  const obsFrame=document.getElementById('observe-frame');
+  const diagFrame=document.getElementById('diagnose-frame');
+  const simFrame=document.getElementById('simulation-frame');
+  document.querySelectorAll('.sidebar-item[data-view]').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.view===view);
+  });
+  if(briefing)briefing.hidden=view!=='briefing';
+  if(forecasting)forecasting.hidden=view!=='forecasting';
+  if(observe)observe.hidden=view!=='observe';
+  if(diagnose)diagnose.hidden=view!=='diagnose';
+  if(simulation)simulation.hidden=view!=='simulation';
+  if(view==='forecasting'&&frame){
+    const loaded=frame.dataset.loaded==='1';
+    if(!loaded){
+      frame.src=FORECASTING_SRC;
+      frame.dataset.loaded='1';
+    }
+    document.title='Labour Market Observatory — Forecasting · Bayaan';
+  }else if(view==='observe'&&obsFrame){
+    const loaded=obsFrame.dataset.loaded==='1';
+    if(!loaded){
+      obsFrame.src=OBSERVE_SRC;
+      obsFrame.dataset.loaded='1';
+    }
+    document.title='Labour Market Observatory — Observe · Bayaan';
+  }else if(view==='diagnose'&&diagFrame){
+    const loaded=diagFrame.dataset.loaded==='1';
+    if(!loaded){
+      diagFrame.src=DIAGNOSE_SRC;
+      diagFrame.dataset.loaded='1';
+    }
+    document.title='Labour Market Observatory — Diagnose · Bayaan';
+  }else if(view==='simulation'&&simFrame){
+    const loaded=simFrame.dataset.loaded==='1';
+    if(!loaded){
+      simFrame.src=SIMULATION_SRC;
+      simFrame.dataset.loaded='1';
+    }
+    document.title='Labour Market Observatory — Simulations · Bayaan';
+  }else{
+    document.title='Labour Market Observatory — Briefing Desk · Bayaan';
+  }
+}
+
+window.addEventListener('message',e=>{
+  if(e.data?.type==='lmo-breadcrumb'){
+    if(window.parent!==window)window.parent.postMessage(e.data,'*');
+    return;
+  }
+  if(e.data?.type==='lmo-nav'&&e.data.view){
+    switchView(e.data.view);
+    return;
+  }
+  if(e.data?.type==='lmo-chat'){
+    openChat(e.data.ctx||'',e.data.title||'Forecast Intelligence');
+    return;
+  }
+  if(e.data?.type==='lmo-embed-resize'&&e.data.height){
+    const h=Math.max(Math.round(e.data.height),400);
+    const frameMap=[
+      ['forecasting-frame','view-forecasting'],
+      ['observe-frame','view-observe'],
+      ['diagnose-frame','view-diagnose'],
+      ['simulation-frame','view-simulation']
+    ];
+    for(const[id,viewId]of frameMap){
+      const frame=document.getElementById(id);
+      const view=document.getElementById(viewId);
+      if(frame&&view&&!view.hidden&&e.source===frame.contentWindow){
+        const cur=parseInt(frame.style.height,10)||0;
+        if(Math.abs(cur-h)<2)break;
+        frame.style.height=h+'px';
+        frame.style.minHeight='0';
+        break;
+      }
+    }
+  }
+});
+
+function initLmoDownloadModal() {
+  const backdrop = document.getElementById("lmoDlBackdrop");
+  const fromSel = document.getElementById("lmoDlFromYear");
+  const toSel = document.getElementById("lmoDlToYear");
+  const fromDd = document.getElementById("lmoDlFromDd");
+  const toDd = document.getElementById("lmoDlToDd");
+  const fromTrigger = document.getElementById("lmoDlFromTrigger");
+  const toTrigger = document.getElementById("lmoDlToTrigger");
+  const fromMenu = document.getElementById("lmoDlFromMenu");
+  const toMenu = document.getElementById("lmoDlToMenu");
+  const fromLabel = document.getElementById("lmoDlFromLabel");
+  const toLabel = document.getElementById("lmoDlToLabel");
+  const tnc = document.getElementById("lmoDlTnc");
+  const formats = document.getElementById("lmoDlFormats");
+  const closeBtn = document.getElementById("lmoDlClose");
+  const tncLink = document.getElementById("lmoDlTncLink");
+  if (!backdrop || !fromSel || !toSel || !fromDd || !toDd || !tnc || !formats) return;
+
+  const years = [];
+  for (let y = 2019; y <= 2025; y++) years.push(y);
+
+  const setYearUi = (which, year) => {
+    const y = String(year);
+    if (which === "from") {
+      fromSel.value = y;
+      if (fromLabel) fromLabel.textContent = y;
+      fromMenu?.querySelectorAll(".lmo-dl-dd-option").forEach((opt) => {
+        const on = opt.getAttribute("data-year") === y;
+        opt.classList.toggle("is-active", on);
+        opt.setAttribute("aria-selected", on ? "true" : "false");
+      });
+    } else {
+      toSel.value = y;
+      if (toLabel) toLabel.textContent = y;
+      toMenu?.querySelectorAll(".lmo-dl-dd-option").forEach((opt) => {
+        const on = opt.getAttribute("data-year") === y;
+        opt.classList.toggle("is-active", on);
+        opt.setAttribute("aria-selected", on ? "true" : "false");
+      });
+    }
+  };
+
+  const fillYearMenu = (menu, selected) => {
+    if (!menu) return;
+    menu.innerHTML = years
+      .map(
+        (y) =>
+          `<button type="button" class="lmo-dl-dd-option${y === selected ? " is-active" : ""}" data-year="${y}" role="option" aria-selected="${y === selected ? "true" : "false"}">${y}<i class="ti ti-check" aria-hidden="true"></i></button>`
+      )
+      .join("");
+  };
+  fillYearMenu(fromMenu, 2020);
+  fillYearMenu(toMenu, 2025);
+  setYearUi("from", 2020);
+  setYearUi("to", 2025);
+
+  const closeYearMenus = () => {
+    [fromMenu, toMenu].forEach((menu) => {
+      if (menu) menu.hidden = true;
+    });
+    [fromTrigger, toTrigger].forEach((btn) => {
+      if (!btn) return;
+      btn.classList.remove("is-open");
+      btn.setAttribute("aria-expanded", "false");
+    });
+  };
+
+  const toggleYearMenu = (which, force) => {
+    const isFrom = which === "from";
+    const menu = isFrom ? fromMenu : toMenu;
+    const trigger = isFrom ? fromTrigger : toTrigger;
+    const otherMenu = isFrom ? toMenu : fromMenu;
+    const otherTrigger = isFrom ? toTrigger : fromTrigger;
+    if (!menu || !trigger) return;
+    const open = typeof force === "boolean" ? force : menu.hasAttribute("hidden");
+    if (otherMenu) otherMenu.hidden = true;
+    if (otherTrigger) {
+      otherTrigger.classList.remove("is-open");
+      otherTrigger.setAttribute("aria-expanded", "false");
+    }
+    menu.hidden = !open;
+    trigger.classList.toggle("is-open", open);
+    trigger.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+
+  const state = { scope: "overview", metric: "" };
+
+  const syncFormats = () => {
+    const on = tnc.checked;
+    formats.classList.toggle("is-disabled", !on);
+    formats.querySelectorAll(".lmo-dl-fmt").forEach((b) => {
+      b.disabled = !on;
+    });
+  };
+
+  const syncYearOrder = () => {
+    let from = Number(fromSel.value);
+    let to = Number(toSel.value);
+    if (from > to) setYearUi("to", from);
+  };
+
+  const openModal = (scope, metric) => {
+    state.scope = scope || "overview";
+    state.metric = metric || "";
+    tnc.checked = false;
+    syncFormats();
+    closeYearMenus();
+    backdrop.hidden = false;
+    backdrop.classList.add("is-open");
+    backdrop.setAttribute("aria-hidden", "false");
+  };
+
+  const closeModal = () => {
+    closeYearMenus();
+    backdrop.classList.remove("is-open");
+    backdrop.hidden = true;
+    backdrop.setAttribute("aria-hidden", "true");
+  };
+
+  const csvEscape = (v) => {
+    const s = String(v ?? "");
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+
+  const downloadBlob = (filename, content, mime) => {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 500);
+  };
+
+  const metricRows = (list) =>
+    list.map((m) => [
+      m.label,
+      m.emi.val,
+      m.emi.chg,
+      m.non.val,
+      m.non.chg,
+      m.total.val,
+      m.total.chg,
+    ]);
+
+  const buildCsv = () => {
+    const from = fromSel.value;
+    const to = toSel.value;
+    const header = ["Metric", "Emirati", "Emirati YoY", "Non-Emirati", "Non-Emirati YoY", "Total", "Total YoY", "From Year", "To Year"];
+    let rows = [];
+    let slug = "Overview";
+    if (state.scope === "overview-metric" && state.metric) {
+      const one = (window.LMO_OVERVIEW_METRICS || []).filter((m) => m.label === state.metric);
+      rows = metricRows(one);
+      slug = state.metric.replace(/[^\w]+/g, "-");
+    } else if (state.scope === "key-indicators") {
+      header.splice(0, header.length, "Indicator", "Value", "Change", "From Year", "To Year");
+      rows = (typeof lmoKeyIndicators !== "undefined" ? lmoKeyIndicators : []).map((k) => [
+        k.title || "",
+        k.value || "",
+        k.cmp || "",
+      ]);
+      slug = "Key-Indicators";
+    } else if (state.scope === "emiratization") {
+      header.splice(0, header.length, "Sector", "Percent", "Change vs 2024", "From Year", "To Year");
+      rows = [...(typeof lmoLocSectors !== "undefined" ? lmoLocSectors : []), ...(typeof lmoDomains !== "undefined" ? lmoDomains : [])].map((s) => [
+        s.name || "",
+        s.pct || "",
+        s.chg || "",
+      ]);
+      slug = "Emiratization";
+    } else {
+      rows = metricRows(window.LMO_OVERVIEW_METRICS || []);
+      slug = "Overview";
+    }
+    const withYears = rows.map((r) => [...r, from, to]);
+    return {
+      csv: [header, ...withYears].map((r) => r.map(csvEscape).join(",")).join("\n"),
+      slug,
+      from,
+      to,
+    };
+  };
+
+  const doExport = (fmt) => {
+    syncYearOrder();
+    const { csv, slug, from, to } = buildCsv();
+    const base = `LMO-${slug}-${from}-${to}`;
+    if (fmt === "excel") {
+      downloadBlob(`${base}.csv`, csv, "text/csv;charset=utf-8");
+      return;
+    }
+    if (fmt === "pdf") {
+      downloadBlob(`${base}.txt`, `LMO Download (${from}–${to})\n\n${csv}`, "text/plain;charset=utf-8");
+      return;
+    }
+    if (fmt === "image") {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="#f8fafc"/><text x="32" y="48" font-family="Arial" font-size="18" fill="#0f172a">LMO ${slug}</text><text x="32" y="80" font-family="Arial" font-size="13" fill="#64748b">Years ${from}–${to}</text><text x="32" y="120" font-family="Arial" font-size="12" fill="#334155">Export prepared — open CSV via Excel for full data.</text></svg>`;
+      downloadBlob(`${base}.svg`, svg, "image/svg+xml;charset=utf-8");
+    }
+  };
+
+  document.getElementById("view-briefing")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-dl-scope]");
+    if (!btn || !document.getElementById("view-briefing").contains(btn)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openModal(btn.getAttribute("data-dl-scope"), btn.getAttribute("data-dl-metric") || "");
+  });
+
+  fromTrigger?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleYearMenu("from");
+  });
+  toTrigger?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleYearMenu("to");
+  });
+  fromMenu?.addEventListener("click", (e) => {
+    const opt = e.target.closest(".lmo-dl-dd-option");
+    if (!opt) return;
+    e.stopPropagation();
+    setYearUi("from", opt.getAttribute("data-year"));
+    syncYearOrder();
+    closeYearMenus();
+  });
+  toMenu?.addEventListener("click", (e) => {
+    const opt = e.target.closest(".lmo-dl-dd-option");
+    if (!opt) return;
+    e.stopPropagation();
+    setYearUi("to", opt.getAttribute("data-year"));
+    syncYearOrder();
+    closeYearMenus();
+  });
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) {
+      closeModal();
+      return;
+    }
+    if (!e.target.closest(".lmo-dl-dd")) closeYearMenus();
+  });
+
+  closeBtn?.addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && backdrop.classList.contains("is-open")) closeModal();
+  });
+  tnc.addEventListener("change", syncFormats);
+  tncLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    alert("Demo terms: downloaded labour market overview data is for internal briefing use only.");
+  });
+  formats.querySelectorAll(".lmo-dl-fmt").forEach((b) => {
+    b.addEventListener("click", () => {
+      if (b.disabled) return;
+      doExport(b.getAttribute("data-fmt"));
+      closeModal();
+    });
+  });
+  syncFormats();
+}
+
+initBriefDatePicker();
+initBriefSpeech();
+renderBriefingDesk();
+initLmoDownloadModal();
+document.querySelectorAll('#view-briefing .dg-carousel').forEach(initDgCarousel);
+initLmoLocCharts(document.getElementById('view-briefing'));
+if (window.LMO && LMO.onThemeChange) {
+  LMO.onThemeChange(() => initLmoLocCharts(document.getElementById('view-briefing')));
+}
+requestAnimationFrame(() => {
+  initLmoBriefingDots();
+});
+if(!window._briefingCarouselResizeBound){
+  window._briefingCarouselResizeBound=true;
+  window.addEventListener('resize',()=>{
+    document.querySelectorAll('#view-briefing .dg-carousel').forEach((c)=>c._sync&&c._sync());
+    syncLmoBriefingDots();
+  });
+}
+LMO.initLmoEmbed();
+</script>
+</body>
+</html>

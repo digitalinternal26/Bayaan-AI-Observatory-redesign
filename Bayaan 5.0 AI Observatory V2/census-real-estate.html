@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Census Observatory — Real Estate · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <!-- Shared design system — same #screen-cpi-obs shell + census-detail.css
+         (cd-kpi, cd-hero/cd-ai-*, cd-bar-*, cd-key-card, cen-btn) already
+         established by Population and Labour Force. This page hand-authors
+         its own markup (region toggle, paired use/type panels, top-10
+         tables) rather than the generic js/census-detail.js renderer —
+         that file is left untouched so it never has to change again. -->
+    <link rel="stylesheet" href="css/pages/ai.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/pages/exec-home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/pages/census-detail.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" ? "dark" : "light"
+        );
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/census-global-filter.js"></script>
+    <script src="js/census-region-map.js"></script>
+    <script src="js/census-exec-brief.js"></script>
+    <script src="js/census-ai-panel.js"></script>
+    <style>
+      /* ====================================================================
+         REAL ESTATE DETAIL PAGE — page-local additions on top of the shared
+         cpi-obs.css / census-detail.css design system, matching the pattern
+         already established by census-population.html (.pd-*) and
+         census-labour.html (.lf-*). New shapes here are prefixed .re-.
+         Real Estate's domain accent is Amber 600 (#d97706) / Amber 50
+         (#fff7ed) — the same tokens Interpret's Real Estate glance-card
+         already uses, and Amber is the Design Guidelines' official warm
+         secondary chart colour. ==================================================================== */
+
+      /* Section "module card" — ported verbatim from CPI.html's page-local
+         `#cpi-obs-content > section` rule (applied there to every top-level
+         section for a consistent soft-gradient outer card, with inner
+         .obs-card elements nesting inside it). Same rule as
+         CensusObservatory.html / census-population.html /
+         census-labour.html, applied here as a class selector since this
+         page's content wrapper is a class (.cpi-obs-content), not CPI's id.
+         The AI Summary hero (.cd-hero) is a plain div, not a section, so —
+         exactly as on CPI.html — it keeps its own distinct treatment
+         untouched. */
+      #screen-cpi-obs .cpi-obs-content > section {
+        background:
+          radial-gradient(ellipse 90% 70% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%),
+          linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 28px;
+        box-shadow:
+          0 1px 2px rgba(15, 23, 42, 0.05),
+          0 10px 28px rgba(42, 61, 76, 0.07);
+        padding: 24px 28px 28px;
+        margin-bottom: 24px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-obs-content > section {
+        background: var(--surface, #141a26);
+        border: 1px solid var(--border);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+      }
+
+      /* Key Impacts — identical CPI pattern used by Interpret/Population/
+         Labour Force: one card, vertical list, icon + text rows. */
+      #screen-cpi-obs .impacts-list {
+        padding: 0;
+        border-radius: 0;
+        border: none;
+        background-color: transparent;
+      }
+      #screen-cpi-obs .impacts-list,
+      #screen-cpi-obs .impacts-list:hover {
+        box-shadow: none;
+      }
+      #screen-cpi-obs .impacts-list .impact-item {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 11px;
+        align-items: start;
+        padding: 10px 0;
+        border-bottom: 1px solid #eaecf0;
+        font-size: var(--fs-md);
+        line-height: 1.5;
+        color: #536277;
+        transition: transform 0.22s ease;
+      }
+      #screen-cpi-obs .impacts-list .impact-item:last-child { border-bottom: 0; }
+      #screen-cpi-obs .impacts-list .impact-item:hover { background: none; transform: translateX(3px); }
+      #screen-cpi-obs .impacts-list .impact-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 9%, white);
+      }
+      #screen-cpi-obs .impacts-list .impact-icon i { font-size: var(--fs-xl); line-height: 1; }
+      #screen-cpi-obs .impacts-list .impact-icon--up { --tone: #d97706; }
+      #screen-cpi-obs .impacts-list .impact-icon--neutral { --tone: #246bfd; }
+      #screen-cpi-obs .impacts-list .impact-val { color: #172033; font-weight: 700; }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-item { border-color: var(--border); color: var(--text-secondary); }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-val { color: var(--text-primary); }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-icon { background: color-mix(in srgb, var(--tone) 18%, transparent); }
+
+      /* Real Estate KPI icon tint (Amber, matches Interpret's glance-card--re). */
+      #screen-cpi-obs .re-kpi .cd-kpi-ic { color: #d97706; background: #fff7ed; }
+
+      /* ── Real Estate at a Glance — amber KPI cards: magnitude + momentum
+         (Buildings, Units) and residential composition (Residential Units,
+         Residential Buildings). ── */
+      #screen-cpi-obs .cd-kpi-row.re-glance {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+      #screen-cpi-obs .cd-kpi.re-card { display: flex; flex-direction: column; gap: 0; }
+      #screen-cpi-obs .re-card--amber  { --re-acc: #d97706; --re-acc-soft: rgba(217, 119, 6, 0.10); }
+      #screen-cpi-obs .re-card .re-kpi-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+      #screen-cpi-obs .re-card .cd-kpi-ic {
+        width: 28px; height: 28px; border-radius: 8px; font-size: var(--fs-md);
+        color: var(--re-acc); background: var(--re-acc-soft); flex-shrink: 0;
+      }
+      #screen-cpi-obs .re-card .kpi-label { margin: 0; }
+      #screen-cpi-obs .re-card .cd-kpi-val { font-size: var(--fs-3xl); margin-bottom: 3px; }
+      #screen-cpi-obs .re-kpi-sub { font-size: var(--fs-xs); color: var(--text2); line-height: 1.4; }
+      #screen-cpi-obs .re-kpi-sub b { color: var(--text); font-weight: 700; }
+      #screen-cpi-obs .re-kpi-delta { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: var(--fs-xs); color: var(--text2); }
+      @media (max-width: 1000px) { #screen-cpi-obs .cd-kpi-row.re-glance { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 560px) { #screen-cpi-obs .cd-kpi-row.re-glance { grid-template-columns: 1fr; } }
+
+      /* Paired "by use" / "by type" panels — two cards side by side, each a
+         ranked proportional bar list with its own colour intensity per row
+         (single hue family, darkest = largest, per Design Guidelines'
+         "lighter shades for fills, darker for emphasis" chart guidance). */
+      #screen-cpi-obs .re-pair-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+      #screen-cpi-obs .re-pair-grid > * { min-width: 0; }
+      #screen-cpi-obs .re-bar-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      #screen-cpi-obs .re-bar-row {
+        display: grid;
+        grid-template-columns: 130px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        font-size: var(--fs-sm);
+      }
+      #screen-cpi-obs .re-bar-row-label { color: var(--text2); }
+      #screen-cpi-obs .re-bar-track {
+        height: 8px;
+        border-radius: 5px;
+        background: rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+      }
+      #screen-cpi-obs .re-bar-fill { display: block; height: 100%; border-radius: 5px; background: #d97706; }
+      #screen-cpi-obs .re-bar-row-val { font-weight: 700; color: var(--text); white-space: nowrap; }
+      #screen-cpi-obs .re-bar-row-pct { color: var(--text2); font-weight: 500; }
+      @media (max-width: 900px) {
+        #screen-cpi-obs .re-pair-grid { grid-template-columns: 1fr; }
+      }
+
+      /* Geographic Distribution — shared Census regional map component
+         (js/census-region-map.js: real Abu Dhabi Emirate coastline, the
+         same map used on Interpret and Population) paired with a plain
+         Region/Buildings/Housing Units table — both metrics always
+         visible together, no Buildings/Units toggle. Map fills the left
+         column at roughly equal visual height to the table on the right,
+         per the reference design (no bars column, no max-width cap). */
+      #screen-cpi-obs .re-geo-body {
+        display: grid;
+        grid-template-columns: minmax(240px, 1fr) minmax(0, 1fr);
+        gap: 20px;
+        align-items: stretch;
+      }
+      #screen-cpi-obs .re-geo-right {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      @media (max-width: 800px) {
+        #screen-cpi-obs .re-geo-body {
+          grid-template-columns: 1fr;
+        }
+        #screen-cpi-obs .re-geo-body .cen-map-wrap {
+          max-width: 420px;
+          margin: 2px auto 6px;
+        }
+      }
+
+      /* Shared Census regional map — geometry/colours defined by
+         js/census-region-map.js; this page only styles it. Callout
+         values use Real Estate's amber accent to match the domain. */
+      #screen-cpi-obs .cen-map-wrap {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 500 / 290;
+      }
+      #screen-cpi-obs .cen-map-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #screen-cpi-obs .cen-map-label {
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        fill: #0f2744;
+        font-family: inherit;
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cen-map-label--muted {
+        font-size: var(--fs-micro);
+        font-weight: 600;
+        fill: #94a3b8;
+      }
+      #screen-cpi-obs .cen-map-label--on-dark {
+        fill: #fff;
+      }
+      #screen-cpi-obs .cen-map-compass text {
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        fill: #64748b;
+        font-family: inherit;
+      }
+      #screen-cpi-obs .cen-map-compass polygon {
+        fill: #94a3b8;
+      }
+      #screen-cpi-obs .cen-map-scale line {
+        stroke: #94a3b8;
+        stroke-width: 1;
+      }
+      #screen-cpi-obs .cen-map-scale text {
+        font-size: var(--fs-micro);
+        fill: #94a3b8;
+        font-family: inherit;
+      }
+      #screen-cpi-obs .cen-map-dot {
+        fill: #0f2744;
+        stroke: #fff;
+        stroke-width: 1.5;
+      }
+      #screen-cpi-obs .cen-map-line {
+        stroke: #94a3b8;
+        stroke-width: 1;
+        stroke-dasharray: 2 2;
+      }
+      #screen-cpi-obs .cen-map-callout {
+        position: absolute;
+        transform: translate(-50%, -100%);
+        background: var(--white);
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 6px 10px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+        text-align: center;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cen-map-callout--below {
+        transform: translate(-50%, 8px);
+      }
+      #screen-cpi-obs .cen-map-callout-pct {
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        color: var(--blue);
+      }
+      #screen-cpi-obs .cen-map-callout-name {
+        font-size: var(--fs-2xs);
+        color: var(--text2);
+        margin-top: 1px;
+      }
+      @media (max-width: 420px) {
+        #screen-cpi-obs .cen-map-callout { padding: 4px 7px; }
+      }
+
+      /* Region × Buildings × Housing Units comparison table — light-blue
+         header band, colour dot per region (matching the map's own
+         three-shade blue palette), plain dark-navy values (no amber
+         "best" highlight — the reference shows every row the same
+         weight/colour). */
+      #screen-cpi-obs .re-compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--fs-md);
+      }
+      #screen-cpi-obs .re-compare-table th {
+        text-align: right;
+        font-size: var(--fs-md);
+        font-weight: 700;
+        color: var(--navy);
+        background: var(--blue-light);
+        padding: 13px 16px;
+      }
+      #screen-cpi-obs .re-compare-table th:first-child {
+        text-align: left;
+        border-radius: 10px 0 0 10px;
+      }
+      #screen-cpi-obs .re-compare-table th:last-child {
+        border-radius: 0 10px 10px 0;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .re-compare-table th {
+        background: color-mix(in srgb, var(--blue) 16%, transparent);
+      }
+      #screen-cpi-obs .re-compare-table td {
+        padding: 15px 16px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+        text-align: right;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .re-compare-table td {
+        color: var(--text);
+        border-color: var(--border);
+      }
+      #screen-cpi-obs .re-compare-table tr:last-child td { border-bottom: 0; }
+      #screen-cpi-obs .re-compare-table td:first-child {
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+      #screen-cpi-obs .re-compare-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: inline-block;
+      }
+
+      /* Geographic Distribution's information footnote — a neutral note,
+         not a data-gap caveat, so it uses the shared blue tokens instead
+         of .re-gap-notice's amber warning treatment (still used elsewhere
+         on this page for genuine data-gap flags). */
+      #screen-cpi-obs .re-info-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+        background: var(--blue-light);
+        border-radius: 12px;
+        font-size: var(--fs-sm);
+        line-height: 1.55;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .re-info-note i { font-size: var(--fs-lg); flex-shrink: 0; margin-top: 1px; color: var(--blue); }
+      html[data-theme="dark"] #screen-cpi-obs .re-info-note {
+        background: color-mix(in srgb, var(--blue) 14%, transparent);
+        color: var(--text-secondary);
+      }
+
+      /* Top 10 district ranked tables. */
+      #screen-cpi-obs .re-rank-row {
+        display: grid;
+        grid-template-columns: 22px 1fr 90px auto;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        font-size: var(--fs-sm);
+      }
+      #screen-cpi-obs .re-rank-row:last-child { border-bottom: 0; }
+      #screen-cpi-obs .re-rank-num {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: var(--fs-2xs);
+        font-weight: 700;
+        background: #fff7ed;
+        color: #d97706;
+      }
+      #screen-cpi-obs .re-rank-name { color: var(--text); font-weight: 600; }
+      #screen-cpi-obs .re-rank-region { display: block; font-size: var(--fs-2xs); font-weight: 400; color: var(--muted); }
+      #screen-cpi-obs .re-rank-track { height: 7px; border-radius: 4px; background: rgba(15, 23, 42, 0.06); overflow: hidden; }
+      #screen-cpi-obs .re-rank-fill { display: block; height: 100%; border-radius: 4px; background: #d97706; }
+      #screen-cpi-obs .re-rank-val { text-align: right; font-weight: 700; color: var(--text); white-space: nowrap; }
+      #screen-cpi-obs .re-rank-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(15, 23, 42, 0.08);
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      #screen-cpi-obs .re-gap-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
+        margin-top: 14px;
+        background: #faeeda;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        font-size: var(--fs-sm);
+        line-height: 1.5;
+        color: #854f0b;
+      }
+      #screen-cpi-obs .re-gap-notice i { font-size: var(--fs-lg); flex-shrink: 0; margin-top: 1px; }
+      html[data-theme="dark"] #screen-cpi-obs .re-gap-notice {
+        background: rgba(250, 238, 218, 0.08);
+        border-color: rgba(253, 230, 138, 0.3);
+        color: #fbbf24;
+      }
+
+      /* AI insight callouts (.cd-insight) — same bulb-icon component used on
+         census-labour.html, recoloured to this page's amber (#d97706 /
+         #fff7ed) instead of the shared blue --accent tokens. */
+      #screen-cpi-obs .re-insight { background: #fff7ed; }
+      #screen-cpi-obs .re-insight > i,
+      #screen-cpi-obs .re-insight::before { color: #d97706; }
+      html[data-theme="dark"] #screen-cpi-obs .re-insight { background: rgba(217, 119, 6, 0.16); }
+      html[data-theme="dark"] #screen-cpi-obs .re-insight > i,
+      html[data-theme="dark"] #screen-cpi-obs .re-insight::before { color: #fbbf24; }
+    </style>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="CensusObservatory.html">Census Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Real Estate</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <div id="census-global-filter-mount"></div>
+            <aside class="sidebar" aria-label="Census Observatory views">
+              <button type="button" class="sidebar-item sidebar-item--ai" onclick="openObsSidebarAI(this)">
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Census AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item active" href="CensusObservatory.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="census-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="census-population-projection.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+                <span class="sidebar-label">Forecast</span>
+              </a>
+              <a class="sidebar-item" href="census-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+              <a class="sidebar-item" href="census-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="census-geo.html">
+                <div class="sidebar-icon"><i class="ti ti-map-2"></i></div>
+                <span class="sidebar-label">Geo View</span>
+              </a>
+            </aside>
+          </div>
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <a class="cd-back-link" href="CensusObservatory.html"><i class="ti ti-arrow-left"></i>Back to Overview</a>
+                    <h1 class="topic-title">Real Estate</h1>
+                    <p class="topic-title-sub">Buildings and units shaping Abu Dhabi</p>
+                    <p class="topic-title-desc">Explore the size, use, type and distribution of buildings and units across the Emirate.</p>
+                  </div>
+                  <div>
+                    <div class="cen-hdr-btns">
+                      <button type="button" class="cen-btn" onclick="censusComingSoon('Export')">
+                        <i class="ti ti-download"></i> Export
+                      </button>
+                      <button type="button" class="cen-btn cen-btn--ai" onclick="censusComingSoon('Ask Bayaan AI')">
+                        <i class="ti ti-sparkles"></i> Ask Bayaan AI
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cpi-obs-content">
+                <!-- ══════════════ EXECUTIVE BRIEF ══════════════
+                     Same .cpi-hero component as CensusObservatory.html's
+                     Interpret page (see css/pages/census-detail.css +
+                     js/census-exec-brief.js), so the AI Summary card
+                     matches Interpret's Executive Brief design exactly. -->
+                <div class="cpi-hero">
+                  <svg class="cpi-hero-skyline" viewBox="0 0 220 68" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
+                    <rect x="4" y="30" width="16" height="38" fill="currentColor" />
+                    <rect x="24" y="18" width="14" height="50" fill="currentColor" />
+                    <rect x="42" y="40" width="12" height="28" fill="currentColor" />
+                    <rect x="58" y="8" width="16" height="60" fill="currentColor" />
+                    <polygon points="66,8 66,0 68,8" fill="currentColor" />
+                    <rect x="78" y="26" width="14" height="42" fill="currentColor" />
+                    <rect x="96" y="36" width="12" height="32" fill="currentColor" />
+                    <circle cx="122" cy="52" r="16" fill="none" stroke="currentColor" stroke-width="2.5" />
+                    <rect x="140" y="20" width="14" height="48" fill="currentColor" />
+                    <rect x="158" y="34" width="12" height="34" fill="currentColor" />
+                    <rect x="174" y="12" width="16" height="56" fill="currentColor" />
+                    <rect x="194" y="30" width="14" height="38" fill="currentColor" />
+                  </svg>
+                  <div class="cpi-hero-topline">
+                    <div class="cpi-hero-inner" style="flex:1">
+                      <span class="cpi-hero-ico"><i class="ti ti-brain"></i></span>
+                      <div class="cpi-hero-text">
+                        <div class="cpi-hero-badge-row">
+                          <span class="cpi-hero-title">Executive Brief</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cpi-hero-meta">
+                      <div class="brief-speech">
+                        <button class="brief-listen" type="button" data-state="idle" aria-label="Listen to the brief" aria-pressed="false">
+                          <span class="brief-listen__icon" aria-hidden="true">
+                            <i class="ti ti-volume brief-listen__speaker"></i>
+                            <i class="ti ti-player-play brief-listen__play"></i>
+                            <i class="ti ti-player-pause brief-listen__pause"></i>
+                          </span>
+                          <span class="brief-listen__copy">
+                            <span class="brief-listen__wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                            <span class="brief-listen__text">Audio brief</span>
+                          </span>
+                        </button>
+                        <span class="brief-speech__actions" aria-label="Playback options">
+                          <button class="brief-audio-action brief-audio-action--restart" type="button" aria-label="Restart brief" title="Restart">
+                            <i class="ti ti-refresh" aria-hidden="true"></i>
+                          </button>
+                          <button class="brief-audio-action brief-audio-action--stop" type="button" aria-label="Stop brief" title="Stop">
+                            <span class="brief-stop-box" aria-hidden="true"></span>
+                          </button>
+                        </span>
+                      </div>
+                      <button type="button" class="brief-copy-action" aria-label="Copy summary" title="Copy summary">
+                        <i class="ti ti-copy" aria-hidden="true"></i>
+                      </button>
+                      <div class="brief-speech-status visually-hidden" role="status" aria-live="polite"></div>
+                    </div>
+                  </div>
+                  <p class="cpi-hero-sub">Abu Dhabi Emirate recorded 326,130 buildings and 899,575 units in 2025, with units growing 2.9% from 2024. Residential uses account for the majority of both buildings (62.3%) and units (58.0%), while Abu Dhabi Region holds the largest share of the built environment — 54.2% of buildings and 69.4% of units.</p>
+                </div>
+
+                <!-- ══════════════ REAL ESTATE AT A GLANCE ══════════════ -->
+                <section>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-building-skyscraper"></i>Real Estate at a Glance</h2>
+                    <p class="section-hdr-sub">Key highlights of Abu Dhabi's real estate in 2025</p>
+                  </div>
+                  <div class="cd-kpi-row re-glance">
+                    <div class="obs-card cd-kpi re-kpi re-card re-card--amber">
+                      <div class="re-kpi-head">
+                        <span class="cd-kpi-ic"><i class="ti ti-building"></i></span>
+                        <span class="kpi-label">Buildings</span>
+                      </div>
+                      <div class="cd-kpi-val">326,130</div>
+                      <div class="re-kpi-sub">Total buildings</div>
+                      <div class="re-kpi-delta">
+                        <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>+2.1%</span>
+                        <span>vs 2024</span>
+                      </div>
+                    </div>
+                    <div class="obs-card cd-kpi re-kpi re-card re-card--amber">
+                      <div class="re-kpi-head">
+                        <span class="cd-kpi-ic"><i class="ti ti-home"></i></span>
+                        <span class="kpi-label">Units</span>
+                      </div>
+                      <div class="cd-kpi-val">899,575</div>
+                      <div class="re-kpi-sub">Total units</div>
+                      <div class="re-kpi-delta">
+                        <span class="cen-badge cen-badge--up"><i class="ti ti-arrow-up"></i>+2.9%</span>
+                        <span>vs 2024</span>
+                      </div>
+                    </div>
+                    <div class="obs-card cd-kpi re-kpi re-card re-card--amber">
+                      <div class="re-kpi-head">
+                        <span class="cd-kpi-ic"><i class="ti ti-building-community"></i></span>
+                        <span class="kpi-label">Residential Units</span>
+                      </div>
+                      <div class="cd-kpi-val">521,795</div>
+                      <div class="re-kpi-sub"><b>58.0%</b> of total units</div>
+                    </div>
+                    <div class="obs-card cd-kpi re-kpi re-card re-card--amber">
+                      <div class="re-kpi-head">
+                        <span class="cd-kpi-ic"><i class="ti ti-buildings"></i></span>
+                        <span class="kpi-label">Residential Buildings</span>
+                      </div>
+                      <div class="cd-kpi-val">203,095</div>
+                      <div class="re-kpi-sub"><b>62.3%</b> of total buildings</div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════ GEOGRAPHIC DISTRIBUTION ══════════════
+                     Moved directly under "Real Estate at a Glance" so the
+                     executive flow reads KPIs → where it's concentrated →
+                     deeper analysis. Map (left) + a plain Region/Buildings/
+                     Housing Units table (right) — both metrics always
+                     visible together, no toggle, no ranked-bars column, no
+                     duplicate regional presentation. Matches the refined
+                     reference design exactly; blue tokens (not this page's
+                     usual amber) per that reference's own colour language. -->
+                <section>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-map-2"></i>Geographic Distribution</h2>
+                  </div>
+                  <div class="obs-card">
+                    <div class="re-geo-body">
+                      <div id="cenMapRealEstate"></div>
+                      <div class="re-geo-right">
+                        <table class="re-compare-table">
+                          <thead><tr><th>Region</th><th>Buildings</th><th>Units</th></tr></thead>
+                          <tbody id="reGeoTableBody"><!-- populated by JS from RE_REGION --></tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <p class="cd-insight re-insight"><i class="ti ti-bulb"></i><span>Abu Dhabi Region holds 54.2% of buildings but 69.4% of units — a notably higher units-per-building density than Al Ain (36.0% / 23.0%) or Al Dhafra (9.8% / 7.5%), pointing to more multi-unit housing stock concentrated in the capital region.</span></p>
+                  </div>
+                </section>
+
+                <!-- ══════════════ UNITS BY USE + UNITS BY TYPE ══════════════ -->
+                <section>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-category-2"></i>Units by Use &amp; Type</h2>
+                    <p class="section-hdr-sub">Distribution of units by intended use and building type, 2025</p>
+                  </div>
+                  <div class="re-pair-grid">
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-home"></i>Units by Use</div>
+                      <p class="cd-card-sub">899,575 units, 2025</p>
+                      <div class="re-bar-list">
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Residential</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:100%"></span></span>
+                          <span><span class="re-bar-row-val">521,795</span> <span class="re-bar-row-pct">58.0%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Commercial</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:54.0%"></span></span>
+                          <span><span class="re-bar-row-val">281,960</span> <span class="re-bar-row-pct">31.3%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Other</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:18.4%"></span></span>
+                          <span><span class="re-bar-row-val">95,820</span> <span class="re-bar-row-pct">10.7%</span></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-layout-grid"></i>Units by Type</div>
+                      <p class="cd-card-sub">899,575 units, 2025 — a separate dimension from Units by Use</p>
+                      <div class="re-bar-list">
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Apartment &amp; similar</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:100%"></span></span>
+                          <span><span class="re-bar-row-val">359,850</span> <span class="re-bar-row-pct">40.0%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Establishment unit</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:99.2%"></span></span>
+                          <span><span class="re-bar-row-val">356,930</span> <span class="re-bar-row-pct">39.7%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Villa &amp; similar</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:50.3%"></span></span>
+                          <span><span class="re-bar-row-val">180,910</span> <span class="re-bar-row-pct">20.1%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Other</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:0.5%"></span></span>
+                          <span><span class="re-bar-row-val">1,885</span> <span class="re-bar-row-pct">0.2%</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="cd-insight re-insight"><i class="ti ti-bulb"></i><span>Apartment &amp; similar and establishment units are nearly tied at the top of the type breakdown (40.0% vs 39.7%), while villa &amp; similar units make up just 20.1% — despite residential use accounting for 58.0% of all units.</span></p>
+                </section>
+
+                <!-- ══════════════ BUILDINGS BY USE + BUILDINGS BY TYPE ══════════════ -->
+                <section>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-category-2"></i>Buildings by Use &amp; Type</h2>
+                    <p class="section-hdr-sub">Distribution of buildings by intended use and building type, 2025</p>
+                  </div>
+                  <div class="re-pair-grid">
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-building"></i>Buildings by Use</div>
+                      <p class="cd-card-sub">326,130 buildings, 2025</p>
+                      <div class="re-bar-list">
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Residential</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:100%"></span></span>
+                          <span><span class="re-bar-row-val">203,095</span> <span class="re-bar-row-pct">62.3%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Other</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:27.8%"></span></span>
+                          <span><span class="re-bar-row-val">56,410</span> <span class="re-bar-row-pct">17.3%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Commercial</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:27.2%"></span></span>
+                          <span><span class="re-bar-row-val">55,255</span> <span class="re-bar-row-pct">16.9%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Multi-use</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:5.6%"></span></span>
+                          <span><span class="re-bar-row-val">11,375</span> <span class="re-bar-row-pct">3.5%</span></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-building"></i>Buildings by Type</div>
+                      <p class="cd-card-sub">326,130 buildings, 2025 — a separate dimension from Buildings by Use</p>
+                      <div class="re-bar-list">
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Villa &amp; similar</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:100%"></span></span>
+                          <span><span class="re-bar-row-val">180,900</span> <span class="re-bar-row-pct">55.5%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Establishment building</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:57.6%"></span></span>
+                          <span><span class="re-bar-row-val">104,110</span> <span class="re-bar-row-pct">31.9%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Multi-apartment building</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:21.9%"></span></span>
+                          <span><span class="re-bar-row-val">39,620</span> <span class="re-bar-row-pct">12.1%</span></span>
+                        </div>
+                        <div class="re-bar-row">
+                          <span class="re-bar-row-label">Other</span>
+                          <span class="re-bar-track"><span class="re-bar-fill" style="width:0.8%"></span></span>
+                          <span><span class="re-bar-row-val">1,500</span> <span class="re-bar-row-pct">0.5%</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="cd-insight re-insight"><i class="ti ti-bulb"></i><span>Villa &amp; similar buildings (55.5%) closely track residential use's 62.3% share, while establishment buildings (31.9%) run nearly double the 16.9% share held by commercial use — the two classifications diverge more sharply for non-residential stock.</span></p>
+                </section>
+
+                <!-- ══════════════ TOP 10 DISTRICTS ══════════════ -->
+                <section>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-list-numbers"></i>Top 10 Districts</h2>
+                    <p class="section-hdr-sub">Ranked districts by buildings and units, 2025</p>
+                  </div>
+                  <div class="re-pair-grid">
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-building"></i>Top 10 Districts — Buildings</div>
+                      <p class="cd-card-sub">By number of buildings, 2025</p>
+                      <div id="reTopBuildings"></div>
+                      <div class="re-rank-total"><span>Top 10 total</span><span>97,715 <span style="font-weight:500;color:var(--text2)">(30.0% of all buildings)</span></span></div>
+                      <p class="cd-insight re-insight"><i class="ti ti-bulb"></i><span>Nine of the top 10 districts by building count sit in Abu Dhabi Region — only Zayed City (Al Dhafra Region, 2.1%) breaks the pattern — led by Mohamed Bin Zayed City (18,230 buildings, 5.6%) and Khalifa City (16,425, 5.0%).</span></p>
+                    </div>
+                    <div class="obs-card">
+                      <div class="cd-card-hd"><i class="ti ti-home"></i>Top 10 Districts — Units</div>
+                      <p class="cd-card-sub">By number of units, 2025 — a different dataset and district ranking from Buildings</p>
+                      <div id="reTopUnits"></div>
+                      <div class="re-rank-total"><span>Top 10 total</span><span>416,350 <span style="font-weight:500;color:var(--text2)">(46.3% of all units)</span></span></div>
+                      <p class="cd-insight re-insight"><i class="ti ti-bulb"></i><span>All 10 top districts by units sit within Abu Dhabi Region, led by Al Danah (78,300 units, 8.7%) and Musaffah (72,060, 8.0%) — together the top 10 hold 46.3% of all units, a far higher concentration than the 30.0% held by the top 10 districts by buildings.</span></p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════ KEY IMPACTS ══════════════ -->
+                <section>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-bulb"></i>Key Impacts</h2>
+                  </div>
+                  <div class="obs-card impacts-list">
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--up"><i class="ti ti-home"></i></div>
+                      <div>Residential use dominates — residential units account for <span class="impact-val">58.0%</span> of all units, and residential buildings for <span class="impact-val">62.3%</span> of all buildings.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--neutral"><i class="ti ti-map-pin"></i></div>
+                      <div>Abu Dhabi Region is the main concentration — it holds <span class="impact-val">54.2%</span> of buildings and <span class="impact-val">69.4%</span> of units, a notably larger share of units than of buildings.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--up"><i class="ti ti-stack-2"></i></div>
+                      <div>Units significantly exceed buildings — <span class="impact-val">899,575</span> units are distributed across <span class="impact-val">326,130</span> buildings, an average of <span class="impact-val">2.76</span> units per building.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--neutral"><i class="ti ti-category-2"></i></div>
+                      <div>Building and unit composition differ by use — buildings are <span class="impact-val">62.3%</span> residential by use, while units are <span class="impact-val">58.0%</span> residential by use, two different lenses on the same built environment.</div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </main>
+          </div>
+        </div>
+
+        <div data-bayaan-footer></div>
+      </div>
+      <div class="cen-toast" id="censusToast"></div>
+    </div>
+
+    <script>
+      function goTo() {}
+      function openGeoView(e) { if (e) e.preventDefault(); }
+      function openBayaanSpace(e) { if (e) e.preventDefault(); }
+      function openProducts(e) { if (e) e.preventDefault(); }
+      function openObservatories(e) { if (e) e.preventDefault(); }
+      function openWsDrp() {}
+      function onHeaderSearchClick() {}
+      function toast() {}
+
+      let censusToastTimer = null;
+      function censusComingSoon(label) {
+        const el = document.getElementById("censusToast");
+        if (!el) return;
+        el.textContent = label + " is coming soon.";
+        el.classList.add("is-visible");
+        clearTimeout(censusToastTimer);
+        censusToastTimer = setTimeout(() => el.classList.remove("is-visible"), 2200);
+      }
+
+      /* ============================================================
+         CONFIRMED DATA — every figure traceable to
+         docs/census-data-reference.md §3 (Real Estate).
+         ============================================================ */
+      const RE_REGION = {
+        buildings: [
+          { name: "Abu Dhabi Region", value: 176905, pct: 54.2 },
+          { name: "Al Ain Region", value: 117425, pct: 36.0 },
+          { name: "Al Dhafra Region", value: 31805, pct: 9.8 },
+        ],
+        units: [
+          { name: "Abu Dhabi Region", value: 624455, pct: 69.4 },
+          { name: "Al Ain Region", value: 207205, pct: 23.0 },
+          { name: "Al Dhafra Region", value: 67910, pct: 7.5 },
+        ],
+      };
+
+      const RE_TOP_BUILDINGS = [
+        { name: "Mohamed Bin Zayed City", region: "Abu Dhabi Region", value: 18230, pct: 5.6 },
+        { name: "Khalifa City", region: "Abu Dhabi Region", value: 16425, pct: 5.0 },
+        { name: "Madinat Al Riyad", region: "Abu Dhabi Region", value: 10915, pct: 3.3 },
+        { name: "Bani Yas", region: "Abu Dhabi Region", value: 9080, pct: 2.8 },
+        { name: "Al Falah", region: "Abu Dhabi Region", value: 8280, pct: 2.5 },
+        { name: "Al Shamkhah", region: "Abu Dhabi Region", value: 7800, pct: 2.4 },
+        { name: "Zayed City", region: "Al Dhafra Region", value: 6970, pct: 2.1 },
+        { name: "Al Aamerah", region: "Al Ain Region", value: 6745, pct: 2.1 },
+        { name: "Musaffah", region: "Abu Dhabi Region", value: 6690, pct: 2.1 },
+        { name: "Shakhbout City", region: "Abu Dhabi Region", value: 6575, pct: 2.0 },
+      ];
+
+      const RE_TOP_UNITS = [
+        { name: "Al Danah", region: "Abu Dhabi Region", value: 78300, pct: 8.7 },
+        { name: "Musaffah", region: "Abu Dhabi Region", value: 72060, pct: 8.0 },
+        { name: "Mohamed Bin Zayed City", region: "Abu Dhabi Region", value: 58210, pct: 6.5 },
+        { name: "Khalifa City", region: "Abu Dhabi Region", value: 36035, pct: 4.0 },
+        { name: "Al Reem Island", region: "Abu Dhabi Region", value: 34510, pct: 3.8 },
+        { name: "Al Zahiyah", region: "Abu Dhabi Region", value: 31980, pct: 3.6 },
+        { name: "Al Nahyan", region: "Abu Dhabi Region", value: 29685, pct: 3.3 },
+        { name: "Al Bateen", region: "Abu Dhabi Region", value: 26990, pct: 3.0 },
+        { name: "Al Mushrif", region: "Abu Dhabi Region", value: 25190, pct: 2.8 },
+        { name: "Al Karamah", region: "Abu Dhabi Region", value: 23390, pct: 2.6 },
+      ];
+
+      function reFmt(n) { return n.toLocaleString("en-US"); }
+
+      /* ── Geographic Distribution: map callouts (buildings share) + a
+         plain Region/Buildings/Housing Units table — both RE_REGION
+         datasets (buildings, units) feed the SAME table row rather than
+         toggling between two separate views; the map's callout % is the
+         buildings share, matching the reference exactly. ── */
+      const RE_REGION_DOT = {
+        "Abu Dhabi Region": "#0073F0",
+        "Al Ain Region": "#1B4F9E",
+        "Al Dhafra Region": "#5B9BD5",
+      };
+      function renderGeo() {
+        const buildings = RE_REGION.buildings;
+        const units = RE_REGION.units;
+        if (window.renderCensusRegionMap) {
+          const keys = ["abudhabi", "alain", "aldhafra"];
+          const calloutHtml = {};
+          const tooltip = {};
+          buildings.forEach((r, i) => {
+            const pctLabel = r.pct.toFixed(1) + "%";
+            calloutHtml[keys[i]] = `<div class="cen-map-callout-pct">${pctLabel}</div><div class="cen-map-callout-name">${r.name}</div>`;
+            tooltip[keys[i]] = `${r.name} — ${reFmt(r.value)} buildings (${pctLabel})`;
+          });
+          renderCensusRegionMap(document.getElementById("cenMapRealEstate"), {
+            uid: "realestate",
+            ...calloutHtml,
+            tooltip,
+          });
+        }
+        const tbody = document.getElementById("reGeoTableBody");
+        tbody.innerHTML = buildings
+          .map(
+            (r, i) => `<tr>
+              <td><span class="re-compare-dot" style="background:${RE_REGION_DOT[r.name]}"></span>${r.name}</td>
+              <td>${reFmt(r.value)}</td>
+              <td>${reFmt(units[i].value)}</td>
+            </tr>`
+          )
+          .join("");
+      }
+      renderGeo();
+
+      /* ── Top 10 district ranked lists ── */
+      function renderRank(rootId, rows) {
+        const root = document.getElementById(rootId);
+        const max = Math.max(...rows.map((r) => r.value));
+        root.innerHTML = rows
+          .map(
+            (r, i) => `<div class="re-rank-row">
+              <span class="re-rank-num">${i + 1}</span>
+              <span class="re-rank-name">${r.name}<span class="re-rank-region">${r.region}</span></span>
+              <span class="re-rank-track"><span class="re-rank-fill" style="width:${(r.value / max) * 100}%"></span></span>
+              <span class="re-rank-val">${reFmt(r.value)} <span style="color:var(--text2);font-weight:500">(${r.pct}%)</span></span>
+            </div>`
+          )
+          .join("");
+      }
+      renderRank("reTopBuildings", RE_TOP_BUILDINGS);
+      renderRank("reTopUnits", RE_TOP_UNITS);
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.initCensusExecBrief) initCensusExecBrief(document.querySelector(".cpi-hero"));
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+        if (window.CensusGlobalFilter) CensusGlobalFilter.mount();
+      });
+    </script>
+  </body>
+</html>

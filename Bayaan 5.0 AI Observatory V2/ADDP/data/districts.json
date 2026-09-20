@@ -1,0 +1,1531 @@
+{
+  "districts": [
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Danah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Manhal",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Hisn",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Zahiyah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Nahyan",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Lulu Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Qasr Al Bahr",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Zayed Port",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Maryah Island",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Reem Island",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Khalidiyah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Bateen",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Mushrif",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Kasir",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Abu Dhabi Islands",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Hadbat Al Za'faranah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Kheeran",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Ras Al Akhdar",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Hidayriyyat",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Saadiyat Island",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Qurm",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Reem East Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Um Yifeenah Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Qirqishan",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Sa'adah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Rawdah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Muzoun",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Fteysi Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Muntazah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Jubail Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Bilrimaid Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Sas Al Nakhl",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Sammaliyyah Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Halah Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Rabdan",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Musaffah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Ramhan Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Bilghaylam Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Bu Niyaydah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Khalifa City",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Fahid Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Abu Dhabi Industrial City",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Rahah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Nourai Island",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Abu Al Habl Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Aliah Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Mohamed Bin Zayed City",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Mihsinah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Aryam Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Zayed City",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Yas Island",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Selmiyyah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Heel Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Bahyah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Ujaij",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Matar",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Bihouth",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Zubarah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Nouf",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Reef",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Shakhbout City",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Jarn Yafour",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Shahamah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Shinayin",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Sader",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Bani Yas",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Shelaylah Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Shawamekh",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Hanyourah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Rawdat Al Reef",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Falah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Shamkhah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Rahbah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Abu Mreikhah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Wathbah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Khidayrah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Madinat Al Riyad",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Nahdah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Samhah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Taweelah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Mshayrif",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Muwaylih",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Zayed Military City",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Mi'rad",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Ma'mourah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Haffar",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Khalifa Industrial",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Ghanadhah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Smeeh",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Abu Al Abyad Island",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al 'Adlah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al 'Asheesh",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Sout",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Fayah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Dhaharat Al Teeb",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Ghadeer Al Tayr",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Layyan",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Dihan",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Al Khatm",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Abu Dhabi",
+      "district": "Ghantout",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Jimi",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Mu'tarid",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Qattarah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Mas'oudi",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Muwaij'i",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Tiwayya",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Khibeesi",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Central District",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Nabbagh",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Jahili",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Hili",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Mutaw'ah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Falaj Hazza'",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Industrial Area",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Sarouj",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Markhaniyyah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Dahma",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "'Asharij",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Shiab Al Ashkhar",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Bateen",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Ruwaydat",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al 'Iqabiyyah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Ain International Airport",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Bad' Bint Sa'oud",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Zakhir",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Shuwaymah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Fou'ah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Aflaj",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Maqam",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Ghnaymah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Rawdah Al Sharqiyah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Noud",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Malaqit",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Mbazzarah Al Khadra",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Ghireebah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Shi'bat Al Wutah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Salamat",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Ni'mah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Masakin",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Jabal Hafeet",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Aamerah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Ain Al Faydah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Qisees",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Dhahir",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Sweihan",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Khatm Al Shiklah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Industrial City",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Um Ghafah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Nahil",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Rawdah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Dhahrah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Sa'",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Mazyad",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Sad",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Hiyar",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Rimah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Abu Samrah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Ramlat Sweihan",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Faqa'",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al 'Ajban",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Bu Kirayyah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Shiwayb",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al 'Arad",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Niqa Al Dheeb",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Khaznah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Wiqan",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Abu Hiraybah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Al Qou'",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Ain",
+      "district": "Um Al Zumoul",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Zayed City",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Bday'Ah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Bilji'An",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Habshan",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Bu Al Dhiyab",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al 'Azeezah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Bu Hasa",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Um Laylah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "MzeerʻAh",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Tarif",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Taf Al Gharbi",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Zarraf",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Western Mahadir",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Eastern Mahadir",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Rideem",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Marfa",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Hadwaniyyah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Dhafra Islands",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Milaysah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Bateen Liwa",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Yaw Al Nadhrah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Harmiyyah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Qirayn Al 'Aysh",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Khasbat Al Reem",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Baynounah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Abu Qrayn",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Mkhayriz",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Hameem",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al 'Ayif",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Ghiyathi",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Ruways",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Mirayr",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Yaw Al Ghadar",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Bad' Al Mutaw'Ah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Jabal Al Dhannah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Jazeerah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Um Al Ashtan",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Hamra",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Shuweehat",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Barakah",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Sabkhat Matti",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Delma",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Mahmiyyat Al Suqour",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Wuhaydah",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Sila'",
+      "classification": "Urban"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Ras Mshayrib",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Al Ghuweifat",
+      "classification": "Rural"
+    },
+    {
+      "emirate": "Abu Dhabi",
+      "region": "Al Dhafra",
+      "district": "Ras Ghumeis",
+      "classification": "Rural"
+    }
+  ],
+  "byRegion": {
+    "Abu Dhabi": [
+      "Abu Al Abyad Island",
+      "Abu Al Habl Island",
+      "Abu Dhabi Industrial City",
+      "Abu Dhabi Islands",
+      "Abu Mreikhah",
+      "Al 'Adlah",
+      "Al 'Asheesh",
+      "Al Aliah Island",
+      "Al Aryam Island",
+      "Al Bahyah",
+      "Al Bateen",
+      "Al Bihouth",
+      "Al Danah",
+      "Al Falah",
+      "Al Fayah",
+      "Al Fteysi Island",
+      "Al Haffar",
+      "Al Halah Island",
+      "Al Hanyourah",
+      "Al Heel Island",
+      "Al Hidayriyyat",
+      "Al Hisn",
+      "Al Jubail Island",
+      "Al Kasir",
+      "Al Khalidiyah",
+      "Al Khatm",
+      "Al Kheeran",
+      "Al Khidayrah",
+      "Al Layyan",
+      "Al Lulu Island",
+      "Al Ma'mourah",
+      "Al Manhal",
+      "Al Maryah Island",
+      "Al Matar",
+      "Al Mi'rad",
+      "Al Mihsinah",
+      "Al Muntazah",
+      "Al Mushrif",
+      "Al Muzoun",
+      "Al Nahdah",
+      "Al Nahyan",
+      "Al Nouf",
+      "Al Qurm",
+      "Al Rahah",
+      "Al Rahbah",
+      "Al Ras Al Akhdar",
+      "Al Rawdah",
+      "Al Reef",
+      "Al Reem East Island",
+      "Al Reem Island",
+      "Al Sa'adah",
+      "Al Saadiyat Island",
+      "Al Sader",
+      "Al Samhah",
+      "Al Sammaliyyah Island",
+      "Al Selmiyyah",
+      "Al Shahamah",
+      "Al Shamkhah",
+      "Al Shawamekh",
+      "Al Shelaylah Island",
+      "Al Shinayin",
+      "Al Smeeh",
+      "Al Sout",
+      "Al Taweelah",
+      "Al Wathbah",
+      "Al Zahiyah",
+      "Al Zubarah",
+      "Bani Yas",
+      "Bilghaylam Island",
+      "Bilrimaid Island",
+      "Bu Niyaydah",
+      "Dhaharat Al Teeb",
+      "Dihan",
+      "Fahid Island",
+      "Ghadeer Al Tayr",
+      "Ghanadhah",
+      "Ghantout",
+      "Hadbat Al Za'faranah",
+      "Jarn Yafour",
+      "Khalifa City",
+      "Khalifa Industrial",
+      "Madinat Al Riyad",
+      "Mohamed Bin Zayed City",
+      "Mshayrif",
+      "Musaffah",
+      "Muwaylih",
+      "Nourai Island",
+      "Qasr Al Bahr",
+      "Qirqishan",
+      "Rabdan",
+      "Ramhan Island",
+      "Rawdat Al Reef",
+      "Sas Al Nakhl",
+      "Shakhbout City",
+      "Ujaij",
+      "Um Yifeenah Island",
+      "Yas Island",
+      "Zayed City",
+      "Zayed Military City",
+      "Zayed Port"
+    ],
+    "Al Ain": [
+      "'Asharij",
+      "Abu Hiraybah",
+      "Abu Samrah",
+      "Ain Al Faydah",
+      "Al 'Ajban",
+      "Al 'Arad",
+      "Al 'Iqabiyyah",
+      "Al Aamerah",
+      "Al Aflaj",
+      "Al Ain International Airport",
+      "Al Bateen",
+      "Al Dahma",
+      "Al Dhahir",
+      "Al Dhahrah",
+      "Al Faqa'",
+      "Al Fou'ah",
+      "Al Hiyar",
+      "Al Jahili",
+      "Al Jimi",
+      "Al Khaznah",
+      "Al Khibeesi",
+      "Al Maqam",
+      "Al Markhaniyyah",
+      "Al Mas'oudi",
+      "Al Mu'tarid",
+      "Al Mutaw'ah",
+      "Al Muwaij'i",
+      "Al Nabbagh",
+      "Al Noud",
+      "Al Qattarah",
+      "Al Qisees",
+      "Al Qou'",
+      "Al Rawdah",
+      "Al Rawdah Al Sharqiyah",
+      "Al Ruwaydat",
+      "Al Sad",
+      "Al Salamat",
+      "Al Sarouj",
+      "Al Shiwayb",
+      "Al Shuwaymah",
+      "Al Tiwayya",
+      "Al Wiqan",
+      "Bad' Bint Sa'oud",
+      "Bu Kirayyah",
+      "Central District",
+      "Falaj Hazza'",
+      "Ghireebah",
+      "Ghnaymah",
+      "Hili",
+      "Industrial Area",
+      "Industrial City",
+      "Jabal Hafeet",
+      "Khatm Al Shiklah",
+      "Malaqit",
+      "Masakin",
+      "Mazyad",
+      "Mbazzarah Al Khadra",
+      "Nahil",
+      "Ni'mah",
+      "Niqa Al Dheeb",
+      "Ramlat Sweihan",
+      "Rimah",
+      "Sa'",
+      "Shi'bat Al Wutah",
+      "Shiab Al Ashkhar",
+      "Sweihan",
+      "Um Al Zumoul",
+      "Um Ghafah",
+      "Zakhir"
+    ],
+    "Al Dhafra": [
+      "Abu Qrayn",
+      "Al 'Ayif",
+      "Al 'Azeezah",
+      "Al Bday'Ah",
+      "Al Dhafra Islands",
+      "Al Ghuweifat",
+      "Al Hadwaniyyah",
+      "Al Hamra",
+      "Al Harmiyyah",
+      "Al Jazeerah",
+      "Al Marfa",
+      "Al Mirayr",
+      "Al Rideem",
+      "Al Ruways",
+      "Al Shuweehat",
+      "Al Sila'",
+      "Al Taf Al Gharbi",
+      "Al Wuhaydah",
+      "Al Zarraf",
+      "Bad' Al Mutaw'Ah",
+      "Barakah",
+      "Bateen Liwa",
+      "Baynounah",
+      "Bilji'An",
+      "Bu Al Dhiyab",
+      "Bu Hasa",
+      "Delma",
+      "Eastern Mahadir",
+      "Ghiyathi",
+      "Habshan",
+      "Hameem",
+      "Jabal Al Dhannah",
+      "Khasbat Al Reem",
+      "Mahmiyyat Al Suqour",
+      "Milaysah",
+      "Mkhayriz",
+      "MzeerʻAh",
+      "Qirayn Al 'Aysh",
+      "Ras Ghumeis",
+      "Ras Mshayrib",
+      "Sabkhat Matti",
+      "Tarif",
+      "Um Al Ashtan",
+      "Um Laylah",
+      "Western Mahadir",
+      "Yaw Al Ghadar",
+      "Yaw Al Nadhrah",
+      "Zayed City"
+    ]
+  }
+}

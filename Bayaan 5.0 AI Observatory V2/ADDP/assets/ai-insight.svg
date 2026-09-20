@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="23.819" height="24.939" viewBox="0 0 23.819 24.939">
+  <g id="ai_insight" transform="translate(0.75 0.75)">
+    <line id="Line_2315" data-name="Line 2315" y2="2.79" transform="translate(11.161)" fill="none" stroke="#202020" stroke-linecap="round" stroke-width="1.5"/>
+    <line id="Line_2316" data-name="Line 2316" x2="1.973" y2="1.973" transform="translate(3.269 3.268)" fill="none" stroke="#202020" stroke-linecap="round" stroke-width="1.5"/>
+    <line id="Line_2317" data-name="Line 2317" x2="2.79" transform="translate(0 11.159)" fill="none" stroke="#202020" stroke-linecap="round" stroke-width="1.5"/>
+    <line id="Line_2318" data-name="Line 2318" x1="1.973" y2="1.973" transform="translate(17.078 3.269)" fill="none" stroke="#202020" stroke-linecap="round" stroke-width="1.5"/>
+    <line id="Line_2319" data-name="Line 2319" x1="2.79" transform="translate(19.529 11.16)" fill="none" stroke="#202020" stroke-linecap="round" stroke-width="1.5"/>
+    <path id="Path_100398" data-name="Path 100398" d="M8.651,20.838l.131,1.1a1.017,1.017,0,0,0,1.01.9h3.049a1.017,1.017,0,0,0,1.01-.9l.131-1.1Z" transform="translate(-0.155 0.608)" fill="rgba(255,255,255,0)" stroke="#202020" stroke-width="1.5"/>
+    <path id="Path_100399" data-name="Path 100399" d="M8.329,18.362l.108.907h5.638l.091-.771a5.953,5.953,0,0,1,1.52-3.228,5.921,5.921,0,1,0-8.829.036A5.587,5.587,0,0,1,8.329,18.362Z" transform="translate(-0.096 -0.097)" fill="rgba(255,255,255,0)" stroke="#202020" stroke-width="1.5"/>
+  </g>
+</svg>

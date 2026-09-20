@@ -1,0 +1,159 @@
+:root {
+  /* ── Primitive ramps ── */
+  --blue-50: #EFF6FF;
+  --blue-100: #BFDBFE;
+  --blue-200: #93C5FD;
+  --blue-400: #378ADD;
+  --blue-600: #2563EB;
+  --blue-800: #1E40AF;
+  --blue-900: #1E3A5F;
+  --teal-50: #E1F5EE;
+  --teal-100: #9FE1CB;
+  --teal-200: #5DCAA5;
+  --teal-400: #1D9E75;
+  --teal-600: #0F6E56;
+  --teal-800: #085041;
+  --amber-50: #FAEEDA;
+  --amber-400: #BA7517;
+  --amber-600: #854F0B;
+  --red-50: #FCEBEB;
+  --red-400: #E24B4A;
+  --red-600: #A32D2D;
+  --gray-50: #F8FAFC;
+  --gray-100: #F1F5F9;
+  --gray-200: #E2E8F0;
+  --gray-300: #CBD5E1;
+  --gray-400: #94A3B8;
+  --gray-500: #64748B;
+  --gray-600: #475569;
+
+  /* ── Neutral / brand ── */
+  --bg: #EFF4F7;
+  --surface: #FFFFFF;
+  --surface2: #F1F5F9;
+  --border: rgba(15, 23, 42, 0.06);
+  --border-md: rgba(15, 23, 42, 0.10);
+  --border-soft: rgba(15, 23, 42, 0.07);
+  --border-solid: #E5E7EB;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --accent: #0066FF;
+  --accent-light: #EBF5FF;
+  --accent-mid: #99C2FF;
+  --accent-dark: #0052CC;
+  --accent-hover: var(--accent-dark);
+  --footer-bg: #001a35;
+  --glass: rgba(255, 255, 255, 0.92);
+
+  /* ── Semantic (canonical light) ── */
+  --success: #059669;
+  --success-bg: #ECFDF5;
+  --success-border: #A7F3D0;
+  --success-dark: #047857;
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #FDE68A;
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #FECACA;
+  --info: var(--blue-400);
+  --focus-ring: rgba(37, 99, 235, 0.12);
+
+  /* ── Figma semantic (alias global semantics; theme.css overrides per mode) ── */
+  --figma-green: var(--success);
+  --figma-green-dark: var(--success);
+  --figma-amber: var(--warning);
+  --figma-red: var(--danger);
+
+  /* ── Chart palette (light) ── */
+  --chart-1: #0066FF;
+  --chart-2: #059669;
+  --chart-3: #378ADD;
+  --chart-4: #1D9E75;
+  --chart-5: #BA7517;
+  --chart-6: #7C3AED;
+  --chart-7: #0D9488;
+  --chart-8: #E24B4A;
+  --chart-indigo: #6366F1;
+
+  /* ── Legacy text aliases → canonical ── */
+  --text: var(--text-primary);
+  --text2: var(--text-secondary);
+  --text3: var(--text-tertiary);
+  --text-1: var(--text-primary);
+  --text-2: var(--text-secondary);
+  --text-3: var(--text-tertiary);
+  --t1: var(--text-primary);
+  --t2: var(--text-secondary);
+  --t3: var(--text-tertiary);
+
+  /* ── Legacy accent aliases ── */
+  --acc: var(--accent);
+  --acc-l: var(--accent-light);
+  --acc-lt: var(--accent-light);
+  --acc-md: var(--accent-mid);
+  --acc2: var(--accent-dark);
+  --acc-hv: var(--accent-hover);
+  --ac: var(--accent);
+  --ac2: var(--accent-dark);
+  --acbg: var(--accent-light);
+  --acbr: var(--blue-100);
+
+  /* ── Legacy semantic aliases ── */
+  --ok: var(--success);
+  --ok-bg: var(--success-bg);
+  --ok-b: var(--success-border);
+  --ok-lt: var(--success-bg);
+  --ok-md: var(--teal-200);
+  --warn: var(--warning);
+  --warn-bg: var(--warning-bg);
+  --warn-b: var(--warning-border);
+  --warn-lt: var(--warning-bg);
+  --risk: var(--danger);
+  --risk-bg: var(--danger-bg);
+  --risk-b: var(--danger-border);
+  --err: var(--danger);
+  --err-lt: var(--danger-bg);
+  --up: var(--success);
+  --upbg: var(--success-bg);
+  --upbr: var(--success-border);
+  --dn: var(--danger);
+  --dnbg: var(--danger-bg);
+  --dnbr: var(--danger-border);
+  --wn: var(--warning);
+  --wnbg: var(--warning-bg);
+  --wnbr: var(--warning-border);
+
+  /* ── Typography ── */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Liberation Mono', monospace;
+
+  /* Type scale — one ladder for the Observatory surfaces (CPI + Census).
+     Every font-size in those pages should resolve to one of these steps
+     rather than a bespoke px literal; the trailing comment on each step
+     records the loose px values it replaced. */
+  --fs-micro: 10px;  /* SVG axis labels, densest chart captions      (was 8–10)    */
+  --fs-2xs:   11px;  /* legends, meta rows, badge text               (was 10.5–11) */
+  --fs-xs:    12px;  /* secondary body, card sub-labels, table cells (was 11.5–12) */
+  --fs-sm:    13px;  /* Observatory body default                     (was 12.5–13) */
+  --fs-md:    14px;  /* emphasized body, small card headings         (was 13.5–14) */
+  --fs-lg:    16px;  /* card headings                                (was 15–16)   */
+  --fs-xl:    18px;  /* prominent card headers                       (was 17–19)   */
+  --fs-2xl:   21px;  /* section titles                               (was 20–22)   */
+  --fs-3xl:   26px;  /* KPI values                                   (was 24–28)   */
+  --fs-4xl:   32px;  /* hub / hero headline numerals                 (was 30–40)   */
+
+  /* ── Layout / effects ── */
+  --page-gutter: 32px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
+  --ai-from: oklch(0.620 0.200 285);
+  --ai-to: oklch(0.620 0.210 255);
+  --gd-gutter: clamp(20px, 2.2vw, 40px);
+}

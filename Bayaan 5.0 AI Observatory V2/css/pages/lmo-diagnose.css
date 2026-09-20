@@ -1,0 +1,364 @@
+/* Diagnose page — Overview KPI band (CPI-style three-card layout) */
+
+body.lmo.lmo--diagnose .lmo-dg-overview {
+  margin-bottom: 28px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .section-hdr {
+  margin-bottom: 16px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--t1);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-section-title i {
+  font-size: 21px;
+  line-height: 1;
+  color: var(--ac);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .obs-card {
+  border-radius: 16px;
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  box-shadow: var(--sh);
+  padding: 18px 20px;
+  transition:
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .kpi-card::before {
+  display: none;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .ov-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t1);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .ov-card-title i {
+  font-size: 16px;
+  color: var(--ac);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--t2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Card 1: Labor Balance (CPI-style) ── */
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-kpi-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-kpi-val {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--t1);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-kpi-val--supply {
+  color: #2563eb;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-kpi-val--demand {
+  color: #16a34a;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-chart-wrap {
+  height: 56px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-chart-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpi-chart-wrap .cpi-chart-grid {
+  stroke: #e2e8f0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .obs-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 8px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .obs-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--t2);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .obs-chart-legend-line {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--legend-color, #2563eb);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .obs-chart-legend-line--dashed {
+  height: 0;
+  border-top: 2.5px dashed var(--legend-color, #7ec89a);
+  background: none;
+}
+
+/* ── Card 2: Gap (Inflation-style) ── */
+body.lmo.lmo--diagnose .lmo-dg-overview .ov-metrics {
+  display: grid;
+  gap: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .ov-metrics.cols-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .ov-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 0 14px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .ov-metric:first-child {
+  padding-left: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .ov-metric:last-child {
+  padding-right: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .ov-metric + .ov-metric {
+  border-left: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .kpi-card--infl .ov-metric {
+  padding: 0 10px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .kpi-card--infl .ov-metric:first-child {
+  padding-left: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .kpi-card--infl .ov-metric:last-child {
+  padding-right: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-rows {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-row {
+  --tone: #8b93a7;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 0;
+  min-width: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-row:last-child {
+  padding-bottom: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-row--up {
+  --tone: #e5484d;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-row--down {
+  --tone: #0c9b70;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-row--warn {
+  --tone: #ea580c;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 9%, white);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-icon i {
+  font-size: 13px;
+  line-height: 1;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-figure {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 1px 5px;
+  min-width: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-val {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--tone);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .infl-unit {
+  font-size: 10px;
+  font-weight: 500;
+  color: #8492a6;
+}
+
+/* ── Card 3: Workforce by (CPI-by style) ── */
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-rows {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2px;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  min-width: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row + .cpiby-row {
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--t2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row-val {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--t1);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row-meta {
+  font-size: 11px;
+  color: var(--t2);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row-meta .up {
+  color: var(--up);
+  font-weight: 600;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row-spark {
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row-spark svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 1250px) {
+  body.lmo.lmo--diagnose .lmo-dg-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row-spark {
+    width: 40px;
+  }
+
+  body.lmo.lmo--diagnose .lmo-dg-overview .cpiby-row-meta {
+    white-space: normal;
+  }
+}
+
+/* ── Dark theme ── */
+[data-theme="dark"] body.lmo.lmo--diagnose .lmo-dg-overview .ov-metric + .ov-metric {
+  border-left-color: var(--bd);
+}
+
+[data-theme="dark"] body.lmo.lmo--diagnose .lmo-dg-overview .infl-icon {
+  background: color-mix(in srgb, var(--tone) 14%, var(--sf));
+}
+
+[data-theme="dark"] body.lmo.lmo--diagnose .lmo-dg-overview .infl-unit {
+  color: var(--t3);
+}
+
+[data-theme="dark"] body.lmo.lmo--diagnose .lmo-dg-overview .cpi-chart-wrap .cpi-chart-grid {
+  stroke: rgba(255, 255, 255, 0.08);
+}

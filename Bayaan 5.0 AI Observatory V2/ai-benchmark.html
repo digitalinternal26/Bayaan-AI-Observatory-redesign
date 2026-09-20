@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Observatory — Benchmark · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/pages/census-detail.css" />
+    <link rel="stylesheet" href="css/pages/ai-observatory.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/ai-observatory.js" defer></script>
+    <style>
+      /* ============ BENCHMARK — comparison / position layout (page-local) ============
+         Structure and item order mirror census-benchmark.html exactly:
+         page header → filter row → main grid (KPI strip + chart left,
+         insight rail right) → disclaimer. AI-specific chart types and data
+         live here; shared .bm-* shell is ported from Census Benchmark. */
+
+      /* Filter row — same spacing as census-benchmark.html */
+      #screen-cpi-obs .bm-filter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px 0 20px; }
+
+      /* Export */
+      #screen-cpi-obs .abm-export { position: relative; }
+      #screen-cpi-obs .abm-export-menu {
+        position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; min-width: 190px;
+        background: var(--surface); border: 1px solid var(--border-solid); border-radius: var(--r-md);
+        box-shadow: var(--shadow-lg); padding: 6px; display: none; flex-direction: column;
+      }
+      #screen-cpi-obs .abm-export.is-open .abm-export-menu { display: flex; }
+      #screen-cpi-obs .abm-export-opt {
+        display: flex; align-items: center; gap: 9px; padding: 9px 10px; border: none; border-radius: 8px;
+        background: transparent; font-family: inherit; font-size: var(--fs-sm); font-weight: 500;
+        color: var(--text-secondary); text-align: left; cursor: pointer; transition: background 0.12s, color 0.12s;
+      }
+      #screen-cpi-obs .abm-export-opt:hover { background: var(--accent-light); color: var(--accent-dark); }
+      #screen-cpi-obs .abm-export-opt .ti { font-size: var(--fs-lg); color: var(--accent); }
+
+      /* Main grid + panels — ported from census-benchmark.html */
+      #screen-cpi-obs .bm-main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+      #screen-cpi-obs .bm-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+      #screen-cpi-obs .bm-main.is-expanded { grid-template-columns: minmax(0, 1fr); }
+      #screen-cpi-obs .bm-main.is-expanded .bm-side { display: none; }
+      #screen-cpi-obs .bm-panel { border-radius: 16px; padding: 18px 20px; }
+      html:not([data-theme="dark"]) #screen-cpi-obs .bm-panel { background: #fff; border: 1px solid #eaecf0; box-shadow: 0 1px 6px rgba(15,23,42,0.04); }
+      html[data-theme="dark"] #screen-cpi-obs .bm-panel { background: var(--surface, #141a26); border: 1px solid var(--border); }
+      #screen-cpi-obs .bm-chart-card { position: relative; min-width: 0; }
+
+      /* KPI strip — inside left column above chart, same as Census Benchmark */
+      #screen-cpi-obs .bm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+      #screen-cpi-obs .bm-kpi { position: relative; display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+      #screen-cpi-obs .bm-kpi-ic { width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; color: var(--accent); background: var(--accent-light); }
+      #screen-cpi-obs .bm-kpi-ic i { font-size: var(--fs-lg); }
+      #screen-cpi-obs .bm-kpi-body { min-width: 0; flex: 1; }
+      #screen-cpi-obs .bm-kpi-val { font-size: var(--fs-2xl); font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-top: 6px; }
+      #screen-cpi-obs .bm-kpi-rank { margin-top: 3px; font-size: var(--fs-2xs); color: var(--text2); }
+      #screen-cpi-obs .bm-kpi-rank b { color: var(--accent); font-weight: 700; }
+      #screen-cpi-obs .bm-kpi-entity { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; color: var(--text2); margin-top: 3px; }
+      #screen-cpi-obs .bm-kpi .aiobs-info { position: absolute; top: 14px; right: 14px; }
+      @media (max-width: 1100px) { #screen-cpi-obs .bm-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+
+      /* Controls row — uses .bm-filter-row spacing from Census Benchmark */
+      #screen-cpi-obs .bm-region-seg {
+        display: inline-flex; align-items: center; gap: 4px; height: 38px; padding: 4px;
+        border: 1px solid #ced4da; border-radius: 11px; background: #fff;
+      }
+      #screen-cpi-obs .bm-seg-btn {
+        display: inline-flex; align-items: center; gap: 6px; height: 100%; padding: 0 12px;
+        border: 0; border-radius: 8px; background: transparent; color: var(--text-primary, #0f172a);
+        font-family: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; white-space: nowrap;
+        transition: background 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .bm-seg-btn i { font-size: var(--fs-lg); line-height: 1; }
+      #screen-cpi-obs .bm-seg-btn:hover:not(.is-active) { background: var(--accent-light); color: var(--accent-dark); }
+      #screen-cpi-obs .bm-seg-btn.is-active { background: var(--accent); color: #fff; }
+      html[data-theme="dark"] #screen-cpi-obs .bm-region-seg { background: var(--surface); border-color: var(--border-md); }
+      html[data-theme="dark"] #screen-cpi-obs .bm-seg-btn { color: var(--text-primary); }
+      #screen-cpi-obs .bm-seg-btn .abm-seg-flag { font-size: 9.5px; font-weight: 800; background: rgba(255,255,255,0.28); padding: 1px 5px; border-radius: 999px; margin-inline-start: 2px; }
+      #screen-cpi-obs .bm-seg-btn:not(.is-active) .abm-seg-flag { background: var(--surface2); color: var(--text-tertiary); }
+
+      #screen-cpi-obs .abm-select-wrap { position: relative; display: inline-flex; align-items: center; }
+      #screen-cpi-obs .abm-select-wrap .ti-chart-bar { position: absolute; left: 12px; font-size: var(--fs-lg); color: var(--accent); pointer-events: none; }
+      #screen-cpi-obs .abm-select-wrap .ti-chevron-down { position: absolute; right: 12px; font-size: var(--fs-md); color: var(--text-tertiary); pointer-events: none; }
+      #screen-cpi-obs .abm-select {
+        appearance: none; -webkit-appearance: none; height: 38px; padding: 0 34px 0 36px; min-width: 220px;
+        border: 1px solid var(--border-solid); border-radius: 10px; background: var(--surface); color: var(--text-primary);
+        font-family: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; transition: border-color 0.15s;
+      }
+      #screen-cpi-obs .abm-select:hover:not(:disabled) { border-color: var(--accent); }
+      #screen-cpi-obs .abm-select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      #screen-cpi-obs .abm-ref-pill {
+        display: inline-flex; align-items: center; gap: 6px; padding: 0 13px; height: 38px; border-radius: 10px;
+        background: var(--surface2); color: var(--text-tertiary); font-size: var(--fs-xs); font-weight: 600;
+        margin-inline-start: auto;
+      }
+      #screen-cpi-obs .abm-ref-pill .ti { font-size: var(--fs-md); }
+
+      #screen-cpi-obs .bm-expand {
+        position: absolute; top: 18px; right: 20px; z-index: 2; display: flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; border: 1px solid #ced4da; border-radius: 9px; background: #fff; color: var(--text-primary);
+        cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .bm-expand i { font-size: var(--fs-md); }
+      #screen-cpi-obs .bm-expand:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
+
+      #screen-cpi-obs .abm-chart-canvas { position: relative; height: 360px; margin-top: 14px; }
+      #screen-cpi-obs .bm-main.is-expanded .abm-chart-canvas { height: 480px; }
+      #screen-cpi-obs .abm-chart-note { font-size: 11.5px; color: var(--text-tertiary); line-height: 1.55; margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--border-solid); }
+
+      #screen-cpi-obs .abm-empty { padding: 54px 16px; text-align: center; color: var(--text-tertiary); }
+      #screen-cpi-obs .abm-empty i { display: block; font-size: 32px; color: var(--gray-300); margin-bottom: 10px; }
+      #screen-cpi-obs .abm-empty p { font-size: var(--fs-sm); max-width: 46ch; margin: 0 auto; line-height: 1.6; }
+      #screen-cpi-obs .abm-empty p.abm-empty-lede { font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+
+      /* Lollipop ranking (Global AI Positioning) */
+      #screen-cpi-obs .abm-lolli { display: flex; flex-direction: column; gap: 4px; margin-top: 14px; }
+      #screen-cpi-obs .abm-lolli-row { display: grid; grid-template-columns: 176px minmax(0,1fr) 88px; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--border-solid); }
+      #screen-cpi-obs .abm-lolli-row:first-child { border-top: none; }
+      #screen-cpi-obs .abm-lolli-label { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+      #screen-cpi-obs .abm-lolli-name { font-size: var(--fs-xs); font-weight: 700; color: var(--text-primary); }
+      #screen-cpi-obs .abm-lolli-entity { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); }
+      #screen-cpi-obs .abm-lolli-track { position: relative; height: 6px; border-radius: 999px; background: var(--surface2); }
+      #screen-cpi-obs .abm-lolli-fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent-light), var(--accent)); }
+      #screen-cpi-obs .abm-lolli-dot { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--accent); transform: translate(-50%, -50%); }
+      #screen-cpi-obs .abm-lolli-rank { text-align: right; }
+      #screen-cpi-obs .abm-lolli-rank b { font-size: var(--fs-md); font-weight: 800; color: var(--text-primary); }
+      #screen-cpi-obs .abm-lolli-rank span { display: block; font-size: 10px; color: var(--text-tertiary); }
+      #screen-cpi-obs .abm-lolli-axis { display: grid; grid-template-columns: 176px minmax(0,1fr) 88px; gap: 12px; margin-top: 6px; }
+      #screen-cpi-obs .abm-lolli-axis-track { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); padding: 0 1px; }
+      #screen-cpi-obs .abm-lolli-src { font-size: 10.5px; color: var(--text-tertiary); margin-top: 1px; }
+
+      /* Ranked bar chart footnote row (source per bar, shown below Chart.js canvas) */
+      #screen-cpi-obs .abm-bar-legend { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--text-tertiary); }
+      #screen-cpi-obs .abm-bar-legend span { display: inline-flex; align-items: center; gap: 6px; }
+      #screen-cpi-obs .abm-bar-legend i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+
+      /* Insight rail — ported verbatim from census-benchmark.html */
+      #screen-cpi-obs .bm-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+      #screen-cpi-obs .bm-side .bm-panel.bm-ai-card { background: var(--accent-light); border: none; box-shadow: none; }
+      #screen-cpi-obs .bm-side-hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+      #screen-cpi-obs .bm-side-hd-left { display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); font-weight: 700; color: var(--text); }
+      #screen-cpi-obs .bm-ai-ic { width: 24px; height: 24px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: #fff; font-size: var(--fs-sm); flex-shrink: 0; }
+      #screen-cpi-obs .bm-ai-btn { flex-shrink: 0; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: var(--accent); cursor: pointer; transition: background 0.15s; }
+      #screen-cpi-obs .bm-ai-btn i { font-size: var(--fs-lg); }
+      #screen-cpi-obs .bm-ai-btn:hover { background: rgba(15, 23, 42, 0.06); }
+      html[data-theme="dark"] #screen-cpi-obs .bm-ai-btn:hover { background: rgba(255, 255, 255, 0.09); }
+      #screen-cpi-obs .bm-ai-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+      #screen-cpi-obs .bm-point { font-size: var(--fs-sm); line-height: 1.6; color: #536277; }
+      #screen-cpi-obs .bm-point p { margin: 0; }
+      #screen-cpi-obs .bm-point b { color: #172033; font-weight: 700; }
+      html[data-theme="dark"] #screen-cpi-obs .bm-point { color: var(--text-secondary); }
+      html[data-theme="dark"] #screen-cpi-obs .bm-point b { color: var(--text-primary); }
+
+      /* Source details toggle inside .cpi-notice */
+      #screen-cpi-obs .cpi-notice .abm-notice-body p { margin: 0; }
+      #screen-cpi-obs .abm-notice-toggle {
+        display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; border: none; background: none;
+        font-family: inherit; font-size: var(--fs-xs); font-weight: 700; color: var(--accent-dark); cursor: pointer; padding: 0;
+      }
+      #screen-cpi-obs .abm-notice-toggle .ti { font-size: 13px; transition: transform 0.15s; }
+      #screen-cpi-obs .abm-notice-toggle.is-open .ti { transform: rotate(180deg); }
+      #screen-cpi-obs .abm-source-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #FCE7C3; }
+      #screen-cpi-obs .abm-source-detail.is-open { display: block; }
+      #screen-cpi-obs .abm-source-detail dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+      #screen-cpi-obs .abm-source-detail dt { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); white-space: nowrap; }
+      #screen-cpi-obs .abm-source-detail dd { font-size: var(--fs-xs); color: var(--text-secondary); margin: 0; }
+
+      @media (max-width: 1200px) { #screen-cpi-obs .bm-main { grid-template-columns: minmax(0, 1fr); } }
+      @media (max-width: 700px) {
+        #screen-cpi-obs .bm-kpis { grid-template-columns: minmax(0, 1fr); }
+        #screen-cpi-obs .abm-lolli-row, #screen-cpi-obs .abm-lolli-axis { grid-template-columns: 120px minmax(0,1fr) 64px; }
+        #screen-cpi-obs .bm-filter-row { flex-direction: column; align-items: stretch; }
+        #screen-cpi-obs .abm-ref-pill { margin-inline-start: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Products</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="ai-overview.html">AI Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Benchmark</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <aside class="sidebar" aria-label="AI Observatory views">
+              <button type="button" class="sidebar-item sidebar-item--ai" onclick="AIObs.toast('AI Observatory assistant — coming soon in this preview')">
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Survey AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item" href="ai-overview.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="ai-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="ai-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item active" href="ai-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+            </aside>
+          </div>
+
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <h1 class="topic-title">Benchmark</h1>
+                    <p class="topic-title-sub">Compare Abu Dhabi's AI position against comparable economies and leading global AI indices — where we stand, and where the gap to the next tier is widest.</p>
+                  </div>
+                  <div class="cen-hdr-btns">
+                    <div class="abm-export">
+                      <button type="button" class="cen-btn" onclick="abmToggleExport(event)"><i class="ti ti-download"></i> Export</button>
+                      <div class="abm-export-menu">
+                        <button class="abm-export-opt" type="button" onclick="AIObs.toast('Export data (CSV) — coming soon in this preview')"><i class="ti ti-table"></i>Export data (CSV)</button>
+                        <button class="abm-export-opt" type="button" onclick="AIObs.toast('Export chart (PNG) — coming soon in this preview')"><i class="ti ti-photo"></i>Export chart (PNG)</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cpi-obs-content">
+                <!-- ── Controls (same position as census-benchmark.html) ── -->
+                <div class="bm-filter-row">
+                  <div class="bm-region-seg" role="group" aria-label="Comparison group" id="abmGroupSeg"></div>
+                  <div class="abm-select-wrap">
+                    <i class="ti ti-chart-bar"></i>
+                    <select class="abm-select" id="abmIndicatorSelect" aria-label="Indicator" onchange="abmSetIndicator(this.value)"></select>
+                    <i class="ti ti-chevron-down"></i>
+                  </div>
+                  <span class="abm-ref-pill" id="abmRefPill"><i class="ti ti-calendar"></i>Reference: 2025</span>
+                </div>
+
+                <!-- ── KPI summary + chart, insight panels alongside ── -->
+                <div class="bm-main" id="abmMain">
+                  <div class="bm-col">
+                    <div class="bm-kpis">
+                      <div class="obs-card bm-kpi">
+                        <span class="aiobs-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Share of enterprises that have used AI in any business function.</dd>
+                            <dt>Comparison group</dt><dd>Global Partners — Eurostat/OECD-comparable economies</dd>
+                            <dt>Reference year</dt><dd>2025</dd>
+                            <dt>Source</dt><dd>SCAD Enterprise AI Adoption Survey 2026 (4,189 of 5,160 enterprises); Eurostat/OECD 2025</dd>
+                          </dl>
+                        </span>
+                        <div class="bm-kpi-ic"><i class="ti ti-building-skyscraper"></i></div>
+                        <div class="bm-kpi-body">
+                          <div class="kpi-label">Enterprise AI Adoption</div>
+                          <div class="bm-kpi-val">73%</div>
+                          <div class="bm-kpi-rank">Rank <b>#1</b> of 7 · Global Partners</div>
+                          <span class="bm-kpi-entity"><i class="ti ti-map-pin" style="font-size:10px"></i>Abu Dhabi · 2025</span>
+                        </div>
+                      </div>
+
+                      <div class="obs-card bm-kpi">
+                        <span class="aiobs-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Composite index of national AI adoption intensity, 147 countries.</dd>
+                            <dt>Reference period</dt><dd>Q1 2026</dd>
+                            <dt>Source</dt><dd>Microsoft AI Economy Institute, Global AI Diffusion Index</dd>
+                            <dt>Note</dt><dd>Distinct from Abu Dhabi's own individual AI adoption rate of 86.0% (SCAD 2026 survey, stricter active-use threshold) — not the same measure.</dd>
+                          </dl>
+                        </span>
+                        <div class="bm-kpi-ic"><i class="ti ti-world"></i></div>
+                        <div class="bm-kpi-body">
+                          <div class="kpi-label">Global AI Diffusion</div>
+                          <div class="bm-kpi-val">1st</div>
+                          <div class="bm-kpi-rank">of <b>147</b> countries</div>
+                          <span class="bm-kpi-entity"><i class="ti ti-map-pin" style="font-size:10px"></i>UAE · Q1 2026</span>
+                        </div>
+                      </div>
+
+                      <div class="obs-card bm-kpi">
+                        <span class="aiobs-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Composite measure of a country's AI research, economic and policy vibrancy.</dd>
+                            <dt>Reference year</dt><dd>2025</dd>
+                            <dt>Source</dt><dd>Stanford HAI, AI Index Report 2025</dd>
+                          </dl>
+                        </span>
+                        <div class="bm-kpi-ic"><i class="ti ti-bolt"></i></div>
+                        <div class="bm-kpi-body">
+                          <div class="kpi-label">AI Vibrancy</div>
+                          <div class="bm-kpi-val">5th</div>
+                          <div class="bm-kpi-rank">of <b>36</b> economies</div>
+                          <span class="bm-kpi-entity"><i class="ti ti-map-pin" style="font-size:10px"></i>UAE · 2025</span>
+                        </div>
+                      </div>
+
+                      <div class="obs-card bm-kpi">
+                        <span class="aiobs-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Assesses government preparedness to design, develop and deploy AI-enabled public services.</dd>
+                            <dt>Reference year</dt><dd>2025</dd>
+                            <dt>Source</dt><dd>Oxford Insights, Government AI Readiness Index</dd>
+                          </dl>
+                        </span>
+                        <div class="bm-kpi-ic"><i class="ti ti-shield-check"></i></div>
+                        <div class="bm-kpi-body">
+                          <div class="kpi-label">Government AI Readiness</div>
+                          <div class="bm-kpi-val">19th</div>
+                          <div class="bm-kpi-rank">of <b>195</b> countries</div>
+                          <span class="bm-kpi-entity"><i class="ti ti-map-pin" style="font-size:10px"></i>UAE · 2025</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="bm-panel bm-chart-card">
+                      <button type="button" class="bm-expand" id="abmExpandBtn" aria-label="Expand" onclick="abmToggleExpand()">
+                        <i class="ti ti-arrows-maximize"></i>
+                      </button>
+                      <div class="cd-card-hd" id="abmChartTitle"><i class="ti ti-chart-bar"></i>Enterprise AI adoption benchmark</div>
+                      <p class="cd-card-sub" id="abmChartSub">Enterprise AI Adoption · Global Partners · 2025</p>
+                      <div id="abmChartBody"></div>
+                    </div>
+                  </div>
+
+                  <aside class="bm-side" id="abmSide">
+                    <section class="bm-panel bm-ai-card">
+                      <div class="bm-side-hd">
+                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-trophy"></i></span>Global Leadership</span>
+                        <button type="button" class="bm-ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Tell me more about Abu Dhabi\'s global AI leadership position')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <div class="bm-point" id="abmInsightLeadership"></div>
+                    </section>
+                    <section class="bm-panel bm-ai-card">
+                      <div class="bm-side-hd">
+                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-world"></i></span>Peer Comparison</span>
+                        <button type="button" class="bm-ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('How does Abu Dhabi compare with its peer economies on AI?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <div class="bm-point" id="abmInsightPeer"></div>
+                    </section>
+                    <section class="bm-panel bm-ai-card">
+                      <div class="bm-side-hd">
+                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-medal"></i></span>Relative Strength</span>
+                        <button type="button" class="bm-ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Where is Abu Dhabi\'s strongest benchmarked AI position?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <div class="bm-point" id="abmInsightStrength"></div>
+                    </section>
+                    <section class="bm-panel bm-ai-card">
+                      <div class="bm-side-hd">
+                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-alert-triangle"></i></span>Area to Watch</span>
+                        <button type="button" class="bm-ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('What AI benchmark area should Abu Dhabi watch most closely?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <div class="bm-point" id="abmInsightWatch"></div>
+                    </section>
+                  </aside>
+                </div>
+
+                <div class="cpi-notice" style="margin:16px 0 0">
+                  <i class="ti ti-alert-circle"></i>
+                  <div class="cpi-notice-text abm-notice-body">
+                    <p>Benchmark figures combine Abu Dhabi's 2026 SCAD Enterprise and Individual AI Adoption Surveys with seven independent global AI indices and Eurostat/OECD 2025 figures for peer economies. Definitions, survey years and methodologies differ across sources — cross-comparisons are directional, not exact. GCC country-level AI adoption figures are not yet published and are not included here.</p>
+                    <button class="abm-notice-toggle" id="abmSourceToggle" type="button" onclick="abmToggleSourceDetail()">
+                      View source details <i class="ti ti-chevron-down"></i>
+                    </button>
+                    <div class="abm-source-detail" id="abmSourceDetail">
+                      <dl>
+                        <dt>Enterprise adoption</dt><dd>SCAD Enterprise AI Adoption Survey, 2026 — 4,189 of 5,160 enterprises surveyed (81% response); benchmarked against Eurostat/OECD 2025 national enterprise-AI-use figures.</dd>
+                        <dt>Individual adoption</dt><dd>SCAD Individual AI Adoption Survey, 2026 — 15,042 respondents aged 15+, weighted to 2,540,268 residents. Not part of the cross-country benchmark shown here.</dd>
+                        <dt>AI diffusion</dt><dd>Microsoft AI Economy Institute, Global AI Diffusion Index, Q1 2026 — 147 countries.</dd>
+                        <dt>AI vibrancy</dt><dd>Stanford HAI, AI Index Report 2025 — 36 economies.</dd>
+                        <dt>Skills investment</dt><dd>Oliver Wyman Industry 5.0, 2025 — 92 countries.</dd>
+                        <dt>Gov. AI readiness</dt><dd>Oxford Insights, Government AI Readiness Index, 2025 — 195 countries.</dd>
+                        <dt>Intelligent cities</dt><dd>BCG, 2025 — 61 cities; Abu Dhabi is ranked at the city level, not the UAE.</dd>
+                        <dt>Usage intensity</dt><dd>Anthropic Economic Index, 2025 — 121 countries.</dd>
+                        <dt>Innovation outputs</dt><dd>WIPO Global Innovation Index, 2025 — 139 economies.</dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ============================================================
+         DATA — every figure here traces to ai-overview-a/b/c.html,
+         ai-interpret.html and ai-diagnose.html (SCAD Enterprise &
+         Individual AI Adoption Surveys, 2026, plus the seven named
+         global indices). Nothing here is invented. GCC has no published
+         AI-benchmark entities anywhere in this
+         project, so they render an honest empty state — see
+         ABM_INSIGHTS.emptyGroup below — rather than illustrative
+         placeholder numbers (the convention used for Census/CPI
+         benchmarks does not apply here; the AI statistics programme
+         is new enough that inventing peer figures would misrepresent
+         what is actually measured).
+         ============================================================ */
+      const ABM_GROUPS = {
+        gcc: { label: "GCC", icon: "ti-users" },
+        global: { label: "Global Partners", icon: "ti-world" },
+      };
+      const ABM_GROUP_ORDER = ["gcc", "global"];
+
+      const ABM_INDICATORS = {
+        enterprise: {
+          key: "enterprise", label: "Enterprise AI Adoption", icon: "ti-building-skyscraper",
+          chartType: "bar", refPeriod: "2025", availableIn: ["global"],
+          entities: [
+            { name: "Abu Dhabi", value: 73, highlight: true },
+            { name: "Denmark", value: 42 },
+            { name: "Finland", value: 38 },
+            { name: "Sweden", value: 35 },
+            { name: "South Korea", value: 30 },
+            { name: "Germany", value: 26 },
+            { name: "United Kingdom", value: 16 },
+          ],
+          note: "North America (90%) and Greater China (88%) report higher enterprise AI adoption but use a different, non-comparable survey methodology — shown as context only, not ranked in this comparison. Source: SCAD Enterprise AI Adoption Survey 2026; Eurostat/OECD 2025.",
+        },
+        positioning: {
+          key: "positioning", label: "Global AI Positioning", icon: "ti-world",
+          chartType: "lollipop", refPeriod: "2025–2026", availableIn: ["global"],
+          entities: [
+            { name: "AI Diffusion", entity: "UAE", rank: 1, total: 147, source: "Microsoft AI Economy Institute · Q1 2026" },
+            { name: "AI Vibrancy", entity: "UAE", rank: 5, total: 36, source: "Stanford HAI, AI Index 2025" },
+            { name: "AI Skills Investment", entity: "UAE", rank: 6, total: 92, source: "Oliver Wyman Industry 5.0, 2025" },
+            { name: "Government AI Readiness", entity: "UAE", rank: 19, total: 195, source: "Oxford Insights, 2025" },
+            { name: "Intelligent Cities", entity: "Abu Dhabi", rank: 20, total: 61, source: "BCG, 2025" },
+            { name: "AI Usage Intensity", entity: "UAE", rank: 23, total: 121, source: "Anthropic Economic Index, 2025" },
+            { name: "Innovation Outputs", entity: "UAE", rank: 47, total: 139, source: "WIPO Global Innovation Index, 2025" },
+          ],
+        },
+      };
+      const ABM_INDICATOR_ORDER = ["enterprise", "positioning"];
+
+      const ABM_INSIGHTS = {
+        global: {
+          enterprise: {
+            leadership: "Abu Dhabi's enterprise AI adoption rate of <b>73%</b> is the highest among the Eurostat/OECD-comparable economies in this comparison — 31 percentage points ahead of the next-highest peer.",
+            peer: "Abu Dhabi ranks <b>#1 of 7</b> in this comparison group, ahead of Denmark (42%), Finland (38%), Sweden (35%), South Korea (30%), Germany (26%) and the United Kingdom (16%).",
+            strength: "Enterprise adoption is Abu Dhabi's strongest benchmarked position — no peer economy shown here is within 25 percentage points.",
+            watch: "North America (90%) and Greater China (88%) report higher adoption, but use a different, non-comparable survey methodology — shown as context only, not part of this ranking.",
+          },
+          positioning: {
+            leadership: "The UAE ranks <b>1st of 147</b> countries worldwide on AI diffusion (Microsoft AI Economy Institute) — the strongest of the seven global indices tracked here.",
+            peer: "Across the seven indices tracked, the UAE/Abu Dhabi's rank ranges from <b>1st to 47th</b>. No single index tells the whole story — each uses a different methodology and peer set.",
+            strength: "AI diffusion (1st of 147) and AI Vibrancy (5th, Stanford HAI) are the UAE's strongest global positions.",
+            watch: "Innovation outputs (<b>47th</b>, WIPO) and Intelligent Cities (<b>20th</b>, BCG) lag well behind the adoption-based indices — innovation output and urban AI deployment are less developed than everyday AI use.",
+          },
+        },
+        emptyGroup: {
+          gcc: {
+            leadership: "GCC-level AI benchmark data is not yet published.",
+            peer: "Abu Dhabi's AI statistics programme currently benchmarks against Eurostat/OECD-comparable economies and global indices; GCC country-level AI adoption figures are not yet part of the published survey series.",
+            strength: "Select <b>Global Partners</b> to see where Abu Dhabi's AI position is strongest today.",
+            watch: "This panel will populate once GCC-level AI statistics are published.",
+          },
+        },
+      };
+
+      const abmState = { group: "global", indicator: "enterprise" };
+      let abmChart = null;
+
+      function abmAvailableIndicators(group) {
+        return ABM_INDICATOR_ORDER.filter((k) => ABM_INDICATORS[k].availableIn.includes(group));
+      }
+
+      /* ── Group tabs ── */
+      function abmRenderGroupTabs() {
+        const root = document.getElementById("abmGroupSeg");
+        root.innerHTML = ABM_GROUP_ORDER.map((key) => {
+          const g = ABM_GROUPS[key];
+          const available = abmAvailableIndicators(key).length > 0;
+          return `<button type="button" class="bm-seg-btn${key === abmState.group ? " is-active" : ""}" onclick="abmSetGroup('${key}')">
+            <i class="ti ${g.icon}"></i>${g.label}${available ? "" : '<span class="abm-seg-flag">no data yet</span>'}
+          </button>`;
+        }).join("");
+      }
+
+      /* ── Indicator select ── */
+      function abmRenderIndicatorSelect() {
+        const select = document.getElementById("abmIndicatorSelect");
+        const available = abmAvailableIndicators(abmState.group);
+        if (!available.length) {
+          select.disabled = true;
+          select.innerHTML = `<option>Not available for this group</option>`;
+          return;
+        }
+        select.disabled = false;
+        if (!available.includes(abmState.indicator)) abmState.indicator = available[0];
+        select.innerHTML = available
+          .map((k) => `<option value="${k}"${k === abmState.indicator ? " selected" : ""}>${ABM_INDICATORS[k].label}</option>`)
+          .join("");
+      }
+
+      function abmSetGroup(group) {
+        abmState.group = group;
+        abmRenderAll();
+      }
+      function abmSetIndicator(key) {
+        abmState.indicator = key;
+        abmRenderAll();
+      }
+
+      /* ── Reference pill ── */
+      function abmRenderRefPill() {
+        const pill = document.getElementById("abmRefPill");
+        const available = abmAvailableIndicators(abmState.group);
+        if (!available.length) {
+          pill.innerHTML = `<i class="ti ti-calendar"></i>No reference period`;
+          return;
+        }
+        const ind = ABM_INDICATORS[abmState.indicator];
+        pill.innerHTML = `<i class="ti ti-calendar"></i>Reference: ${ind.refPeriod}`;
+      }
+
+      /* ── Chart / empty state ── */
+      function abmRenderChart() {
+        const body = document.getElementById("abmChartBody");
+        const available = abmAvailableIndicators(abmState.group);
+        const groupLabel = ABM_GROUPS[abmState.group].label;
+
+        if (abmChart) { abmChart.destroy(); abmChart = null; }
+
+        if (!available.length) {
+          document.getElementById("abmChartTitle").innerHTML = `<i class="ti ti-chart-bar"></i>AI benchmark`;
+          document.getElementById("abmChartSub").textContent = `${groupLabel} · no published data`;
+          body.innerHTML = `<div class="abm-empty">
+            <i class="ti ti-database-off"></i>
+            <p class="abm-empty-lede">No AI benchmark indicators are available for ${groupLabel} yet.</p>
+            <p>Abu Dhabi's AI statistics programme currently publishes at the Emirate of Abu Dhabi level plus seven global indices. GCC country-level AI adoption figures are not yet part of the released survey series — this view is ready to populate once they are.</p>
+          </div>`;
+          return;
+        }
+
+        const ind = ABM_INDICATORS[abmState.indicator];
+        document.getElementById("abmChartTitle").innerHTML = `<i class="ti ${ind.icon}"></i>${ind.label} benchmark`;
+        document.getElementById("abmChartSub").textContent = `${ind.label} · ${groupLabel} · ${ind.refPeriod}`;
+
+        if (ind.chartType === "bar") {
+          body.innerHTML = `<div class="abm-chart-canvas"><canvas id="abmCanvas"></canvas></div>
+            <div class="abm-bar-legend"><span><i style="background:var(--accent)"></i>Abu Dhabi</span><span><i style="background:var(--gray-300)"></i>Peer economies</span></div>
+            <p class="abm-chart-note">${ind.note}</p>`;
+          const ranked = [...ind.entities].sort((a, b) => b.value - a.value);
+          const theme = window.BayaanTheme ? window.BayaanTheme.chartTheme() : {};
+          const tick = theme.tick || "#94a3b8";
+          const grid = theme.grid || "rgba(0,0,0,0.06)";
+          const accentColor = (window.BayaanTheme && window.BayaanTheme.cssVar("--accent")) || "#0066FF";
+          const mutedColor = (window.BayaanTheme && window.BayaanTheme.cssVar("--gray-300")) || "#CBD5E1";
+          abmChart = new Chart(document.getElementById("abmCanvas"), {
+            type: "bar",
+            data: {
+              labels: ranked.map((e) => e.name),
+              datasets: [{
+                data: ranked.map((e) => e.value),
+                backgroundColor: ranked.map((e) => (e.highlight ? accentColor : mutedColor)),
+                borderRadius: 6,
+                barThickness: 22,
+              }],
+            },
+            options: {
+              indexAxis: "y",
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.parsed.x}%` } },
+              },
+              scales: {
+                x: { beginAtZero: true, max: 100, grid: { color: grid }, ticks: { color: tick, font: { size: 11 }, callback: (v) => v + "%" } },
+                y: { grid: { display: false }, ticks: { color: tick, font: { size: 12, weight: "600" } } },
+              },
+            },
+          });
+        } else if (ind.chartType === "lollipop") {
+          const AXIS_MAX = 50;
+          const rows = ind.entities
+            .map((e) => {
+              const pct = Math.min(100, (e.rank / AXIS_MAX) * 100);
+              return `<div class="abm-lolli-row">
+                <div class="abm-lolli-label">
+                  <span class="abm-lolli-name">${e.name}</span>
+                  <span class="abm-lolli-entity">${e.entity}</span>
+                  <span class="abm-lolli-src">${e.source}</span>
+                </div>
+                <div class="abm-lolli-track">
+                  <div class="abm-lolli-fill" style="width:${pct}%"></div>
+                  <div class="abm-lolli-dot" style="left:${pct}%"></div>
+                </div>
+                <div class="abm-lolli-rank"><b>${abmOrdinal(e.rank)}</b><span>${e.total ? "of " + e.total : "global rank"}</span></div>
+              </div>`;
+            })
+            .join("");
+          body.innerHTML = `<div class="abm-lolli">${rows}</div>
+            <div class="abm-lolli-axis">
+              <span></span>
+              <div class="abm-lolli-axis-track"><span>1st (best)</span><span>25th</span><span>50th+</span></div>
+              <span></span>
+            </div>
+            <p class="abm-chart-note">Each index uses its own methodology, peer set and country count — ranks are plotted on a shared 1st–50th ordinal scale to compare relative position only, not on a common numeric value. Lower is better.</p>`;
+        }
+      }
+
+      function abmOrdinal(n) {
+        const s = ["th", "st", "nd", "rd"], v = n % 100;
+        return n + (s[(v - 20) % 10] || s[v] || s[0]);
+      }
+
+      /* ── Insight rail ── */
+      function abmRenderInsights() {
+        const els = {
+          leadership: document.getElementById("abmInsightLeadership"),
+          peer: document.getElementById("abmInsightPeer"),
+          strength: document.getElementById("abmInsightStrength"),
+          watch: document.getElementById("abmInsightWatch"),
+        };
+        let set;
+        if (abmState.group === "global") {
+          set = ABM_INSIGHTS.global[abmState.indicator] || ABM_INSIGHTS.global.enterprise;
+        } else {
+          set = ABM_INSIGHTS.emptyGroup[abmState.group];
+        }
+        els.leadership.innerHTML = set.leadership;
+        els.peer.innerHTML = set.peer;
+        els.strength.innerHTML = set.strength;
+        els.watch.innerHTML = set.watch;
+      }
+
+      function abmRenderAll() {
+        abmRenderGroupTabs();
+        abmRenderIndicatorSelect();
+        abmRenderRefPill();
+        abmRenderChart();
+        abmRenderInsights();
+      }
+
+      /* ── Expand / export / source detail ── */
+      function abmToggleExpand() {
+        const main = document.getElementById("abmMain");
+        const icon = document.querySelector("#abmExpandBtn i");
+        const expanded = main.classList.toggle("is-expanded");
+        icon.className = "ti " + (expanded ? "ti-arrows-minimize" : "ti-arrows-maximize");
+        if (abmChart) requestAnimationFrame(() => abmChart.resize());
+      }
+
+      function abmToggleExport(e) {
+        e.stopPropagation();
+        document.querySelector(".abm-export").classList.toggle("is-open");
+      }
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".abm-export")) document.querySelector(".abm-export")?.classList.remove("is-open");
+      });
+
+      function abmToggleSourceDetail() {
+        document.getElementById("abmSourceDetail").classList.toggle("is-open");
+        document.getElementById("abmSourceToggle").classList.toggle("is-open");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+        abmRenderAll();
+        let abmResizeTimer;
+        window.addEventListener("resize", function () {
+          clearTimeout(abmResizeTimer);
+          abmResizeTimer = setTimeout(function () { if (abmChart) abmChart.resize(); }, 150);
+        });
+      });
+    </script>
+  </body>
+</html>

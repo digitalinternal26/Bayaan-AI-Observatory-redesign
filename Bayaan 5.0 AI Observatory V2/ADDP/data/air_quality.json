@@ -1,0 +1,6857 @@
+{
+  "meta": {
+    "source": "generated",
+    "districtCount": 214,
+    "note": "Synthetic AQI and pollutant concentrations for ADDP air-quality module demos."
+  },
+  "districts": {
+    "Al Danah": {
+      "district": "Al Danah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 96,
+      "pollutants": {
+        "co": {
+          "value": 6.07,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 65.74,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 93.25,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 99.66,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 79.8,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 87.49,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Manhal": {
+      "district": "Al Manhal",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 169,
+      "pollutants": {
+        "co": {
+          "value": 3.43,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 74.07,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 87.06,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 121.05,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 60.37,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 77.23,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Hisn": {
+      "district": "Al Hisn",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 247,
+      "pollutants": {
+        "co": {
+          "value": 1.36,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 72.84,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 96.58,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 243.4,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 78.43,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 80.24,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Zahiyah": {
+      "district": "Al Zahiyah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 224,
+      "pollutants": {
+        "co": {
+          "value": 6.49,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 102.37,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 83.4,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 243.58,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 40.72,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 99.18,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Nahyan": {
+      "district": "Al Nahyan",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 168,
+      "pollutants": {
+        "co": {
+          "value": 6.55,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 53.74,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 92.15,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 124.02,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 164.01,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 29.61,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Lulu Island": {
+      "district": "Al Lulu Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 145,
+      "pollutants": {
+        "co": {
+          "value": 5.53,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 56.37,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 88.03,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 63.48,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 42.75,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 100.78,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Qasr Al Bahr": {
+      "district": "Qasr Al Bahr",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 199,
+      "pollutants": {
+        "co": {
+          "value": 1.05,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 62.17,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 65.63,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 191.29,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 34.95,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 45.87,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Zayed Port": {
+      "district": "Zayed Port",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 234,
+      "pollutants": {
+        "co": {
+          "value": 8.1,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 73.68,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 81.07,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 219.11,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 69.53,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 67.97,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Maryah Island": {
+      "district": "Al Maryah Island",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 183,
+      "pollutants": {
+        "co": {
+          "value": 1.51,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 92.35,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 104.17,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 192.05,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 76.97,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 18.64,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Reem Island": {
+      "district": "Al Reem Island",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 241,
+      "pollutants": {
+        "co": {
+          "value": 2.15,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 83.24,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 124.32,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 227.98,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 138.87,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 102.12,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Khalidiyah": {
+      "district": "Al Khalidiyah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 246,
+      "pollutants": {
+        "co": {
+          "value": 1.61,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 72.03,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 92.09,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 204.74,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 151.45,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 97.37,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Bateen": {
+      "district": "Al Bateen",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 108,
+      "pollutants": {
+        "co": {
+          "value": 1.46,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 61.78,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 98.66,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 114.41,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 13.38,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 104.34,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Mushrif": {
+      "district": "Al Mushrif",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 174,
+      "pollutants": {
+        "co": {
+          "value": 2.81,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 113.72,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 99.86,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 147.18,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 165.56,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 14.73,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Kasir": {
+      "district": "Al Kasir",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 245,
+      "pollutants": {
+        "co": {
+          "value": 2.94,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 52.71,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 92.35,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 238.25,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 43.06,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 97.98,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Abu Dhabi Islands": {
+      "district": "Abu Dhabi Islands",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 123,
+      "pollutants": {
+        "co": {
+          "value": 4.43,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 97.07,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 46.08,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 218.04,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 140.14,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 34.39,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Hadbat Al Za'faranah": {
+      "district": "Hadbat Al Za'faranah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 164,
+      "pollutants": {
+        "co": {
+          "value": 6.36,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 64.54,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 55.11,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 219.68,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 94.19,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 91.38,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Kheeran": {
+      "district": "Al Kheeran",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 205,
+      "pollutants": {
+        "co": {
+          "value": 0.27,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 82.2,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 40.58,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 160.95,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 76.2,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 93.95,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Ras Al Akhdar": {
+      "district": "Al Ras Al Akhdar",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 202,
+      "pollutants": {
+        "co": {
+          "value": 0.69,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 81.19,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 30.45,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 105.11,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 90.31,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 103.34,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Hidayriyyat": {
+      "district": "Al Hidayriyyat",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 178,
+      "pollutants": {
+        "co": {
+          "value": 5.99,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 53.07,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 85.78,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 162.56,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 18.13,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 112.23,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Saadiyat Island": {
+      "district": "Al Saadiyat Island",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 199,
+      "pollutants": {
+        "co": {
+          "value": 2.21,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 71.07,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 115.84,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 203.68,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 133.22,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 89.68,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Qurm": {
+      "district": "Al Qurm",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 218,
+      "pollutants": {
+        "co": {
+          "value": 3.86,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 62.53,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 109.93,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 157.91,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 105.38,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 78.57,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Reem East Island": {
+      "district": "Al Reem East Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 101,
+      "pollutants": {
+        "co": {
+          "value": 0.7,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 53.1,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 68.35,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 136.85,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 90.89,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 9.31,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Um Yifeenah Island": {
+      "district": "Um Yifeenah Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 196,
+      "pollutants": {
+        "co": {
+          "value": 7.16,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 42.06,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 10.64,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 195.0,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 95.01,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 27.91,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Qirqishan": {
+      "district": "Qirqishan",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 208,
+      "pollutants": {
+        "co": {
+          "value": 7.18,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 32.96,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 88.53,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 161.72,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 130.06,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 18.42,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Sa'adah": {
+      "district": "Al Sa'adah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 130,
+      "pollutants": {
+        "co": {
+          "value": 2.95,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 78.43,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 121.01,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 183.38,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 91.06,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 31.7,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Rawdah": {
+      "district": "Al Rawdah",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 53,
+      "pollutants": {
+        "co": {
+          "value": 5.61,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 93.87,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 24.77,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 26.34,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 70.88,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 86.12,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Muzoun": {
+      "district": "Al Muzoun",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 130,
+      "pollutants": {
+        "co": {
+          "value": 8.18,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 63.22,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 34.28,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 208.88,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 60.78,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 88.36,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Fteysi Island": {
+      "district": "Al Fteysi Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 195,
+      "pollutants": {
+        "co": {
+          "value": 1.74,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 49.13,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 40.74,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 69.72,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 79.81,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 64.99,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Muntazah": {
+      "district": "Al Muntazah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 229,
+      "pollutants": {
+        "co": {
+          "value": 2.78,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 100.18,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 70.7,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 196.76,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 119.7,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 92.53,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Jubail Island": {
+      "district": "Al Jubail Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 180,
+      "pollutants": {
+        "co": {
+          "value": 1.04,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 112.13,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 57.57,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 187.27,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 111.22,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 105.68,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bilrimaid Island": {
+      "district": "Bilrimaid Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 159,
+      "pollutants": {
+        "co": {
+          "value": 6.92,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 76.12,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 19.79,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 74.75,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 139.9,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 90.86,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Sas Al Nakhl": {
+      "district": "Sas Al Nakhl",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 155,
+      "pollutants": {
+        "co": {
+          "value": 1.48,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 39.36,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 73.29,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 124.26,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 66.7,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 70.69,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Sammaliyyah Island": {
+      "district": "Al Sammaliyyah Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 138,
+      "pollutants": {
+        "co": {
+          "value": 6.35,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 37.3,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 46.2,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 47.69,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 82.86,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 72.5,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Halah Island": {
+      "district": "Al Halah Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 135,
+      "pollutants": {
+        "co": {
+          "value": 5.75,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 86.34,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 15.67,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 175.1,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 66.82,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 56.57,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Rabdan": {
+      "district": "Rabdan",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 135,
+      "pollutants": {
+        "co": {
+          "value": 3.89,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 112.11,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 119.38,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 102.85,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 92.22,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 74.7,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Musaffah": {
+      "district": "Musaffah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 100,
+      "pollutants": {
+        "co": {
+          "value": 4.99,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 31.92,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 91.46,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 136.15,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 39.4,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 41.08,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ramhan Island": {
+      "district": "Ramhan Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 213,
+      "pollutants": {
+        "co": {
+          "value": 6.91,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 75.95,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 58.3,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 183.69,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 55.66,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 28.1,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bilghaylam Island": {
+      "district": "Bilghaylam Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 77,
+      "pollutants": {
+        "co": {
+          "value": 3.14,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 104.49,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 79.0,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 126.33,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 97.54,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 19.18,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bu Niyaydah": {
+      "district": "Bu Niyaydah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 177,
+      "pollutants": {
+        "co": {
+          "value": 0.32,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 66.08,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 76.98,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 221.63,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 143.03,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 48.84,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Khalifa City": {
+      "district": "Khalifa City",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 235,
+      "pollutants": {
+        "co": {
+          "value": 7.96,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 45.32,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 85.84,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 178.17,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 139.58,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 122.67,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Fahid Island": {
+      "district": "Fahid Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 193,
+      "pollutants": {
+        "co": {
+          "value": 6.66,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 56.99,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 29.65,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 83.47,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 138.66,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 47.52,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Abu Dhabi Industrial City": {
+      "district": "Abu Dhabi Industrial City",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 103,
+      "pollutants": {
+        "co": {
+          "value": 1.58,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 106.69,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 47.89,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 173.05,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 148.5,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 2.38,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Rahah": {
+      "district": "Al Rahah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 253,
+      "pollutants": {
+        "co": {
+          "value": 3.15,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 38.22,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 110.46,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 116.33,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 162.98,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 36.92,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Nourai Island": {
+      "district": "Nourai Island",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 249,
+      "pollutants": {
+        "co": {
+          "value": 2.39,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 37.0,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 84.72,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 199.76,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 156.76,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 63.86,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Abu Al Habl Island": {
+      "district": "Abu Al Habl Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 177,
+      "pollutants": {
+        "co": {
+          "value": 2.75,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 31.75,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 19.46,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 79.89,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 27.24,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 111.8,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Aliah Island": {
+      "district": "Al Aliah Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 136,
+      "pollutants": {
+        "co": {
+          "value": 3.15,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 116.03,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 86.97,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 182.3,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 105.33,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 47.72,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Mohamed Bin Zayed City": {
+      "district": "Mohamed Bin Zayed City",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 186,
+      "pollutants": {
+        "co": {
+          "value": 1.31,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 117.22,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 37.79,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 185.93,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 147.62,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 22.59,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Mihsinah": {
+      "district": "Al Mihsinah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 146,
+      "pollutants": {
+        "co": {
+          "value": 1.17,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 107.63,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 47.25,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 210.19,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 50.71,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 96.77,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Aryam Island": {
+      "district": "Al Aryam Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 80,
+      "pollutants": {
+        "co": {
+          "value": 1.66,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 83.46,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 95.11,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 141.88,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 67.68,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 63.55,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Zayed City": {
+      "district": "Zayed City",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 204,
+      "pollutants": {
+        "co": {
+          "value": 3.46,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 53.29,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 88.91,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 129.83,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 77.47,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 21.31,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Yas Island": {
+      "district": "Yas Island",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 115,
+      "pollutants": {
+        "co": {
+          "value": 2.23,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 92.84,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 52.98,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 123.69,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 71.9,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 112.83,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Selmiyyah": {
+      "district": "Al Selmiyyah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 222,
+      "pollutants": {
+        "co": {
+          "value": 5.78,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 83.27,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 14.79,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 58.15,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 116.58,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 103.26,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Heel Island": {
+      "district": "Al Heel Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 171,
+      "pollutants": {
+        "co": {
+          "value": 4.91,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 106.17,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 39.81,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 145.59,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 105.95,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 72.51,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Bahyah": {
+      "district": "Al Bahyah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 214,
+      "pollutants": {
+        "co": {
+          "value": 6.71,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 66.95,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 39.62,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 209.0,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 133.09,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 98.1,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ujaij": {
+      "district": "Ujaij",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 170,
+      "pollutants": {
+        "co": {
+          "value": 3.62,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 55.94,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 83.18,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 211.61,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 147.72,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 103.63,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Matar": {
+      "district": "Al Matar",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 104,
+      "pollutants": {
+        "co": {
+          "value": 7.23,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 115.37,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 45.77,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 137.77,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 44.58,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 74.29,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Bihouth": {
+      "district": "Al Bihouth",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 191,
+      "pollutants": {
+        "co": {
+          "value": 2.6,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 88.99,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 104.29,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 112.76,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 46.65,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 120.09,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Zubarah": {
+      "district": "Al Zubarah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 103,
+      "pollutants": {
+        "co": {
+          "value": 0.5,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 75.26,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 103.85,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 84.2,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 120.39,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 46.8,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Nouf": {
+      "district": "Al Nouf",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 137,
+      "pollutants": {
+        "co": {
+          "value": 0.43,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 75.96,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 38.88,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 161.95,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 97.33,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 47.5,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Reef": {
+      "district": "Al Reef",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 162,
+      "pollutants": {
+        "co": {
+          "value": 1.12,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 35.83,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 92.85,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 150.71,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 156.37,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 77.93,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Shakhbout City": {
+      "district": "Shakhbout City",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 184,
+      "pollutants": {
+        "co": {
+          "value": 2.42,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 109.77,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 74.54,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 200.29,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 88.93,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 103.02,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Jarn Yafour": {
+      "district": "Jarn Yafour",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 175,
+      "pollutants": {
+        "co": {
+          "value": 1.78,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 63.82,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 36.02,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 166.71,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 84.44,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 78.63,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Shahamah": {
+      "district": "Al Shahamah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 139,
+      "pollutants": {
+        "co": {
+          "value": 2.66,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 112.26,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 57.41,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 138.8,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 129.88,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 92.05,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Shinayin": {
+      "district": "Al Shinayin",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 176,
+      "pollutants": {
+        "co": {
+          "value": 4.92,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 101.78,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 27.77,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 76.5,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 18.61,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 18.07,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Sader": {
+      "district": "Al Sader",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 135,
+      "pollutants": {
+        "co": {
+          "value": 3.82,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 84.57,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 120.32,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 197.97,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 81.69,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 24.23,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bani Yas": {
+      "district": "Bani Yas",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 241,
+      "pollutants": {
+        "co": {
+          "value": 3.34,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 92.69,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 89.03,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 226.51,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 42.78,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 70.18,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Shelaylah Island": {
+      "district": "Al Shelaylah Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 205,
+      "pollutants": {
+        "co": {
+          "value": 2.26,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 54.14,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 14.98,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 160.82,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 53.56,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 68.03,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Shawamekh": {
+      "district": "Al Shawamekh",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 173,
+      "pollutants": {
+        "co": {
+          "value": 2.64,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 73.1,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 73.7,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 241.95,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 63.0,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 82.72,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Hanyourah": {
+      "district": "Al Hanyourah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 160,
+      "pollutants": {
+        "co": {
+          "value": 2.77,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 97.32,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 32.15,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 51.29,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 123.05,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 30.24,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Rawdat Al Reef": {
+      "district": "Rawdat Al Reef",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 160,
+      "pollutants": {
+        "co": {
+          "value": 2.31,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 49.51,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 75.11,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 207.47,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 21.44,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 42.77,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Falah": {
+      "district": "Al Falah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 250,
+      "pollutants": {
+        "co": {
+          "value": 2.68,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 113.25,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 43.53,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 133.0,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 158.23,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 80.85,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Shamkhah": {
+      "district": "Al Shamkhah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 218,
+      "pollutants": {
+        "co": {
+          "value": 3.82,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 57.7,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 65.8,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 167.66,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 54.21,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 89.23,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Rahbah": {
+      "district": "Al Rahbah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 209,
+      "pollutants": {
+        "co": {
+          "value": 2.87,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 50.76,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 124.13,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 141.08,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 157.91,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 40.8,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Abu Mreikhah": {
+      "district": "Abu Mreikhah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 57,
+      "pollutants": {
+        "co": {
+          "value": 0.6,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 109.61,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 76.86,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 99.5,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 74.84,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 11.38,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Wathbah": {
+      "district": "Al Wathbah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 200,
+      "pollutants": {
+        "co": {
+          "value": 7.6,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 104.13,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 94.43,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 223.7,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 157.56,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 14.49,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Khidayrah": {
+      "district": "Al Khidayrah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 119,
+      "pollutants": {
+        "co": {
+          "value": 6.94,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 114.32,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 70.58,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 56.97,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 61.92,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 31.65,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Madinat Al Riyad": {
+      "district": "Madinat Al Riyad",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 233,
+      "pollutants": {
+        "co": {
+          "value": 2.29,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 102.58,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 85.71,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 206.9,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 45.12,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 89.96,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Nahdah": {
+      "district": "Al Nahdah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 207,
+      "pollutants": {
+        "co": {
+          "value": 8.61,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 100.78,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 65.82,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 87.71,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 105.5,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 102.82,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Samhah": {
+      "district": "Al Samhah",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 166,
+      "pollutants": {
+        "co": {
+          "value": 6.28,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 105.36,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 57.2,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 161.66,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 49.6,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 41.75,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Taweelah": {
+      "district": "Al Taweelah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 79,
+      "pollutants": {
+        "co": {
+          "value": 1.75,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 95.93,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 88.97,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 88.9,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 52.16,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 105.32,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Mshayrif": {
+      "district": "Mshayrif",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 200,
+      "pollutants": {
+        "co": {
+          "value": 1.66,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 51.44,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 101.03,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 91.12,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 143.86,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 39.17,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Muwaylih": {
+      "district": "Muwaylih",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 108,
+      "pollutants": {
+        "co": {
+          "value": 0.23,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 37.43,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 97.0,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 225.5,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 17.52,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 94.39,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Zayed Military City": {
+      "district": "Zayed Military City",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 220,
+      "pollutants": {
+        "co": {
+          "value": 2.73,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 89.23,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 87.17,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 210.67,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 44.51,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 56.73,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Mi'rad": {
+      "district": "Al Mi'rad",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 123,
+      "pollutants": {
+        "co": {
+          "value": 2.71,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 51.51,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 29.35,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 221.43,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 150.11,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 13.81,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Ma'mourah": {
+      "district": "Al Ma'mourah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 166,
+      "pollutants": {
+        "co": {
+          "value": 1.83,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 77.24,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 59.1,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 210.0,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 111.55,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 54.13,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Haffar": {
+      "district": "Al Haffar",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 193,
+      "pollutants": {
+        "co": {
+          "value": 6.56,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 79.52,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 13.68,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 216.72,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 45.38,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 97.56,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Khalifa Industrial": {
+      "district": "Khalifa Industrial",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 167,
+      "pollutants": {
+        "co": {
+          "value": 4.11,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 37.67,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 52.61,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 218.21,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 113.98,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 81.36,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ghanadhah": {
+      "district": "Ghanadhah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 168,
+      "pollutants": {
+        "co": {
+          "value": 1.57,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 69.19,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 40.29,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 115.66,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 108.66,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 7.65,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Smeeh": {
+      "district": "Al Smeeh",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 171,
+      "pollutants": {
+        "co": {
+          "value": 4.08,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 94.36,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 98.24,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 143.37,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 133.81,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 17.49,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Abu Al Abyad Island": {
+      "district": "Abu Al Abyad Island",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 128,
+      "pollutants": {
+        "co": {
+          "value": 7.24,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 70.0,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 80.38,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 93.21,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 94.32,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 43.15,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al 'Adlah": {
+      "district": "Al 'Adlah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 203,
+      "pollutants": {
+        "co": {
+          "value": 5.07,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 60.15,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 69.01,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 138.91,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 68.1,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 90.02,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al 'Asheesh": {
+      "district": "Al 'Asheesh",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 190,
+      "pollutants": {
+        "co": {
+          "value": 0.29,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 117.29,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 100.82,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 177.21,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 23.9,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 107.97,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Sout": {
+      "district": "Al Sout",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 213,
+      "pollutants": {
+        "co": {
+          "value": 3.56,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 90.33,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 38.21,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 186.88,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 18.97,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 22.2,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Fayah": {
+      "district": "Al Fayah",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 88,
+      "pollutants": {
+        "co": {
+          "value": -0.06,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 49.89,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 98.31,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 196.27,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 55.23,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 60.64,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Dhaharat Al Teeb": {
+      "district": "Dhaharat Al Teeb",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 193,
+      "pollutants": {
+        "co": {
+          "value": 1.07,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 70.54,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 25.17,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 203.05,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 138.29,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 84.17,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ghadeer Al Tayr": {
+      "district": "Ghadeer Al Tayr",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 188,
+      "pollutants": {
+        "co": {
+          "value": 1.3,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 32.13,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 99.19,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 214.57,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 113.9,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 37.67,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Layyan": {
+      "district": "Al Layyan",
+      "region": "Abu Dhabi",
+      "classification": "Urban",
+      "aqi": 230,
+      "pollutants": {
+        "co": {
+          "value": 2.51,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 36.91,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 97.54,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 151.07,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 124.34,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 122.75,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Dihan": {
+      "district": "Dihan",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 101,
+      "pollutants": {
+        "co": {
+          "value": 1.04,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 99.76,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 57.87,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 137.26,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 131.61,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 52.0,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Khatm": {
+      "district": "Al Khatm",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 75,
+      "pollutants": {
+        "co": {
+          "value": 2.77,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 49.41,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 56.97,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 70.54,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 68.29,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 21.31,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ghantout": {
+      "district": "Ghantout",
+      "region": "Abu Dhabi",
+      "classification": "Rural",
+      "aqi": 173,
+      "pollutants": {
+        "co": {
+          "value": 1.52,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 33.05,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 90.86,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 103.7,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 21.94,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 62.1,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Jimi": {
+      "district": "Al Jimi",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 206,
+      "pollutants": {
+        "co": {
+          "value": 7.96,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 77.62,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 55.18,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 161.01,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 16.36,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 109.28,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Mu'tarid": {
+      "district": "Al Mu'tarid",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 86,
+      "pollutants": {
+        "co": {
+          "value": 1.44,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 100.77,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 104.01,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 152.5,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 44.96,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 30.88,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Qattarah": {
+      "district": "Al Qattarah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 139,
+      "pollutants": {
+        "co": {
+          "value": 3.34,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 36.17,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 44.48,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 23.81,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 94.43,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 24.43,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Mas'oudi": {
+      "district": "Al Mas'oudi",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 164,
+      "pollutants": {
+        "co": {
+          "value": 4.41,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 84.59,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 70.56,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 107.0,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 48.23,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 32.91,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Muwaij'i": {
+      "district": "Al Muwaij'i",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 140,
+      "pollutants": {
+        "co": {
+          "value": 1.65,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 112.85,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 87.15,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 85.43,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 124.36,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 69.57,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Tiwayya": {
+      "district": "Al Tiwayya",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 161,
+      "pollutants": {
+        "co": {
+          "value": 4.13,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 75.47,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 54.91,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 172.83,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 18.55,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 85.51,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Khibeesi": {
+      "district": "Al Khibeesi",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 102,
+      "pollutants": {
+        "co": {
+          "value": 6.92,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 55.98,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 46.26,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 130.02,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 53.49,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 123.89,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Central District": {
+      "district": "Central District",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 138,
+      "pollutants": {
+        "co": {
+          "value": 8.02,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 83.79,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 40.42,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 27.02,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 81.82,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 90.36,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Nabbagh": {
+      "district": "Al Nabbagh",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 122,
+      "pollutants": {
+        "co": {
+          "value": 4.69,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 99.74,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 82.96,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 110.04,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": -1.12,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 90.78,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Jahili": {
+      "district": "Al Jahili",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 79,
+      "pollutants": {
+        "co": {
+          "value": 3.61,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 113.41,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 52.66,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 83.36,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 35.81,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 64.57,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Hili": {
+      "district": "Hili",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 89,
+      "pollutants": {
+        "co": {
+          "value": 8.58,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 39.85,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 47.52,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 76.66,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 12.14,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 91.3,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Mutaw'ah": {
+      "district": "Al Mutaw'ah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 178,
+      "pollutants": {
+        "co": {
+          "value": 5.22,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 99.17,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 76.88,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 182.89,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 73.68,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 58.28,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Falaj Hazza'": {
+      "district": "Falaj Hazza'",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 161,
+      "pollutants": {
+        "co": {
+          "value": 6.78,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 27.48,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 74.62,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 117.21,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 111.37,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 50.3,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Industrial Area": {
+      "district": "Industrial Area",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 218,
+      "pollutants": {
+        "co": {
+          "value": 6.85,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 46.33,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 50.31,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 32.11,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 145.25,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 114.54,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Sarouj": {
+      "district": "Al Sarouj",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 166,
+      "pollutants": {
+        "co": {
+          "value": 2.26,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 69.58,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 90.35,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 51.24,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 68.7,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 88.82,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Markhaniyyah": {
+      "district": "Al Markhaniyyah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 180,
+      "pollutants": {
+        "co": {
+          "value": 1.76,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 57.82,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 95.9,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 48.3,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 19.44,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 128.61,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Dahma": {
+      "district": "Al Dahma",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 142,
+      "pollutants": {
+        "co": {
+          "value": 1.66,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 37.27,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 51.32,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 54.64,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 19.72,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": -0.1,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "'Asharij": {
+      "district": "'Asharij",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 212,
+      "pollutants": {
+        "co": {
+          "value": 7.8,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 90.28,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 61.76,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 151.21,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 59.99,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 57.88,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Shiab Al Ashkhar": {
+      "district": "Shiab Al Ashkhar",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 194,
+      "pollutants": {
+        "co": {
+          "value": 5.49,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 83.46,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 34.54,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 117.19,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 121.38,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 26.2,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Ruwaydat": {
+      "district": "Al Ruwaydat",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 70,
+      "pollutants": {
+        "co": {
+          "value": 6.84,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 67.89,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 70.43,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 144.95,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 32.5,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 68.51,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al 'Iqabiyyah": {
+      "district": "Al 'Iqabiyyah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 204,
+      "pollutants": {
+        "co": {
+          "value": 7.26,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 57.34,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 116.53,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 145.8,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 58.45,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 66.17,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Ain International Airport": {
+      "district": "Al Ain International Airport",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 79,
+      "pollutants": {
+        "co": {
+          "value": 5.28,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 53.91,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 75.51,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 181.38,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 21.38,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 93.49,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bad' Bint Sa'oud": {
+      "district": "Bad' Bint Sa'oud",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 83,
+      "pollutants": {
+        "co": {
+          "value": 3.45,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 94.6,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 49.2,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 95.52,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 33.15,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 88.42,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Zakhir": {
+      "district": "Zakhir",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 157,
+      "pollutants": {
+        "co": {
+          "value": 5.77,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 35.9,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 105.24,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 160.32,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 81.26,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 119.05,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Shuwaymah": {
+      "district": "Al Shuwaymah",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 37,
+      "pollutants": {
+        "co": {
+          "value": 6.89,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 68.58,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 53.19,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 70.63,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 29.34,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 0.55,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Fou'ah": {
+      "district": "Al Fou'ah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 144,
+      "pollutants": {
+        "co": {
+          "value": 5.96,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 91.5,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 71.71,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 166.56,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 29.35,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 21.04,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Aflaj": {
+      "district": "Al Aflaj",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 172,
+      "pollutants": {
+        "co": {
+          "value": 0.28,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 58.09,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 47.53,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 156.18,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 45.68,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 54.59,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Maqam": {
+      "district": "Al Maqam",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 99,
+      "pollutants": {
+        "co": {
+          "value": 2.84,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 39.99,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 82.1,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 104.71,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 67.16,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 112.23,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ghnaymah": {
+      "district": "Ghnaymah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 187,
+      "pollutants": {
+        "co": {
+          "value": 8.37,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 74.05,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 34.93,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 24.28,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 82.98,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 42.58,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Rawdah Al Sharqiyah": {
+      "district": "Al Rawdah Al Sharqiyah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 144,
+      "pollutants": {
+        "co": {
+          "value": 6.24,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 82.59,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 120.44,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 166.37,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 39.35,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 13.73,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Noud": {
+      "district": "Al Noud",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 52,
+      "pollutants": {
+        "co": {
+          "value": 1.67,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 85.77,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 54.69,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 47.48,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 32.98,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 15.36,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Malaqit": {
+      "district": "Malaqit",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 89,
+      "pollutants": {
+        "co": {
+          "value": 1.06,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 104.89,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 70.09,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 169.79,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": -0.76,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 100.73,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Mbazzarah Al Khadra": {
+      "district": "Mbazzarah Al Khadra",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 156,
+      "pollutants": {
+        "co": {
+          "value": 5.37,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 85.29,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 47.07,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 189.91,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 145.63,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 53.52,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ghireebah": {
+      "district": "Ghireebah",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 48,
+      "pollutants": {
+        "co": {
+          "value": 6.17,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 81.14,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 48.74,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 57.6,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 62.85,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 16.36,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Shi'bat Al Wutah": {
+      "district": "Shi'bat Al Wutah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 89,
+      "pollutants": {
+        "co": {
+          "value": 1.87,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 80.33,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 118.15,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 118.71,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 111.38,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 16.84,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Salamat": {
+      "district": "Al Salamat",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 224,
+      "pollutants": {
+        "co": {
+          "value": 4.41,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 31.41,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 32.58,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 68.86,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 115.53,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 59.86,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ni'mah": {
+      "district": "Ni'mah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 142,
+      "pollutants": {
+        "co": {
+          "value": 5.3,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 93.6,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 73.98,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 194.09,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 62.54,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 23.63,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Masakin": {
+      "district": "Masakin",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 112,
+      "pollutants": {
+        "co": {
+          "value": 3.99,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 109.27,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 74.9,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 186.1,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 79.34,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 89.74,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Jabal Hafeet": {
+      "district": "Jabal Hafeet",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 185,
+      "pollutants": {
+        "co": {
+          "value": 5.49,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 58.62,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 15.4,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 40.35,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 120.92,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 65.8,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Aamerah": {
+      "district": "Al Aamerah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 161,
+      "pollutants": {
+        "co": {
+          "value": 7.5,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 25.47,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 99.76,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 59.71,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 81.71,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 126.1,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ain Al Faydah": {
+      "district": "Ain Al Faydah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 118,
+      "pollutants": {
+        "co": {
+          "value": 3.01,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 45.71,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 47.6,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 168.17,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 43.52,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 48.0,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Qisees": {
+      "district": "Al Qisees",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 87,
+      "pollutants": {
+        "co": {
+          "value": 0.74,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 105.3,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 74.82,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 9.23,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 126.72,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 62.05,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Dhahir": {
+      "district": "Al Dhahir",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 110,
+      "pollutants": {
+        "co": {
+          "value": 6.34,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 43.85,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 125.83,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 187.31,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 70.16,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 52.48,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Sweihan": {
+      "district": "Sweihan",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 211,
+      "pollutants": {
+        "co": {
+          "value": 8.12,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 87.12,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 65.65,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 184.4,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 91.19,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 29.59,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Khatm Al Shiklah": {
+      "district": "Khatm Al Shiklah",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 52,
+      "pollutants": {
+        "co": {
+          "value": 2.48,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 55.95,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 10.67,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 33.63,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 5.95,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 85.47,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Industrial City": {
+      "district": "Industrial City",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 110,
+      "pollutants": {
+        "co": {
+          "value": 6.86,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 97.8,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 36.5,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 136.6,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 10.4,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 113.16,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Um Ghafah": {
+      "district": "Um Ghafah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 138,
+      "pollutants": {
+        "co": {
+          "value": 1.52,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 61.3,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 109.61,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 85.28,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 49.62,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 23.62,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Nahil": {
+      "district": "Nahil",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 165,
+      "pollutants": {
+        "co": {
+          "value": 3.42,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 71.57,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 93.4,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 93.54,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 51.86,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 53.92,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Dhahrah": {
+      "district": "Al Dhahrah",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 158,
+      "pollutants": {
+        "co": {
+          "value": 6.86,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 40.42,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 51.03,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 71.11,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 76.9,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 70.9,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Sa'": {
+      "district": "Sa'",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 136,
+      "pollutants": {
+        "co": {
+          "value": 7.28,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 90.88,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 28.68,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 167.56,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 68.37,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 14.48,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Mazyad": {
+      "district": "Mazyad",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 110,
+      "pollutants": {
+        "co": {
+          "value": 8.58,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 95.51,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 39.14,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 81.84,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 107.8,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 25.11,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Sad": {
+      "district": "Al Sad",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 181,
+      "pollutants": {
+        "co": {
+          "value": 7.97,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 111.65,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 85.16,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 178.27,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 111.19,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 63.97,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Hiyar": {
+      "district": "Al Hiyar",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 79,
+      "pollutants": {
+        "co": {
+          "value": 6.06,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 42.45,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 37.09,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 84.06,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 94.9,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 82.76,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Rimah": {
+      "district": "Rimah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 210,
+      "pollutants": {
+        "co": {
+          "value": 8.32,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 30.53,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 37.2,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 192.27,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 68.93,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 25.39,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Abu Samrah": {
+      "district": "Abu Samrah",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 50,
+      "pollutants": {
+        "co": {
+          "value": 6.23,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 49.02,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 12.35,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 35.53,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 47.41,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 24.74,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ramlat Sweihan": {
+      "district": "Ramlat Sweihan",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 153,
+      "pollutants": {
+        "co": {
+          "value": 2.28,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 107.01,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 45.83,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 51.08,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 102.38,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 106.49,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Faqa'": {
+      "district": "Al Faqa'",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 154,
+      "pollutants": {
+        "co": {
+          "value": 3.44,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 32.18,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 43.9,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 170.64,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 7.19,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 8.89,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al 'Ajban": {
+      "district": "Al 'Ajban",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 90,
+      "pollutants": {
+        "co": {
+          "value": 5.23,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 39.32,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 60.84,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 92.93,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 23.26,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 113.29,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bu Kirayyah": {
+      "district": "Bu Kirayyah",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 73,
+      "pollutants": {
+        "co": {
+          "value": -0.12,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 108.66,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 56.62,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 103.89,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 1.11,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 83.67,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Shiwayb": {
+      "district": "Al Shiwayb",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 179,
+      "pollutants": {
+        "co": {
+          "value": 4.17,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 40.95,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 108.79,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 119.03,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 117.69,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 20.43,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al 'Arad": {
+      "district": "Al 'Arad",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 50,
+      "pollutants": {
+        "co": {
+          "value": 3.99,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 67.92,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 70.17,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 12.65,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 32.58,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 102.99,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Niqa Al Dheeb": {
+      "district": "Niqa Al Dheeb",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 154,
+      "pollutants": {
+        "co": {
+          "value": 3.1,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 28.01,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 91.95,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 21.74,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 63.13,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 78.16,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Khaznah": {
+      "district": "Al Khaznah",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 185,
+      "pollutants": {
+        "co": {
+          "value": 7.17,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 70.59,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 117.86,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 139.87,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 75.68,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 49.07,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Wiqan": {
+      "district": "Al Wiqan",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 110,
+      "pollutants": {
+        "co": {
+          "value": 8.55,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 107.1,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 85.05,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 90.68,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 105.73,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 56.07,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Abu Hiraybah": {
+      "district": "Abu Hiraybah",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 160,
+      "pollutants": {
+        "co": {
+          "value": 4.02,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 69.52,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 64.8,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 103.38,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 43.27,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 89.61,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Qou'": {
+      "district": "Al Qou'",
+      "region": "Al Ain",
+      "classification": "Urban",
+      "aqi": 115,
+      "pollutants": {
+        "co": {
+          "value": 7.84,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 66.99,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 109.21,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 140.27,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 70.69,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 124.6,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Um Al Zumoul": {
+      "district": "Um Al Zumoul",
+      "region": "Al Ain",
+      "classification": "Rural",
+      "aqi": 92,
+      "pollutants": {
+        "co": {
+          "value": -0.03,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 28.11,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 72.79,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 138.35,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 119.21,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 19.71,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Bday'Ah": {
+      "district": "Al Bday'Ah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 223,
+      "pollutants": {
+        "co": {
+          "value": 2.83,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 70.05,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 87.46,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 246.71,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 152.25,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 41.18,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bilji'An": {
+      "district": "Bilji'An",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 202,
+      "pollutants": {
+        "co": {
+          "value": 6.35,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 70.48,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 97.3,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 218.02,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 159.84,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 93.95,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Habshan": {
+      "district": "Habshan",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 193,
+      "pollutants": {
+        "co": {
+          "value": 4.86,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 102.42,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 41.64,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 102.91,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 63.58,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 30.65,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bu Al Dhiyab": {
+      "district": "Bu Al Dhiyab",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 155,
+      "pollutants": {
+        "co": {
+          "value": 3.14,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 94.34,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 90.54,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 155.99,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 64.51,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 107.4,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al 'Azeezah": {
+      "district": "Al 'Azeezah",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 234,
+      "pollutants": {
+        "co": {
+          "value": 2.84,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 59.89,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 39.79,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 209.36,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 96.87,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 67.64,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bu Hasa": {
+      "district": "Bu Hasa",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 230,
+      "pollutants": {
+        "co": {
+          "value": 2.4,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 90.19,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 120.12,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 199.87,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 109.64,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 104.76,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Um Laylah": {
+      "district": "Um Laylah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 125,
+      "pollutants": {
+        "co": {
+          "value": 2.04,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 97.57,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 19.34,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 103.39,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 142.88,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 69.79,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "MzeerʻAh": {
+      "district": "MzeerʻAh",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 229,
+      "pollutants": {
+        "co": {
+          "value": 4.88,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 80.35,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 82.75,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 194.54,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 122.98,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 45.63,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Tarif": {
+      "district": "Tarif",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 177,
+      "pollutants": {
+        "co": {
+          "value": 5.41,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 80.55,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 31.18,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 191.15,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 118.33,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 51.06,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Taf Al Gharbi": {
+      "district": "Al Taf Al Gharbi",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 172,
+      "pollutants": {
+        "co": {
+          "value": 3.64,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 101.64,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 17.56,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 177.12,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 59.53,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 77.01,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Zarraf": {
+      "district": "Al Zarraf",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 198,
+      "pollutants": {
+        "co": {
+          "value": 0.47,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 78.7,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 52.52,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 118.24,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 47.05,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 77.9,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Western Mahadir": {
+      "district": "Western Mahadir",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 244,
+      "pollutants": {
+        "co": {
+          "value": 5.31,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 86.05,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 67.87,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 193.1,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 153.08,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 60.12,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Eastern Mahadir": {
+      "district": "Eastern Mahadir",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 166,
+      "pollutants": {
+        "co": {
+          "value": 5.93,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 37.34,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 121.78,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 145.58,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 83.62,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 97.92,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Rideem": {
+      "district": "Al Rideem",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 217,
+      "pollutants": {
+        "co": {
+          "value": 6.73,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 69.1,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 41.13,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 116.39,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 103.61,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 34.29,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Marfa": {
+      "district": "Al Marfa",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 153,
+      "pollutants": {
+        "co": {
+          "value": 4.84,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 73.02,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 47.94,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 104.31,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 111.01,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 116.79,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Hadwaniyyah": {
+      "district": "Al Hadwaniyyah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 186,
+      "pollutants": {
+        "co": {
+          "value": 7.12,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 45.0,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 53.63,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 112.68,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 39.9,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 24.13,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Dhafra Islands": {
+      "district": "Al Dhafra Islands",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 127,
+      "pollutants": {
+        "co": {
+          "value": 3.74,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 77.75,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 70.09,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 216.73,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 119.25,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 64.38,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Milaysah": {
+      "district": "Milaysah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 179,
+      "pollutants": {
+        "co": {
+          "value": 7.24,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 67.61,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 15.02,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 90.06,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 42.83,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 96.43,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bateen Liwa": {
+      "district": "Bateen Liwa",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 126,
+      "pollutants": {
+        "co": {
+          "value": 3.67,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 58.93,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 58.63,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 154.93,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 51.89,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 24.68,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Yaw Al Nadhrah": {
+      "district": "Yaw Al Nadhrah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 147,
+      "pollutants": {
+        "co": {
+          "value": 5.21,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 88.55,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 99.12,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 126.52,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 96.53,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 24.24,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Harmiyyah": {
+      "district": "Al Harmiyyah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 184,
+      "pollutants": {
+        "co": {
+          "value": 5.43,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 72.86,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 67.12,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 114.52,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 157.7,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 19.42,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Qirayn Al 'Aysh": {
+      "district": "Qirayn Al 'Aysh",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 192,
+      "pollutants": {
+        "co": {
+          "value": 3.32,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 73.62,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 75.81,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 228.47,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 117.55,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 91.21,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Khasbat Al Reem": {
+      "district": "Khasbat Al Reem",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 201,
+      "pollutants": {
+        "co": {
+          "value": 4.6,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 116.32,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 94.07,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 82.26,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 159.95,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 2.24,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Baynounah": {
+      "district": "Baynounah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 226,
+      "pollutants": {
+        "co": {
+          "value": 5.95,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 111.24,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 23.91,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 143.23,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 145.8,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 37.03,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Abu Qrayn": {
+      "district": "Abu Qrayn",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 142,
+      "pollutants": {
+        "co": {
+          "value": 1.2,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 86.96,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 14.78,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 134.44,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 90.28,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 32.8,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Mkhayriz": {
+      "district": "Mkhayriz",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 220,
+      "pollutants": {
+        "co": {
+          "value": 2.77,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 81.48,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 40.67,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 243.34,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 108.97,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 94.66,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Hameem": {
+      "district": "Hameem",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 175,
+      "pollutants": {
+        "co": {
+          "value": 6.85,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 60.58,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 40.64,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 157.77,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 143.18,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 69.01,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al 'Ayif": {
+      "district": "Al 'Ayif",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 158,
+      "pollutants": {
+        "co": {
+          "value": 4.5,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 109.22,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 100.53,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 184.18,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 161.15,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 10.66,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ghiyathi": {
+      "district": "Ghiyathi",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 224,
+      "pollutants": {
+        "co": {
+          "value": 2.47,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 72.34,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 40.17,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 257.24,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 89.09,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 76.54,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Ruways": {
+      "district": "Al Ruways",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 251,
+      "pollutants": {
+        "co": {
+          "value": 2.38,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 54.94,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 115.29,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 195.55,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 159.76,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 85.64,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Mirayr": {
+      "district": "Al Mirayr",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 101,
+      "pollutants": {
+        "co": {
+          "value": 0.19,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 94.01,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 81.98,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 178.31,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 115.98,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 0.11,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Yaw Al Ghadar": {
+      "district": "Yaw Al Ghadar",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 139,
+      "pollutants": {
+        "co": {
+          "value": 4.77,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 72.59,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 80.92,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 210.26,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 35.21,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 4.51,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Bad' Al Mutaw'Ah": {
+      "district": "Bad' Al Mutaw'Ah",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 144,
+      "pollutants": {
+        "co": {
+          "value": 2.18,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 72.67,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 70.33,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 92.79,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 57.33,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 69.99,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Jabal Al Dhannah": {
+      "district": "Jabal Al Dhannah",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 258,
+      "pollutants": {
+        "co": {
+          "value": 4.9,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 74.16,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 87.13,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 248.76,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 170.93,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 58.66,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Jazeerah": {
+      "district": "Al Jazeerah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 108,
+      "pollutants": {
+        "co": {
+          "value": 3.93,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 120.67,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 25.71,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 194.1,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 75.97,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 6.17,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Um Al Ashtan": {
+      "district": "Um Al Ashtan",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 140,
+      "pollutants": {
+        "co": {
+          "value": 1.92,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 92.97,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 52.84,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 165.17,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 75.7,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 21.47,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Hamra": {
+      "district": "Al Hamra",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 190,
+      "pollutants": {
+        "co": {
+          "value": 2.62,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 48.65,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 100.63,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 76.36,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 72.51,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 6.0,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Shuweehat": {
+      "district": "Al Shuweehat",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 83,
+      "pollutants": {
+        "co": {
+          "value": 7.12,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 41.17,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 42.66,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 68.23,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 47.42,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 52.7,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Barakah": {
+      "district": "Barakah",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 197,
+      "pollutants": {
+        "co": {
+          "value": 3.04,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 123.04,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 86.1,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 228.32,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 65.32,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 18.09,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Sabkhat Matti": {
+      "district": "Sabkhat Matti",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 80,
+      "pollutants": {
+        "co": {
+          "value": 1.25,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 108.48,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 52.93,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 116.57,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 37.85,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 21.77,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Delma": {
+      "district": "Delma",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 123,
+      "pollutants": {
+        "co": {
+          "value": 0.01,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 100.88,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 17.46,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 198.9,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 65.54,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 34.07,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Mahmiyyat Al Suqour": {
+      "district": "Mahmiyyat Al Suqour",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 212,
+      "pollutants": {
+        "co": {
+          "value": 1.09,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 103.33,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 28.6,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 184.78,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 102.54,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 113.8,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Wuhaydah": {
+      "district": "Al Wuhaydah",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 203,
+      "pollutants": {
+        "co": {
+          "value": 4.37,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 90.03,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 29.26,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 150.78,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 47.68,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 101.21,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Sila'": {
+      "district": "Al Sila'",
+      "region": "Al Dhafra",
+      "classification": "Urban",
+      "aqi": 188,
+      "pollutants": {
+        "co": {
+          "value": 7.01,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 108.31,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 42.56,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 88.0,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 53.16,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 125.64,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ras Mshayrib": {
+      "district": "Ras Mshayrib",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 150,
+      "pollutants": {
+        "co": {
+          "value": 0.73,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 75.2,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 14.7,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 230.33,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 120.1,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 0.17,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Al Ghuweifat": {
+      "district": "Al Ghuweifat",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 129,
+      "pollutants": {
+        "co": {
+          "value": 5.59,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 89.69,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 91.35,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 184.97,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 45.5,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 77.3,
+          "unit": "µg/m³"
+        }
+      }
+    },
+    "Ras Ghumeis": {
+      "district": "Ras Ghumeis",
+      "region": "Al Dhafra",
+      "classification": "Rural",
+      "aqi": 139,
+      "pollutants": {
+        "co": {
+          "value": 2.81,
+          "unit": "mg/m³"
+        },
+        "o3": {
+          "value": 47.87,
+          "unit": "µg/m³"
+        },
+        "no2": {
+          "value": 78.24,
+          "unit": "µg/m³"
+        },
+        "pm10": {
+          "value": 107.11,
+          "unit": "µg/m³"
+        },
+        "pm25": {
+          "value": 88.74,
+          "unit": "µg/m³"
+        },
+        "so2": {
+          "value": 86.02,
+          "unit": "µg/m³"
+        }
+      }
+    }
+  }
+}

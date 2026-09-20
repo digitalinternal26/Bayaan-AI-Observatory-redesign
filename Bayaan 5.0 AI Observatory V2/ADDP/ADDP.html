@@ -1,0 +1,2828 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADDP — Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="vendor/maplibre-gl.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../css/theme.css" />
+  <script>
+    (function () {
+      var t = localStorage.getItem("bayaan-theme") || "light";
+      document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+      // Embedded inside another Bayaan surface (e.g. census-geo.html): drop
+      // this page's own Bayaan topnav and the header-height offsets that go
+      // with it — the host page supplies the chrome.
+      try {
+        if (/[?&]embed=1(?:&|$)/.test(location.search) || window.self !== window.top) {
+          document.documentElement.classList.add("addp-embed");
+        }
+      } catch (e) {
+        document.documentElement.classList.add("addp-embed");
+      }
+    })();
+  </script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/addp-chrome.js"></script>
+  <!-- Header-offset overrides: styles.css is a generated build artifact
+       (see README.md → Rebuilding), so the fixed Bayaan topnav's ~67px
+       height gets accounted for here instead of being hand-edited into it. -->
+  <style>
+    /* .map-compare-shell has an explicit height:100% in styles.css, which
+       fights with adding top:67px (the box ends up 67px taller than the
+       viewport, pushing bottom-anchored children like .map-legend-stack
+       off-screen) — override height too so it actually shrinks. */
+    .map-compare-shell { top: 67px; height: calc(100% - 67px); }
+    .top-toolbar { top: 91px; }
+    .left-panel,
+    .detail-stack {
+      top: calc(149px - var(--card-shadow-gutter));
+      max-height: calc(100vh - 173px + (var(--card-shadow-gutter) * 2));
+    }
+    /* .ai-report-modal is inset:0 with place-items:center, so without this
+       it centers using space hidden behind the header too and the dialog's
+       top edge ends up flush against (or under) the topnav. */
+    .ai-report-modal { top: 67px; }
+
+
+    /* Fullscreen mode: no header to duck under, so drop the offsets above
+       back to their original (pre-header) values, and hide the topnav —
+       there's nowhere for it to navigate to while the browser chrome and
+       rest of the app are hidden anyway. */
+    html:fullscreen .topnav-outer,
+    html:-webkit-full-screen .topnav-outer { display: none; }
+    html:fullscreen .map-compare-shell,
+    html:-webkit-full-screen .map-compare-shell { top: 0; height: 100%; }
+    html:fullscreen .top-toolbar,
+    html:-webkit-full-screen .top-toolbar { top: 24px; }
+    html:fullscreen .left-panel,
+    html:fullscreen .detail-stack,
+    html:-webkit-full-screen .left-panel,
+    html:-webkit-full-screen .detail-stack {
+      top: calc(82px - var(--card-shadow-gutter));
+      max-height: calc(100vh - 106px + (var(--card-shadow-gutter) * 2));
+    }
+    html:fullscreen .ai-report-modal,
+    html:-webkit-full-screen .ai-report-modal { top: 0; }
+
+    /* Embedded mode (?embed=1 or framed): the host page owns the topnav, so
+       hide ours and fall back to the same pre-header offsets fullscreen uses. */
+    html.addp-embed .topnav-outer { display: none; }
+    html.addp-embed .map-compare-shell { top: 0; height: 100%; }
+    html.addp-embed .top-toolbar { top: 24px; }
+    html.addp-embed .left-panel,
+    html.addp-embed .detail-stack {
+      top: calc(82px - var(--card-shadow-gutter));
+      max-height: calc(100vh - 106px + (var(--card-shadow-gutter) * 2));
+    }
+    /* Host page (census-geo.html) floats its own vertical nav rail over the
+       left edge — nudge ADDP's panels right so the map stays full-bleed
+       underneath but the panels clear the rail. The tab row lines up with
+       the panel cards' visual left edge (.left-panel's left + its
+       card-shadow-gutter padding = 104px). */
+    html.addp-embed .top-toolbar { left: 104px; }
+    html.addp-embed .left-panel { left: calc(104px - var(--card-shadow-gutter)); }
+    html.addp-embed .detail-stack { left: calc(509px - var(--card-shadow-gutter)); }
+    html.addp-embed .ai-report-modal { top: 0; }
+
+    /* Bayaan AI brand color: styles.css ships its own generic blue
+       (#0a8ffc/#0080bb) for every "AI" surface. Re-point just the report
+       trigger button at Bayaan's actual AI gradient tokens (--ai-from/--ai-to
+       in css/variables.css, oklch(.62 .2 285) → oklch(.62 .21 255), also
+       used by .bayaan-mark) so it reads as Bayaan AI, not ADDP's house
+       blue. Hex values below are that gradient's sRGB equivalents. */
+    .panel-ai-report-btn { background: linear-gradient(135deg, #7e6cf7, #0083ff); }
+
+    /* Bayaan primary color: the rest of the report's content (everything
+       but the AI-branded trigger button above) used ADDP's own house blue
+       (#0a8ffc/#0080bb) — swap it for Bayaan's actual primary accent
+       (--accent/--accent-dark in css/variables.css: #0066FF/#0052CC). */
+    .ai-report-modal-header { background: radial-gradient(circle at top left, rgba(0, 102, 255, .1), transparent 55%), transparent; }
+    .ai-report-modal-brand-icon { background: linear-gradient(145deg, #0066ff33, #0052cc14); box-shadow: inset 0 0 0 1px #0066ff1f; }
+    .ai-report-modal-body { background: radial-gradient(circle at top right, rgba(0, 102, 255, .04), transparent 40%), transparent; }
+    .ai-report-modal-loading-orb { background: linear-gradient(145deg, #0066ff24, #0052cc0d); box-shadow: inset 0 0 0 1px #0066ff1f; }
+    .ai-report-modal-spinner { border: 2px solid rgba(0, 102, 255, .16); border-top-color: var(--accent); }
+    .ai-report-hero { background: linear-gradient(145deg, #0066ff1f, #0052cc08 55%, #ffffffe6), #fff; border: 1px solid rgba(0, 102, 255, .12); box-shadow: 0 10px 28px #0066ff14; }
+    .ai-report-kicker { color: var(--accent-dark); }
+    .ai-report-hero-metric-icon { background: #0066ff1a; }
+    .ai-report-section-icon { background: #0066ff1a; }
+    .ai-report-action-item { background: #0066ff0a; border: 1px solid rgba(0, 102, 255, .08); }
+    .ai-report-action-num { background: var(--accent); }
+    .ai-report-modal-download .icon { color: var(--accent-dark); }
+    .ai-report-modal-done { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); box-shadow: 0 8px 18px #0066ff38; }
+    .ai-report-pillarchip { background: #0066ff12; border: 1px solid rgba(0, 102, 255, .28); color: var(--accent-dark); }
+    .ai-report-exec { background: linear-gradient(90deg, #0066ff14, #0066ff08); }
+    .ai-report-exec-label { color: var(--accent-dark); }
+    .ai-report-pulsebox { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); box-shadow: 0 8px 18px #0066ff2e; }
+    .ai-report-benchseg.is-district { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); }
+    .ai-report-statcell-icon { color: var(--accent-dark); }
+    .ai-report-recnum { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); }
+  </style>
+</head>
+<body>
+  <div id="screen-geo-view" class="ws-screen header-flush">
+  <div data-bayaan-header></div>
+  <div class="map-compare-shell" data-map-compare-shell>
+    <div class="map-compare-pane is-primary" data-map-primary-pane>
+      <div class="map-period-label" data-map-period-label="a" hidden>Period A</div>
+      <div id="map"></div>
+      <div class="map-legend-stack" aria-label="Map legend">
+        <div class="map-legend" data-map-legend>
+          <span class="map-legend-swatch" data-map-legend-swatch aria-hidden="true"></span>
+          <span class="map-legend-label">Focused District</span>
+          <span class="map-legend-divider" aria-hidden="true"></span>
+          <div class="score-legend" data-score-legend>
+            <span class="score-legend-item">
+              <span class="score-legend-swatch is-good" aria-hidden="true"></span>
+              <span class="score-legend-label">Good</span>
+            </span>
+            <span class="score-legend-item">
+              <span class="score-legend-swatch is-risk" aria-hidden="true"></span>
+              <span class="score-legend-label">Risk</span>
+            </span>
+            <span class="score-legend-item">
+              <span class="score-legend-swatch is-critical" aria-hidden="true"></span>
+              <span class="score-legend-label">Critical</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="map-compare-pane is-secondary" data-map-compare-pane hidden>
+      <div class="map-period-label" data-map-period-label="b">Period B</div>
+      <div id="map-compare"></div>
+    </div>
+  </div>
+
+  <div class="top-toolbar">
+    <div class="tabs" role="tablist" aria-label="Inbox views" data-module-only="addp">
+      <button
+        type="button"
+        class="tab is-active"
+        role="tab"
+        id="tab-essentials"
+        aria-selected="true"
+        data-tab="essentials"
+      >
+        <span class="icon" data-icon="list-details" aria-hidden="true"></span>
+        Essentials Index
+      </button>
+      <button
+        type="button"
+        class="tab"
+        role="tab"
+        id="tab-social"
+        aria-selected="false"
+        data-tab="social"
+      >
+        <span class="icon" data-icon="users-group" aria-hidden="true"></span>
+        Social Resilience
+      </button>
+    </div>
+    <div class="panel-export-row">
+      <div class="module-switcher" data-module-switcher>
+        <button
+          type="button"
+          class="module-switcher-btn"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="module-switcher-menu"
+          data-module-switcher-toggle
+        >
+          <span class="module-switcher-icon" aria-hidden="true">
+            <img src="assets/nav-addp.svg" alt="" data-module-switcher-icon />
+          </span>
+          <span class="module-switcher-label" data-module-switcher-label>ADDP</span>
+          <span class="module-switcher-chevron icon" data-icon="chevron-down" aria-hidden="true"></span>
+        </button>
+        <div
+          class="module-switcher-menu"
+          id="module-switcher-menu"
+          role="listbox"
+          aria-label="Main modules"
+          hidden
+          data-module-switcher-menu
+        >
+          <button
+            type="button"
+            class="module-switcher-option"
+            role="option"
+            aria-selected="false"
+            data-module-option="my-map"
+            data-module-label="My map"
+            data-module-icon="assets/nav-my-map.svg"
+          >
+            <span class="module-switcher-option-icon" aria-hidden="true">
+              <img src="assets/nav-my-map.svg" alt="" />
+            </span>
+            <span>My map</span>
+          </button>
+          <button
+            type="button"
+            class="module-switcher-option"
+            role="option"
+            aria-selected="false"
+            data-module-option="population"
+            data-module-label="Population"
+            data-module-icon="assets/nav-population.svg"
+          >
+            <span class="module-switcher-option-icon" aria-hidden="true">
+              <img src="assets/nav-population.svg" alt="" />
+            </span>
+            <span>Population</span>
+          </button>
+          <button
+            type="button"
+            class="module-switcher-option is-active"
+            role="option"
+            aria-selected="true"
+            data-module-option="addp"
+            data-module-label="ADDP"
+            data-module-icon="assets/nav-addp.svg"
+          >
+            <span class="module-switcher-option-icon" aria-hidden="true">
+              <img src="assets/nav-addp.svg" alt="" />
+            </span>
+            <span>ADDP</span>
+          </button>
+          <button
+            type="button"
+            class="module-switcher-option"
+            role="option"
+            aria-selected="false"
+            data-module-option="real-estate"
+            data-module-label="Real estate"
+            data-module-icon="assets/nav-real-estate.svg"
+          >
+            <span class="module-switcher-option-icon" aria-hidden="true">
+              <img src="assets/nav-real-estate.svg" alt="" />
+            </span>
+            <span>Real estate</span>
+          </button>
+          <button
+            type="button"
+            class="module-switcher-option"
+            role="option"
+            aria-selected="false"
+            data-module-option="labour-force"
+            data-module-label="Labour force"
+            data-module-icon="assets/nav-labour-force.svg"
+          >
+            <span class="module-switcher-option-icon" aria-hidden="true">
+              <img src="assets/nav-labour-force.svg" alt="" />
+            </span>
+            <span>Labour force</span>
+          </button>
+          <button
+            type="button"
+            class="module-switcher-option"
+            role="option"
+            aria-selected="false"
+            data-module-option="air-quality"
+            data-module-label="Air quality"
+            data-module-icon="assets/nav-air-quality.svg"
+          >
+            <span class="module-switcher-option-icon" aria-hidden="true">
+              <img src="assets/nav-air-quality.svg" alt="" />
+            </span>
+            <span>Air quality</span>
+          </button>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="panel-ai-report-btn"
+        data-ai-generate-report
+        data-ai-report-focus="overall"
+      >
+        <span class="icon" data-icon="file-text" aria-hidden="true"></span>
+        <span>AI Report</span>
+      </button>
+      <div class="panel-download" data-panel-download>
+        <button
+          type="button"
+          class="panel-download-btn"
+          aria-label="Download"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-controls="panel-download-menu"
+          data-panel-download-toggle
+        >
+          <span class="icon" data-icon="download" aria-hidden="true"></span>
+        </button>
+        <div
+          class="panel-download-menu"
+          id="panel-download-menu"
+          role="menu"
+          hidden
+          data-panel-download-menu
+        >
+          <div class="panel-download-menu-label">Export format</div>
+          <button type="button" class="panel-download-option" role="menuitem" data-download-format="excel">
+            <span class="icon" data-icon="table" aria-hidden="true"></span>
+            <span class="panel-download-option-copy">
+              <span class="panel-download-option-title">Excel</span>
+              <span class="panel-download-option-meta">Spreadsheet (.xls)</span>
+            </span>
+          </button>
+          <button type="button" class="panel-download-option" role="menuitem" data-download-format="pdf">
+            <span class="icon" data-icon="file-type-pdf" aria-hidden="true"></span>
+            <span class="panel-download-option-copy">
+              <span class="panel-download-option-title">PDF</span>
+              <span class="panel-download-option-meta">Printable report</span>
+            </span>
+          </button>
+          <button type="button" class="panel-download-option" role="menuitem" data-download-format="powerpoint">
+            <span class="icon" data-icon="presentation" aria-hidden="true"></span>
+            <span class="panel-download-option-copy">
+              <span class="panel-download-option-title">PowerPoint</span>
+              <span class="panel-download-option-meta">Presentation (.ppt)</span>
+            </span>
+          </button>
+          <div class="panel-download-menu-divider" role="separator"></div>
+          <div class="panel-download-menu-label">Filtered download</div>
+          <button type="button" class="panel-download-option" role="menuitem" data-download-format="filtered-excel">
+            <span class="icon" data-icon="filter" aria-hidden="true"></span>
+            <span class="panel-download-option-copy">
+              <span class="panel-download-option-title">Filtered Excel</span>
+              <span class="panel-download-option-meta">Current district filter</span>
+            </span>
+          </button>
+          <button type="button" class="panel-download-option" role="menuitem" data-download-format="filtered-pdf">
+            <span class="icon" data-icon="filter-2" aria-hidden="true"></span>
+            <span class="panel-download-option-copy">
+              <span class="panel-download-option-title">Filtered PDF</span>
+              <span class="panel-download-option-meta">Current district filter</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-panel">
+    <div
+      class="panel-level-tabs"
+      role="tablist"
+      aria-label="Air quality view level"
+      data-aq-view-level-tabs
+      data-module-only="air-quality"
+    >
+      <button
+        type="button"
+        class="panel-level-tab is-active"
+        role="tab"
+        aria-selected="true"
+        data-aq-view-level="raster"
+      >
+        Raster level
+      </button>
+      <button
+        type="button"
+        class="panel-level-tab"
+        role="tab"
+        aria-selected="false"
+        data-aq-view-level="district"
+      >
+        District level
+      </button>
+    </div>
+    <div class="panel-box">
+      <div class="panel-square" aria-hidden="true">
+        <img
+          src="assets/abu-dhabi-emirate.svg"
+          alt=""
+          class="panel-square-icon"
+          data-panel-icon
+        />
+      </div>
+      <div class="dropdown" data-dropdown>
+        <div class="dropdown-trigger">
+          <span class="dropdown-value" data-dropdown-value>Abu Dhabi</span>
+        </div>
+        <div class="dropdown-subtitle">
+          <span data-district-value>Select district</span>
+        </div>
+        <div class="dropdown-menu" role="listbox" aria-multiselectable="true" hidden data-dropdown-menu>
+          <div class="dropdown-group">
+            <div class="dropdown-label">Emirate</div>
+            <button
+              type="button"
+              class="dropdown-option is-selected"
+              role="option"
+              aria-selected="true"
+              data-group="emirate"
+              data-value="emirate:Abu Dhabi"
+              data-label="Abu Dhabi"
+              data-panel-icon-src="assets/abu-dhabi-emirate.svg"
+            >
+              <img src="assets/abu-dhabi-emirate.svg" alt="" class="dropdown-option-icon" />
+              <span>Abu Dhabi</span>
+            </button>
+          </div>
+          <div class="dropdown-group">
+            <div class="dropdown-label">Region</div>
+            <button
+              type="button"
+              class="dropdown-option"
+              role="option"
+              aria-selected="false"
+              data-group="region"
+              data-value="region:Abu Dhabi"
+              data-label="Abu Dhabi"
+              data-panel-icon-src="assets/abu-dhabi.svg"
+            >
+              <img src="assets/abu-dhabi.svg" alt="" class="dropdown-option-icon" />
+              <span>Abu Dhabi</span>
+            </button>
+            <button
+              type="button"
+              class="dropdown-option"
+              role="option"
+              aria-selected="false"
+              data-group="region"
+              data-value="region:Al Ain"
+              data-label="Al Ain"
+              data-panel-icon-src="assets/al-ain.svg"
+            >
+              <img src="assets/al-ain.svg" alt="" class="dropdown-option-icon" />
+              <span>Al Ain</span>
+            </button>
+            <button
+              type="button"
+              class="dropdown-option"
+              role="option"
+              aria-selected="false"
+              data-group="region"
+              data-value="region:Al Dhafra"
+              data-label="Al Dhafra"
+              data-panel-icon-src="assets/al-dhafra.svg"
+            >
+              <img src="assets/al-dhafra.svg" alt="" class="dropdown-option-icon" />
+              <span>Al Dhafra</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="dropdown-subtitle-wrap" data-district-dropdown>
+        <button
+          type="button"
+          class="panel-box-chevron"
+          aria-label="Toggle location picker"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          data-district-trigger
+        >
+          <span class="icon" data-icon="chevron-down" aria-hidden="true"></span>
+        </button>
+        <div class="district-menu location-district-menu" role="listbox" hidden data-district-menu></div>
+      </div>
+      <button
+        type="button"
+        class="panel-box-reset"
+        aria-label="Reset region and district"
+        title="Reset"
+        data-location-reset
+      >
+        <span class="icon" data-icon="refresh" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div data-module-view="addp">
+    <div class="score-panels-stack" data-score-panels>
+    <div class="panel-card" aria-label="District Score" data-panel-card data-district-card>
+      <div class="panel-card-header">
+        <div class="panel-card-title-wrap">
+          <h2 class="panel-card-title">
+            <button
+              type="button"
+              class="panel-card-info-btn"
+              aria-label="District Score info"
+              aria-expanded="false"
+              aria-controls="info-tooltip"
+              data-panel-info-toggle
+              data-info-title="District Score"
+            >District Score</button>
+          </h2>
+        </div>
+        <div class="panel-card-header-stats">
+          <span class="panel-card-header-stat">
+            <span class="panel-card-header-stat-label">Score</span>
+            <span class="panel-card-header-stat-value" data-overall-score-compact>83.18%</span>
+          </span>
+          <span class="panel-card-header-stat-divider" aria-hidden="true"></span>
+          <span class="panel-card-header-stat">
+            <span class="panel-card-header-stat-label">Population</span>
+            <span class="panel-card-header-stat-value" data-population-total-compact>4,135,985</span>
+          </span>
+        </div>
+        <div class="panel-card-ai-actions">
+          <button
+            type="button"
+            class="panel-card-ai-btn"
+            aria-label="AI insight"
+            aria-expanded="false"
+            aria-controls="ai-insight-panel"
+            data-ai-insight-toggle
+          >
+            <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+            <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+          </button>
+        </div>
+        <button
+          type="button"
+          class="panel-card-collapse"
+          aria-label="Collapse district score"
+          aria-expanded="true"
+          aria-controls="district-score-body"
+          title="Collapse"
+          data-district-card-toggle
+        >
+          <span class="icon" data-icon="chevron-up" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="panel-card-collapsible" id="district-score-body" data-district-card-body>
+      <div class="panel-card-collapsible-inner">
+      <div class="panel-card-body">
+        <div class="panel-card-score">
+          <p class="panel-card-score-label" hidden>Total Score</p>
+          <div class="district-score-gauge" data-district-gauge>
+            <svg class="gauge-svg" viewBox="0 0 180 88" role="img" aria-label="District score gauge" focusable="false">
+              <g data-gauge-ticks></g>
+              <path class="gauge-arc" data-gauge-arc="1" />
+              <path class="gauge-arc" data-gauge-arc="2" />
+              <path class="gauge-arc" data-gauge-arc="3" />
+              <path class="gauge-arc" data-gauge-arc="4" />
+              <path class="gauge-arc" data-gauge-arc="5" />
+              <path class="gauge-arc" data-gauge-arc="6" />
+              <g class="gauge-marker" data-gauge-marker>
+                <circle class="gauge-marker-halo" r="8" />
+                <circle class="gauge-marker-inner" r="3.5" />
+              </g>
+            </svg>
+          </div>
+          <div class="district-score-chip" data-district-score-chip>
+            <span class="district-score-chip-dot" aria-hidden="true"></span>
+            <span class="panel-card-score-level" data-overall-level>High</span>
+          </div>
+          <p class="panel-card-score-value" data-overall-score>83.18%</p>
+          <ul class="panel-card-status-list">
+            <li class="panel-card-status-item">
+              <span class="panel-card-status-dot is-good" aria-hidden="true"></span>
+              <span class="panel-card-status-text">
+                <span class="panel-card-status-count" data-status-count="good">0</span>
+                <span class="panel-card-status-label">Good</span>
+              </span>
+            </li>
+            <li class="panel-card-status-item">
+              <span class="panel-card-status-dot is-risk" aria-hidden="true"></span>
+              <span class="panel-card-status-text">
+                <span class="panel-card-status-count" data-status-count="risk">0</span>
+                <span class="panel-card-status-label">Risk</span>
+              </span>
+            </li>
+            <li class="panel-card-status-item">
+              <span class="panel-card-status-dot is-critical" aria-hidden="true"></span>
+              <span class="panel-card-status-text">
+                <span class="panel-card-status-count" data-status-count="critical">0</span>
+                <span class="panel-card-status-label">Critical</span>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <div class="panel-card-population-wrap">
+          <p class="panel-card-score-label">Total Population</p>
+          <p class="panel-card-population-value" data-population-total>4,135,985</p>
+        </div>
+        <div class="panel-card-breakdowns">
+          <div class="panel-card-citizenship">
+            <div class="panel-card-ratio-row">
+              <p class="panel-card-citizenship-label">By Citizenship</p>
+              <span class="panel-card-ratio-value" data-citizenship-ratio hidden>35/65</span>
+            </div>
+            <div class="citizenship-chart-block">
+              <div
+                class="stacked-bar"
+                role="img"
+                aria-label="Emirati 35%, Non-Emirati 65%"
+                data-citizenship-bar
+              >
+                <span class="stacked-bar-seg is-emirati" style="width: 35%" data-citizenship-emirati></span>
+                <span class="stacked-bar-seg is-non-emirati" style="width: 65%" data-citizenship-non-emirati></span>
+              </div>
+              <div class="stacked-bar-legend">
+                <span class="stacked-bar-legend-item">
+                  <span class="stacked-bar-legend-pct" data-citizenship-pct="emirati">35%</span> Emirati
+                </span>
+                <span class="stacked-bar-legend-item">
+                  <span class="stacked-bar-legend-pct" data-citizenship-pct="non-emirati">65%</span> Non-Emirati
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="panel-card-gender">
+            <div class="panel-card-ratio-row">
+              <p class="panel-card-citizenship-label">By Gender</p>
+              <span class="panel-card-ratio-value" data-gender-ratio hidden>55/45</span>
+            </div>
+            <div class="citizenship-chart-block">
+              <div
+                class="stacked-bar"
+                role="img"
+                aria-label="Male 55%, Female 45%"
+                data-gender-bar
+              >
+                <span class="stacked-bar-seg is-male" style="width: 55%" data-gender-male></span>
+                <span class="stacked-bar-seg is-female" style="width: 45%" data-gender-female></span>
+              </div>
+              <div class="stacked-bar-legend">
+                <span class="stacked-bar-legend-item">
+                  <span class="stacked-bar-legend-pct" data-gender-pct="male">55%</span> Male
+                </span>
+                <span class="stacked-bar-legend-item">
+                  <span class="stacked-bar-legend-pct" data-gender-pct="female">45%</span> Female
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="panel-card-insight"
+        id="ai-insight-panel"
+        aria-hidden="true"
+        data-ai-insight-panel
+      >
+        <div class="panel-card-insight-inner">
+          <div class="panel-card-insight-title">
+            <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+            <span>AI Insight</span>
+          </div>
+          <p class="panel-card-insight-text">
+            This district scores high overall, with strong performance across most
+            indicators. Population mix and citizenship patterns suggest stable demand —
+            watch the 2 risk/critical flags for targeted improvements.
+          </p>
+        </div>
+      </div>
+      </div>
+      </div>
+    </div>
+    <div class="domain-card-panel" data-domain-panel>
+      <div class="domain-card-panel-inner">
+    <div class="panel-card" aria-label="Domain scores" id="domain-scores-card" data-domain-card>
+      <div class="metric-section is-clickable" data-metric-section data-domain="healthcare" data-open-detail="healthcare" data-inbox-tabs="essentials social">
+        <div class="metric-section-header">
+          <span class="metric-section-icon-wrap is-healthcare">
+            <span class="metric-section-icon is-healthcare-icon icon" data-icon="heart-rate-monitor" aria-hidden="true"></span>
+          </span>
+          <div class="metric-section-text">
+            <div class="metric-section-title-line">
+              <h2 class="metric-section-title">Health</h2>
+              <p class="metric-section-value">
+                98.26%<span class="metric-section-level">High</span>
+              </p>
+            </div>
+            <div
+              class="metric-section-score-bar"
+              data-score-bar
+              data-score="98.26"
+              aria-hidden="true"
+            ></div>
+          </div>
+          <div class="metric-section-actions">
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="AI insight"
+              aria-expanded="false"
+              aria-controls="healthcare-ai-insight-panel"
+              data-ai-insight-toggle
+            >
+              <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+              <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+            </button>
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="More"
+              data-open-detail-btn
+            >
+              <span class="panel-card-ai-icon icon" data-icon="chevron-right" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="panel-card-insight"
+          id="healthcare-ai-insight-panel"
+          aria-hidden="true"
+          data-ai-insight-panel
+        >
+          <div class="panel-card-insight-inner">
+            <div class="panel-card-insight-title">
+              <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+              <span>AI Insight</span>
+            </div>
+            <p class="panel-card-insight-text">
+              Healthcare performance is excellent at 98.26%. Service coverage and outcomes
+              remain strong — maintain current capacity planning and monitor any emerging
+              demand shifts across the district.
+            </p>
+          </div>
+        </div>
+        <div class="panel-card-divider" aria-hidden="true"></div>
+      </div>
+
+      <div class="metric-section is-clickable" data-metric-section data-domain="education" data-open-detail="education" data-inbox-tabs="essentials social">
+        <div class="metric-section-header">
+          <span class="metric-section-icon-wrap is-education">
+            <span class="metric-section-icon icon" data-icon="school" aria-hidden="true"></span>
+          </span>
+          <div class="metric-section-text">
+            <div class="metric-section-title-line">
+              <h2 class="metric-section-title">Education</h2>
+              <p class="metric-section-value">
+                94.12%<span class="metric-section-level">High</span>
+              </p>
+            </div>
+            <div
+              class="metric-section-score-bar"
+              data-score-bar
+              data-score="94.12"
+              aria-hidden="true"
+            ></div>
+          </div>
+          <div class="metric-section-actions">
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="AI insight"
+              aria-expanded="false"
+              aria-controls="education-ai-insight-panel"
+              data-ai-insight-toggle
+            >
+              <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+              <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+            </button>
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="More"
+              data-open-detail-btn
+            >
+              <span class="panel-card-ai-icon icon" data-icon="chevron-right" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="panel-card-insight"
+          id="education-ai-insight-panel"
+          aria-hidden="true"
+          data-ai-insight-panel
+        >
+          <div class="panel-card-insight-inner">
+            <div class="panel-card-insight-title">
+              <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+              <span>AI Insight</span>
+            </div>
+            <p class="panel-card-insight-text">
+              Education scores highly at 94.12%. Access and attainment indicators are
+              strong — continue supporting school capacity and lifelong learning programs.
+            </p>
+          </div>
+        </div>
+        <div class="panel-card-divider" aria-hidden="true"></div>
+      </div>
+
+      <div class="metric-section is-clickable" data-metric-section data-domain="safety" data-open-detail="safety" data-inbox-tabs="essentials social">
+        <div class="metric-section-header">
+          <span class="metric-section-icon-wrap is-safety">
+            <span class="metric-section-icon icon" data-icon="shield-check" aria-hidden="true"></span>
+          </span>
+          <div class="metric-section-text">
+            <div class="metric-section-title-line">
+              <h2 class="metric-section-title">Safety &amp; Security</h2>
+              <p class="metric-section-value">
+                91.85%<span class="metric-section-level">High</span>
+              </p>
+            </div>
+            <div
+              class="metric-section-score-bar"
+              data-score-bar
+              data-score="91.85"
+              aria-hidden="true"
+            ></div>
+          </div>
+          <div class="metric-section-actions">
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="AI insight"
+              aria-expanded="false"
+              aria-controls="safety-ai-insight-panel"
+              data-ai-insight-toggle
+            >
+              <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+              <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+            </button>
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="More"
+              data-open-detail-btn
+            >
+              <span class="panel-card-ai-icon icon" data-icon="chevron-right" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="panel-card-insight"
+          id="safety-ai-insight-panel"
+          aria-hidden="true"
+          data-ai-insight-panel
+        >
+          <div class="panel-card-insight-inner">
+            <div class="panel-card-insight-title">
+              <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+              <span>AI Insight</span>
+            </div>
+            <p class="panel-card-insight-text">
+              Safety &amp; Security is strong at 91.85%. Incident rates remain low —
+              sustain community policing and emergency response readiness.
+            </p>
+          </div>
+        </div>
+        <div class="panel-card-divider" aria-hidden="true"></div>
+      </div>
+
+      <div class="metric-section is-clickable" data-metric-section data-domain="environment" data-open-detail="environment" data-inbox-tabs="essentials social">
+        <div class="metric-section-header">
+          <span class="metric-section-icon-wrap is-environment">
+            <span class="metric-section-icon icon" data-icon="leaf" aria-hidden="true"></span>
+          </span>
+          <div class="metric-section-text">
+            <div class="metric-section-title-line">
+              <h2 class="metric-section-title">Environment & Facilities</h2>
+              <p class="metric-section-value">
+                82.60%<span class="metric-section-level">High</span>
+              </p>
+            </div>
+            <div
+              class="metric-section-score-bar"
+              data-score-bar
+              data-score="82.60"
+              aria-hidden="true"
+            ></div>
+          </div>
+          <div class="metric-section-actions">
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="AI insight"
+              aria-expanded="false"
+              aria-controls="environment-ai-insight-panel"
+              data-ai-insight-toggle
+            >
+              <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+              <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+            </button>
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="More"
+              data-open-detail-btn
+            >
+              <span class="panel-card-ai-icon icon" data-icon="chevron-right" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="panel-card-insight"
+          id="environment-ai-insight-panel"
+          aria-hidden="true"
+          data-ai-insight-panel
+        >
+          <div class="panel-card-insight-inner">
+            <div class="panel-card-insight-title">
+              <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+              <span>AI Insight</span>
+            </div>
+            <p class="panel-card-insight-text">
+              Environment scores 82.60%. Air quality and green space access are good —
+              keep advancing sustainability and waste-reduction initiatives.
+            </p>
+          </div>
+        </div>
+        <div class="panel-card-divider" aria-hidden="true"></div>
+      </div>
+
+      <div class="metric-section is-clickable" data-metric-section data-domain="income" data-open-detail="income" data-inbox-tabs="social" hidden>
+        <div class="metric-section-header">
+          <span class="metric-section-icon-wrap is-income">
+            <span class="metric-section-icon icon" data-icon="wallet" aria-hidden="true"></span>
+          </span>
+          <div class="metric-section-text">
+            <div class="metric-section-title-line">
+              <h2 class="metric-section-title">Income &amp; Job</h2>
+              <p class="metric-section-value">
+                87.40%<span class="metric-section-level">High</span>
+              </p>
+            </div>
+            <div
+              class="metric-section-score-bar"
+              data-score-bar
+              data-score="87.40"
+              aria-hidden="true"
+            ></div>
+          </div>
+          <div class="metric-section-actions">
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="AI insight"
+              aria-expanded="false"
+              aria-controls="income-ai-insight-panel"
+              data-ai-insight-toggle
+            >
+              <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+              <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+            </button>
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="More"
+              data-open-detail-btn
+            >
+              <span class="panel-card-ai-icon icon" data-icon="chevron-right" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="panel-card-insight"
+          id="income-ai-insight-panel"
+          aria-hidden="true"
+          data-ai-insight-panel
+        >
+          <div class="panel-card-insight-inner">
+            <div class="panel-card-insight-title">
+              <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+              <span>AI Insight</span>
+            </div>
+            <p class="panel-card-insight-text">
+              Income &amp; Job scores 87.40%. Employment levels are healthy — focus on
+              skills matching and supporting small business growth in the district.
+            </p>
+          </div>
+        </div>
+        <div class="panel-card-divider" aria-hidden="true"></div>
+      </div>
+
+      <div class="metric-section is-clickable" data-metric-section data-domain="housing" data-open-detail="housing" data-inbox-tabs="social" hidden>
+        <div class="metric-section-header">
+          <span class="metric-section-icon-wrap is-housing">
+            <span class="metric-section-icon icon" data-icon="home-2" aria-hidden="true"></span>
+          </span>
+          <div class="metric-section-text">
+            <div class="metric-section-title-line">
+              <h2 class="metric-section-title">Housing</h2>
+              <p class="metric-section-value">
+                85.72%<span class="metric-section-level">High</span>
+              </p>
+            </div>
+            <div
+              class="metric-section-score-bar"
+              data-score-bar
+              data-score="85.72"
+              aria-hidden="true"
+            ></div>
+          </div>
+          <div class="metric-section-actions">
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="AI insight"
+              aria-expanded="false"
+              aria-controls="housing-ai-insight-panel"
+              data-ai-insight-toggle
+            >
+              <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+              <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+            </button>
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="More"
+              data-open-detail-btn
+            >
+              <span class="panel-card-ai-icon icon" data-icon="chevron-right" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="panel-card-insight"
+          id="housing-ai-insight-panel"
+          aria-hidden="true"
+          data-ai-insight-panel
+        >
+          <div class="panel-card-insight-inner">
+            <div class="panel-card-insight-title">
+              <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+              <span>AI Insight</span>
+            </div>
+            <p class="panel-card-insight-text">
+              Housing scores 85.72%. Affordability and quality remain solid — monitor
+              supply pipelines and prioritize balanced residential growth.
+            </p>
+          </div>
+        </div>
+        <div class="panel-card-divider" aria-hidden="true"></div>
+      </div>
+
+      <div class="metric-section is-clickable" data-metric-section data-domain="family" data-open-detail="family" data-inbox-tabs="social" hidden>
+        <div class="metric-section-header">
+          <span class="metric-section-icon-wrap is-family">
+            <span class="metric-section-icon icon" data-icon="users-group" aria-hidden="true"></span>
+          </span>
+          <div class="metric-section-text">
+            <div class="metric-section-title-line">
+              <h2 class="metric-section-title">Family &amp; Social</h2>
+              <p class="metric-section-value">
+                89.35%<span class="metric-section-level">High</span>
+              </p>
+            </div>
+            <div
+              class="metric-section-score-bar"
+              data-score-bar
+              data-score="89.35"
+              aria-hidden="true"
+            ></div>
+          </div>
+          <div class="metric-section-actions">
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="AI insight"
+              aria-expanded="false"
+              aria-controls="family-ai-insight-panel"
+              data-ai-insight-toggle
+            >
+              <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+              <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+            </button>
+            <button
+              type="button"
+              class="panel-card-ai-btn"
+              aria-label="More"
+              data-open-detail-btn
+            >
+              <span class="panel-card-ai-icon icon" data-icon="chevron-right" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="panel-card-insight"
+          id="family-ai-insight-panel"
+          aria-hidden="true"
+          data-ai-insight-panel
+        >
+          <div class="panel-card-insight-inner">
+            <div class="panel-card-insight-title">
+              <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+              <span>AI Insight</span>
+            </div>
+            <p class="panel-card-insight-text">
+              Family &amp; Social scores 89.35%. Community cohesion and social services
+              are performing well — expand inclusive programs where demand is rising.
+            </p>
+          </div>
+        </div>
+        <div class="panel-card-divider" aria-hidden="true"></div>
+      </div>
+    </div>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="domain-toggle-btn"
+      aria-label="Toggle domain scores"
+      aria-expanded="true"
+      aria-controls="domain-scores-card"
+      data-domain-toggle
+    >
+      <span class="domain-toggle-icon icon" data-icon="chevron-up" aria-hidden="true"></span>
+    </button>
+    </div>
+    </div>
+    <div data-module-view="air-quality" hidden>
+      <div class="score-panels-stack" data-aq-panels>
+      <div class="panel-card" aria-label="Air Quality" data-panel-card data-air-quality-card>
+        <div class="panel-card-header">
+          <span class="panel-card-icon-wrap">
+            <img
+              src="assets/nav-air-quality.svg"
+              alt=""
+              class="panel-card-icon"
+            />
+          </span>
+          <div class="panel-card-title-wrap">
+            <h2 class="panel-card-title">
+              <button
+                type="button"
+                class="panel-card-info-btn"
+                aria-label="Air Quality info"
+                aria-expanded="false"
+                aria-controls="info-tooltip"
+                data-panel-info-toggle
+                data-info-title="Air Quality"
+              >Air Quality</button>
+            </h2>
+          </div>
+          <div class="panel-card-header-stats">
+            <span class="panel-card-header-stat">
+              <span class="panel-card-header-stat-label">AQI</span>
+              <span class="panel-card-header-stat-value-row">
+                <span class="panel-card-header-stat-value" data-air-quality-aqi-compact>42</span>
+                <span class="aq-delta is-compact" data-air-quality-delta-compact hidden></span>
+              </span>
+            </span>
+            <span class="panel-card-header-stat-divider" aria-hidden="true"></span>
+            <span class="panel-card-header-stat">
+              <span class="panel-card-header-stat-label">Population</span>
+              <span class="panel-card-header-stat-value" data-population-total-compact>4,135,985</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            class="panel-card-collapse"
+            aria-label="Collapse air quality"
+            aria-expanded="true"
+            aria-controls="air-quality-body"
+            title="Collapse"
+            data-air-quality-card-toggle
+          >
+            <span class="icon" data-icon="chevron-up" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="panel-card-collapsible" id="air-quality-body" data-air-quality-card-body>
+          <div class="panel-card-collapsible-inner">
+            <div class="panel-card-body">
+              <div class="panel-card-score">
+                <div
+                  class="panel-card-score-bar"
+                  data-score-bar
+                  data-score="84"
+                  aria-hidden="true"
+                ></div>
+                <p class="panel-card-score-label">Air Quality Index</p>
+                <p class="panel-card-score-value" data-air-quality-aqi>42</p>
+                <p class="aq-delta" data-air-quality-delta hidden></p>
+                <p class="panel-card-score-level" data-air-quality-status>Good</p>
+              </div>
+              <div class="panel-card-population-wrap">
+                <p class="panel-card-score-label">Total Population</p>
+                <p class="panel-card-population-value" data-population-total>4,135,985</p>
+              </div>
+              <div class="panel-card-breakdowns">
+                <div class="panel-card-citizenship">
+                  <div class="panel-card-ratio-row">
+                    <p class="panel-card-citizenship-label">By Citizenship</p>
+                    <span class="panel-card-ratio-value" data-citizenship-ratio hidden>35/65</span>
+                  </div>
+                  <div class="citizenship-chart-block">
+                    <div
+                      class="stacked-bar"
+                      role="img"
+                      aria-label="Emirati 35%, Non-Emirati 65%"
+                      data-citizenship-bar
+                    >
+                      <span class="stacked-bar-seg is-emirati" style="width: 35%" data-citizenship-emirati></span>
+                      <span class="stacked-bar-seg is-non-emirati" style="width: 65%" data-citizenship-non-emirati></span>
+                    </div>
+                    <div class="stacked-bar-legend">
+                      <span class="stacked-bar-legend-item">
+                        <span class="stacked-bar-legend-pct" data-citizenship-pct="emirati">35%</span> Emirati
+                      </span>
+                      <span class="stacked-bar-legend-item">
+                        <span class="stacked-bar-legend-pct" data-citizenship-pct="non-emirati">65%</span> Non-Emirati
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-card-gender">
+                  <div class="panel-card-ratio-row">
+                    <p class="panel-card-citizenship-label">By Gender</p>
+                    <span class="panel-card-ratio-value" data-gender-ratio hidden>55/45</span>
+                  </div>
+                  <div class="citizenship-chart-block">
+                    <div
+                      class="stacked-bar"
+                      role="img"
+                      aria-label="Male 55%, Female 45%"
+                      data-gender-bar
+                    >
+                      <span class="stacked-bar-seg is-male" style="width: 55%" data-gender-male></span>
+                      <span class="stacked-bar-seg is-female" style="width: 45%" data-gender-female></span>
+                    </div>
+                    <div class="stacked-bar-legend">
+                      <span class="stacked-bar-legend-item">
+                        <span class="stacked-bar-legend-pct" data-gender-pct="male">55%</span> Male
+                      </span>
+                      <span class="stacked-bar-legend-item">
+                        <span class="stacked-bar-legend-pct" data-gender-pct="female">45%</span> Female
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel-card-footer">
+              <div class="panel-card-ai-actions">
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="AI insight"
+                  aria-expanded="false"
+                  aria-controls="air-quality-ai-insight-panel"
+                  data-ai-insight-toggle
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                </button>
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="AI assistant"
+                  data-ai-assistant-open
+                  data-ai-focus="air-quality"
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+            <div
+              class="panel-card-insight"
+              id="air-quality-ai-insight-panel"
+              aria-hidden="true"
+              data-ai-insight-panel
+            >
+              <div class="panel-card-insight-inner">
+                <div class="panel-card-insight-title">
+                  <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                  <span>AI Insight</span>
+                </div>
+                <p class="panel-card-insight-text" data-air-quality-insight-text>
+                  Air quality conditions for the selected area are summarized from the latest
+                  AQI reading and pollutant mix. Review PM and NO₂ contributors when status
+                  moves above Moderate.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="domain-toggle-btn"
+        aria-label="Toggle pollutant overview"
+        aria-expanded="true"
+        aria-controls="pollutant-overview-card"
+        data-pollutant-toggle
+      >
+        <span class="domain-toggle-icon icon" data-icon="chevron-up" aria-hidden="true"></span>
+      </button>
+      <div class="domain-card-panel" data-pollutant-panel>
+        <div class="domain-card-panel-inner">
+      <div
+        class="panel-card pollutant-overview-card"
+        aria-label="Pollutant Overview"
+        id="pollutant-overview-card"
+        data-panel-card
+        data-pollutant-overview
+      >
+        <div class="panel-card-header pollutant-overview-header">
+          <span class="panel-card-icon-wrap is-pollutant">
+            <img
+              src="assets/pollutant-overview.svg"
+              alt=""
+              class="panel-card-icon"
+            />
+          </span>
+          <div class="panel-card-title-wrap">
+            <h2 class="panel-card-title">
+              <button
+                type="button"
+                class="panel-card-info-btn"
+                aria-label="Pollutant Overview info"
+                aria-expanded="false"
+                aria-controls="info-tooltip"
+                data-panel-info-toggle
+                data-info-title="Pollutant Overview"
+                data-info-text="Shows current concentration and health status for key air pollutants in the selected area."
+              >Pollutant Overview</button>
+            </h2>
+          </div>
+        </div>
+        <div class="pollutant-table" role="table" aria-label="Pollutant values">
+          <div class="pollutant-table-header" role="row">
+            <span class="pollutant-table-cell is-name" role="columnheader"></span>
+            <span class="pollutant-table-cell is-value" role="columnheader">Value</span>
+            <span class="pollutant-table-cell is-status" role="columnheader">Status</span>
+            <span class="pollutant-table-cell is-actions" role="columnheader"></span>
+          </div>
+
+          <div class="pollutant-item" data-pollutant="co" data-pollutant-insight>
+            <div class="pollutant-table-row" role="row">
+              <span class="pollutant-table-cell is-name" role="cell">
+                <span class="pollutant-dot is-good" aria-hidden="true"></span>
+                <span class="pollutant-name">CO</span>
+              </span>
+              <span class="pollutant-table-cell is-value" role="cell">
+                <span data-pollutant-value="co">0.78</span>
+                <span class="pollutant-unit">mg/m³</span>
+                <span class="aq-delta" data-pollutant-delta="co" hidden></span>
+              </span>
+              <span class="pollutant-table-cell is-status is-good" role="cell" data-pollutant-status="co">Good</span>
+              <span class="pollutant-table-cell is-actions" role="cell">
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="CO AI insight"
+                  aria-expanded="false"
+                  aria-controls="pollutant-co-ai-insight-panel"
+                  data-ai-insight-toggle
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                </button>
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="CO AI assistant"
+                  data-ai-assistant-open
+                  data-ai-focus="pollutant"
+                  data-ai-pollutant="co"
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+                </button>
+              </span>
+            </div>
+            <div
+              class="panel-card-insight"
+              id="pollutant-co-ai-insight-panel"
+              aria-hidden="true"
+              data-ai-insight-panel
+            >
+              <div class="panel-card-insight-inner">
+                <div class="panel-card-insight-title">
+                  <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                  <span>AI Insight</span>
+                </div>
+                <p class="panel-card-insight-text">
+                  Carbon monoxide remains within a manageable band for most outdoor activity.
+                  Watch traffic peaks if values climb toward Moderate.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pollutant-item" data-pollutant="o3" data-pollutant-insight>
+            <div class="pollutant-table-row" role="row">
+              <span class="pollutant-table-cell is-name" role="cell">
+                <span class="pollutant-dot is-moderate" aria-hidden="true"></span>
+                <span class="pollutant-name">O3</span>
+              </span>
+              <span class="pollutant-table-cell is-value" role="cell">
+                <span data-pollutant-value="o3">63.14</span>
+                <span class="pollutant-unit">µg/m³</span>
+                <span class="aq-delta" data-pollutant-delta="o3" hidden></span>
+              </span>
+              <span class="pollutant-table-cell is-status is-moderate" role="cell" data-pollutant-status="o3">Moderate</span>
+              <span class="pollutant-table-cell is-actions" role="cell">
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="O3 AI insight"
+                  aria-expanded="false"
+                  aria-controls="pollutant-o3-ai-insight-panel"
+                  data-ai-insight-toggle
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                </button>
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="O3 AI assistant"
+                  data-ai-assistant-open
+                  data-ai-focus="pollutant"
+                  data-ai-pollutant="o3"
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+                </button>
+              </span>
+            </div>
+            <div
+              class="panel-card-insight"
+              id="pollutant-o3-ai-insight-panel"
+              aria-hidden="true"
+              data-ai-insight-panel
+            >
+              <div class="panel-card-insight-inner">
+                <div class="panel-card-insight-title">
+                  <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                  <span>AI Insight</span>
+                </div>
+                <p class="panel-card-insight-text">
+                  Ozone is sensitive to heat and sunlight. Limit prolonged midday outdoor
+                  exertion when O₃ stays in the Moderate range or higher.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pollutant-item" data-pollutant="no2" data-pollutant-insight>
+            <div class="pollutant-table-row" role="row">
+              <span class="pollutant-table-cell is-name" role="cell">
+                <span class="pollutant-dot is-moderate" aria-hidden="true"></span>
+                <span class="pollutant-name">NO₂</span>
+              </span>
+              <span class="pollutant-table-cell is-value" role="cell">
+                <span data-pollutant-value="no2">61.24</span>
+                <span class="pollutant-unit">µg/m³</span>
+                <span class="aq-delta" data-pollutant-delta="no2" hidden></span>
+              </span>
+              <span class="pollutant-table-cell is-status is-moderate" role="cell" data-pollutant-status="no2">Moderate</span>
+              <span class="pollutant-table-cell is-actions" role="cell">
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="NO2 AI insight"
+                  aria-expanded="false"
+                  aria-controls="pollutant-no2-ai-insight-panel"
+                  data-ai-insight-toggle
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                </button>
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="NO2 AI assistant"
+                  data-ai-assistant-open
+                  data-ai-focus="pollutant"
+                  data-ai-pollutant="no2"
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+                </button>
+              </span>
+            </div>
+            <div
+              class="panel-card-insight"
+              id="pollutant-no2-ai-insight-panel"
+              aria-hidden="true"
+              data-ai-insight-panel
+            >
+              <div class="panel-card-insight-inner">
+                <div class="panel-card-insight-title">
+                  <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                  <span>AI Insight</span>
+                </div>
+                <p class="panel-card-insight-text">
+                  Nitrogen dioxide often tracks road traffic and combustion sources. Peak-hour
+                  corridors may show higher NO₂ than the district average.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pollutant-item" data-pollutant="pm10" data-pollutant-insight>
+            <div class="pollutant-table-row" role="row">
+              <span class="pollutant-table-cell is-name" role="cell">
+                <span class="pollutant-dot is-very-unhealthy" aria-hidden="true"></span>
+                <span class="pollutant-name">PM10</span>
+              </span>
+              <span class="pollutant-table-cell is-value" role="cell">
+                <span data-pollutant-value="pm10">102.74</span>
+                <span class="pollutant-unit">µg/m³</span>
+                <span class="aq-delta" data-pollutant-delta="pm10" hidden></span>
+              </span>
+              <span class="pollutant-table-cell is-status is-very-unhealthy" role="cell" data-pollutant-status="pm10">very unhealthy</span>
+              <span class="pollutant-table-cell is-actions" role="cell">
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="PM10 AI insight"
+                  aria-expanded="false"
+                  aria-controls="pollutant-pm10-ai-insight-panel"
+                  data-ai-insight-toggle
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                </button>
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="PM10 AI assistant"
+                  data-ai-assistant-open
+                  data-ai-focus="pollutant"
+                  data-ai-pollutant="pm10"
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+                </button>
+              </span>
+            </div>
+            <div
+              class="panel-card-insight"
+              id="pollutant-pm10-ai-insight-panel"
+              aria-hidden="true"
+              data-ai-insight-panel
+            >
+              <div class="panel-card-insight-inner">
+                <div class="panel-card-insight-title">
+                  <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                  <span>AI Insight</span>
+                </div>
+                <p class="panel-card-insight-text">
+                  Elevated PM10 is often linked to dust and coarse particles. Reduce outdoor
+                  exposure and keep windows closed during dusty periods.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pollutant-item" data-pollutant="pm25" data-pollutant-insight>
+            <div class="pollutant-table-row" role="row">
+              <span class="pollutant-table-cell is-name" role="cell">
+                <span class="pollutant-dot is-unhealthy" aria-hidden="true"></span>
+                <span class="pollutant-name">PM2.5</span>
+              </span>
+              <span class="pollutant-table-cell is-value" role="cell">
+                <span data-pollutant-value="pm25">91.55</span>
+                <span class="pollutant-unit">µg/m³</span>
+                <span class="aq-delta" data-pollutant-delta="pm25" hidden></span>
+              </span>
+              <span class="pollutant-table-cell is-status is-unhealthy" role="cell" data-pollutant-status="pm25">Unhealthy</span>
+              <span class="pollutant-table-cell is-actions" role="cell">
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="PM2.5 AI insight"
+                  aria-expanded="false"
+                  aria-controls="pollutant-pm25-ai-insight-panel"
+                  data-ai-insight-toggle
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                </button>
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="PM2.5 AI assistant"
+                  data-ai-assistant-open
+                  data-ai-focus="pollutant"
+                  data-ai-pollutant="pm25"
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+                </button>
+              </span>
+            </div>
+            <div
+              class="panel-card-insight"
+              id="pollutant-pm25-ai-insight-panel"
+              aria-hidden="true"
+              data-ai-insight-panel
+            >
+              <div class="panel-card-insight-inner">
+                <div class="panel-card-insight-title">
+                  <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                  <span>AI Insight</span>
+                </div>
+                <p class="panel-card-insight-text">
+                  Fine particulate matter (PM2.5) can penetrate deep into the lungs. Sensitive
+                  groups should minimize outdoor activity while levels remain Unhealthy.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pollutant-item" data-pollutant="so2" data-pollutant-insight>
+            <div class="pollutant-table-row" role="row">
+              <span class="pollutant-table-cell is-name" role="cell">
+                <span class="pollutant-dot is-hazardous" aria-hidden="true"></span>
+                <span class="pollutant-name">SO₂</span>
+              </span>
+              <span class="pollutant-table-cell is-value" role="cell">
+                <span data-pollutant-value="so2">91.55</span>
+                <span class="pollutant-unit">µg/m³</span>
+                <span class="aq-delta" data-pollutant-delta="so2" hidden></span>
+              </span>
+              <span class="pollutant-table-cell is-status is-hazardous" role="cell" data-pollutant-status="so2">Hazardous</span>
+              <span class="pollutant-table-cell is-actions" role="cell">
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="SO2 AI insight"
+                  aria-expanded="false"
+                  aria-controls="pollutant-so2-ai-insight-panel"
+                  data-ai-insight-toggle
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                </button>
+                <button
+                  type="button"
+                  class="panel-card-ai-btn"
+                  aria-label="SO2 AI assistant"
+                  data-ai-assistant-open
+                  data-ai-focus="pollutant"
+                  data-ai-pollutant="so2"
+                >
+                  <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+                </button>
+              </span>
+            </div>
+            <div
+              class="panel-card-insight"
+              id="pollutant-so2-ai-insight-panel"
+              aria-hidden="true"
+              data-ai-insight-panel
+            >
+              <div class="panel-card-insight-inner">
+                <div class="panel-card-insight-title">
+                  <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+                  <span>AI Insight</span>
+                </div>
+                <p class="panel-card-insight-text">
+                  Sulfur dioxide spikes can irritate airways quickly. Prefer indoor settings and
+                  avoid strenuous outdoor activity while SO₂ is elevated.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="aq-control-bar"
+    aria-label="Air quality controls"
+    data-aq-control-bar
+    data-module-only="air-quality"
+  >
+    <div class="aq-control-section" data-aq-timeline>
+      <span class="aq-control-label">Timeline</span>
+      <div class="aq-control-row">
+        <div class="aq-segmented" role="group" aria-label="Timeline period">
+          <button
+            type="button"
+            class="aq-segment is-active"
+            aria-pressed="true"
+            data-aq-timeline-period="monthly"
+          >
+            Monthly
+          </button>
+          <button
+            type="button"
+            class="aq-segment"
+            aria-pressed="false"
+            data-aq-timeline-period="yearly"
+          >
+            Yearly
+          </button>
+        </div>
+        <div class="aq-year-select" data-aq-year-select>
+          <button
+            type="button"
+            class="aq-year-trigger"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="aq-year-menu"
+            data-aq-year-toggle
+          >
+            <span data-aq-year-value>2024</span>
+            <span class="icon" data-icon="chevron-down" aria-hidden="true"></span>
+          </button>
+          <div class="aq-year-menu" id="aq-year-menu" role="listbox" hidden data-aq-year-menu>
+            <button type="button" class="aq-year-option is-active" role="option" aria-selected="true" data-aq-year="2024">2024</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2023">2023</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2022">2022</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2021">2021</button>
+          </div>
+        </div>
+        <div class="aq-year-select aq-month-select" data-aq-month-select>
+          <button
+            type="button"
+            class="aq-year-trigger"
+            aria-label="Month"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="aq-month-menu"
+            data-aq-month-toggle
+          >
+            <span data-aq-month-value>Jan</span>
+            <span class="icon" data-icon="chevron-down" aria-hidden="true"></span>
+          </button>
+          <div class="aq-year-menu aq-month-menu" id="aq-month-menu" role="listbox" hidden data-aq-month-menu>
+            <button type="button" class="aq-year-option is-active" role="option" aria-selected="true" data-aq-month="1">Jan</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="2">Feb</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="3">Mar</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="4">Apr</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="5">May</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="6">Jun</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="7">Jul</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="8">Aug</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="9">Sep</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="10">Oct</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="11">Nov</button>
+            <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="12">Dec</button>
+          </div>
+        </div>
+        <div class="aq-compare-years" data-aq-compare-years hidden>
+          <div class="aq-compare-period">
+            <div class="aq-year-select" data-aq-year-select-a>
+              <button
+                type="button"
+                class="aq-year-trigger"
+                aria-label="Period A year"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls="aq-year-menu-a"
+                data-aq-year-toggle-a
+              >
+                <span data-aq-year-value-a>2024</span>
+                <span class="icon" data-icon="chevron-down" aria-hidden="true"></span>
+              </button>
+              <div class="aq-year-menu" id="aq-year-menu-a" role="listbox" hidden data-aq-year-menu-a>
+                <button type="button" class="aq-year-option is-active" role="option" aria-selected="true" data-aq-year="2024">2024</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2023">2023</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2022">2022</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2021">2021</button>
+              </div>
+            </div>
+            <div class="aq-year-select aq-month-select" data-aq-month-select-a>
+              <button
+                type="button"
+                class="aq-year-trigger"
+                aria-label="Period A month"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls="aq-month-menu-a"
+                data-aq-month-toggle-a
+              >
+                <span data-aq-month-value-a>Jan</span>
+                <span class="icon" data-icon="chevron-down" aria-hidden="true"></span>
+              </button>
+              <div class="aq-year-menu aq-month-menu" id="aq-month-menu-a" role="listbox" hidden data-aq-month-menu-a>
+                <button type="button" class="aq-year-option is-active" role="option" aria-selected="true" data-aq-month="1">Jan</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="2">Feb</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="3">Mar</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="4">Apr</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="5">May</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="6">Jun</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="7">Jul</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="8">Aug</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="9">Sep</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="10">Oct</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="11">Nov</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="12">Dec</button>
+              </div>
+            </div>
+          </div>
+          <span class="aq-compare-vs" aria-hidden="true">vs</span>
+          <div class="aq-compare-period">
+            <div class="aq-year-select" data-aq-year-select-b>
+              <button
+                type="button"
+                class="aq-year-trigger"
+                aria-label="Period B year"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls="aq-year-menu-b"
+                data-aq-year-toggle-b
+              >
+                <span data-aq-year-value-b>2023</span>
+                <span class="icon" data-icon="chevron-down" aria-hidden="true"></span>
+              </button>
+              <div class="aq-year-menu" id="aq-year-menu-b" role="listbox" hidden data-aq-year-menu-b>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2024">2024</button>
+                <button type="button" class="aq-year-option is-active" role="option" aria-selected="true" data-aq-year="2023">2023</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2022">2022</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-year="2021">2021</button>
+              </div>
+            </div>
+            <div class="aq-year-select aq-month-select" data-aq-month-select-b>
+              <button
+                type="button"
+                class="aq-year-trigger"
+                aria-label="Period B month"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls="aq-month-menu-b"
+                data-aq-month-toggle-b
+              >
+                <span data-aq-month-value-b>Jan</span>
+                <span class="icon" data-icon="chevron-down" aria-hidden="true"></span>
+              </button>
+              <div class="aq-year-menu aq-month-menu" id="aq-month-menu-b" role="listbox" hidden data-aq-month-menu-b>
+                <button type="button" class="aq-year-option is-active" role="option" aria-selected="true" data-aq-month="1">Jan</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="2">Feb</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="3">Mar</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="4">Apr</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="5">May</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="6">Jun</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="7">Jul</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="8">Aug</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="9">Sep</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="10">Oct</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="11">Nov</button>
+                <button type="button" class="aq-year-option" role="option" aria-selected="false" data-aq-month="12">Dec</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aq-control-divider" aria-hidden="true"></div>
+
+    <div class="aq-control-section" data-aq-data>
+      <span class="aq-control-label">Data</span>
+      <div class="aq-control-row">
+        <div class="aq-segmented" role="group" aria-label="Data source">
+          <button
+            type="button"
+            class="aq-segment is-active"
+            aria-pressed="true"
+            data-aq-data-source="ground"
+          >
+            Ground
+          </button>
+          <button
+            type="button"
+            class="aq-segment"
+            aria-pressed="false"
+            data-aq-data-source="satellite"
+          >
+            Satellite
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="aq-control-divider" aria-hidden="true"></div>
+
+    <div class="aq-control-section" data-aq-compare>
+      <span class="aq-control-label">Compare</span>
+      <div class="aq-control-row">
+        <button
+          type="button"
+          class="aq-compare-btn"
+          aria-pressed="false"
+          aria-label="Compare two periods"
+          data-aq-compare-toggle
+        >
+          <span class="icon" data-icon="columns-2" aria-hidden="true"></span>
+          <span>Compare</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="aq-control-divider" aria-hidden="true"></div>
+
+    <div class="aq-control-section aq-control-section-play" data-aq-playback>
+      <span class="aq-control-label">Play air quality evolution</span>
+      <div class="aq-control-row aq-playback-row">
+        <button
+          type="button"
+          class="aq-play-btn"
+          aria-label="Play air quality evolution"
+          data-aq-play-toggle
+        >
+          <span class="icon" data-icon="player-play" aria-hidden="true" data-aq-play-icon></span>
+        </button>
+        <input
+          class="aq-evolution-slider"
+          type="range"
+          min="0"
+          max="100"
+          value="45"
+          aria-label="Air quality evolution"
+          data-aq-evolution-slider
+        />
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="detail-stack"
+    id="domain-detail-stack"
+    hidden
+    data-detail-card
+    data-module-only="addp"
+  >
+  <aside
+    class="detail-card"
+    id="domain-detail-card"
+    aria-label="Domain details"
+    data-detail-insight
+    data-detail-main
+  >
+    <div class="detail-card-header">
+      <span class="metric-section-icon-wrap is-healthcare">
+        <span class="metric-section-icon is-healthcare-icon icon" data-icon="heart-rate-monitor" aria-hidden="true"></span>
+      </span>
+      <div class="detail-card-header-copy">
+        <h2 class="detail-card-title">Health</h2>
+        <div class="detail-card-header-stats">
+          <span class="panel-card-header-stat">
+            <span class="panel-card-header-stat-label" data-detail-metric-compact-label="primary">Accessibility</span>
+            <span class="panel-card-header-stat-value" data-detail-metric-compact="primary">90%</span>
+          </span>
+          <span class="panel-card-header-stat-divider" aria-hidden="true"></span>
+          <span class="panel-card-header-stat">
+            <span class="panel-card-header-stat-label" data-detail-metric-compact-label="secondary">Availability</span>
+            <span class="panel-card-header-stat-value" data-detail-metric-compact="secondary">80%</span>
+          </span>
+        </div>
+      </div>
+      <div class="detail-card-header-actions">
+        <button
+          type="button"
+          class="panel-card-collapse"
+          aria-label="Collapse domain details"
+          aria-expanded="true"
+          aria-controls="domain-detail-body"
+          title="Collapse"
+          data-detail-card-toggle
+        >
+          <span class="icon" data-icon="chevron-up" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="detail-card-close" aria-label="Close" data-detail-close>
+          <span class="detail-card-close-icon icon" data-icon="circle-x" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-card-collapsible" id="domain-detail-body" data-detail-card-body>
+      <div class="detail-card-collapsible-inner">
+    <div class="detail-card-columns">
+      <section
+        class="detail-metric-col"
+        data-detail-metric="primary"
+        aria-labelledby="detail-metric-primary-title"
+      >
+        <img
+          src="assets/accessibility-illust.png?v=2"
+          alt=""
+          class="detail-metric-illust"
+          data-detail-metric-illust
+        />
+        <div class="detail-metric-heading">
+          <h3 id="detail-metric-primary-title" class="detail-metric-title">
+            <button
+              type="button"
+              class="detail-metric-info"
+              aria-label="Accessibility info"
+              aria-expanded="false"
+              aria-controls="info-tooltip"
+              data-panel-info-toggle
+              data-info-title="Accessibility"
+              data-info-text="Share of residents within convenient reach of this service."
+              data-detail-metric-info
+              data-detail-metric-title
+            >Accessibility</button>
+          </h3>
+        </div>
+        <p class="detail-metric-value" data-detail-metric-value>90%</p>
+        <div
+          class="detail-metric-bar"
+          role="img"
+          aria-label="Accessibility 90%"
+          data-detail-metric-bar
+        >
+          <span class="detail-metric-bar-fill" style="width: 90%" data-detail-metric-bar-fill></span>
+        </div>
+        <p class="detail-metric-level" data-detail-metric-level>High</p>
+      </section>
+
+      <div class="detail-card-divider" aria-hidden="true"></div>
+
+      <section
+        class="detail-metric-col"
+        data-detail-metric="secondary"
+        aria-labelledby="detail-metric-secondary-title"
+      >
+        <img
+          src="assets/availability-illust.png?v=2"
+          alt=""
+          class="detail-metric-illust"
+          data-detail-metric-illust
+        />
+        <div class="detail-metric-heading">
+          <h3 id="detail-metric-secondary-title" class="detail-metric-title">
+            <button
+              type="button"
+              class="detail-metric-info"
+              aria-label="Availability info"
+              aria-expanded="false"
+              aria-controls="info-tooltip"
+              data-panel-info-toggle
+              data-info-title="Availability"
+              data-info-text="Number of facilities available per 90,000 people."
+              data-detail-metric-info
+              data-detail-metric-title
+            >Availability</button>
+          </h3>
+        </div>
+        <p class="detail-metric-value" data-detail-metric-value>80%</p>
+        <div
+          class="detail-metric-bar"
+          role="img"
+          aria-label="Availability 80%"
+          data-detail-metric-bar
+        >
+          <span class="detail-metric-bar-fill" style="width: 80%" data-detail-metric-bar-fill></span>
+        </div>
+        <p class="detail-metric-level" data-detail-metric-level>High</p>
+      </section>
+    </div>
+
+    <div class="panel-card-footer">
+      <ul class="panel-card-status-list">
+        <li class="panel-card-status-item">
+          <span class="panel-card-status-dot is-good" aria-hidden="true"></span>
+          <span class="panel-card-status-text">
+            <span class="panel-card-status-count" data-detail-status-count="good">0</span>
+            <span class="panel-card-status-label">Good</span>
+          </span>
+        </li>
+        <li class="panel-card-status-item">
+          <span class="panel-card-status-dot is-risk" aria-hidden="true"></span>
+          <span class="panel-card-status-text">
+            <span class="panel-card-status-count" data-detail-status-count="risk">0</span>
+            <span class="panel-card-status-label">Risk</span>
+          </span>
+        </li>
+        <li class="panel-card-status-item">
+          <span class="panel-card-status-dot is-critical" aria-hidden="true"></span>
+          <span class="panel-card-status-text">
+            <span class="panel-card-status-count" data-detail-status-count="critical">0</span>
+            <span class="panel-card-status-label">Critical</span>
+          </span>
+        </li>
+      </ul>
+      <div class="panel-card-ai-actions">
+        <button
+          type="button"
+          class="panel-card-ai-btn"
+          aria-label="AI insight"
+          aria-expanded="false"
+          aria-controls="domain-detail-ai-insight-panel"
+          data-ai-insight-toggle
+        >
+          <span class="panel-card-ai-icon icon" data-icon="bulb" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="panel-card-ai-btn" aria-label="AI assistant" data-ai-assistant-open>
+          <span class="panel-card-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="panel-card-insight"
+      id="domain-detail-ai-insight-panel"
+      aria-hidden="true"
+      data-ai-insight-panel
+    >
+      <div class="panel-card-insight-inner">
+        <div class="panel-card-insight-title">
+          <span class="panel-card-insight-icon icon" data-icon="bulb" aria-hidden="true"></span>
+          <span>AI Insight</span>
+        </div>
+        <p class="panel-card-insight-text">
+          Healthcare scores are strong overall, with availability showing one critical gap flagged for follow-up in this district.
+        </p>
+      </div>
+    </div>
+      </div>
+    </div>
+  </aside>
+
+  <button
+    type="button"
+    class="domain-toggle-btn facility-toggle-btn"
+    aria-label="Toggle facilities"
+    aria-expanded="true"
+    aria-controls="domain-facilities-card"
+    data-facility-toggle
+  >
+    <span class="domain-toggle-icon icon" data-icon="chevron-up" aria-hidden="true"></span>
+  </button>
+
+  <div class="facility-card-panel" data-facility-panel>
+    <div class="facility-card-panel-inner">
+      <div class="facility-variant is-active" data-facility-variant="essentials">
+        <article
+          class="facility-card"
+          id="domain-facilities-card"
+          aria-label="Domain facilities"
+          data-facility-card
+          data-facility-essentials
+        ></article>
+      </div>
+
+      <div class="facility-variant" data-facility-variant="social" hidden aria-hidden="true">
+        <div
+          class="indicator-card-stack"
+          aria-label="Social resilience indicators"
+          data-facility-card
+          data-facility-social
+        ></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="floating-actions">
+    <div class="floating-actions-group">
+    <button
+      type="button"
+      class="floating-filter-btn"
+      aria-label="Selection level"
+      aria-expanded="false"
+      aria-controls="selection-level-panel"
+      title="Selection level"
+      data-selection-level-toggle
+    >
+      <span
+        class="floating-filter-icon icon"
+        data-icon="world"
+        aria-hidden="true"
+        data-selection-level-icon
+      ></span>
+    </button>
+    <button
+      type="button"
+      class="floating-filter-btn"
+      aria-label="Filters"
+      aria-expanded="false"
+      aria-controls="map-filter-panel"
+      data-floating-filter
+    >
+      <span class="floating-filter-icon icon" data-icon="adjustments-horizontal" aria-hidden="true"></span>
+    </button>
+    <button
+      type="button"
+      class="floating-filter-btn floating-ai-btn"
+      aria-label="AI assistant"
+      title="AI assistant"
+      aria-expanded="false"
+      aria-controls="ai-assistant-panel"
+      data-floating-ai
+    >
+      <span class="floating-ai-icon icon" data-icon="sparkles" aria-hidden="true"></span>
+    </button>
+    <button
+      type="button"
+      class="floating-filter-btn floating-basemap-btn"
+      aria-label="Map layers"
+      aria-expanded="false"
+      aria-controls="basemap-panel"
+      title="Layers"
+      data-basemap-toggle
+      data-basemap-mode="light"
+    >
+      <span class="floating-filter-icon icon" data-icon="stack-2" aria-hidden="true" data-basemap-icon></span>
+    </button>
+    <button
+      type="button"
+      class="floating-filter-btn"
+      aria-label="Statistics"
+      aria-expanded="false"
+      aria-controls="statistics-panel"
+      title="Statistics"
+      data-statistics-toggle
+    >
+      <span class="floating-filter-icon icon" data-icon="chart-bar" aria-hidden="true"></span>
+    </button>
+    </div>
+    <button
+      type="button"
+      class="floating-filter-btn"
+      aria-label="Disclaimer"
+      aria-expanded="false"
+      aria-controls="disclaimer-panel"
+      title="Disclaimer"
+      data-disclaimer-toggle
+    >
+      <span class="floating-filter-icon icon" data-icon="info-circle" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <aside
+    class="filter-panel"
+    id="map-filter-panel"
+    aria-label="Map filters"
+    hidden
+    data-filter-panel
+  >
+    <div class="filter-panel-header">
+      <h2 class="filter-panel-title">Filters</h2>
+      <div class="filter-panel-header-actions">
+        <button
+          type="button"
+          class="panel-box-reset"
+          aria-label="Reset filters"
+          title="Reset"
+          data-filter-reset
+        >
+          <span class="icon" data-icon="refresh" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="filter-panel-close" aria-label="Close filters" data-filter-close>
+          <span class="filter-panel-close-icon icon" data-icon="circle-x" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <section class="filter-section" aria-labelledby="filter-region-label">
+      <h3 id="filter-region-label" class="filter-section-title">Region</h3>
+      <div class="filter-option-list is-regions" role="group" aria-labelledby="filter-region-label" data-filter-regions>
+        <button
+          type="button"
+          class="filter-option is-selected"
+          aria-pressed="true"
+          data-filter-region="all"
+        >
+          <span>All</span>
+        </button>
+        <button
+          type="button"
+          class="filter-option"
+          aria-pressed="false"
+          data-filter-region="Abu Dhabi"
+        >
+          <img src="assets/abu-dhabi.svg" alt="" class="filter-option-icon" />
+          <span>Abu Dhabi</span>
+        </button>
+        <button
+          type="button"
+          class="filter-option"
+          aria-pressed="false"
+          data-filter-region="Al Ain"
+        >
+          <img src="assets/al-ain.svg" alt="" class="filter-option-icon" />
+          <span>Al Ain</span>
+        </button>
+        <button
+          type="button"
+          class="filter-option"
+          aria-pressed="false"
+          data-filter-region="Al Dhafra"
+        >
+          <img src="assets/al-dhafra.svg" alt="" class="filter-option-icon" />
+          <span>Al Dhafra</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="filter-section" aria-labelledby="filter-district-label">
+      <h3 id="filter-district-label" class="filter-section-title">District</h3>
+      <div class="filter-district" data-filter-district>
+        <button
+          type="button"
+          class="filter-district-trigger"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          data-filter-district-trigger
+        >
+          <span class="filter-district-trigger-value" data-filter-district-value>All districts</span>
+          <span class="filter-district-chevron icon" data-icon="chevron-down" aria-hidden="true"></span>
+        </button>
+        <div
+          class="district-menu filter-district-menu"
+          role="listbox"
+          hidden
+          data-filter-district-menu
+        ></div>
+      </div>
+    </section>
+
+    <section class="filter-section" aria-labelledby="filter-citizenship-label">
+      <h3 id="filter-citizenship-label" class="filter-section-title">Citizenship</h3>
+      <div class="filter-option-list" role="group" aria-labelledby="filter-citizenship-label">
+        <button
+          type="button"
+          class="filter-option"
+          aria-pressed="false"
+          data-filter-group="citizenship"
+          data-filter-value="emirati"
+        >
+          <span class="filter-option-icon icon" data-icon="id-badge-2" aria-hidden="true"></span>
+          <span>Emirati</span>
+        </button>
+        <button
+          type="button"
+          class="filter-option"
+          aria-pressed="false"
+          data-filter-group="citizenship"
+          data-filter-value="non-emirati"
+        >
+          <span class="filter-option-icon icon" data-icon="world" aria-hidden="true"></span>
+          <span>Non-Emirati</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="filter-section" aria-labelledby="filter-gender-label">
+      <h3 id="filter-gender-label" class="filter-section-title">Gender</h3>
+      <div class="filter-option-list" role="group" aria-labelledby="filter-gender-label">
+        <button
+          type="button"
+          class="filter-option"
+          aria-pressed="false"
+          data-filter-group="gender"
+          data-filter-value="male"
+        >
+          <span class="filter-option-icon icon" data-icon="gender-male" aria-hidden="true"></span>
+          <span>Male</span>
+        </button>
+        <button
+          type="button"
+          class="filter-option"
+          aria-pressed="false"
+          data-filter-group="gender"
+          data-filter-value="female"
+        >
+          <span class="filter-option-icon icon" data-icon="gender-female" aria-hidden="true"></span>
+          <span>Female</span>
+        </button>
+      </div>
+    </section>
+  </aside>
+
+  <aside
+    class="filter-panel statistics-panel"
+    id="statistics-panel"
+    aria-label="Statistics"
+    hidden
+    data-statistics-panel
+  >
+    <div class="filter-panel-header">
+      <h2 class="filter-panel-title">Statistics</h2>
+      <button type="button" class="filter-panel-close" aria-label="Close statistics" data-statistics-close>
+        <span class="filter-panel-close-icon icon" data-icon="circle-x" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div class="statistics-summary">
+      <div class="statistics-summary-icon" aria-hidden="true">
+        <span class="icon" data-icon="report-analytics" aria-hidden="true"></span>
+      </div>
+      <div class="statistics-summary-text">
+        <p class="statistics-area" data-statistics-area>Abu Dhabi Emirate</p>
+        <p class="statistics-summary-label">Total facilities</p>
+        <p class="statistics-total-value" data-statistics-total>—</p>
+      </div>
+    </div>
+    <div class="statistics-body">
+      <p class="statistics-section-title">By category</p>
+      <p class="statistics-hint">Select a category to show locations on the map</p>
+      <ul class="statistics-list" data-statistics-list></ul>
+    </div>
+  </aside>
+
+  <aside
+    class="filter-panel disclaimer-panel"
+    id="disclaimer-panel"
+    aria-label="Disclaimer"
+    hidden
+    data-disclaimer-panel
+  >
+    <div class="filter-panel-header">
+      <h2 class="filter-panel-title">Disclaimer</h2>
+      <button type="button" class="filter-panel-close" aria-label="Close disclaimer" data-disclaimer-close>
+        <span class="filter-panel-close-icon icon" data-icon="circle-x" aria-hidden="true"></span>
+      </button>
+    </div>
+    <p class="disclaimer-text">
+      The information presented on this dashboard is for general informational
+      purposes only. Data may be updated periodically and should not be treated
+      as official legal or operational advice.
+    </p>
+  </aside>
+
+  <aside
+    class="basemap-panel"
+    id="selection-level-panel"
+    aria-label="Selection level"
+    hidden
+    data-selection-level-panel
+  >
+    <div class="basemap-options" role="group" aria-label="Map selection level">
+      <button
+        type="button"
+        class="basemap-option is-active"
+        aria-pressed="true"
+        data-selection-level-btn="region"
+      >
+        <span class="basemap-option-thumb is-icon">
+          <span class="icon" data-icon="world" aria-hidden="true"></span>
+        </span>
+        <span class="basemap-option-label">Region</span>
+      </button>
+      <button
+        type="button"
+        class="basemap-option"
+        aria-pressed="false"
+        data-selection-level-btn="district"
+      >
+        <span class="basemap-option-thumb is-icon">
+          <span class="icon" data-icon="layout-grid" aria-hidden="true"></span>
+        </span>
+        <span class="basemap-option-label">District</span>
+      </button>
+    </div>
+  </aside>
+
+  <aside
+    class="basemap-panel"
+    id="basemap-panel"
+    aria-label="Map layers"
+    hidden
+    data-basemap-panel
+  >
+    <div class="basemap-options" role="group" aria-label="Map type">
+      <button
+        type="button"
+        class="basemap-option is-active"
+        aria-pressed="true"
+        data-basemap-option="light"
+      >
+        <span class="basemap-option-thumb">
+          <img src="assets/basemap-map-preview.svg" alt="" />
+        </span>
+        <span class="basemap-option-label">Map</span>
+      </button>
+      <button
+        type="button"
+        class="basemap-option"
+        aria-pressed="false"
+        data-basemap-option="satellite"
+      >
+        <span class="basemap-option-thumb">
+          <img src="assets/basemap-satellite-preview.svg" alt="" />
+        </span>
+        <span class="basemap-option-label">Satellite</span>
+      </button>
+    </div>
+  </aside>
+
+  <aside
+    class="ai-assistant-panel"
+    id="ai-assistant-panel"
+    aria-label="AI assistant"
+    hidden
+    data-ai-assistant-panel
+  >
+    <header class="ai-assistant-header">
+      <div class="ai-assistant-brand">
+        <span class="ai-assistant-brand-icon icon" aria-hidden="true"><img src="assets/Bayaan%20Logo.svg" alt="" /></span>
+        <div class="ai-assistant-brand-copy">
+          <div class="ai-assistant-title-row">
+            <h2 class="ai-assistant-title">ADDP Assistant</h2>
+            <span class="ai-assistant-live" aria-hidden="true">Live</span>
+          </div>
+          <p class="ai-assistant-subtitle" data-ai-focus-label>Scores, districts, and insights</p>
+        </div>
+      </div>
+      <div class="ai-assistant-header-actions">
+        <button
+          type="button"
+          class="ai-assistant-icon-btn"
+          aria-label="New chat"
+          title="New chat"
+          data-ai-new-chat
+        >
+          <span class="icon" data-icon="pencil" aria-hidden="true"></span>
+        </button>
+        <button
+          type="button"
+          class="ai-assistant-icon-btn"
+          aria-label="Close assistant"
+          data-ai-assistant-close
+        >
+          <span class="icon" data-icon="x" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="ai-assistant-body" data-ai-chat-body>
+      <div class="ai-assistant-empty" data-ai-empty>
+        <div class="ai-assistant-empty-hero" aria-hidden="true">
+          <span class="ai-assistant-empty-orb"></span>
+          <span class="ai-assistant-empty-icon icon" aria-hidden="true"><img src="assets/Bayaan%20Logo.svg" alt="" /></span>
+        </div>
+        <h3 class="ai-assistant-empty-title">How can I help?</h3>
+        <p class="ai-assistant-empty-text">
+          Ask about the selected area, compare scores, or draft an insight.
+        </p>
+        <div class="ai-assistant-suggestions-label">Suggested</div>
+        <div class="ai-assistant-suggestions" data-ai-suggestions></div>
+      </div>
+      <div class="ai-assistant-messages" data-ai-messages hidden></div>
+    </div>
+
+    <footer class="ai-assistant-composer">
+      <div class="ai-assistant-tools-menu" role="menu" hidden data-ai-tools-menu>
+        <div class="ai-assistant-tools-label">Tools</div>
+        <button type="button" class="ai-assistant-tool-option" role="menuitem" data-ai-tool="analyze">
+          <span class="icon" data-icon="map" aria-hidden="true"></span>
+          <span>Analyze current selection</span>
+        </button>
+        <button type="button" class="ai-assistant-tool-option" role="menuitem" data-ai-tool="compare">
+          <span class="icon" data-icon="chart-histogram" aria-hidden="true"></span>
+          <span>Compare regions</span>
+        </button>
+        <button type="button" class="ai-assistant-tool-option" role="menuitem" data-ai-tool="explain">
+          <span class="icon" data-icon="book-2" aria-hidden="true"></span>
+          <span>Explain indicators</span>
+        </button>
+        <button type="button" class="ai-assistant-tool-option" role="menuitem" data-ai-tool="draft">
+          <span class="icon" data-icon="file-text" aria-hidden="true"></span>
+          <span>Draft insight</span>
+        </button>
+      </div>
+
+      <div class="ai-assistant-input-shell">
+        <textarea
+          class="ai-assistant-input"
+          rows="1"
+          placeholder="Message ADDP Assistant…"
+          aria-label="Message ADDP Assistant"
+          data-ai-input
+        ></textarea>
+        <div class="ai-assistant-input-actions">
+          <button
+            type="button"
+            class="ai-assistant-icon-btn"
+            aria-label="Attach file"
+            title="Attach"
+            data-ai-attach
+          >
+            <span class="icon" data-icon="paperclip" aria-hidden="true"></span>
+          </button>
+          <input type="file" hidden accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx" data-ai-file />
+          <button
+            type="button"
+            class="ai-assistant-icon-btn"
+            aria-label="Tools"
+            aria-expanded="false"
+            aria-haspopup="true"
+            title="Tools"
+            data-ai-tools-toggle
+          >
+            <span class="icon" data-icon="tool" aria-hidden="true"></span>
+          </button>
+          <button
+            type="button"
+            class="ai-assistant-send"
+            aria-label="Send message"
+            disabled
+            data-ai-send
+          >
+            <span class="icon" data-icon="arrow-up" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+      <p class="ai-assistant-footnote">
+        AI can make mistakes. Verify important scores and population figures.
+      </p>
+    </footer>
+  </aside>
+
+  <div
+    class="ai-report-modal"
+    id="ai-report-modal"
+    hidden
+    data-ai-report-modal
+  >
+    <div class="ai-report-modal-backdrop" data-ai-report-close></div>
+    <div
+      class="ai-report-modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-report-modal-title"
+      data-ai-report-dialog
+    >
+      <header class="ai-report-modal-header">
+        <div class="ai-report-modal-brand">
+          <span class="ai-report-modal-brand-icon" aria-hidden="true"><img src="assets/Bayaan%20Logo.svg" alt="" /></span>
+          <div class="ai-report-modal-brand-copy">
+            <div class="ai-report-modal-title-row">
+              <h2 class="ai-report-modal-title" id="ai-report-modal-title">AI Report</h2>
+              <span class="ai-report-modal-badge">Live</span>
+            </div>
+            <p class="ai-report-modal-subtitle" data-ai-report-subtitle>Generating report…</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="ai-report-modal-close"
+          aria-label="Close report"
+          data-ai-report-close
+        >
+          <span class="ai-report-modal-close-icon icon" data-icon="circle-x" aria-hidden="true"></span>
+        </button>
+      </header>
+      <div class="ai-report-modal-body" data-ai-report-body>
+        <div class="ai-report-modal-loading" data-ai-report-loading>
+          <div class="ai-report-modal-loading-orb" aria-hidden="true">
+            <span class="ai-report-modal-spinner"></span>
+          </div>
+          <p class="ai-report-modal-loading-title">Preparing your report</p>
+          <p class="ai-report-modal-loading-text">Analyzing score, population, and priority signals…</p>
+        </div>
+        <div class="ai-report-modal-content" data-ai-report-content hidden></div>
+      </div>
+      <footer class="ai-report-modal-footer">
+        <p class="ai-report-modal-footnote">
+          AI can make mistakes. Verify important scores and population figures.
+        </p>
+        <div class="ai-report-modal-actions">
+          <button
+            type="button"
+            class="ai-report-modal-download"
+            data-ai-report-download
+            disabled
+          >
+            <span class="icon" data-icon="download" aria-hidden="true"></span>
+            <span>Download</span>
+          </button>
+          <button type="button" class="ai-report-modal-done" data-ai-report-close>
+            Done
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div
+    class="info-tooltip"
+    id="info-tooltip"
+    hidden
+    data-info-tooltip
+    role="tooltip"
+  >
+    <span class="info-tooltip-anchor-ring" aria-hidden="true"></span>
+    <div class="info-tooltip-card">
+      <h3 class="info-tooltip-title" id="info-tooltip-title" data-info-tooltip-title>
+        Tooltip
+      </h3>
+      <p class="info-tooltip-text" data-info-tooltip-text>Tooltip text goes here !</p>
+      <p class="info-tooltip-source" data-info-tooltip-source hidden></p>
+    </div>
+  </div>
+
+  <script src="vendor/maplibre-gl.js"></script>
+<script src="enhancements.js"></script>
+<script src="data/districts.json.js"></script>
+<script src="data/pillars.json.js"></script>
+<script src="data/demographics.json.js"></script>
+<script src="data/air_quality.json.js"></script>
+<script src="data/pois.json.js"></script>
+<script src="data/pois.geojson.js"></script>
+<script src="data/district-boundaries.geojson.js"></script>
+<script src="data/region-boundaries.geojson.js"></script>
+<script>
+(function () {
+  function lookup(url) {
+    var s = String(url).split("?")[0].split("#")[0];
+    var i = s.indexOf("data/");
+    if (i === -1) return null;
+    var hit = (window.__ADDP_DATA || {})[s.slice(i)];
+    return hit === undefined ? null : hit;
+  }
+  var real = window.fetch ? window.fetch.bind(window) : null;
+  window.fetch = function (input, init) {
+    var url = typeof input === "string" ? input : (input && input.url) || "";
+    var body = lookup(url);
+    if (body !== null) {
+      return Promise.resolve(new Response(body, {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      }));
+    }
+    if (!real) return Promise.reject(new Error("fetch unavailable: " + url));
+    return real(input, init);
+  };
+})();
+</script>
+<script src="app.bundle.js"></script>
+<script>
+  (function () {
+    var el = document.documentElement;
+    var requestFn = el.requestFullscreen || el.webkitRequestFullscreen;
+    var exitFn = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!requestFn || !exitFn) return;
+
+    // Two-corner variant (half the paths of Tabler's full 4-corner
+    // maximize/minimize) — the full version reads visibly bigger/bolder
+    // than the plain plus/minus glyphs next to it in the zoom control.
+    var ENTER_ICON =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-maximize"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16 4l4 0l0 4" /><path d="M14 10l6 -6" /><path d="M8 20l-4 0l0 -4" /><path d="M4 20l6 -6" /></svg>';
+    var EXIT_ICON =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-minimize"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19 9l-4 0l0 -4" /><path d="M15 9l6 -6" /><path d="M5 15l4 0l0 4" /><path d="M3 21l6 -6" /></svg>';
+
+    function isFullscreen() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement);
+    }
+
+    // MapLibre builds the zoom control (.maplibregl-ctrl-bottom-right
+    // .maplibregl-ctrl-group) asynchronously inside app.bundle.js, after
+    // this script tag runs — poll briefly until it exists, then prepend a
+    // real button into that same group so it inherits the group's border,
+    // divider and hover styling instead of floating as its own card.
+    var attempts = 0;
+    var pollId = setInterval(function () {
+      attempts++;
+      var zoomGroup = document.querySelector(
+        ".maplibregl-ctrl-bottom-right .maplibregl-ctrl-group"
+      );
+      if (zoomGroup) {
+        clearInterval(pollId);
+        insertButton(zoomGroup);
+        alignZoomGroup(zoomGroup);
+        window.addEventListener("resize", function () {
+          alignZoomGroup(zoomGroup);
+        });
+      } else if (attempts > 50) {
+        clearInterval(pollId);
+      }
+    }, 100);
+
+    // styles.css fixes the zoom control at right:10px while every other
+    // floating control on this screen (.floating-actions, .top-toolbar)
+    // sits at a different, responsive inset — that mismatch is the visible
+    // misalignment between the zoom control and the buttons above it.
+    // Match it by measuring the actual rendered edges rather than
+    // duplicating whatever breakpoint math produced them.
+    function alignZoomGroup(zoomGroup) {
+      var reference = document.querySelector(".floating-actions");
+      if (!reference) return;
+      var currentRight = parseFloat(getComputedStyle(zoomGroup).right) || 0;
+      var delta =
+        reference.getBoundingClientRect().right -
+        zoomGroup.getBoundingClientRect().right;
+      zoomGroup.style.right = currentRight - delta + "px";
+    }
+
+    function insertButton(zoomGroup) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.id = "addp-fullscreen-btn";
+      var icon = document.createElement("span");
+      icon.className = "maplibregl-ctrl-icon";
+      icon.setAttribute("aria-hidden", "true");
+      btn.appendChild(icon);
+      zoomGroup.insertBefore(btn, zoomGroup.firstChild);
+
+      function sync() {
+        var active = isFullscreen();
+        icon.innerHTML = active ? EXIT_ICON : ENTER_ICON;
+        var label = active ? "Exit fullscreen" : "Enter fullscreen";
+        btn.setAttribute("aria-label", label);
+        btn.title = label;
+      }
+
+      btn.addEventListener("click", function () {
+        var result = isFullscreen() ? exitFn.call(document) : requestFn.call(el);
+        if (result && result.catch) result.catch(function () {});
+      });
+
+      document.addEventListener("fullscreenchange", sync);
+      document.addEventListener("webkitfullscreenchange", sync);
+      sync();
+    }
+  })();
+</script>
+  </div>
+</body>
+</html>

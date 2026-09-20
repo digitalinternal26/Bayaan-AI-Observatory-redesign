@@ -1,0 +1,1275 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Observatory — Overview · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/pages/ai-observatory.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/voice-brief-dock.js" defer></script>
+    <script src="js/census-exec-brief.js" defer></script>
+    <script src="js/ai-observatory.js" defer></script>
+    <style>
+      /* ============ OVERVIEW — page-local layout only ============
+         Everything reusable (panel, insight, glance grid, gap cards, rank
+         rows, gauge, key-insights list, news cards, the opening section)
+         lives in the shared css/pages/ai-observatory.css so Diagnose/
+         Benchmark/future pages can reuse it. Only genuinely Overview-
+         specific sizing lives here. */
+      #screen-cpi-obs .ovw-sections { display: flex; flex-direction: column; gap: 28px; }
+
+      /* ── State of AI chapters — content-specific bar layouts only.
+         Shared card chrome (accent, header, sub-panels, insight) lives
+         in css/pages/ai-observatory.css under .aiobs-state-of-ai. ── */
+
+      /* Adoption: single-row bar layout (label | track | value) */
+      #screen-cpi-obs #sec-adoption .aiobs-bar-item { display: flex; flex-direction: row; align-items: center; gap: 14px; }
+      #screen-cpi-obs #sec-adoption .aiobs-bar-name { flex: 0 0 auto; min-width: 128px; }
+      #screen-cpi-obs #sec-adoption .aiobs-bar-track { flex: 1 1 auto; }
+      #screen-cpi-obs #sec-adoption .aiobs-bar-val { flex: 0 0 auto; min-width: 48px; text-align: right; }
+      @media (max-width: 640px) {
+        #screen-cpi-obs #sec-adoption .aiobs-bar-name { min-width: 96px; }
+      }
+      @media (max-width: 480px) {
+        #screen-cpi-obs #sec-adoption .aiobs-bar-item { flex-direction: column; align-items: stretch; gap: 5px; }
+        #screen-cpi-obs #sec-adoption .aiobs-bar-name { min-width: 0; }
+        #screen-cpi-obs #sec-adoption .aiobs-bar-val { min-width: 0; text-align: left; }
+      }
+
+      /* Enterprise: grid bar layout with proportional axis scaling */
+      #screen-cpi-obs #sec-enterprise .aiobs-bar-item {
+        display: grid;
+        grid-template-columns: minmax(0, var(--labelw)) minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 14px;
+      }
+      #screen-cpi-obs #sec-enterprise .aiobs-bar-fill { width: calc(var(--v) / var(--axis) * 100%); }
+      #screen-cpi-obs #sec-enterprise .aiobs-bar-val { min-width: 46px; text-align: right; }
+      @media (max-width: 480px) {
+        #screen-cpi-obs #sec-enterprise .aiobs-bar-item { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; }
+        #screen-cpi-obs #sec-enterprise .aiobs-bar-name { grid-area: 1 / 1; }
+        #screen-cpi-obs #sec-enterprise .aiobs-bar-val { grid-area: 1 / 2; min-width: 0; }
+        #screen-cpi-obs #sec-enterprise .aiobs-bar-track { grid-area: 2 / 1 / 3 / 3; }
+      }
+
+      /* Impact: grid bar layout with metric icons */
+      #screen-cpi-obs #sec-impact .aiobs-impact-bars .aiobs-bar-item {
+        display: grid;
+        grid-template-columns: 30px minmax(0, 34%) minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px 12px;
+      }
+      #screen-cpi-obs #sec-impact .aiobs-impact-bar-ic {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs #sec-impact .aiobs-bar-val { min-width: 46px; text-align: right; }
+      #screen-cpi-obs #sec-impact .aiobs-chap-note--sub {
+        margin-top: 4px;
+        padding-top: 0;
+      }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric {
+        padding: 16px 14px;
+        border-radius: var(--r-md);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric--blue { background: var(--accent-light); }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric--purple { background: #F3E8FF; }
+      html[data-theme="dark"] #screen-cpi-obs #sec-impact .aiobs-impact-metric--purple { background: rgba(124, 58, 237, 0.14); }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric-ic {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        margin-bottom: 6px;
+        background: #fff;
+      }
+      html[data-theme="dark"] #screen-cpi-obs #sec-impact .aiobs-impact-metric-ic { background: rgba(255, 255, 255, 0.08); }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric--blue .aiobs-impact-metric-ic { color: var(--accent); }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric--purple .aiobs-impact-metric-ic { color: #7C3AED; }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric-val {
+        font-size: clamp(1.5rem, 3vw, 1.75rem);
+        font-weight: 800;
+        color: var(--aiobs-navy-900);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+      }
+      html[data-theme="dark"] #screen-cpi-obs #sec-impact .aiobs-impact-metric-val { color: var(--text-primary); }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric-label {
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.35;
+      }
+      #screen-cpi-obs #sec-impact .aiobs-impact-metric-src {
+        font-size: 11px;
+        color: var(--text-tertiary);
+        margin-top: 2px;
+      }
+      #screen-cpi-obs #sec-impact .aiobs-impact-callout {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: var(--r-md);
+        background: #E7F8EF;
+        margin-top: auto;
+      }
+      html[data-theme="dark"] #screen-cpi-obs #sec-impact .aiobs-impact-callout { background: rgba(52, 211, 153, 0.12); }
+      #screen-cpi-obs #sec-impact .aiobs-impact-callout-ic {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--teal-600);
+        display: grid;
+        place-items: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      html[data-theme="dark"] #screen-cpi-obs #sec-impact .aiobs-impact-callout-ic { background: rgba(255, 255, 255, 0.08); }
+      #screen-cpi-obs #sec-impact .aiobs-impact-callout-title {
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 4px;
+        line-height: 1.4;
+      }
+      #screen-cpi-obs #sec-impact .aiobs-impact-callout-text {
+        font-size: 11.5px;
+        color: var(--text-secondary);
+        margin: 0;
+        line-height: 1.5;
+      }
+      @media (max-width: 560px) {
+        #screen-cpi-obs #sec-impact .aiobs-impact-metrics { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 480px) {
+        #screen-cpi-obs #sec-impact .aiobs-impact-bars .aiobs-bar-item {
+          grid-template-columns: 30px minmax(0, 1fr) auto;
+          grid-template-areas: "ic name val" "ic track track";
+          gap: 6px 10px;
+        }
+        #screen-cpi-obs #sec-impact .aiobs-impact-bar-ic { grid-area: ic; }
+        #screen-cpi-obs #sec-impact .aiobs-bar-name { grid-area: name; }
+        #screen-cpi-obs #sec-impact .aiobs-bar-val { grid-area: val; min-width: 0; }
+        #screen-cpi-obs #sec-impact .aiobs-bar-track { grid-area: track; }
+      }
+
+      /* Sentiment: grid bar layout with fixed label column */
+      #screen-cpi-obs #sec-sentiment .aiobs-bar-item {
+        display: grid;
+        grid-template-columns: minmax(0, 30%) minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 14px;
+      }
+      #screen-cpi-obs #sec-sentiment .aiobs-bar-val { min-width: 46px; text-align: right; }
+      @media (max-width: 480px) {
+        #screen-cpi-obs #sec-sentiment .aiobs-bar-item { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; }
+        #screen-cpi-obs #sec-sentiment .aiobs-bar-name { grid-area: 1 / 1; }
+        #screen-cpi-obs #sec-sentiment .aiobs-bar-val { grid-area: 1 / 2; min-width: 0; }
+        #screen-cpi-obs #sec-sentiment .aiobs-bar-track { grid-area: 2 / 1 / 3 / 3; }
+      }
+
+      /* ── News — ported from CensusObservatory.html's News carousel
+         (image-overlay cards + .dg-carousel pagination). ── */
+      #screen-cpi-obs .section-hdr-sub {
+        margin: 2px 0 16px;
+        font-size: var(--fs-sm);
+        color: var(--text2);
+      }
+      #screen-cpi-obs .section-hdr h2.cpi-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: var(--fs-2xl);
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      #screen-cpi-obs .section-hdr h2.cpi-section-title i {
+        font-size: var(--fs-2xl);
+        line-height: 1;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .obs-card {
+        background: var(--white);
+        border: 1px solid #eaecf0;
+        border-radius: 12px;
+        padding: 16px 18px;
+        box-shadow: 0 1px 6px rgba(15, 23, 42, 0.04);
+        transition: box-shadow 0.2s, border-color 0.2s;
+      }
+      #screen-cpi-obs .obs-card:hover {
+        border-color: #99c2ff;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+      }
+      #screen-cpi-obs .cen-news-hdr {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      #screen-cpi-obs .cen-news-track .dg-slide {
+        flex: 0 0 calc((100% - 28px) / 3);
+      }
+      #screen-cpi-obs .cen-news-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px;
+        min-height: 340px;
+        padding: 0;
+        display: flex;
+        color: #fff;
+        isolation: isolate;
+      }
+      #screen-cpi-obs .cen-news-media {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background-color: #0b172c;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: transform 0.5s ease;
+      }
+      #screen-cpi-obs .cen-news-card:hover .cen-news-media { transform: scale(1.05); }
+      #screen-cpi-obs .cen-news-shade {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(180deg, rgba(11, 23, 44, 0.1) 0%, rgba(11, 23, 44, 0.32) 42%, rgba(11, 23, 44, 0.9) 100%);
+      }
+      #screen-cpi-obs .cen-news-inner {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        padding: 16px;
+      }
+      #screen-cpi-obs .cen-news-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      #screen-cpi-obs .cen-news-badge {
+        font-size: var(--fs-micro);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        padding: 3px 9px;
+        border-radius: 100px;
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        backdrop-filter: blur(4px);
+      }
+      #screen-cpi-obs .cen-news-date {
+        font-size: var(--fs-2xs);
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.85);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      #screen-cpi-obs .cen-news-foot { display: flex; flex-direction: column; gap: 8px; }
+      #screen-cpi-obs .cen-news-title {
+        margin: 0;
+        font-size: var(--fs-lg);
+        font-weight: 700;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+      }
+      #screen-cpi-obs .cen-news-sum {
+        margin: 0;
+        font-size: var(--fs-xs);
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.86);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      #screen-cpi-obs .cen-news-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+      #screen-cpi-obs .cen-news-act {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font: inherit;
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 8px;
+        padding: 5px 9px;
+        transition: background 0.15s;
+      }
+      #screen-cpi-obs .cen-news-act:hover { background: rgba(255, 255, 255, 0.26); }
+      #screen-cpi-obs .cen-news-act i { font-size: var(--fs-md); }
+      #screen-cpi-obs .cen-news-more {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        color: #fff;
+        text-decoration: none;
+      }
+      #screen-cpi-obs .cen-news-more:hover { text-decoration: underline; }
+      #screen-cpi-obs .cen-news-more i { font-size: var(--fs-md); }
+      @media (max-width: 1080px) {
+        #screen-cpi-obs .cen-news-track .dg-slide { flex: 0 0 calc((100% - 14px) / 2); }
+      }
+      @media (max-width: 620px) {
+        #screen-cpi-obs .cen-news-track .dg-slide { flex: 0 0 100%; }
+        #screen-cpi-obs .cen-news-hdr { flex-direction: column; }
+      }
+      #screen-cpi-obs .dg-carousel { position: relative; }
+      #screen-cpi-obs .dg-track {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        padding: 2px 2px 4px;
+      }
+      #screen-cpi-obs .dg-track::-webkit-scrollbar { display: none; }
+      #screen-cpi-obs .dg-slide {
+        flex: 0 0 calc((100% - 14px) / 2);
+        box-sizing: border-box;
+        min-width: 0;
+      }
+      #screen-cpi-obs .dg-carousel-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 14px;
+      }
+      #screen-cpi-obs .dg-carousel-nav.is-single { display: none; }
+      #screen-cpi-obs .home-carousel-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text2);
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .home-carousel-arrow:hover:not(:disabled) {
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .home-carousel-arrow:disabled { opacity: 0.35; cursor: default; }
+      #screen-cpi-obs .home-carousel-arrow i { font-size: var(--fs-lg); }
+      #screen-cpi-obs .home-carousel-dots { display: flex; align-items: center; gap: 4px; }
+      #screen-cpi-obs .home-carousel-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 3px;
+        background: #d3dfec;
+        flex-shrink: 0;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+        transition: width 0.2s, background 0.2s;
+      }
+      #screen-cpi-obs .home-carousel-dot.active { width: 16px; background: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="index.html">Products</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">AI Observatory</span>
+          </nav>
+        </div>
+
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <aside class="sidebar" aria-label="AI Observatory views">
+              <button type="button" class="sidebar-item sidebar-item--ai" onclick="AIObs.toast('AI Observatory assistant — coming soon in this preview')">
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Survey AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item active" href="ai-overview.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="ai-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="ai-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="ai-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+            </aside>
+          </div>
+
+          <main class="main">
+            <div class="aiobs-content">
+
+              <div class="ovw-sections">
+
+                <!-- ══════════════════════════════════════════════════════
+                     EXECUTIVE BRIEF — the editorial headline read: what
+                     the AI Observatory measures and why it matters to Abu
+                     Dhabi. The section's one illustration lives here only;
+                     the five headline figures live in AI at a Glance below
+                     (2026-09-11 split into Executive Brief + AI at a
+                     Glance, layout referenced from Census Observatory).
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-execbrief aiobs-section-reveal" id="exec-brief" data-reveal>
+                  <!-- Signature animation: a minimal, abstract connected-data
+                       network — cyan on navy for stronger visual presence. -->
+                  <svg class="aiobs-execbrief-bg" viewBox="0 0 480 200" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
+                    <g class="aiobs-art-links" fill="none">
+                      <path class="aiobs-art-link" style="--ld:.4s" d="M96,150 L214,86" />
+                      <path class="aiobs-art-link" style="--ld:1.1s" d="M214,86 L322,132" />
+                      <path class="aiobs-art-link" style="--ld:.7s" d="M322,132 L410,74" />
+                      <path class="aiobs-art-link" style="--ld:1.6s" d="M214,86 L246,182" />
+                      <path class="aiobs-art-link" style="--ld:1.3s" d="M322,132 L358,208" />
+                      <path class="aiobs-art-link" style="--ld:.9s" d="M246,182 L358,208" />
+                    </g>
+                    <g class="aiobs-art-nodes">
+                      <circle class="aiobs-art-node aiobs-art-node--lg" style="--nd:0s" cx="214" cy="86" r="7.5" />
+                      <circle class="aiobs-art-node" style="--nd:.6s" cx="96" cy="150" r="5" />
+                      <circle class="aiobs-art-node aiobs-art-node--lg" style="--nd:1.2s" cx="322" cy="132" r="7" />
+                      <circle class="aiobs-art-node" style="--nd:.3s" cx="410" cy="74" r="4.5" />
+                      <circle class="aiobs-art-node" style="--nd:1.5s" cx="246" cy="182" r="5" />
+                      <circle class="aiobs-art-node aiobs-art-node--lg" style="--nd:1.8s" cx="358" cy="208" r="6.5" />
+                    </g>
+                  </svg>
+                  <div class="aiobs-execbrief-topline">
+                    <div class="aiobs-execbrief-inner">
+                      <span class="aiobs-execbrief-ico"><i class="ti ti-brain"></i></span>
+                      <span class="aiobs-execbrief-title">Executive Brief</span>
+                    </div>
+                    <div class="aiobs-execbrief-meta">
+                      <div class="brief-speech" id="aiobsBriefSpeech">
+                        <button class="brief-listen" id="aiobsBriefListen" type="button" data-state="idle" aria-label="Listen to the AI Observatory brief" aria-pressed="false">
+                          <span class="brief-listen__icon" aria-hidden="true">
+                            <svg class="brief-listen__speaker" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                              <path d="M9 4L9 20" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M15 4L15 20" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M20 8L20 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M4 8L4 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <i class="ti ti-player-play brief-listen__play"></i>
+                            <i class="ti ti-player-pause brief-listen__pause"></i>
+                          </span>
+                          <span class="brief-listen__copy">
+                            <span class="brief-listen__wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                            <span class="brief-listen__text">Audio brief</span>
+                          </span>
+                        </button>
+                        <span class="brief-speech__actions" aria-label="Playback options">
+                          <button class="brief-audio-action brief-audio-action--restart" type="button" aria-label="Restart brief" title="Restart">
+                            <i class="ti ti-refresh" aria-hidden="true"></i>
+                          </button>
+                          <button class="brief-audio-action brief-audio-action--stop" type="button" aria-label="Stop brief" title="Stop">
+                            <span class="brief-stop-box" aria-hidden="true"></span>
+                          </button>
+                        </span>
+                      </div>
+                      <div id="aiobsBriefSpeechStatus" role="status" aria-live="polite" class="visually-hidden brief-speech-status"></div>
+                    </div>
+                  </div>
+                  <p class="aiobs-execbrief-sub" id="aiobsExecBriefSub">
+                    AI adoption is high across Abu Dhabi, with 73% of surveyed enterprises and 86% of individuals aged 15+ reporting AI use. Enterprise adoption is ahead of the selected international benchmarks, while the UAE ranks first globally in the separate Microsoft AI Diffusion measure. The next challenge is moving from adoption to capability and governance: only 12.4% of individuals reach advanced AI capability, and 29% of enterprises report AI governance arrangements.
+                  </p>
+                </section>
+
+                <!-- ══════════════════════════════════════════════════════
+                     AI AT A GLANCE — the five headline figures, one card
+                     each, so each population/measure reads on its own
+                     instead of blurring into a single score.
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-panel aiobs-glance" id="glance">
+                  <div class="aiobs-panel-hd">
+                    <div>
+                      <h2><i class="ti ti-chart-donut-3"></i>AI at a Glance</h2>
+                      <p>Key indicators of AI adoption, capability, governance and sentiment in Abu Dhabi</p>
+                    </div>
+                    <span class="aiobs-glance-label">AI statistics • 2026</span>
+                  </div>
+                  <div class="aiobs-glancecards">
+                    <div class="aiobs-glancecard" data-reveal style="--rv-delay:.08s">
+                      <div class="aiobs-glancecard-hd">
+                        <span class="aiobs-glancecard-ic" style="background:var(--accent-light);color:var(--accent)"><i class="ti ti-building-skyscraper"></i></span>
+                        <span class="aiobs-glancecard-label">Enterprise AI adoption</span>
+                        <span class="aiobs-info aiobs-glancecard-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Enterprises using AI in at least one business function.</dd>
+                            <dt>Source</dt><dd>SCAD AI Enterprise Adoption Survey, 2026</dd>
+                            <dt>Population</dt><dd>4,189 of 5,160 enterprises surveyed, all sectors and size bands</dd>
+                          </dl>
+                        </span>
+                      </div>
+                      <div class="aiobs-glancecard-val" data-countup>73%</div>
+                      <div class="aiobs-glancecard-bar"><div class="aiobs-glancecard-bar-fill" style="width:73%"></div></div>
+                      <div class="aiobs-glancecard-sub">Enterprises · 2025</div>
+                    </div>
+                    <div class="aiobs-glancecard" data-reveal style="--rv-delay:.12s">
+                      <div class="aiobs-glancecard-hd">
+                        <span class="aiobs-glancecard-ic" style="background:#E1F5EE;color:var(--teal-600)"><i class="ti ti-users"></i></span>
+                        <span class="aiobs-glancecard-label">Individual AI use</span>
+                        <span class="aiobs-info aiobs-glancecard-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Residents aged 15+ who have used AI in some form.</dd>
+                            <dt>Source</dt><dd>SCAD Individual AI Adoption Survey, 2026</dd>
+                            <dt>Population</dt><dd>15,042 respondents, weighted to 2,540,268 residents aged 15+</dd>
+                          </dl>
+                        </span>
+                      </div>
+                      <div class="aiobs-glancecard-val" data-countup>86.0%</div>
+                      <div class="aiobs-glancecard-bar"><div class="aiobs-glancecard-bar-fill" style="width:86.0%;background:var(--teal-600)"></div></div>
+                      <div class="aiobs-glancecard-sub">Individuals · 15+</div>
+                    </div>
+                    <div class="aiobs-glancecard" data-reveal style="--rv-delay:.16s">
+                      <div class="aiobs-glancecard-hd">
+                        <span class="aiobs-glancecard-ic" style="background:#F3E8FF;color:#7C3AED"><i class="ti ti-brain"></i></span>
+                        <span class="aiobs-glancecard-label">Advanced AI capability</span>
+                        <span class="aiobs-info aiobs-glancecard-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Individuals self-assessing at the "advanced" tier of AI conceptual knowledge.</dd>
+                            <dt>Source</dt><dd>SCAD Individual AI Adoption Survey, 2026</dd>
+                            <dt>Population</dt><dd>15,042 respondents, weighted to 2,540,268 residents aged 15+</dd>
+                          </dl>
+                        </span>
+                      </div>
+                      <div class="aiobs-glancecard-val" data-countup>12.4%</div>
+                      <div class="aiobs-glancecard-bar"><div class="aiobs-glancecard-bar-fill" style="width:12.4%;background:#7C3AED"></div></div>
+                      <div class="aiobs-glancecard-sub">Individuals · 15+</div>
+                    </div>
+                    <div class="aiobs-glancecard" data-reveal style="--rv-delay:.2s">
+                      <div class="aiobs-glancecard-hd">
+                        <span class="aiobs-glancecard-ic" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-shield-check"></i></span>
+                        <span class="aiobs-glancecard-label">AI governance in place</span>
+                        <span class="aiobs-info aiobs-glancecard-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Adopting enterprises with a formal AI strategy (11%) or internal AI policies/guidelines (18%) in place.</dd>
+                            <dt>Source</dt><dd>SCAD AI Enterprise Adoption Survey, 2026</dd>
+                            <dt>Note</dt><dd>33% report no AI strategy or policy at all; a further 38% have no plans yet but say adoption is planned.</dd>
+                          </dl>
+                        </span>
+                      </div>
+                      <div class="aiobs-glancecard-val" data-countup>29%</div>
+                      <div class="aiobs-glancecard-bar"><div class="aiobs-glancecard-bar-fill" style="width:29%;background:var(--warning)"></div></div>
+                      <div class="aiobs-glancecard-sub">Enterprises · 2025</div>
+                    </div>
+                    <div class="aiobs-glancecard" data-reveal style="--rv-delay:.28s">
+                      <div class="aiobs-glancecard-hd">
+                        <span class="aiobs-glancecard-ic" style="background:#FDECF1;color:#C2255C"><i class="ti ti-heart"></i></span>
+                        <span class="aiobs-glancecard-label">Positive AI outlook</span>
+                        <span class="aiobs-info aiobs-glancecard-info">
+                          <button class="aiobs-info-btn" type="button" onclick="AIObs.toggleInfo(this)"><i class="ti ti-info-circle"></i></button>
+                          <dl class="aiobs-info-pop">
+                            <dt>Definition</dt><dd>Residents who hold a positive view of the UAE's AI future specifically — distinct from general AI sentiment today (71.3% positive or very positive).</dd>
+                            <dt>Source</dt><dd>SCAD Individual AI Adoption Survey, 2026</dd>
+                            <dt>Population</dt><dd>15,042 respondents, weighted to 2,540,268 residents aged 15+</dd>
+                          </dl>
+                        </span>
+                      </div>
+                      <div class="aiobs-glancecard-val" data-countup>88.6%</div>
+                      <div class="aiobs-glancecard-bar"><div class="aiobs-glancecard-bar-fill" style="width:88.6%;background:#C2255C"></div></div>
+                      <div class="aiobs-glancecard-sub">Individuals · 15+</div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════════════════════════════════════════════
+                     EXPLORE AI ACROSS THREE DOMAINS — shortcut cards to
+                     Interpret's People & Skills, Economic and Infrastructure
+                     tabs, with headline metrics per domain.
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-panel aiobs-domain-explore" id="domain-explore">
+                  <div class="aiobs-domain-explore-hd">
+                    <span class="aiobs-domain-explore-ic" aria-hidden="true"><i class="ti ti-hexagons"></i></span>
+                    <div>
+                      <h2>Explore AI across three domains</h2>
+                      <p>Explore Abu Dhabi&rsquo;s AI evidence by domain &mdash; what it means, why it matters, and where opportunity lies.</p>
+                    </div>
+                  </div>
+                  <div class="aiobs-domain-explore-grid">
+                    <article class="aiobs-domain-card" style="--domain:#7C3AED;--domain-light:#F1E9FE;--domain-dark:#5B21B6">
+                      <div class="aiobs-domain-card-top">
+                        <span class="aiobs-domain-card-ic" aria-hidden="true"><i class="ti ti-users"></i></span>
+                        <div class="aiobs-domain-card-titles">
+                          <h3>People &amp; Skills</h3>
+                          <p>How people are using AI, developing skills, and preparing for the future.</p>
+                        </div>
+                        <i class="ti ti-arrow-right aiobs-domain-card-arrow" aria-hidden="true"></i>
+                      </div>
+                      <div class="aiobs-domain-card-metrics" role="list">
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">86.0%</div>
+                          <div class="aiobs-domain-metric-label">Have used AI</div>
+                        </div>
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">12.4%</div>
+                          <div class="aiobs-domain-metric-label">Advanced AI capability</div>
+                        </div>
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">74.3%</div>
+                          <div class="aiobs-domain-metric-label">Students use AI regularly</div>
+                        </div>
+                      </div>
+                      <a class="aiobs-domain-card-cta" href="ai-interpret.html?domain=people">Explore People &amp; Skills <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+                    </article>
+
+                    <article class="aiobs-domain-card" style="--domain:#0B4F9E;--domain-light:#E5F0FC;--domain-dark:#073E82">
+                      <div class="aiobs-domain-card-top">
+                        <span class="aiobs-domain-card-ic" aria-hidden="true"><i class="ti ti-building-skyscraper"></i></span>
+                        <div class="aiobs-domain-card-titles">
+                          <h3>Economic</h3>
+                          <p>How enterprises are adopting AI and realising value across the economy.</p>
+                        </div>
+                        <i class="ti ti-arrow-right aiobs-domain-card-arrow" aria-hidden="true"></i>
+                      </div>
+                      <div class="aiobs-domain-card-metrics" role="list">
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">73%</div>
+                          <div class="aiobs-domain-metric-label">Enterprise adoption</div>
+                        </div>
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">29%</div>
+                          <div class="aiobs-domain-metric-label">Have formal governance</div>
+                        </div>
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">73.6%</div>
+                          <div class="aiobs-domain-metric-label">Report higher productivity</div>
+                        </div>
+                      </div>
+                      <a class="aiobs-domain-card-cta" href="ai-interpret.html?domain=economic">Explore Economic <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+                    </article>
+
+                    <article class="aiobs-domain-card" style="--domain:#14B8C4;--domain-light:rgba(20,184,196,0.16);--domain-dark:#0B7480">
+                      <div class="aiobs-domain-card-top">
+                        <span class="aiobs-domain-card-ic" aria-hidden="true"><i class="ti ti-server-2"></i></span>
+                        <div class="aiobs-domain-card-titles">
+                          <h3>Infrastructure</h3>
+                          <p>How the UAE is building the foundations for an AI-ready future.</p>
+                        </div>
+                        <i class="ti ti-arrow-right aiobs-domain-card-arrow" aria-hidden="true"></i>
+                      </div>
+                      <div class="aiobs-domain-card-metrics" role="list">
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">88%</div>
+                          <div class="aiobs-domain-metric-label">Data is readily available</div>
+                        </div>
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">69%</div>
+                          <div class="aiobs-domain-metric-label">Have adequate AI infrastructure</div>
+                        </div>
+                        <div class="aiobs-domain-metric" role="listitem">
+                          <div class="aiobs-domain-metric-val">67%</div>
+                          <div class="aiobs-domain-metric-label">Report strong cybersecurity</div>
+                        </div>
+                      </div>
+                      <a class="aiobs-domain-card-cta" href="ai-interpret.html?domain=infra">Explore Infrastructure <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+                    </article>
+                  </div>
+                </section>
+
+                <div class="aiobs-state-of-ai">
+                <!-- ══════════════════════════════════════════════════════
+                     SECTION 3 — AI adoption is widespread, but not uniform
+                     (Individual + Enterprise)
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-panel aiobs-section-reveal" id="sec-adoption" data-chapter="sec-adoption" data-reveal>
+                  <div class="aiobs-panel-hd">
+                    <div class="aiobs-chapter-hd-main">
+                      <span class="aiobs-chapter-hd-ic"><i class="ti ti-users-group"></i></span>
+                      <div>
+                        <h2>AI adoption is widespread, but not uniform</h2>
+                        <p>AI use is high across population groups and enterprises, with stronger adoption among younger people and larger enterprises.</p>
+                      </div>
+                    </div>
+                    <button type="button" class="aiobs-ask aiobs-ask--icon" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Why does AI adoption vary by age and enterprise size?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                  </div>
+                  <div class="aiobs-subgrid">
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-hd">
+                        <span class="aiobs-subcard-ic" style="background:#E1F5EE;color:var(--teal-600)"><i class="ti ti-user"></i></span>
+                        <div class="aiobs-subcard-kicker">Individuals · by age band</div>
+                      </div>
+                      <div class="aiobs-subcard-title">Nearly 20 points lower among those 45 and older</div>
+                      <div class="aiobs-bars">
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">15–24</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:92.9%;background:var(--teal-400)"></div></div><span class="aiobs-bar-val">92.9%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">25–34</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:91.9%;background:#5DCAA5"></div></div><span class="aiobs-bar-val">91.9%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">35–44</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:85%;background:#9FE1CB"></div></div><span class="aiobs-bar-val">85%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">45+</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:73.0%;background:#D1F5E6"></div></div><span class="aiobs-bar-val">73.0%</span></div>
+                      </div>
+                      <p class="aiobs-chap-note">SCAD Individual AI Adoption Survey, 2026.</p>
+                    </div>
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-hd">
+                        <span class="aiobs-subcard-ic" style="background:var(--accent-light);color:var(--accent)"><i class="ti ti-building-skyscraper"></i></span>
+                        <div class="aiobs-subcard-kicker">Enterprises · by company size</div>
+                      </div>
+                      <div class="aiobs-subcard-title">+16pp gap, small to large</div>
+                      <div class="aiobs-bars">
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Large enterprises</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:88%"></div></div><span class="aiobs-bar-val">88%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Medium enterprises</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:79%;background:#3B82C4"></div></div><span class="aiobs-bar-val">79%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Small enterprises</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:72%;background:#93C5FD"></div></div><span class="aiobs-bar-val">72%</span></div>
+                      </div>
+                      <p class="aiobs-chap-note">SCAD AI Enterprise Adoption Survey, 2026.</p>
+                    </div>
+                  </div>
+                  <div class="aiobs-insight aiobs-insight-reveal" data-reveal>
+                    <span class="aiobs-insight-ic"><i class="ti ti-bulb"></i></span>
+                    <div class="aiobs-insight-body">
+                      <div class="aiobs-insight-label">AI Insight</div>
+                      <p>AI use is widespread across both individuals and enterprises, but adoption is not uniform: younger people report higher use, while larger enterprises lead smaller firms by 16 percentage points.</p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════════════════════════════════════════════
+                     SECTION 4 — Use is high, but advanced capability is
+                     still developing (Individual only)
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-panel aiobs-section-reveal" id="sec-capability" data-chapter="sec-capability" data-reveal>
+                  <div class="aiobs-panel-hd">
+                    <div class="aiobs-chapter-hd-main">
+                      <span class="aiobs-chapter-hd-ic"><i class="ti ti-certificate"></i></span>
+                      <div>
+                        <h2>Use is high, but advanced capability is still developing</h2>
+                        <p>Many individuals use AI, but a smaller proportion have the advanced skills to develop or apply AI solutions.</p>
+                      </div>
+                    </div>
+                    <button type="button" class="aiobs-ask aiobs-ask--icon" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Why does AI capability lag so far behind AI use?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                  </div>
+                  <div class="aiobs-subgrid">
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-kicker">From use to advanced capability</div>
+                      <div class="aiobs-duo">
+                        <div class="aiobs-duo-col">
+                          <div class="aiobs-donut-wrap">
+                            <svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--gray-300)" stroke-width="5"/><circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--accent)" stroke-width="5" stroke-dasharray="86 14" stroke-linecap="round"/></svg>
+                            <div class="aiobs-donut-center"><b>86.0%</b></div>
+                          </div>
+                          <div class="aiobs-duo-label">Have used AI in some form</div>
+                        </div>
+                        <span class="aiobs-duo-arrow"><i class="ti ti-arrow-right"></i></span>
+                        <div class="aiobs-duo-col">
+                          <div class="aiobs-donut-wrap">
+                            <svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--gray-300)" stroke-width="5"/><circle cx="21" cy="21" r="15.9155" fill="none" stroke="#7C3AED" stroke-width="5" stroke-dasharray="12.4 87.6" stroke-linecap="round"/></svg>
+                            <div class="aiobs-donut-center"><b>12.4%</b></div>
+                          </div>
+                          <div class="aiobs-duo-label">Reach advanced AI capability</div>
+                        </div>
+                      </div>
+                      <p class="aiobs-chap-note">Individuals aged 15+. SCAD Individual AI Adoption Survey, 2026.</p>
+                    </div>
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-kicker">AI literacy levels (individuals)</div>
+                      <div class="aiobs-subcard-title">Fewer than half reach good or advanced literacy</div>
+                      <div class="aiobs-bars">
+                        <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">No AI knowledge</span><span class="aiobs-bar-val">42.5%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:42.5%"></div></div></div>
+                        <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Basic AI literacy</span><span class="aiobs-bar-val">12.1%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:12.1%"></div></div></div>
+                        <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Good AI literacy</span><span class="aiobs-bar-val">32.1%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:32.1%"></div></div></div>
+                        <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Advanced AI literacy</span><span class="aiobs-bar-val">13.3%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:13.3%;background:#7C3AED"></div></div></div>
+                      </div>
+                      <p class="aiobs-chap-note">SCAD Individual AI Adoption Survey, 2026.</p>
+                    </div>
+                  </div>
+                  <div class="aiobs-insight aiobs-insight-reveal" data-reveal>
+                    <span class="aiobs-insight-ic"><i class="ti ti-bulb"></i></span>
+                    <div class="aiobs-insight-body">
+                      <div class="aiobs-insight-label">AI Insight</div>
+                      <p>High levels of AI use do not yet translate into advanced capability: 86.0% have used AI, but only 12.4% reach the advanced tier, and 42.5% still report no AI knowledge at all. There is a clear opportunity to strengthen skills, training and applied expertise to move from everyday use to deeper capability and value creation.</p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════════════════════════════════════════════
+                     SECTION 5 — Enterprises are adopting AI, with
+                     governance still emerging (Enterprise only)
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-panel aiobs-section-reveal" id="sec-enterprise" data-chapter="sec-enterprise" data-reveal>
+                  <div class="aiobs-panel-hd">
+                    <div class="aiobs-chapter-hd-main">
+                      <span class="aiobs-chapter-hd-ic"><i class="ti ti-building-skyscraper"></i></span>
+                      <div>
+                        <h2>Enterprises are adopting AI, with governance still emerging</h2>
+                        <p>AI is being used across a range of business functions, but formal governance is less widespread.</p>
+                      </div>
+                    </div>
+                    <button type="button" class="aiobs-ask aiobs-ask--icon" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Why does enterprise AI governance lag behind adoption?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                  </div>
+                  <div class="aiobs-subgrid">
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-kicker">Main purposes of AI use (enterprises)</div>
+                      <div class="aiobs-subcard-title">Administration, production and marketing lead; R&amp;D trails at 2%</div>
+                      <div class="aiobs-bars" style="--axis:56;--labelw:39%">
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Administration</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="--v:26"></div></div><span class="aiobs-bar-val">26%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Production / service processes</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="--v:23"></div></div><span class="aiobs-bar-val">23%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Marketing or sales</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="--v:22"></div></div><span class="aiobs-bar-val">22%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Finance management</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="--v:13"></div></div><span class="aiobs-bar-val">13%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">ICT security</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="--v:9"></div></div><span class="aiobs-bar-val">9%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Logistics</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="--v:5"></div></div><span class="aiobs-bar-val">5%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">R&amp;D or innovation</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="--v:2"></div></div><span class="aiobs-bar-val">2%</span></div>
+                      </div>
+                      <p class="aiobs-chap-note">SCAD AI Enterprise Adoption Survey, 2026.</p>
+                    </div>
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-kicker">AI strategy &amp; governance status (enterprises)</div>
+                      <div class="aiobs-subcard-title">29% have formal governance in place</div>
+                      <div class="aiobs-bars" style="--axis:66;--labelw:45%">
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">No plans yet, but adoption planned</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="--v:37.7"></div></div><span class="aiobs-bar-val">37.7%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">No AI strategy or policy in place</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="--v:33.1"></div></div><span class="aiobs-bar-val">33.1%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Internal AI policies or guidelines</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="--v:18.2;background:var(--warning)"></div></div><span class="aiobs-bar-val">18.2%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Formal AI strategy</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="--v:11.1;background:var(--warning)"></div></div><span class="aiobs-bar-val">11.1%</span></div>
+                      </div>
+                      <p class="aiobs-chap-note">SCAD AI Enterprise Adoption Survey, 2026. Internal policies (18.2%) + formal strategy (11.1%) = the 29% governance headline.</p>
+                    </div>
+                  </div>
+                  <div class="aiobs-insight aiobs-insight-reveal" data-reveal>
+                    <span class="aiobs-insight-ic"><i class="ti ti-bulb"></i></span>
+                    <div class="aiobs-insight-body">
+                      <div class="aiobs-insight-label">AI Insight</div>
+                      <p>Enterprises are using AI across core operations—administration, production and marketing account for 71% of reported use between them—but governance and structured implementation are still developing, highlighting a need for clearer frameworks, policies and oversight.</p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════════════════════════════════════════════
+                     SECTION 6 — Economic & workforce impact
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-panel aiobs-section-reveal" id="sec-impact" data-chapter="sec-impact" data-reveal>
+                  <div class="aiobs-panel-hd">
+                    <div class="aiobs-chapter-hd-main">
+                      <span class="aiobs-chapter-hd-ic"><i class="ti ti-briefcase"></i></span>
+                      <div>
+                        <h2>AI is beginning to show economic and workforce impact</h2>
+                        <p>Enterprises report productivity gains, while AI-related workforce demand is emerging.</p>
+                      </div>
+                    </div>
+                    <button type="button" class="aiobs-ask aiobs-ask--icon" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('How is AI adoption affecting enterprise productivity and workforce demand?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                  </div>
+                  <div class="aiobs-subgrid">
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-kicker">Reported enterprise impact</div>
+                      <div class="aiobs-subcard-title">AI's reported impact across enterprises</div>
+                      <div class="aiobs-bars aiobs-impact-bars">
+                        <div class="aiobs-bar-item">
+                          <span class="aiobs-impact-bar-ic" style="background:var(--accent-light);color:var(--accent)"><i class="ti ti-trending-up"></i></span>
+                          <span class="aiobs-bar-name">Productivity increased</span>
+                          <div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:73.6%"></div></div>
+                          <span class="aiobs-bar-val">73.6%</span>
+                        </div>
+                        <div class="aiobs-bar-item">
+                          <span class="aiobs-impact-bar-ic" style="background:#E1F5EE;color:var(--teal-600)"><i class="ti ti-mood-smile"></i></span>
+                          <span class="aiobs-bar-name">Worker satisfaction increased</span>
+                          <div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:65.8%;background:var(--teal-600)"></div></div>
+                          <span class="aiobs-bar-val">65.8%</span>
+                        </div>
+                        <div class="aiobs-bar-item">
+                          <span class="aiobs-impact-bar-ic" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-users"></i></span>
+                          <span class="aiobs-bar-name">Employment increased</span>
+                          <div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:36.9%;background:var(--warning)"></div></div>
+                          <span class="aiobs-bar-val">36.9%</span>
+                        </div>
+                      </div>
+                      <p class="aiobs-chap-note">SCAD AI Enterprise Adoption Survey, 2026.</p>
+                      <p class="aiobs-chap-note aiobs-chap-note--sub">Percentage of enterprises reporting an increase.</p>
+                    </div>
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-kicker">AI workforce &amp; demand</div>
+                      <div class="aiobs-subcard-title">AI-related workforce is taking shape</div>
+                      <div class="aiobs-impact-metrics">
+                        <div class="aiobs-impact-metric aiobs-impact-metric--blue">
+                          <span class="aiobs-impact-metric-ic"><i class="ti ti-users"></i></span>
+                          <div class="aiobs-impact-metric-val">10,881</div>
+                          <div class="aiobs-impact-metric-label">AI-related FTE</div>
+                          <div class="aiobs-impact-metric-src">Enterprise survey, 2026.</div>
+                        </div>
+                        <div class="aiobs-impact-metric aiobs-impact-metric--purple">
+                          <span class="aiobs-impact-metric-ic"><i class="ti ti-briefcase"></i></span>
+                          <div class="aiobs-impact-metric-val">1,201</div>
+                          <div class="aiobs-impact-metric-label">AI-related vacancies</div>
+                          <div class="aiobs-impact-metric-src">Enterprise survey, 2026.</div>
+                        </div>
+                      </div>
+                      <div class="aiobs-impact-callout">
+                        <span class="aiobs-impact-callout-ic"><i class="ti ti-trending-up"></i></span>
+                        <div>
+                          <p class="aiobs-impact-callout-title">AI adoption is creating demand for specialised skills.</p>
+                          <p class="aiobs-impact-callout-text">This is a directional interpretation of the reported workforce and vacancy indicators.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="aiobs-insight aiobs-insight-reveal" data-reveal>
+                    <span class="aiobs-insight-ic"><i class="ti ti-bulb"></i></span>
+                    <div class="aiobs-insight-body">
+                      <div class="aiobs-insight-label">AI Insight</div>
+                      <p>AI adoption is beginning to translate into reported enterprise benefits, with <b>73.6% of enterprises reporting increased productivity</b>. At the same time, <b>10,881 AI-related FTE</b> and <b>1,201 AI-related vacancies</b> point to a growing workforce dimension—making skills development and talent readiness important next steps.</p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- ══════════════════════════════════════════════════════
+                     SECTION 7 — Sentiment toward AI is strongly positive,
+                     and confidence in its future runs even higher
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-panel aiobs-section-reveal" id="sec-sentiment" data-chapter="sec-sentiment" data-reveal>
+                  <div class="aiobs-panel-hd">
+                    <div class="aiobs-chapter-hd-main">
+                      <span class="aiobs-chapter-hd-ic"><i class="ti ti-users-group"></i></span>
+                      <div>
+                        <h2>Sentiment toward AI is strongly positive, and confidence in its future runs even higher</h2>
+                        <p>Most residents already feel positively about AI, and are even more confident about where the UAE's AI future is heading.</p>
+                      </div>
+                    </div>
+                    <button type="button" class="aiobs-ask aiobs-ask--icon" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('How positive are residents about AI today, and about the future?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                  </div>
+                  <div class="aiobs-subgrid">
+                    <div class="aiobs-subcard">
+                      <div class="aiobs-subcard-kicker">Individuals · general sentiment toward AI</div>
+                      <div class="aiobs-subcard-title">71.3% are positive or very positive</div>
+                      <div class="aiobs-bars">
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Very positive</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:26.3%;background:var(--teal-400)"></div></div><span class="aiobs-bar-val">26.3%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Positive</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:45.0%;background:var(--teal-200)"></div></div><span class="aiobs-bar-val">45.0%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Neutral</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:25.6%;background:#94A3B8"></div></div><span class="aiobs-bar-val">25.6%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Negative</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:2.1%;background:var(--warning)"></div></div><span class="aiobs-bar-val">2.1%</span></div>
+                        <div class="aiobs-bar-item"><span class="aiobs-bar-name">Very negative</span><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:1.0%;background:var(--danger)"></div></div><span class="aiobs-bar-val">1.0%</span></div>
+                      </div>
+                      <p class="aiobs-chap-note">SCAD Individual AI Adoption Survey, 2026.</p>
+                    </div>
+                    <div class="aiobs-subcard aiobs-statpanel">
+                      <span class="aiobs-statpanel-ic" style="background:#FDECF1;color:#C2255C"><i class="ti ti-heart"></i></span>
+                      <div class="aiobs-stat-value">88.6%</div>
+                      <div class="aiobs-stat-label">Positive about the UAE's AI future specifically</div>
+                      <p class="aiobs-chap-note">Confidence about where AI is heading runs higher than sentiment about AI today (71.3%) — SCAD Individual AI Adoption Survey, 2026.</p>
+                    </div>
+                  </div>
+                  <div class="aiobs-insight aiobs-insight-reveal" data-reveal>
+                    <span class="aiobs-insight-ic"><i class="ti ti-bulb"></i></span>
+                    <div class="aiobs-insight-body">
+                      <div class="aiobs-insight-label">AI Insight</div>
+                      <p>Sentiment toward AI is already positive on balance (71.3% positive or very positive, only 3.1% negative), and confidence about the UAE's AI future is stronger still (88.6%). Sustaining that goodwill as adoption deepens will depend on the same maturity markers seen elsewhere — advanced capability (12.4%) and formal governance (29%) — keeping pace with usage.</p>
+                    </div>
+                  </div>
+                </section>
+                </div><!-- /.aiobs-state-of-ai -->
+
+                <!-- ══════════════════════════════════════════════════════
+                     KEY INSIGHTS — Census Observatory Key Insights treatment
+                     (.aiobs-keyins-section + .impacts-list/.impact-item):
+                     one soft-gradient section card, vertical icon+sentence
+                     rows, AI footnote. Placed directly before Latest Updates.
+                     ══════════════════════════════════════════════════════ -->
+                <section class="aiobs-keyins-section aiobs-section-reveal" id="key-insights" data-reveal>
+                  <div class="section-hdr">
+                    <h2 class="cpi-section-title"><i class="ti ti-bulb"></i>Key Insights</h2>
+                  </div>
+                  <p class="section-hdr-sub">What these findings mean, distilled into the takeaways that matter most.</p>
+                  <div class="obs-card impacts-list">
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--purple"><i class="ti ti-certificate"></i></div>
+                      <div>Advanced AI capability sits at just <span class="impact-val">12.4%</span> of individuals, even though <span class="impact-val">86.0%</span> have used AI in some form — the next constraint on Abu Dhabi's AI story is depth, not access.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--warning"><i class="ti ti-code"></i></div>
+                      <div>Programming and AI-app-development show the widest self-reported skills gap, at <span class="impact-val">+26.2 percentage points</span> between what people want to learn and what they already know.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--warning"><i class="ti ti-shield-check"></i></div>
+                      <div>Only <span class="impact-val">29%</span> of adopting enterprises have a formal AI strategy or governance policy in place, even as <span class="impact-val">73%</span> already use AI in day-to-day operations.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--neutral"><i class="ti ti-bulb"></i></div>
+                      <div>Just <span class="impact-val">2%</span> of reported enterprise AI use goes toward R&amp;D or innovation — activity is concentrated in administration, production and marketing instead.</div>
+                    </div>
+                    <div class="impact-item">
+                      <div class="impact-icon impact-icon--pink"><i class="ti ti-heart"></i></div>
+                      <div>Sentiment toward AI is already positive (<span class="impact-val">71.3%</span>) and confidence in the UAE's AI future runs even higher (<span class="impact-val">88.6%</span>) — an early advantage for closing the capability and governance gaps above.</div>
+                    </div>
+                  </div>
+                  <div class="ai-footnote">
+                    <span>Synthesised from confirmed SCAD 2026 AI Adoption Survey figures.</span>
+                  </div>
+                </section>
+
+              </div>
+
+              <!-- ══════════════════════════════════════════════════════
+                   NEWS — same carousel layout as Census Observatory
+                   Overview (image-overlay cards + pagination).
+                   ══════════════════════════════════════════════════════ -->
+              <section id="ai-news">
+                <div class="dg-carousel cen-news-carousel">
+                  <div class="cen-news-hdr">
+                    <div>
+                      <div class="section-hdr"><h2 class="cpi-section-title"><i class="ti ti-rss"></i>News</h2></div>
+                      <p class="section-hdr-sub" style="margin-bottom:0">Authoritative news and analysis on AI adoption, capability and readiness across Abu Dhabi enterprises and residents.</p>
+                    </div>
+                  </div>
+                  <div class="dg-track cen-news-track">
+                    <div class="obs-card dg-slide cen-news-card">
+                      <div class="cen-news-media" style="background-image:url('assets/News 1.jpg')" role="img" aria-label="Modern office towers in Abu Dhabi"></div>
+                      <div class="cen-news-shade"></div>
+                      <div class="cen-news-inner">
+                        <div class="cen-news-top">
+                          <span class="cen-news-badge">AI DIFFUSION</span>
+                          <span class="cen-news-date">Mar 10 2026</span>
+                        </div>
+                        <div class="cen-news-foot">
+                          <h3 class="cen-news-title">UAE Ranks 1st of 147 Countries on Global AI Diffusion</h3>
+                          <p class="cen-news-sum">The Microsoft AI Economy Institute's Q1 2026 index places the UAE at the top of 147 countries — Abu Dhabi's 73% enterprise adoption rate is a leading driver…</p>
+                          <div class="cen-news-actions">
+                            <button type="button" class="cen-news-act" onclick="AIObs.askAI('Summarise the UAE global AI diffusion ranking')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                            <button type="button" class="cen-news-act" onclick="AIObs.toast('Audio brief — coming soon in this preview')"><i class="ti ti-volume"></i> Listen</button>
+                            <a class="cen-news-more" href="ai-benchmark.html">Read more <i class="ti ti-arrow-right"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="obs-card dg-slide cen-news-card">
+                      <div class="cen-news-media" style="background-image:url('assets/News 2.avif')" role="img" aria-label="Professional working in a modern office"></div>
+                      <div class="cen-news-shade"></div>
+                      <div class="cen-news-inner">
+                        <div class="cen-news-top">
+                          <span class="cen-news-badge">GOVERNANCE</span>
+                          <span class="cen-news-date">Mar 8 2026</span>
+                        </div>
+                        <div class="cen-news-foot">
+                          <h3 class="cen-news-title">Enterprise AI Adoption Is Mainstream — Governance Still Catching Up</h3>
+                          <p class="cen-news-sum">73% of Abu Dhabi enterprises have adopted AI, but only 29% have a formal AI strategy or policy in place, SCAD's 2026 survey finds…</p>
+                          <div class="cen-news-actions">
+                            <button type="button" class="cen-news-act" onclick="AIObs.askAI('Summarise the enterprise AI governance gap')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                            <button type="button" class="cen-news-act" onclick="AIObs.toast('Audio brief — coming soon in this preview')"><i class="ti ti-volume"></i> Listen</button>
+                            <a class="cen-news-more" href="ai-interpret.html#c3">Read more <i class="ti ti-arrow-right"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="obs-card dg-slide cen-news-card">
+                      <div class="cen-news-media" style="background-image:url('assets/News 3.jpg')" role="img" aria-label="Developers collaborating on AI projects"></div>
+                      <div class="cen-news-shade"></div>
+                      <div class="cen-news-inner">
+                        <div class="cen-news-top">
+                          <span class="cen-news-badge">SKILLS</span>
+                          <span class="cen-news-date">Mar 5 2026</span>
+                        </div>
+                        <div class="cen-news-foot">
+                          <h3 class="cen-news-title">Programming Emerges as Abu Dhabi's Widest AI Skills Gap</h3>
+                          <p class="cen-news-sum">Demand for programming and AI-app-development skills exceeds supply by 26.2 percentage points — more than double the gap in AI ethics…</p>
+                          <div class="cen-news-actions">
+                            <button type="button" class="cen-news-act" onclick="AIObs.askAI('Summarise the AI programming skills gap')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                            <button type="button" class="cen-news-act" onclick="AIObs.toast('Audio brief — coming soon in this preview')"><i class="ti ti-volume"></i> Listen</button>
+                            <a class="cen-news-more" href="ai-interpret.html#c5">Read more <i class="ti ti-arrow-right"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="obs-card dg-slide cen-news-card">
+                      <div class="cen-news-media" style="background-image:url('assets/story-3.jpg')" role="img" aria-label="Aerial view of Abu Dhabi skyline"></div>
+                      <div class="cen-news-shade"></div>
+                      <div class="cen-news-inner">
+                        <div class="cen-news-top">
+                          <span class="cen-news-badge">ADOPTION</span>
+                          <span class="cen-news-date">Feb 28 2026</span>
+                        </div>
+                        <div class="cen-news-foot">
+                          <h3 class="cen-news-title">86% of Abu Dhabi Residents Have Used AI — Capability Lags Behind</h3>
+                          <p class="cen-news-sum">SCAD's 2026 individual survey finds near-universal AI use among residents aged 15+, yet only 13.3% reach advanced AI literacy and 42.5% report no AI knowledge…</p>
+                          <div class="cen-news-actions">
+                            <button type="button" class="cen-news-act" onclick="AIObs.askAI('Summarise the gap between AI use and capability in Abu Dhabi')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                            <button type="button" class="cen-news-act" onclick="AIObs.toast('Audio brief — coming soon in this preview')"><i class="ti ti-volume"></i> Listen</button>
+                            <a class="cen-news-more" href="ai-observe.html">Read more <i class="ti ti-arrow-right"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="obs-card dg-slide cen-news-card">
+                      <div class="cen-news-media" style="background-image:url('assets/story-4.jpg')" role="img" aria-label="Residents in a community setting"></div>
+                      <div class="cen-news-shade"></div>
+                      <div class="cen-news-inner">
+                        <div class="cen-news-top">
+                          <span class="cen-news-badge">SENTIMENT</span>
+                          <span class="cen-news-date">Feb 22 2026</span>
+                        </div>
+                        <div class="cen-news-foot">
+                          <h3 class="cen-news-title">Abu Dhabi Residents Overwhelmingly Positive on AI's Future</h3>
+                          <p class="cen-news-sum">71.3% hold a positive or very positive view of AI today, and 89% are optimistic about the UAE's AI future — with just 3.1% reporting negative sentiment…</p>
+                          <div class="cen-news-actions">
+                            <button type="button" class="cen-news-act" onclick="AIObs.askAI('How positive are residents about AI today and the future?')"><i class="ti ti-sparkles"></i> AI Summarize</button>
+                            <button type="button" class="cen-news-act" onclick="AIObs.toast('Audio brief — coming soon in this preview')"><i class="ti ti-volume"></i> Listen</button>
+                            <a class="cen-news-more" href="ai-interpret.html#c6">Read more <i class="ti ti-arrow-right"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dg-carousel-nav home-carousel-nav">
+                    <button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+                    <div class="home-carousel-dots"></div>
+                    <button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+          </main>
+        </div>
+        <div data-bayaan-footer></div>
+      </div>
+    </div>
+    <script>
+      function initDgCarousel(carousel) {
+        const track = carousel.querySelector(".dg-track");
+        const nav = carousel.querySelector(".dg-carousel-nav");
+        if (!track || !nav) return;
+        const dotsWrap = nav.querySelector(".home-carousel-dots");
+        const arrows = nav.querySelectorAll(".home-carousel-arrow");
+        if (!dotsWrap || arrows.length < 2) return;
+
+        const cards = () => [...track.children];
+        const gap = () => {
+          const s = getComputedStyle(track);
+          return parseFloat(s.columnGap || s.gap) || 14;
+        };
+        const step = () => {
+          const first = cards()[0];
+          return first ? first.offsetWidth + gap() : track.clientWidth;
+        };
+        const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
+        const pageCount = () => {
+          const ms = maxScroll();
+          if (ms <= 2) return 1;
+          return Math.ceil(ms / step()) + 1;
+        };
+        const currentPage = () => {
+          const s = step();
+          return s <= 0 ? 0 : Math.round(track.scrollLeft / s);
+        };
+
+        function sync() {
+          const pages = pageCount();
+          const page = Math.min(currentPage(), pages - 1);
+          nav.classList.toggle("is-single", pages <= 1);
+          const dots = dotsWrap.querySelectorAll(".home-carousel-dot");
+          if (dots.length !== pages) {
+            dotsWrap.innerHTML = Array.from({ length: pages }, (_, i) =>
+              `<button type="button" class="home-carousel-dot${i === page ? " active" : ""}" aria-label="Go to page ${i + 1}"></button>`
+            ).join("");
+            dotsWrap.querySelectorAll(".home-carousel-dot").forEach((dot, i) =>
+              dot.addEventListener("click", () => goTo(i))
+            );
+          } else {
+            dots.forEach((dot, i) => dot.classList.toggle("active", i === page));
+          }
+          const ms = maxScroll();
+          arrows[0].disabled = track.scrollLeft <= 2;
+          arrows[1].disabled = ms <= 2 || track.scrollLeft >= ms - 2;
+        }
+
+        function goTo(i) {
+          const pages = pageCount();
+          const page = Math.max(0, Math.min(i, pages - 1));
+          track.scrollTo({ left: Math.min(page * step(), maxScroll()), behavior: "smooth" });
+          requestAnimationFrame(sync);
+        }
+
+        arrows[0].addEventListener("click", () => goTo(currentPage() - 1));
+        arrows[1].addEventListener("click", () => goTo(currentPage() + 1));
+        let tick = 0;
+        track.addEventListener("scroll", () => {
+          if (tick) return;
+          tick = requestAnimationFrame(() => { tick = 0; sync(); });
+        }, { passive: true });
+
+        carousel._sync = sync;
+        sync();
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+        document.querySelectorAll(".dg-carousel").forEach(initDgCarousel);
+      });
+    </script>
+  </body>
+</html>

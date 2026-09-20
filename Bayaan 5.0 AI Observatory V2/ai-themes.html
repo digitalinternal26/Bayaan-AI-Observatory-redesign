@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Observatory — Themes · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/pages/ai-observatory.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/ai-observatory.js" defer></script>
+    <style>
+      /* ============ THEMES / DATA STORIES — curated topic journeys (page-local) ============
+         Philosophy: not the catalogue (Observe) and not the full narrative
+         (Interpret) — a guided way in, by topic or policy question, to a
+         small selected set of indicators + one story each. Six themes are
+         populated today from figures already verified on Overview/Interpret/
+         Observe/Benchmark — nothing here is a new figure. Two themes
+         (Infrastructure, Economic Value) have no approved current data per
+         the IA workbook and render as honestly-labelled roadmap cards
+         rather than invented placeholders. */
+
+      #screen-cpi-obs .tm-head { max-width: 78ch; }
+      #screen-cpi-obs .tm-head h1 { font-size: 34px; font-weight: 800; margin: 8px 0 8px; color: var(--text-primary); letter-spacing: -0.015em; line-height: 1.15; }
+      #screen-cpi-obs .tm-head p { font-size: var(--fs-md); color: var(--text-secondary); line-height: 1.6; margin: 0; max-width: 74ch; }
+
+      /* Theme selector grid */
+      #screen-cpi-obs .tm-cardgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+      #screen-cpi-obs .tm-card {
+        display: flex; flex-direction: column; gap: 10px; padding: 18px 19px; text-align: left;
+        background: var(--surface); border: 1px solid var(--border-solid); border-radius: var(--r-lg);
+        box-shadow: var(--shadow-sm); text-decoration: none; transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+      }
+      #screen-cpi-obs .tm-card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+      #screen-cpi-obs .tm-card-top { display: flex; align-items: center; justify-content: space-between; }
+      #screen-cpi-obs .tm-card-ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 17px; flex-shrink: 0; }
+      #screen-cpi-obs .tm-card-badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+      #screen-cpi-obs .tm-card-badge--live { background: #E1F5EE; color: var(--teal-600); }
+      #screen-cpi-obs .tm-card-badge--roadmap { background: var(--surface2); color: var(--text-tertiary); }
+      #screen-cpi-obs .tm-card-title { font-size: var(--fs-sm); font-weight: 700; color: var(--text-primary); line-height: 1.35; }
+      #screen-cpi-obs .tm-card-desc { font-size: 11.5px; color: var(--text-tertiary); line-height: 1.5; }
+
+      /* Related-indicator chips */
+      #screen-cpi-obs .tm-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      #screen-cpi-obs .tm-chip {
+        display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px;
+        border: 1px solid var(--border-solid); background: var(--surface); color: var(--text-secondary);
+        font-size: var(--fs-xs); font-weight: 600; text-decoration: none; transition: border-color 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .tm-chip:hover { border-color: var(--accent); color: var(--accent-dark); }
+      #screen-cpi-obs .tm-chip .ti { font-size: 13px; }
+      #screen-cpi-obs .tm-chapterlink { display: inline-flex; align-items: center; gap: 5px; font-size: var(--fs-xs); font-weight: 700; color: var(--accent-dark); text-decoration: none; margin-top: 14px; }
+      #screen-cpi-obs .tm-chapterlink:hover { color: var(--accent); }
+
+      /* Roadmap empty-state cards */
+      #screen-cpi-obs .tm-roadmap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      #screen-cpi-obs .tm-roadmap-card { padding: 26px 26px 24px; display: flex; flex-direction: column; gap: 10px; }
+      #screen-cpi-obs .tm-roadmap-top { display: flex; align-items: center; gap: 10px; }
+      #screen-cpi-obs .tm-roadmap-ic { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 18px; background: var(--surface2); color: var(--text-tertiary); flex-shrink: 0; }
+      #screen-cpi-obs .tm-roadmap-title { font-size: var(--fs-lg); font-weight: 800; color: var(--text-primary); margin: 0; }
+      #screen-cpi-obs .tm-roadmap-desc { font-size: var(--fs-sm); color: var(--text-secondary); line-height: 1.6; margin: 0; }
+      #screen-cpi-obs .tm-roadmap-when { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text-tertiary); background: var(--surface2); padding: 5px 11px; border-radius: 999px; margin-top: 2px; }
+
+      /* Education mini-stats row */
+      #screen-cpi-obs .tm-statrow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+      #screen-cpi-obs .tm-stat { text-align: center; padding: 18px 12px; }
+      #screen-cpi-obs .tm-stat-val { font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+      #screen-cpi-obs .tm-stat-label { font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 6px; max-width: 22ch; margin-left: auto; margin-right: auto; line-height: 1.45; }
+
+      @media (max-width: 1180px) {
+        #screen-cpi-obs .tm-cardgrid { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 720px) {
+        #screen-cpi-obs .tm-cardgrid { grid-template-columns: 1fr; }
+        #screen-cpi-obs .tm-roadmap-grid, #screen-cpi-obs .tm-statrow { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Products</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="ai-overview.html">AI Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Themes</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <aside class="sidebar" aria-label="AI Observatory views">
+              <button type="button" class="sidebar-item sidebar-item--ai" onclick="AIObs.toast('AI Observatory assistant — coming soon in this preview')">
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Survey AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item" href="ai-overview.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="ai-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="ai-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="ai-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+            </aside>
+          </div>
+
+          <main class="main">
+            <div class="aiobs-content">
+
+              <!-- ══════════ PAGE HEADER ══════════ -->
+              <div class="tm-head" style="padding-top:6px">
+                <span class="aiobs-eyebrow"><i class="ti ti-sparkles"></i>AI Observatory</span>
+                <h1>Themes &amp; Data Stories</h1>
+                <p>A guided way into a specific topic or policy question — each theme pairs a short evidence brief with the indicators behind it. For the complete catalogue, go to Observe; for the connected narrative, go to Interpret.</p>
+              </div>
+
+              <!-- ══════════ THEME SELECTOR GRID ══════════ -->
+              <div class="tm-cardgrid">
+                <a class="tm-card" href="#t-economy">
+                  <div class="tm-card-top"><span class="tm-card-ic" style="background:var(--accent-light);color:var(--accent)"><i class="ti ti-building-skyscraper"></i></span><span class="tm-card-badge tm-card-badge--live">Live data</span></div>
+                  <div class="tm-card-title">AI in the Economy</div>
+                  <div class="tm-card-desc">Enterprise adoption, purpose of use and where it varies by sector.</div>
+                </a>
+                <a class="tm-card" href="#t-people">
+                  <div class="tm-card-top"><span class="tm-card-ic" style="background:#E1F5EE;color:var(--teal-600)"><i class="ti ti-users"></i></span><span class="tm-card-badge tm-card-badge--live">Live data</span></div>
+                  <div class="tm-card-title">People &amp; Skills</div>
+                  <div class="tm-card-desc">Individual adoption, AI literacy and where the skills gap is widest.</div>
+                </a>
+                <a class="tm-card" href="#t-readiness">
+                  <div class="tm-card-top"><span class="tm-card-ic" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-shield-check"></i></span><span class="tm-card-badge tm-card-badge--live">Live data</span></div>
+                  <div class="tm-card-title">Enterprise Readiness</div>
+                  <div class="tm-card-desc">Governance status, barriers to adoption and non-adopter intent.</div>
+                </a>
+                <a class="tm-card" href="#t-workforce">
+                  <div class="tm-card-top"><span class="tm-card-ic" style="background:#FFF4E5;color:#C08A2E"><i class="ti ti-briefcase"></i></span><span class="tm-card-badge tm-card-badge--live">Live data</span></div>
+                  <div class="tm-card-title">AI Workforce</div>
+                  <div class="tm-card-desc">Reported effect on employment — dedicated headcount data not yet published.</div>
+                </a>
+                <a class="tm-card" href="#t-education">
+                  <div class="tm-card-top"><span class="tm-card-ic" style="background:#F1E9FE;color:#7C3AED"><i class="ti ti-school"></i></span><span class="tm-card-badge tm-card-badge--live">Live data</span></div>
+                  <div class="tm-card-title">Education</div>
+                  <div class="tm-card-desc">How higher-education students already use AI, and training reach.</div>
+                </a>
+                <a class="tm-card" href="#t-innovation">
+                  <div class="tm-card-top"><span class="tm-card-ic" style="background:#FDECF1;color:#C2255C"><i class="ti ti-bulb"></i></span><span class="tm-card-badge tm-card-badge--live">Live data</span></div>
+                  <div class="tm-card-title">Innovation &amp; R&amp;D</div>
+                  <div class="tm-card-desc">How much reported AI use is directed at R&amp;D versus daily operations.</div>
+                </a>
+                <a class="tm-card" href="#t-infra">
+                  <div class="tm-card-top"><span class="tm-card-ic"><i class="ti ti-server-2"></i></span><span class="tm-card-badge tm-card-badge--roadmap">Roadmap</span></div>
+                  <div class="tm-card-title">Infrastructure</div>
+                  <div class="tm-card-desc">Compute, cloud platforms, connectivity and sustainability.</div>
+                </a>
+                <a class="tm-card" href="#t-value">
+                  <div class="tm-card-top"><span class="tm-card-ic"><i class="ti ti-coin"></i></span><span class="tm-card-badge tm-card-badge--roadmap">Roadmap</span></div>
+                  <div class="tm-card-title">Economic Value</div>
+                  <div class="tm-card-desc">GDP, productivity and investment value attributable to AI.</div>
+                </a>
+              </div>
+
+              <!-- ══════════════════════════════════════════════════════
+                   T1 · AI IN THE ECONOMY
+                   ══════════════════════════════════════════════════════ -->
+              <section class="aiobs-panel" id="t-economy">
+                <div class="aiobs-panel-hd">
+                  <div>
+                    <h2><i class="ti ti-building-skyscraper"></i>AI in the Economy</h2>
+                    <p>73% of Abu Dhabi enterprises have adopted AI — concentrated in everyday operations, and unevenly spread across sectors.</p>
+                  </div>
+                </div>
+                <div class="aiobs-subcard">
+                  <div class="aiobs-subcard-kicker">Purpose of AI use · share of enterprises</div>
+                  <div class="aiobs-bars" style="margin-top:14px">
+                    <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Administration</span><span class="aiobs-bar-val">26%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:26%"></div></div></div>
+                    <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Production / service processes</span><span class="aiobs-bar-val">23%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:23%"></div></div></div>
+                    <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Marketing or sales</span><span class="aiobs-bar-val">22%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:22%"></div></div></div>
+                    <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Finance management</span><span class="aiobs-bar-val">13%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:13%"></div></div></div>
+                    <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">R&amp;D or innovation</span><span class="aiobs-bar-val">2%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:2%"></div></div></div>
+                  </div>
+                  <p class="aiobs-chap-note">Sector adoption ranges from 66% (Other Service Activities) to 86% (Electricity). SCAD AI Enterprise Adoption Survey, 2026.</p>
+                </div>
+                <div class="tm-chips">
+                  <a class="tm-chip" href="ai-observe.html?domain=enterprises"><i class="ti ti-eye"></i>Enterprise AI adoption</a>
+                  <a class="tm-chip" href="ai-observe.html?q=r%26d"><i class="ti ti-eye"></i>AI use directed to R&amp;D</a>
+                  <a class="tm-chip" href="ai-observe.html?domain=technology"><i class="ti ti-eye"></i>Technology types in use</a>
+                </div>
+                <a class="tm-chapterlink" href="ai-interpret.html#c1">Read the full story in Interpret <i class="ti ti-arrow-right"></i></a>
+              </section>
+
+              <!-- ══════════════════════════════════════════════════════
+                   T2 · PEOPLE & SKILLS
+                   ══════════════════════════════════════════════════════ -->
+              <section class="aiobs-panel" id="t-people">
+                <div class="aiobs-panel-hd">
+                  <div>
+                    <h2><i class="ti ti-users"></i>People &amp; Skills</h2>
+                    <p>86.0% of residents have used AI, but capability and skills are still catching up — most sharply in technical, applied skills.</p>
+                  </div>
+                </div>
+                <div class="aiobs-subgrid">
+                  <div class="aiobs-subcard">
+                    <div class="aiobs-subcard-kicker">AI literacy levels · individuals</div>
+                    <div class="aiobs-bars">
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">No AI knowledge</span><span class="aiobs-bar-val">42.5%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:42.5%"></div></div></div>
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Basic AI literacy</span><span class="aiobs-bar-val">12.1%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:12.1%"></div></div></div>
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Good AI literacy</span><span class="aiobs-bar-val">32.1%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:32.1%"></div></div></div>
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Advanced AI literacy</span><span class="aiobs-bar-val">13.3%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:13.3%;background:#7C3AED"></div></div></div>
+                    </div>
+                    <p class="aiobs-chap-note">SCAD Individual AI Adoption Survey, 2026.</p>
+                  </div>
+                  <div class="aiobs-subcard">
+                    <div class="aiobs-subcard-kicker">Widest skills gap · want minus have</div>
+                    <div class="aiobs-gapbars" style="margin-top:14px">
+                      <div class="aiobs-gap-row"><span class="aiobs-gap-name">Programming / developing AI apps</span><div class="aiobs-gap-track"><div class="aiobs-gap-axis"></div><div class="aiobs-gap-fill" style="left:50%;width:26.2%"></div><span class="aiobs-gap-val" style="left:calc(50% + 26.2% + 6px)">+26.2</span></div></div>
+                      <div class="aiobs-gap-row"><span class="aiobs-gap-name">Data analysis</span><div class="aiobs-gap-track"><div class="aiobs-gap-axis"></div><div class="aiobs-gap-fill" style="left:50%;width:22.2%"></div><span class="aiobs-gap-val" style="left:calc(50% + 22.2% + 6px)">+22.2</span></div></div>
+                      <div class="aiobs-gap-row"><span class="aiobs-gap-name">Creative design using AI</span><div class="aiobs-gap-track"><div class="aiobs-gap-axis"></div><div class="aiobs-gap-fill" style="left:50%;width:18.9%"></div><span class="aiobs-gap-val" style="left:calc(50% + 18.9% + 6px)">+18.9</span></div></div>
+                    </div>
+                    <p class="aiobs-chap-note">Full 6-skill ranking in Observe. SCAD Individual AI Adoption Survey, 2026.</p>
+                  </div>
+                </div>
+                <div class="tm-chips">
+                  <a class="tm-chip" href="ai-observe.html?domain=people"><i class="ti ti-eye"></i>AI use (individuals 15+)</a>
+                  <a class="tm-chip" href="ai-observe.html?domain=skills"><i class="ti ti-eye"></i>Advanced AI capability</a>
+                  <a class="tm-chip" href="ai-observe.html?q=skills%20gap"><i class="ti ti-eye"></i>AI skills gap</a>
+                </div>
+                <a class="tm-chapterlink" href="ai-interpret.html#c5">Read the full story in Interpret <i class="ti ti-arrow-right"></i></a>
+              </section>
+
+              <!-- ══════════════════════════════════════════════════════
+                   T3 · ENTERPRISE READINESS
+                   ══════════════════════════════════════════════════════ -->
+              <section class="aiobs-panel" id="t-readiness">
+                <div class="aiobs-panel-hd">
+                  <div>
+                    <h2><i class="ti ti-shield-check"></i>Enterprise Readiness</h2>
+                    <p>Interest in AI is high among non-adopters, and governance is still forming among those who have already adopted.</p>
+                  </div>
+                </div>
+                <div class="aiobs-subgrid">
+                  <div class="aiobs-subcard">
+                    <div class="aiobs-subcard-kicker">Top barriers to adoption · % of non-adopters</div>
+                    <div class="aiobs-bars">
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Lack of relevant expertise</span><span class="aiobs-bar-val">16.7%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:16.7%;background:var(--warning)"></div></div></div>
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Incompatibility with existing systems</span><span class="aiobs-bar-val">16.1%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:16.1%;background:var(--warning)"></div></div></div>
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Costs too high</span><span class="aiobs-bar-val">13.8%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:13.8%"></div></div></div>
+                    </div>
+                    <p class="aiobs-chap-note">47% of non-adopters plan to adopt within 3–5 years. SCAD AI Enterprise Adoption Survey, 2026.</p>
+                  </div>
+                  <div class="aiobs-subcard">
+                    <div class="aiobs-subcard-kicker">AI strategy &amp; governance status · adopters</div>
+                    <div class="aiobs-bars">
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">No AI strategy or policy in place</span><span class="aiobs-bar-val">33.1%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:33.1%"></div></div></div>
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Internal AI policies or guidelines</span><span class="aiobs-bar-val">18.2%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:18.2%;background:var(--warning)"></div></div></div>
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Formal AI strategy</span><span class="aiobs-bar-val">11.1%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:11.1%;background:var(--warning)"></div></div></div>
+                    </div>
+                    <p class="aiobs-chap-note">18.2% + 11.1% = the 29% governance headline. SCAD AI Enterprise Adoption Survey, 2026.</p>
+                  </div>
+                </div>
+                <div class="tm-chips">
+                  <a class="tm-chip" href="ai-observe.html?domain=trust"><i class="ti ti-eye"></i>Enterprises with AI governance</a>
+                  <a class="tm-chip" href="ai-observe.html?q=barriers"><i class="ti ti-eye"></i>Non-adopters planning to adopt</a>
+                </div>
+                <a class="tm-chapterlink" href="ai-interpret.html#c3">Read the full story in Interpret <i class="ti ti-arrow-right"></i></a>
+              </section>
+
+              <!-- ══════════════════════════════════════════════════════
+                   T4 · AI WORKFORCE
+                   ══════════════════════════════════════════════════════ -->
+              <section class="aiobs-panel" id="t-workforce">
+                <div class="aiobs-panel-hd">
+                  <div>
+                    <h2><i class="ti ti-briefcase"></i>AI Workforce</h2>
+                    <p>Enterprises report AI's clearest effect on productivity so far; its effect on employment is real but smaller — and dedicated AI-occupation statistics are still to come.</p>
+                  </div>
+                </div>
+                <div class="aiobs-subcard">
+                  <div class="aiobs-subcard-kicker">Reported effect on employment · enterprises</div>
+                  <div class="aiobs-bars" style="margin-top:14px">
+                    <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Workforce, expected in 3–5 yrs</span><span class="aiobs-bar-val">57.2%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:57.2%"></div></div></div>
+                    <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Employment, current effect</span><span class="aiobs-bar-val">36.9%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill aiobs-bar-fill--muted" style="width:36.9%"></div></div></div>
+                  </div>
+                  <p class="aiobs-chap-note">Share of enterprises reporting an increase; almost none report a decline. SCAD AI Enterprise Adoption Survey, 2026.</p>
+                </div>
+                <div class="aiobs-insight" style="margin-top:16px">
+                  <span class="aiobs-insight-ic"><i class="ti ti-info-circle"></i></span>
+                  <div class="aiobs-insight-body">
+                    <div class="aiobs-insight-label">Not yet published</div>
+                    <p>Dedicated AI-occupation headcount and vacancy statistics are not yet part of the published 2026 survey — shown as unavailable in Observe rather than estimated.</p>
+                  </div>
+                </div>
+                <div class="tm-chips">
+                  <a class="tm-chip" href="ai-observe.html?q=productivity"><i class="ti ti-eye"></i>Reported effect on productivity</a>
+                  <a class="tm-chip" href="ai-observe.html?domain=workforce"><i class="ti ti-eye"></i>AI-related FTE / vacancies</a>
+                </div>
+                <a class="tm-chapterlink" href="ai-interpret.html#c4">Read the full story in Interpret <i class="ti ti-arrow-right"></i></a>
+              </section>
+
+              <!-- ══════════════════════════════════════════════════════
+                   T5 · EDUCATION
+                   ══════════════════════════════════════════════════════ -->
+              <section class="aiobs-panel" id="t-education">
+                <div class="aiobs-panel-hd">
+                  <div>
+                    <h2><i class="ti ti-school"></i>Education</h2>
+                    <p>The next generation is already engaging with AI, and training reach among the wider population is still building.</p>
+                  </div>
+                </div>
+                <div class="tm-statrow">
+                  <div class="aiobs-subcard tm-stat">
+                    <div class="tm-stat-val">74.3%</div>
+                    <div class="tm-stat-label">Higher-ed students use AI daily or weekly</div>
+                  </div>
+                  <div class="aiobs-subcard tm-stat">
+                    <div class="tm-stat-val">55.6%</div>
+                    <div class="tm-stat-label">Use AI directly in graduation research</div>
+                  </div>
+                  <div class="aiobs-subcard tm-stat">
+                    <div class="tm-stat-val">17.5%</div>
+                    <div class="tm-stat-label">Current or formal AI training reach, general population</div>
+                  </div>
+                </div>
+                <div class="tm-chips">
+                  <a class="tm-chip" href="ai-observe.html?domain=education"><i class="ti ti-eye"></i>AI training reach</a>
+                </div>
+                <a class="tm-chapterlink" href="ai-interpret.html#c6">Read the full story in Interpret <i class="ti ti-arrow-right"></i></a>
+              </section>
+
+              <!-- ══════════════════════════════════════════════════════
+                   T6 · INNOVATION & R&D
+                   ══════════════════════════════════════════════════════ -->
+              <section class="aiobs-panel" id="t-innovation">
+                <div class="aiobs-panel-hd">
+                  <div>
+                    <h2><i class="ti ti-bulb"></i>Innovation &amp; R&amp;D</h2>
+                    <p>Only 2% of reported AI use is directed at R&amp;D or innovation — most value today comes from day-to-day operations, not new products or research.</p>
+                  </div>
+                </div>
+                <div class="aiobs-subgrid">
+                  <div class="aiobs-subcard aiobs-statpanel">
+                    <span class="aiobs-statpanel-ic" style="background:#FDECF1;color:#C2255C"><i class="ti ti-flask"></i></span>
+                    <div class="aiobs-stat-value">2%</div>
+                    <div class="aiobs-stat-label">of reported enterprise AI use is directed at R&amp;D or innovation</div>
+                    <p class="aiobs-chap-note">SCAD AI Enterprise Adoption Survey, 2026.</p>
+                  </div>
+                  <div class="aiobs-subcard">
+                    <div class="aiobs-subcard-kicker">Where R&amp;D-directed AI use concentrates</div>
+                    <div class="aiobs-bars">
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Information &amp; Communication</span><span class="aiobs-bar-val">41.1%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:41.1%"></div></div></div>
+                      <div class="aiobs-bar-item"><div class="aiobs-bar-top"><span class="aiobs-bar-name">Professional activities</span><span class="aiobs-bar-val">24.6%</span></div><div class="aiobs-bar-track"><div class="aiobs-bar-fill" style="width:24.6%;background:#3B82C4"></div></div></div>
+                    </div>
+                    <p class="aiobs-chap-note">Share of R&amp;D-directed AI use by sector, among sectors reporting it. SCAD AI Enterprise Adoption Survey, 2026.</p>
+                  </div>
+                </div>
+                <div class="tm-chips">
+                  <a class="tm-chip" href="ai-observe.html?q=r%26d"><i class="ti ti-eye"></i>AI use directed to R&amp;D or innovation</a>
+                </div>
+                <a class="tm-chapterlink" href="ai-interpret.html#c2">Read the full story in Interpret <i class="ti ti-arrow-right"></i></a>
+              </section>
+
+              <!-- ══════════════════════════════════════════════════════
+                   ROADMAP THEMES — Infrastructure & Economic Value
+                   ══════════════════════════════════════════════════════ -->
+              <section class="aiobs-section-hd" style="margin-top:4px">
+                <div>
+                  <h2 class="aiobs-section-title"><i class="ti ti-map-2"></i>Coming to the Observatory</h2>
+                  <p class="aiobs-section-note" style="max-width:64ch">Two themes the IA roadmap identifies, with no approved current figures to show yet — labelled honestly rather than estimated.</p>
+                </div>
+              </section>
+              <div class="tm-roadmap-grid">
+                <div class="aiobs-card tm-roadmap-card" id="t-infra">
+                  <div class="tm-roadmap-top">
+                    <span class="tm-roadmap-ic"><i class="ti ti-server-2"></i></span>
+                    <h3 class="tm-roadmap-title">Infrastructure</h3>
+                  </div>
+                  <p class="tm-roadmap-desc">Compute capacity and utilisation, cloud/AI platform mix, connectivity and edge deployment, and the sustainability footprint of AI infrastructure.</p>
+                  <span class="tm-roadmap-when"><i class="ti ti-clock"></i>Not yet published</span>
+                </div>
+                <div class="aiobs-card tm-roadmap-card" id="t-value">
+                  <div class="tm-roadmap-top">
+                    <span class="tm-roadmap-ic"><i class="ti ti-coin"></i></span>
+                    <h3 class="tm-roadmap-title">Economic Value</h3>
+                  </div>
+                  <p class="tm-roadmap-desc">GDP contribution, productivity and investment value attributable to AI — planned under the AI Satellite Account measurement programme.</p>
+                  <span class="tm-roadmap-when"><i class="ti ti-clock"></i>Planned, 2027 — not a current statistic</span>
+                </div>
+              </div>
+
+              <!-- ══════════════════════════════════════════════════════
+                   CONTINUE
+                   ══════════════════════════════════════════════════════ -->
+              <section>
+                <div class="aiobs-section-hd">
+                  <div>
+                    <h2 class="aiobs-section-title">Continue the analysis</h2>
+                    <p class="aiobs-section-note" style="max-width:60ch">Every theme above links into the full catalogue and the connected narrative — here's the direct route to each.</p>
+                  </div>
+                </div>
+                <div class="aiobs-pathway-grid">
+                  <a class="aiobs-card aiobs-pathway-card" href="ai-observe.html">
+                    <span class="aiobs-pathway-ic" style="background:#F3E8FF;color:#7C3AED"><i class="ti ti-eye"></i></span>
+                    <div class="aiobs-pathway-body"><b>Observe</b><p>Search, filter and export the full indicator catalogue.</p></div>
+                    <i class="ti ti-arrow-right"></i>
+                  </a>
+                  <a class="aiobs-card aiobs-pathway-card" href="ai-interpret.html">
+                    <span class="aiobs-pathway-ic" style="background:var(--accent-light);color:var(--accent)"><i class="ti ti-bulb"></i></span>
+                    <div class="aiobs-pathway-body"><b>Interpret</b><p>The connected narrative behind these themes.</p></div>
+                    <i class="ti ti-arrow-right"></i>
+                  </a>
+                  <a class="aiobs-card aiobs-pathway-card" href="ai-benchmark.html">
+                    <span class="aiobs-pathway-ic" style="background:#E1F5EE;color:var(--teal-600)"><i class="ti ti-world"></i></span>
+                    <div class="aiobs-pathway-body"><b>Benchmark</b><p>Compare Abu Dhabi with global references.</p></div>
+                    <i class="ti ti-arrow-right"></i>
+                  </a>
+                </div>
+              </section>
+
+            </div>
+          </main>
+        </div>
+        <div data-bayaan-footer></div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+      });
+    </script>
+  </body>
+</html>

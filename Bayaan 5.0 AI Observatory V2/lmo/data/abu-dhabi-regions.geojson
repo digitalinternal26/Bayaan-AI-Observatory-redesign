@@ -1,0 +1,38 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Abu Dhabi", "regionId": "abudhabi" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [53.95, 23.55], [54.95, 23.55], [55.05, 24.15], [54.85, 24.75],
+          [54.35, 25.05], [53.95, 24.65], [53.85, 24.05], [53.95, 23.55]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Al Ain", "regionId": "alain" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [55.15, 23.65], [56.15, 23.65], [56.05, 24.85], [55.45, 24.95],
+          [55.15, 24.45], [55.15, 23.65]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Al Dhafra", "regionId": "aldhafra" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [51.75, 22.75], [53.95, 22.75], [53.95, 23.85], [53.55, 24.35],
+          [52.55, 24.25], [51.75, 23.45], [51.75, 22.75]
+        ]]
+      }
+    }
+  ]
+}

@@ -1,0 +1,241 @@
+@import "../variables.css";
+
+#screen-operational-dashboards {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(900px 420px at 88% -10%, var(--accent-light) 0%, transparent 60%),
+    linear-gradient(180deg, var(--gray-50) 0%, var(--bg) 100%);
+}
+
+#screen-operational-dashboards .od-main {
+  flex: 1;
+  padding: 48px var(--page-gutter) 64px;
+}
+
+#screen-operational-dashboards .od-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#screen-operational-dashboards .od-hero {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+#screen-operational-dashboards .od-hero h1 {
+  font-family: var(--font);
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+#screen-operational-dashboards .od-hero p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+#screen-operational-dashboards .od-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+@media (max-width: 960px) {
+  #screen-operational-dashboards .od-grid {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
+#screen-operational-dashboards .od-card {
+  --od-accent: var(--accent);
+  --od-glow: rgba(0, 102, 255, 0.14);
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+  padding: 40px 32px 32px;
+  border: none;
+  border-radius: var(--r-xl);
+  background: linear-gradient(165deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 92%, var(--od-accent)) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    var(--shadow-sm);
+  cursor: default;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+
+#screen-operational-dashboards .od-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 50% 0%, var(--od-glow) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+#screen-operational-dashboards .od-card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 20px 48px var(--od-glow),
+    var(--shadow-md);
+}
+
+#screen-operational-dashboards .od-card:hover::before {
+  opacity: 1;
+}
+
+#screen-operational-dashboards .od-card--teal {
+  --od-accent: var(--teal-400);
+  --od-glow: rgba(29, 158, 117, 0.14);
+}
+
+#screen-operational-dashboards .od-card--amber {
+  --od-accent: var(--amber-400);
+  --od-glow: rgba(186, 117, 23, 0.14);
+}
+
+#screen-operational-dashboards .od-card-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#screen-operational-dashboards .od-card:hover .od-card-body {
+  transform: translateY(-12px);
+}
+
+#screen-operational-dashboards .od-card-icon {
+  display: block;
+  font-size: 42px;
+  line-height: 1;
+  margin-bottom: 22px;
+  color: var(--od-accent);
+  filter: drop-shadow(0 8px 16px color-mix(in srgb, var(--od-accent) 25%, transparent));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#screen-operational-dashboards .od-card:hover .od-card-icon {
+  transform: scale(1.08) translateY(-2px);
+}
+
+#screen-operational-dashboards .od-card h2 {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+#screen-operational-dashboards .od-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 28ch;
+  margin: 0 auto;
+}
+
+#screen-operational-dashboards .od-card-action {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 999px;
+  background: var(--od-accent);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 24px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--od-accent) 35%, transparent);
+}
+
+#screen-operational-dashboards .od-card-action .ti {
+  font-size: 15px;
+  transition: transform 0.25s ease;
+}
+
+#screen-operational-dashboards .od-card:hover .od-card-action {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+#screen-operational-dashboards .od-card-action:hover {
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--od-accent) 45%, transparent);
+}
+
+#screen-operational-dashboards .od-card-action:hover .ti {
+  transform: translateX(3px);
+}
+
+#screen-operational-dashboards .od-card-action:focus-visible {
+  outline: 2px solid var(--od-accent);
+  outline-offset: 3px;
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #screen-operational-dashboards .od-card,
+  #screen-operational-dashboards .od-card-body,
+  #screen-operational-dashboards .od-card-icon,
+  #screen-operational-dashboards .od-card-action,
+  #screen-operational-dashboards .od-card::before {
+    transition: none;
+  }
+
+  #screen-operational-dashboards .od-card-action {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  #screen-operational-dashboards .od-card:hover .od-card-body {
+    transform: none;
+  }
+}
+
+[data-theme="dark"] #screen-operational-dashboards {
+  background:
+    radial-gradient(900px 420px at 88% -10%, rgba(0, 102, 255, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+}
+
+[data-theme="dark"] #screen-operational-dashboards .od-card {
+  background: linear-gradient(165deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 88%, var(--od-accent)) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    var(--shadow-sm);
+}
+
+[data-theme="dark"] #screen-operational-dashboards .od-card:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 20px 48px var(--od-glow),
+    var(--shadow-md);
+}

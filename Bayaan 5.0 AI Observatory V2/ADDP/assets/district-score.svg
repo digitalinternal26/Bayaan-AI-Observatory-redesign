@@ -1,0 +1,10 @@
+<svg id="District_score" data-name="District score" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <circle id="Ellipse_5682" data-name="Ellipse 5682" cx="8" cy="8" r="8" fill="#13b473"/>
+  <circle id="Ellipse_5683" data-name="Ellipse 5683" cx="6.609" cy="6.609" r="6.609" transform="translate(1.391 1.38)" fill="#e7f7f1"/>
+  <circle id="Ellipse_5684" data-name="Ellipse 5684" cx="2" cy="2" r="2" transform="translate(6 6)" fill="#13b473"/>
+  <rect id="Rectangle_23230" data-name="Rectangle 23230" width="1.453" height="5.078" transform="translate(12.195 2.755) rotate(45)" fill="#13b473"/>
+  <path id="Rectangle_23229" data-name="Rectangle 23229" d="M0,0H1.453a0,0,0,0,1,0,0V1.38a.726.726,0,0,1-.726.726h0A.726.726,0,0,1,0,1.38V0A0,0,0,0,1,0,0Z" transform="translate(7.262 1.162)" fill="#13b473"/>
+  <path id="Rectangle_23227" data-name="Rectangle 23227" d="M0,0H1.453a0,0,0,0,1,0,0V1.38a.726.726,0,0,1-.726.726h0A.726.726,0,0,1,0,1.38V0A0,0,0,0,1,0,0Z" transform="translate(2.648 3.675) rotate(-45)" fill="#13b473"/>
+  <path id="Rectangle_23228" data-name="Rectangle 23228" d="M0,0H1.453a0,0,0,0,1,0,0V1.38a.726.726,0,0,1-.726.726h0A.726.726,0,0,1,0,1.38V0A0,0,0,0,1,0,0Z" transform="translate(1.162 8.715) rotate(-90)" fill="#13b473"/>
+  <path id="Rectangle_23231" data-name="Rectangle 23231" d="M0,0H1.453a0,0,0,0,1,0,0V1.38a.726.726,0,0,1-.726.726h0A.726.726,0,0,1,0,1.38V0A0,0,0,0,1,0,0Z" transform="translate(14.816 7.263) rotate(90)" fill="#13b473"/>
+</svg>

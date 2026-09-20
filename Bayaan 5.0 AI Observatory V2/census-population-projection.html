@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Census Observatory — Population Projection · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <!-- Same #screen-cpi-obs shell + shared Census detail stylesheet as
+         census-population.html / census-labour.html / census-real-estate.html. -->
+    <link rel="stylesheet" href="css/pages/ai.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/pages/exec-home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/pages/census-detail.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" ? "dark" : "light"
+        );
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/census-global-filter.js"></script>
+    <script src="js/census-detail.js"></script>
+    <script src="js/census-ai-panel.js"></script>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="CensusObservatory.html">Census Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Population Projection</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <div id="census-global-filter-mount"></div>
+            <!-- Same Census Observatory sidebar as every other Census page —
+                 Forecast is the active item, since Population Projection is
+                 reached via the Forecast/Projection context (see spec §6/§10;
+                 Interpret stays in the list, it's the existing nav, not a new
+                 architecture). -->
+            <aside class="sidebar" aria-label="Census Observatory views">
+              <button type="button" class="sidebar-item sidebar-item--ai" onclick="openObsSidebarAI(this)">
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Census AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item" href="CensusObservatory.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="census-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <button type="button" class="sidebar-item active" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+                <span class="sidebar-label">Forecast</span>
+              </button>
+              <a class="sidebar-item" href="census-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+              <a class="sidebar-item" href="census-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="census-geo.html">
+                <div class="sidebar-icon"><i class="ti ti-map-2"></i></div>
+                <span class="sidebar-label">Geo View</span>
+              </a>
+            </aside>
+          </div>
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <h1 class="topic-title">Population Projection</h1>
+                    <p class="topic-title-sub">Abu Dhabi population forecast to 2030</p>
+                  </div>
+                  <div class="cpi-hdr-actions">
+                    <div class="pp-search">
+                      <i class="ti ti-search" aria-hidden="true"></i>
+                      <input type="search" placeholder="Search…" aria-label="Search" />
+                      <span class="ob-kbd">Ctrl+K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cpi-obs-content">
+                <!-- ══ KPI row ══ -->
+                <div class="pp-kpi-row">
+                  <div class="obs-card cd-kpi">
+                    <div class="cd-kpi-ic"><i class="ti ti-users"></i></div>
+                    <div class="kpi-label">Latest (2025)</div>
+                    <div class="cd-kpi-val">4.44M</div>
+                    <div class="pp-kpi-caption">Total population</div>
+                  </div>
+                  <div class="obs-card cd-kpi">
+                    <div class="cd-kpi-ic"><i class="ti ti-trending-up"></i></div>
+                    <div class="kpi-label">Projected (2030)</div>
+                    <div class="cd-kpi-val">4.95M</div>
+                    <div class="pp-kpi-caption">Total population</div>
+                  </div>
+                  <div class="obs-card cd-kpi pp-kpi--good">
+                    <div class="cd-kpi-ic"><i class="ti ti-arrow-up-right"></i></div>
+                    <div class="kpi-label">Total growth (2025–2030)</div>
+                    <div class="cd-kpi-val">+11.5%</div>
+                    <div class="pp-kpi-caption">+510K people</div>
+                  </div>
+                  <div class="obs-card cd-kpi">
+                    <div class="cd-kpi-ic"><i class="ti ti-chart-bar"></i></div>
+                    <div class="kpi-label">Average annual growth</div>
+                    <div class="cd-kpi-val">2.2%</div>
+                    <div class="pp-kpi-caption">2025 – 2030</div>
+                  </div>
+                </div>
+
+                <!-- ══ Chart + AI panel ══ -->
+                <div class="pp-main-grid">
+                  <div class="obs-card pp-chart-card" id="ppChartCard">
+                    <div class="pp-chart-hd">
+                      <div>
+                        <div class="cd-card-hd"><i class="ti ti-chart-line"></i>Population projection</div>
+                        <p class="cd-card-sub" style="margin-bottom:0">Actual population (2023–2025) and projected population (2026–2030)</p>
+                      </div>
+                      <button type="button" class="pp-expand-btn" id="ppExpandBtn" aria-label="Expand chart" title="Expand chart" onclick="ppToggleFullscreen()">
+                        <i class="ti ti-arrows-maximize"></i>
+                      </button>
+                    </div>
+                    <div class="pp-chart-box"><canvas id="ppChart"></canvas></div>
+                    <div class="pp-legend">
+                      <span class="pp-legend-item"><span class="pp-legend-dot" style="background:#0066FF"></span>Actual</span>
+                      <span class="pp-legend-item"><span class="pp-legend-dot" style="background:#16a34a"></span>Forecast</span>
+                    </div>
+                  </div>
+
+                  <div class="pp-side-col">
+                    <div class="obs-card cd-key-card pp-ai-card">
+                      <div class="cd-key-card-hd">
+                        <span class="cd-key-card-hd-left"><span class="pp-ai-ic"><i class="ti ti-bulb"></i></span>AI Interpretation</span>
+                        <button type="button" class="pp-ai-btn" title="Open Census AI" aria-label="Open Census AI" onclick="openObsSidebarAI(this)"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <p>Abu Dhabi's population is projected to reach <b>4.95 million</b> by 2030, representing an increase of <b>11.5%</b> (<b>+510K people</b>) from 2025. The population is expected to grow at an average annual rate of approximately <b>2.2%</b>, supported by continued economic development, workforce demand and ongoing infrastructure investment.</p>
+                    </div>
+
+                    <div class="obs-card cd-key-card pp-ai-card">
+                      <div class="cd-key-card-hd">
+                        <span class="cd-key-card-hd-left"><span class="pp-ai-ic"><i class="ti ti-target-arrow"></i></span>Key Impacts</span>
+                        <button type="button" class="pp-ai-btn" title="Open Census AI" aria-label="Open Census AI" onclick="openObsSidebarAI(this)"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <ul class="pp-impacts">
+                        <li class="pp-impact-row">
+                          <span class="pp-impact-ic pp-impact-ic--green"><i class="ti ti-users"></i></span>
+                          <span>Continued demand for <b>housing, education, healthcare</b> and public services.</span>
+                        </li>
+                        <li class="pp-impact-row">
+                          <span class="pp-impact-ic pp-impact-ic--purple"><i class="ti ti-chart-bar"></i></span>
+                          <span>A growing <b>working-age population</b> supports economic growth and workforce capacity.</span>
+                        </li>
+                        <li class="pp-impact-row">
+                          <span class="pp-impact-ic pp-impact-ic--orange"><i class="ti ti-map-pin"></i></span>
+                          <span>Continued population growth reinforces the importance of <b>regional infrastructure and service planning</b>.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+
+        <div data-bayaan-footer></div>
+      </div>
+      <div class="pp-chart-scrim" id="ppScrim" onclick="ppToggleFullscreen()"></div>
+      <div class="cen-toast" id="censusToast"></div>
+    </div>
+
+    <script>
+      function goTo() {}
+      function openGeoView(e) { if (e) e.preventDefault(); }
+      function openBayaanSpace(e) { if (e) e.preventDefault(); }
+      function openProducts(e) { if (e) e.preventDefault(); }
+      function openObservatories(e) { if (e) e.preventDefault(); }
+      function openWsDrp() {}
+      function onHeaderSearchClick() {}
+      function toast() {}
+      function activateSidebar(el) {
+        const sidebar = el.closest(".sidebar");
+        (sidebar || document).querySelectorAll(".sidebar-item").forEach((s) => s.classList.remove("active"));
+        el.classList.add("active");
+      }
+
+      /* ============================================================
+         DATA — matches CensusObservatory.html's Population trajectory
+         (2023 4.05M / 2024 4.23M / 2025 4.44M) exactly. 2026–2030 are the
+         projection figures given for this page; no other Census page
+         shows a forecast, so nothing here conflicts with existing data.
+         ============================================================ */
+      let ppChart = null;
+
+      function ppRenderChart() {
+        const canvas = document.getElementById("ppChart");
+        if (!canvas || !window.Chart) return;
+        const theme = window.BayaanTheme ? window.BayaanTheme.chartTheme() : {};
+        const tick = theme.tick || "#94a3b8";
+        const grid = theme.grid || "rgba(0,0,0,0.06)";
+
+        const labels = ["2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030"];
+        const actualData = [4.05, 4.23, 4.44, null, null, null, null, null];
+        const forecastData = [null, null, 4.44, 4.6, 4.73, 4.84, 4.9, 4.95];
+        /* Illustrative uncertainty band widening with distance from the last
+           actual year — visual only, not a modelled confidence interval. */
+        const bandUpper = [null, null, 4.44, 4.64, 4.81, 4.97, 5.08, 5.17];
+        const bandLower = [null, null, 4.44, 4.56, 4.65, 4.71, 4.72, 4.73];
+
+        ppChart = new Chart(canvas, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Forecast range",
+                data: bandUpper,
+                borderWidth: 0,
+                pointRadius: 0,
+                fill: "+1",
+                backgroundColor: "rgba(22,163,74,0.10)",
+                order: 3,
+              },
+              {
+                label: "_bandLower",
+                data: bandLower,
+                borderWidth: 0,
+                pointRadius: 0,
+                fill: false,
+                backgroundColor: "transparent",
+                order: 3,
+              },
+              {
+                label: "Actual",
+                data: actualData,
+                borderColor: "#0066FF",
+                backgroundColor: "#0066FF",
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointBackgroundColor: "#0066FF",
+                tension: 0,
+                order: 1,
+              },
+              {
+                label: "Forecast",
+                data: forecastData,
+                borderColor: "#16a34a",
+                backgroundColor: "#16a34a",
+                borderWidth: 2.5,
+                borderDash: [6, 4],
+                pointRadius: 4,
+                pointBackgroundColor: "#16a34a",
+                tension: 0,
+                order: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                filter: (item) => item.dataset.label === "Actual" || item.dataset.label === "Forecast",
+                callbacks: {
+                  label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y}M`,
+                },
+              },
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: tick, font: { size: 11 } } },
+              y: {
+                min: 3,
+                max: 6,
+                grid: { color: grid },
+                ticks: { color: tick, font: { size: 11 }, stepSize: 0.5 },
+                title: { display: true, text: "Population (Million)", color: tick, font: { size: 11 } },
+              },
+            },
+          },
+          plugins: [
+            {
+              id: "ppDataLabels",
+              afterDatasetsDraw(chart) {
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.font = "600 10.5px Inter, sans-serif";
+                ctx.textAlign = "center";
+                chart.data.datasets.forEach((ds, i) => {
+                  if (ds.label !== "Actual" && ds.label !== "Forecast") return;
+                  const meta = chart.getDatasetMeta(i);
+                  ctx.fillStyle = ds.borderColor;
+                  meta.data.forEach((point, idx) => {
+                    const v = ds.data[idx];
+                    if (v === null || v === undefined) return;
+                    ctx.fillText(v.toFixed(2), point.x, point.y - 12);
+                  });
+                });
+                ctx.restore();
+              },
+            },
+          ],
+        });
+      }
+
+      function ppToggleFullscreen() {
+        const card = document.getElementById("ppChartCard");
+        const scrim = document.getElementById("ppScrim");
+        const btn = document.getElementById("ppExpandBtn");
+        const icon = btn.querySelector("i");
+        const isFull = card.classList.toggle("is-fullscreen");
+        scrim.classList.toggle("is-visible", isFull);
+        icon.className = "ti " + (isFull ? "ti-arrows-minimize" : "ti-arrows-maximize");
+        const label = isFull ? "Collapse chart" : "Expand chart";
+        btn.setAttribute("aria-label", label);
+        btn.setAttribute("title", label);
+        if (ppChart) requestAnimationFrame(() => ppChart.resize());
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+        if (window.CensusGlobalFilter) CensusGlobalFilter.mount();
+        ppRenderChart();
+      });
+    </script>
+  </body>
+</html>

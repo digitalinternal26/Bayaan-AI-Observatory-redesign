@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Census Observatory — Benchmark · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <!-- Same #screen-cpi-obs shell as every other Census page, plus the
+         shared Census detail stylesheet (reused here for .obs-card /
+         .cd-bar-row / .ai-pill / .cen-btn). The .bm-* rules below are ported
+         from benchmark.html (CPI's own Benchmark page) verbatim — same
+         convention as CensusObservatory.html porting .cpi-hero: this
+         codebase keeps one full copy of a component family per standalone
+         page rather than a shared file. -->
+    <link rel="stylesheet" href="css/pages/ai.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/pages/exec-home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/pages/census-detail.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" ? "dark" : "light"
+        );
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/census-global-filter.js"></script>
+    <script src="js/census-ai-panel.js"></script>
+    <style>
+      /* ====================================================================
+         CENSUS BENCHMARK — ported from benchmark.html's .bm-* system
+         ==================================================================== */
+      #screen-cpi-obs .bm-filter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px 0 20px; }
+      #screen-cpi-obs .bm-region-seg {
+        display: inline-flex; align-items: center; gap: 4px; height: 38px; padding: 4px;
+        border: 1px solid #ced4da; border-radius: 11px; background: #fff;
+      }
+      #screen-cpi-obs .bm-seg-btn {
+        display: inline-flex; align-items: center; gap: 6px; height: 100%; padding: 0 12px;
+        border: 0; border-radius: 8px; background: transparent; color: var(--text-primary, #0f172a);
+        font-family: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; white-space: nowrap;
+        transition: background 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .bm-seg-btn i { font-size: var(--fs-lg); line-height: 1; }
+      #screen-cpi-obs .bm-seg-btn:hover:not(.is-active) { background: var(--accent-light); color: var(--accent-dark); }
+      #screen-cpi-obs .bm-seg-btn.is-active { background: var(--accent); color: #fff; }
+      html[data-theme="dark"] #screen-cpi-obs .bm-region-seg { background: var(--surface); border-color: var(--border-md); }
+      html[data-theme="dark"] #screen-cpi-obs .bm-seg-btn { color: var(--text-primary); }
+
+      #screen-cpi-obs .prod-filter-dd { position: relative; }
+      #screen-cpi-obs .prod-filter-dd-trigger {
+        display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
+        min-width: 150px; max-width: 220px; height: 38px; padding: 0 12px; border: 1px solid #e5e7eb;
+        border-radius: 10px; background: #fff; color: #0f2744; font-size: var(--fs-sm); font-weight: 600;
+        font-family: inherit; cursor: pointer; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        transition: border-color 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .prod-filter-dd-lead { font-size: var(--fs-lg); color: var(--accent); flex-shrink: 0; }
+      #screen-cpi-obs .prod-filter-dd-trigger span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; margin-right: auto; }
+      #screen-cpi-obs .prod-filter-dd-trigger > i.ti-chevron-down { font-size: var(--fs-md); color: #9ca3af; flex-shrink: 0; transition: transform 0.15s; }
+      #screen-cpi-obs .prod-filter-dd-trigger.is-open > i.ti-chevron-down { transform: rotate(180deg); }
+      #screen-cpi-obs .prod-filter-dd-trigger:hover:not(:disabled), #screen-cpi-obs .prod-filter-dd-trigger.is-open { border-color: var(--accent); color: var(--accent); }
+      #screen-cpi-obs .prod-filter-dd-trigger:disabled { opacity: 0.5; cursor: not-allowed; }
+      #screen-cpi-obs .prod-filter-dd-menu {
+        position: absolute; top: calc(100% + 6px); left: 0; z-index: 900; min-width: 100%; width: max-content;
+        max-width: min(300px, calc(100vw - 32px)); background: #fff; border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(11,28,61,0.14), 0 4px 12px rgba(0,0,0,0.06); padding: 6px;
+      }
+      #screen-cpi-obs .prod-filter-dd-option {
+        display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: none;
+        border-radius: 8px; background: transparent; font-size: var(--fs-sm); font-weight: 500; color: #0f2744;
+        font-family: inherit; text-align: left; cursor: pointer; transition: background 0.12s, color 0.12s;
+      }
+      #screen-cpi-obs .prod-filter-dd-option .ti-check { margin-left: auto; color: var(--accent); font-size: var(--fs-lg); opacity: 0; }
+      #screen-cpi-obs .prod-filter-dd-option.is-active .ti-check { opacity: 1; }
+      #screen-cpi-obs .prod-filter-dd-option:hover { background: #f8fbff; color: var(--accent); }
+      #screen-cpi-obs .prod-filter-dd-option.is-active { background: #eff6ff; color: var(--accent); font-weight: 600; }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger { background: var(--surface); border-color: var(--border-md); color: var(--text-primary); }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-menu { background: var(--surface); border-color: var(--border-md); box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option { color: var(--text-primary); }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option:hover, html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option.is-active { background: var(--accent-light); color: var(--accent-mid); }
+
+      #screen-cpi-obs .bm-main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+      #screen-cpi-obs .bm-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+      #screen-cpi-obs .bm-main.is-expanded { grid-template-columns: minmax(0, 1fr); }
+      #screen-cpi-obs .bm-main.is-expanded .bm-side { display: none; }
+      #screen-cpi-obs .bm-panel { border-radius: 16px; padding: 18px 20px; }
+      html:not([data-theme="dark"]) #screen-cpi-obs .bm-panel { background: #fff; border: 1px solid #eaecf0; box-shadow: 0 1px 6px rgba(15,23,42,0.04); }
+      html[data-theme="dark"] #screen-cpi-obs .bm-panel { background: var(--surface, #141a26); border: 1px solid var(--border); }
+      #screen-cpi-obs .bm-chart-card { position: relative; min-width: 0; }
+
+      #screen-cpi-obs .bm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+      #screen-cpi-obs .bm-kpi { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+      #screen-cpi-obs .bm-kpi-ic { width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; color: var(--accent); background: var(--accent-light); }
+      #screen-cpi-obs .bm-kpi-ic i { font-size: var(--fs-lg); }
+      #screen-cpi-obs .bm-kpi-body { min-width: 0; flex: 1; }
+      #screen-cpi-obs .bm-kpi-val { font-size: var(--fs-2xl); font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-top: 6px; }
+      #screen-cpi-obs .bm-kpi-rank { margin-top: 3px; font-size: var(--fs-2xs); color: var(--text2); }
+      #screen-cpi-obs .bm-kpi-rank b { color: var(--accent); font-weight: 700; }
+      @media (max-width: 1100px) { #screen-cpi-obs .bm-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+
+      #screen-cpi-obs .bm-expand {
+        position: absolute; top: 18px; right: 20px; z-index: 2; display: flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; border: 1px solid #ced4da; border-radius: 9px; background: #fff; color: var(--text-primary);
+        cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .bm-expand i { font-size: var(--fs-md); }
+      #screen-cpi-obs .bm-expand:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
+
+      /* Trend chart + legend — ported verbatim from benchmark.html's own
+         .bm-chart-canvas / .bm-legend (CPI Benchmark), per the reference
+         screenshot: a multi-line time series with Abu Dhabi highlighted and
+         a click-to-toggle legend underneath. */
+      #screen-cpi-obs .bm-chart-canvas { position: relative; height: 360px; margin-top: 14px; }
+      #screen-cpi-obs .bm-main.is-expanded .bm-chart-canvas { height: 480px; }
+      #screen-cpi-obs .bm-legend { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; }
+      #screen-cpi-obs .bm-legend-item {
+        display: inline-flex; align-items: center; gap: 7px; padding: 4px 6px; border: 0; border-radius: 8px;
+        background: transparent; font-family: inherit; font-size: var(--fs-xs); font-weight: 500; color: var(--text2);
+        cursor: pointer; transition: opacity 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .bm-legend-item:hover { background: var(--accent-light); }
+      #screen-cpi-obs .bm-legend-item.is-off { opacity: 0.4; text-decoration: line-through; }
+      #screen-cpi-obs .bm-legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+
+      #screen-cpi-obs .bm-empty { padding: 40px 16px; text-align: center; color: var(--text2); font-size: var(--fs-sm); }
+      #screen-cpi-obs .bm-empty i { display: block; font-size: var(--fs-3xl); color: var(--muted); margin-bottom: 8px; }
+
+      #screen-cpi-obs .bm-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+      #screen-cpi-obs .bm-side .bm-panel.bm-ai-card { background: var(--accent-light); border: none; box-shadow: none; }
+      #screen-cpi-obs .bm-side-hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+      #screen-cpi-obs .bm-side-hd-left { display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); font-weight: 700; color: var(--text); }
+      #screen-cpi-obs .bm-ai-ic { width: 24px; height: 24px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: #fff; font-size: var(--fs-sm); flex-shrink: 0; }
+      /* Sparkle button replacing the "AI-generated" pill in the insight card
+         headers — opens the Census AI panel. */
+      #screen-cpi-obs .bm-ai-btn { flex-shrink: 0; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: var(--accent); cursor: pointer; transition: background 0.15s; }
+      #screen-cpi-obs .bm-ai-btn i { font-size: var(--fs-lg); }
+      #screen-cpi-obs .bm-ai-btn:hover { background: rgba(15, 23, 42, 0.06); }
+      html[data-theme="dark"] #screen-cpi-obs .bm-ai-btn:hover { background: rgba(255, 255, 255, 0.09); }
+      #screen-cpi-obs .bm-ai-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+      #screen-cpi-obs .bm-point { font-size: var(--fs-sm); line-height: 1.6; color: #536277; }
+      #screen-cpi-obs .bm-point p { margin: 0; }
+      #screen-cpi-obs .bm-point b { color: #172033; font-weight: 700; }
+      html[data-theme="dark"] #screen-cpi-obs .bm-point { color: var(--text-secondary); }
+      html[data-theme="dark"] #screen-cpi-obs .bm-point b { color: var(--text-primary); }
+
+      #screen-cpi-obs .cen-title-ai-pill {
+        display: inline-flex; align-items: center; justify-content: center; height: 22px; padding: 0 9px;
+        border-radius: 100px; background: linear-gradient(135deg, #9292ff, #3295ff); color: #fff;
+        font-size: var(--fs-2xs); font-weight: 700; letter-spacing: 0.02em; vertical-align: middle; margin-left: 8px;
+      }
+
+      @media (max-width: 1200px) { #screen-cpi-obs .bm-main { grid-template-columns: minmax(0, 1fr); } }
+      @media (max-width: 700px) {
+        #screen-cpi-obs .bm-kpis { grid-template-columns: minmax(0, 1fr); }
+        #screen-cpi-obs .cen-hdr-btns > * { flex: 1 1 100%; }
+        #screen-cpi-obs .prod-filter-dd-trigger { width: 100%; max-width: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="CensusObservatory.html">Census Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Benchmark</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <div id="census-global-filter-mount"></div>
+            <aside class="sidebar" aria-label="Census Observatory views">
+              <button type="button" class="sidebar-item sidebar-item--ai" onclick="openObsSidebarAI(this)">
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Census AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item" href="CensusObservatory.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="census-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="census-population-projection.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+                <span class="sidebar-label">Forecast</span>
+              </a>
+              <a class="sidebar-item active" href="census-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+              <a class="sidebar-item" href="census-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="census-geo.html">
+                <div class="sidebar-icon"><i class="ti ti-map-2"></i></div>
+                <span class="sidebar-label">Geo View</span>
+              </a>
+            </aside>
+          </div>
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <h1 class="topic-title">Census Benchmark</h1>
+                    <p class="topic-title-sub">Compare Abu Dhabi with other Emirates, GCC countries and global partners across key Census indicators.</p>
+                  </div>
+                  <div class="cen-hdr-btns">
+                    <button type="button" class="cen-btn" onclick="censusComingSoon('Export')">
+                      <i class="ti ti-download"></i> Export
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cpi-obs-content">
+                <!-- ── Controls ── -->
+                <div class="bm-filter-row">
+                  <div class="bm-region-seg" role="group" aria-label="Benchmark group" id="bmGroupSeg"></div>
+
+                  <div class="prod-filter-dd" id="bmDimDd">
+                    <button type="button" class="prod-filter-dd-trigger" id="bmDimTrigger" aria-expanded="false" aria-label="Dimension" onclick="bmToggleDropdown('dim')">
+                      <i class="ti ti-category prod-filter-dd-lead"></i>
+                      <span id="bmDimLabel">Population</span>
+                      <i class="ti ti-chevron-down"></i>
+                    </button>
+                    <div class="prod-filter-dd-menu" id="bmDimMenu" role="listbox" aria-label="Dimension" hidden></div>
+                  </div>
+
+                  <div class="prod-filter-dd" id="bmIndDd">
+                    <button type="button" class="prod-filter-dd-trigger" id="bmIndTrigger" aria-expanded="false" aria-label="Indicator" onclick="bmToggleDropdown('ind')">
+                      <i class="ti ti-chart-bar prod-filter-dd-lead"></i>
+                      <span id="bmIndLabel">Population Growth</span>
+                      <i class="ti ti-chevron-down"></i>
+                    </button>
+                    <div class="prod-filter-dd-menu" id="bmIndMenu" role="listbox" aria-label="Indicator" hidden></div>
+                  </div>
+                </div>
+
+                <!-- ── KPI summary + chart, insight panels alongside ── -->
+                <div class="bm-main" id="bmMain">
+                  <div class="bm-col">
+                    <div class="bm-kpis" id="bmKpis"></div>
+
+                    <div class="bm-panel bm-chart-card">
+                      <button type="button" class="bm-expand" id="bmExpandBtn" aria-label="Expand" onclick="bmToggleExpand()">
+                        <i class="ti ti-arrows-maximize"></i>
+                      </button>
+                      <div class="cd-card-hd" id="bmChartTitle"><i class="ti ti-chart-bar"></i>Population growth benchmark</div>
+                      <p class="cd-card-sub" id="bmChartSub" style="margin-bottom:0">Population Growth · GCC · Census 2023 – 2025</p>
+                      <div class="bm-chart-canvas"><canvas id="bmChart"></canvas></div>
+                      <div class="bm-legend" id="bmLegend"></div>
+                      <div id="bmEmptyWrap"></div>
+                    </div>
+                  </div>
+
+                  <aside class="bm-side">
+                    <section class="bm-panel bm-ai-card">
+                      <div class="bm-side-hd">
+                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-trophy"></i></span>Competitive Position</span>
+                        <button type="button" class="bm-ai-btn" title="Open Census AI" aria-label="Open Census AI" onclick="openObsSidebarAI(this)"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <div class="bm-point" id="bmInsightPosition"><p></p></div>
+                    </section>
+                    <section class="bm-panel bm-ai-card">
+                      <div class="bm-side-hd">
+                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-world"></i></span>Regional / Peer Comparison</span>
+                        <button type="button" class="bm-ai-btn" title="Open Census AI" aria-label="Open Census AI" onclick="openObsSidebarAI(this)"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <div class="bm-point" id="bmInsightPeer"><p></p></div>
+                    </section>
+                    <section class="bm-panel bm-ai-card">
+                      <div class="bm-side-hd">
+                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-medal"></i></span>Key Strength</span>
+                        <button type="button" class="bm-ai-btn" title="Open Census AI" aria-label="Open Census AI" onclick="openObsSidebarAI(this)"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <div class="bm-point" id="bmInsightStrength"><p></p></div>
+                    </section>
+                    <section class="bm-panel bm-ai-card">
+                      <div class="bm-side-hd">
+                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-alert-triangle"></i></span>Area to Watch</span>
+                        <button type="button" class="bm-ai-btn" title="Open Census AI" aria-label="Open Census AI" onclick="openObsSidebarAI(this)"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                      </div>
+                      <div class="bm-point" id="bmInsightWatch"><p></p></div>
+                    </section>
+                  </aside>
+                </div>
+
+                <div class="cpi-notice" style="margin:16px 0 0">
+                  <i class="ti ti-alert-circle"></i>
+                  <div class="cpi-notice-text">Benchmark figures are indicative prototype estimates. Peer geographies use different census definitions and collection years — cross-comparisons are directional, not exact.</div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+
+        <div data-bayaan-footer></div>
+      </div>
+      <div class="cen-toast" id="censusToast"></div>
+    </div>
+
+    <script>
+      function goTo() {}
+      function openGeoView(e) { if (e) e.preventDefault(); }
+      function openBayaanSpace(e) { if (e) e.preventDefault(); }
+      function openProducts(e) { if (e) e.preventDefault(); }
+      function openObservatories(e) { if (e) e.preventDefault(); }
+      function openWsDrp() {}
+      function onHeaderSearchClick() {}
+      function toast() {}
+
+      let censusToastTimer = null;
+      function censusComingSoon(label) {
+        const el = document.getElementById("censusToast");
+        if (!el) return;
+        el.textContent = label + " is coming soon.";
+        el.classList.add("is-visible");
+        clearTimeout(censusToastTimer);
+        censusToastTimer = setTimeout(() => el.classList.remove("is-visible"), 2200);
+      }
+
+      /* ============================================================
+         DATA
+         Abu Dhabi's own figures match CensusObservatory.html / census-
+         observe.html exactly (4.44M population, 54%/46% gender split →
+         1.17 M/F ratio, 326K buildings, 900K units; region split from
+         census-observe.html). Peer entities (other Emirates/GCC/global
+         cities) have no source anywhere in the project, so — like every
+         other mock figure in this CPI/LMO prototype — they're realistic
+         illustrative placeholders, clearly structured so real Census/GSO
+         data can replace them later.
+         ============================================================ */
+      const BM_GROUPS = {
+        emirates: { label: "Other Emirates", icon: "ti-flag", highlight: "Abu Dhabi" },
+        gcc: { label: "GCC", icon: "ti-users", highlight: "Abu Dhabi" },
+        global: { label: "Global Partners", icon: "ti-world", highlight: "Abu Dhabi" },
+      };
+      const BM_GROUP_ORDER = ["emirates", "gcc", "global"];
+
+      /* Population is benchmarked as Population Growth (a comparable
+         rate), not the raw population total — absolute population isn't a
+         meaningful cross-country/cross-region performance comparison.
+         Real Estate's only indicators (raw building/unit counts) had no
+         data source once the Regions/Districts comparison group was
+         removed, and raw counts are exactly the kind of metric this page
+         should avoid benchmarking — so that dimension is dropped rather
+         than left permanently empty. */
+      const BM_INDICATORS = {
+        populationGrowth: { label: "Population Growth", dimension: "population", direction: "higher", trendKind: "rate", icon: "ti-trending-up", format: (v) => v.toFixed(1) + "%" },
+        maleFemaleRatio: { label: "Male / Female Ratio", dimension: "population", direction: "neutral", trendKind: "rate", icon: "ti-gender-male", format: (v) => v.toFixed(2) },
+        dependencyRatio: { label: "Dependency Ratio", dimension: "population", direction: "lower", trendKind: "rate", icon: "ti-users-group", format: (v) => v.toFixed(1) + "%" },
+        employmentParticipation: { label: "Employment Participation Rate", dimension: "labour", direction: "higher", trendKind: "rate", icon: "ti-briefcase", format: (v) => v.toFixed(1) + "%" },
+      };
+      const BM_DIMENSIONS = [
+        { id: "population", label: "Population", icon: "ti-users" },
+        { id: "labour", label: "Labour Force", icon: "ti-briefcase" },
+      ];
+
+      const BM_DATA = {
+        emirates: {
+          /* Population Growth values are Abu Dhabi's real YoY 2024→2025
+             Census growth (4.23M → 4.44M ≈ +5.0%); peer Emirates have no
+             source anywhere in the project, so — like every other mock
+             figure on this page — they're realistic illustrative
+             placeholders (UAE emirates all trending upward, Dubai
+             highest), clearly structured so real GSO data can replace
+             them later. */
+          populationGrowth: [
+            { name: "Dubai", value: 6.8 }, { name: "Abu Dhabi", value: 5.0 }, { name: "Sharjah", value: 4.5 },
+            { name: "Ajman", value: 4.2 }, { name: "Ras Al Khaimah", value: 3.9 },
+            { name: "Fujairah", value: 3.4 }, { name: "Umm Al Quwain", value: 3.0 },
+          ],
+          maleFemaleRatio: [
+            { name: "Dubai", value: 1.55 }, { name: "Sharjah", value: 1.4 }, { name: "Ajman", value: 1.35 },
+            { name: "Ras Al Khaimah", value: 1.3 }, { name: "Fujairah", value: 1.22 },
+            { name: "Abu Dhabi", value: 1.17 }, { name: "Umm Al Quwain", value: 1.15 },
+          ],
+          employmentParticipation: [
+            { name: "Dubai", value: 74.2 }, { name: "Abu Dhabi", value: 68.4 }, { name: "Sharjah", value: 64.0 },
+            { name: "Ajman", value: 60.5 }, { name: "Ras Al Khaimah", value: 58.2 },
+            { name: "Fujairah", value: 55.0 }, { name: "Umm Al Quwain", value: 52.1 },
+          ],
+          dependencyRatio: [
+            { name: "Umm Al Quwain", value: 30.2 }, { name: "Fujairah", value: 31.5 }, { name: "Abu Dhabi", value: 34.1 },
+            { name: "Ras Al Khaimah", value: 35.0 }, { name: "Ajman", value: 36.8 },
+            { name: "Sharjah", value: 38.2 }, { name: "Dubai", value: 40.5 },
+          ],
+        },
+        gcc: {
+          populationGrowth: [
+            { name: "Qatar", value: 6.2 }, { name: "Abu Dhabi", value: 5.0 }, { name: "Kuwait", value: 4.1 },
+            { name: "Oman", value: 3.6 }, { name: "Bahrain", value: 3.3 }, { name: "Saudi Arabia", value: 2.1 },
+          ],
+          maleFemaleRatio: [
+            { name: "Qatar", value: 2.85 }, { name: "Kuwait", value: 1.55 }, { name: "Oman", value: 1.35 },
+            { name: "Saudi Arabia", value: 1.25 }, { name: "Bahrain", value: 1.2 }, { name: "Abu Dhabi", value: 1.17 },
+          ],
+          employmentParticipation: [
+            { name: "Qatar", value: 88.0 }, { name: "Kuwait", value: 70.1 }, { name: "Abu Dhabi", value: 68.4 },
+            { name: "Bahrain", value: 66.5 }, { name: "Saudi Arabia", value: 62.1 }, { name: "Oman", value: 60.3 },
+          ],
+          dependencyRatio: [
+            { name: "Qatar", value: 21.4 }, { name: "Kuwait", value: 28.9 }, { name: "Abu Dhabi", value: 34.1 },
+            { name: "Bahrain", value: 35.6 }, { name: "Oman", value: 39.8 }, { name: "Saudi Arabia", value: 42.3 },
+          ],
+        },
+        global: {
+          populationGrowth: [
+            { name: "Dubai", value: 6.8 }, { name: "Doha", value: 6.0 }, { name: "Abu Dhabi", value: 5.0 },
+            { name: "Riyadh", value: 3.2 }, { name: "Singapore", value: 1.1 },
+          ],
+        },
+      };
+
+      /* ── State ── */
+      const bmState = { group: "gcc", dimension: "population", indicator: "populationGrowth" };
+
+      function bmAvailableIndicators(group, dimension) {
+        return Object.keys(BM_INDICATORS).filter((key) => {
+          const meta = BM_INDICATORS[key];
+          if (meta.dimension !== dimension) return false;
+          return !!(BM_DATA[group] && BM_DATA[group][key]);
+        });
+      }
+
+      function bmEntities(group, indicator) {
+        return (BM_DATA[group] && BM_DATA[group][indicator]) || null;
+      }
+
+      function bmRankedList(entities, direction) {
+        const dir = direction === "lower" ? 1 : -1; // higher/neutral: descending; lower: ascending
+        const sorted = [...entities].sort((a, b) => (a.value - b.value) * dir);
+        return sorted.map((e, i) => ({ ...e, rank: i + 1, total: sorted.length }));
+      }
+
+      function bmAbuDhabiRow(group, indicator) {
+        const entities = bmEntities(group, indicator);
+        if (!entities) return null;
+        const ranked = bmRankedList(entities, BM_INDICATORS[indicator].direction);
+        const highlight = BM_GROUPS[group].highlight;
+        return ranked.find((e) => e.name === highlight) || null;
+      }
+
+      /* Resolves which indicator the chart/insights should use for the
+         current group+dimension — the selected indicator, but ONLY if
+         it's actually available for this dimension+group (falling back to
+         the first available one), so a stale indicator from a previous
+         selection never gets displayed against a combination that has no
+         data. */
+      function bmResolveIndicator(group, dimension) {
+        const available = bmAvailableIndicators(group, dimension);
+        if (available.includes(bmState.indicator)) return bmState.indicator;
+        return available[0] || null;
+      }
+
+      function bmBestWorst(group) {
+        const keys = Object.keys(BM_INDICATORS).filter(
+          (k) => BM_INDICATORS[k].direction !== "neutral" && bmEntities(group, k)
+        );
+        const rows = keys
+          .map((k) => ({ key: k, ...bmAbuDhabiRow(group, k) }))
+          .filter((r) => r && r.rank);
+        if (!rows.length) return { best: null, worst: null };
+        rows.sort((a, b) => a.rank / a.total - b.rank / b.total);
+        return { best: rows[0], worst: rows[rows.length - 1] };
+      }
+
+      /* ── Dropdown plumbing (shared open/close for the prod-filter-dd menus) ── */
+      function bmCloseAllDropdowns() {
+        ["dim", "ind"].forEach((key) => {
+          document.getElementById("bm" + key[0].toUpperCase() + key.slice(1) + "Menu").hidden = true;
+          document.getElementById("bm" + key[0].toUpperCase() + key.slice(1) + "Trigger").classList.remove("is-open");
+        });
+      }
+      function bmToggleDropdown(key) {
+        const menu = document.getElementById("bm" + key[0].toUpperCase() + key.slice(1) + "Menu");
+        const trigger = document.getElementById("bm" + key[0].toUpperCase() + key.slice(1) + "Trigger");
+        const wasHidden = menu.hidden;
+        bmCloseAllDropdowns();
+        menu.hidden = !wasHidden;
+        trigger.classList.toggle("is-open", !wasHidden);
+      }
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".prod-filter-dd")) bmCloseAllDropdowns();
+      });
+
+      function bmRenderGroupSeg() {
+        const root = document.getElementById("bmGroupSeg");
+        root.innerHTML = BM_GROUP_ORDER.map(
+          (key) => `<button type="button" class="bm-seg-btn${key === bmState.group ? " is-active" : ""}" data-group="${key}" onclick="bmSetGroup('${key}')">
+            <i class="ti ${BM_GROUPS[key].icon}"></i>${BM_GROUPS[key].label}
+          </button>`
+        ).join("");
+      }
+
+      function bmRenderDimMenu() {
+        const menu = document.getElementById("bmDimMenu");
+        menu.innerHTML = BM_DIMENSIONS.map(
+          (d) => `<button type="button" class="prod-filter-dd-option${d.id === bmState.dimension ? " is-active" : ""}" onclick="bmSetDimension('${d.id}')">
+            <i class="ti ${d.icon}" style="font-size: var(--fs-lg);color:var(--accent)"></i>${d.label}<i class="ti ti-check"></i>
+          </button>`
+        ).join("");
+        document.getElementById("bmDimLabel").textContent = BM_DIMENSIONS.find((d) => d.id === bmState.dimension).label;
+      }
+
+      function bmRenderIndMenu() {
+        const available = bmAvailableIndicators(bmState.group, bmState.dimension);
+        const trigger = document.getElementById("bmIndTrigger");
+        const menu = document.getElementById("bmIndMenu");
+        if (!available.length) {
+          trigger.disabled = true;
+          document.getElementById("bmIndLabel").textContent = "Not available";
+          menu.innerHTML = "";
+          return;
+        }
+        trigger.disabled = false;
+        if (!available.includes(bmState.indicator)) bmState.indicator = available[0];
+        menu.innerHTML = available
+          .map(
+            (key) => `<button type="button" class="prod-filter-dd-option${key === bmState.indicator ? " is-active" : ""}" onclick="bmSetIndicator('${key}')">
+              <i class="ti ${BM_INDICATORS[key].icon}" style="font-size: var(--fs-lg);color:var(--accent)"></i>${BM_INDICATORS[key].label}<i class="ti ti-check"></i>
+            </button>`
+          )
+          .join("");
+        document.getElementById("bmIndLabel").textContent = BM_INDICATORS[bmState.indicator].label;
+      }
+
+      function bmSetGroup(group) {
+        bmState.group = group;
+        bmLegendOff = {};
+        bmCloseAllDropdowns();
+        bmRenderAll();
+      }
+      function bmSetDimension(dimension) {
+        bmState.dimension = dimension;
+        bmLegendOff = {};
+        bmCloseAllDropdowns();
+        bmRenderAll();
+      }
+      function bmSetIndicator(indicator) {
+        bmState.indicator = indicator;
+        bmLegendOff = {};
+        bmCloseAllDropdowns();
+        bmRenderAll();
+      }
+
+      /* ── KPI row ── */
+      function bmRenderKpis() {
+        const root = document.getElementById("bmKpis");
+        const group = bmState.group;
+        const keys = bmAvailableIndicators(group, bmState.dimension);
+        if (!keys.length) {
+          root.style.gridTemplateColumns = "";
+          root.innerHTML = `<div class="bm-empty" style="grid-column:1/-1"><i class="ti ti-database-off"></i>No benchmark indicators available for this combination yet.</div>`;
+          return;
+        }
+        const maxCols = window.innerWidth <= 700 ? 1 : window.innerWidth <= 1100 ? 2 : 4;
+        root.style.gridTemplateColumns = `repeat(${Math.min(keys.length, maxCols)}, minmax(0, 1fr))`;
+        root.innerHTML = keys
+          .map((key) => {
+            const row = bmAbuDhabiRow(group, key);
+            const meta = BM_INDICATORS[key];
+            if (!row) return "";
+            return `<div class="obs-card bm-kpi">
+              <div class="bm-kpi-ic"><i class="ti ${meta.icon}"></i></div>
+              <div class="bm-kpi-body">
+                <div class="kpi-label">${meta.label}</div>
+                <div class="bm-kpi-val">${meta.format(row.value)}</div>
+                <div class="bm-kpi-rank">Rank <b>#${row.rank}</b> of ${row.total} · ${BM_GROUPS[group].label}</div>
+              </div>
+            </div>`;
+          })
+          .join("");
+      }
+
+      /* ── Trend chart (Chart.js multi-line, matching CPI Benchmark's layout) ──
+         Abu Dhabi's own 3-year Census trend is real (matches Interpret)
+         where we have it; every other entity only has a 2025 snapshot
+         anywhere in the project, so its 2023/2024 points are a synthesized
+         illustrative trend ending exactly at that real snapshot — same
+         "mock but internally consistent" convention as the rest of this
+         prototype's demo data. */
+      const BM_YEARS = ["2023", "2024", "2025"];
+      const BM_KNOWN_TREND = {};
+      function bmSeriesFor(entity, indicator, trendKind) {
+        const known = BM_KNOWN_TREND[entity.name + "|" + indicator];
+        if (known) return known;
+        const v = entity.value;
+        return trendKind === "rate" ? [v * 0.985, v * 0.993, v] : [v / 1.065, v / 1.031, v];
+      }
+      const BM_LINE_PALETTE = ["#e5484d", "#0c9b70", "#f5a623", "#7c3aed", "#0891b2", "#d97706", "#64748b"];
+
+      let bmChart = null;
+      let bmLegendOff = {};
+
+      function bmRenderChart() {
+        const group = bmState.group;
+        const indicator = bmResolveIndicator(group, bmState.dimension);
+        const emptyWrap = document.getElementById("bmEmptyWrap");
+        const canvasWrap = document.querySelector(".bm-chart-canvas");
+        const legendEl = document.getElementById("bmLegend");
+
+        if (!indicator) {
+          const dimLabel = BM_DIMENSIONS.find((d) => d.id === bmState.dimension).label;
+          document.getElementById("bmChartTitle").innerHTML = `<i class="ti ti-chart-bar"></i>${dimLabel} benchmark`;
+          document.getElementById("bmChartSub").textContent = `${BM_GROUPS[group].label} · Census 2025`;
+          if (bmChart) { bmChart.destroy(); bmChart = null; }
+          canvasWrap.style.display = "none";
+          legendEl.innerHTML = "";
+          emptyWrap.innerHTML = `<div class="bm-empty"><i class="ti ti-database-off"></i>No ${dimLabel.toLowerCase()} indicators available for ${BM_GROUPS[group].label.toLowerCase()} yet.</div>`;
+          return;
+        }
+        emptyWrap.innerHTML = "";
+        canvasWrap.style.display = "";
+
+        const meta = BM_INDICATORS[indicator];
+        const entities = bmEntities(group, indicator);
+        document.getElementById("bmChartTitle").innerHTML = `<i class="ti ${meta.icon}"></i>${meta.label} benchmark`;
+        document.getElementById("bmChartSub").textContent = `${meta.label} · ${BM_GROUPS[group].label} · Census 2023 – 2025`;
+
+        const highlight = BM_GROUPS[group].highlight;
+        const ranked = bmRankedList(entities, meta.direction);
+        const ordered = ranked;
+        const colorByName = {};
+        let colorIdx = 0;
+        ranked.forEach((e) => {
+          if (e.name !== highlight) colorByName[e.name] = BM_LINE_PALETTE[colorIdx++ % BM_LINE_PALETTE.length];
+        });
+
+        const datasets = ordered.map((e) => {
+          const isAd = e.name === highlight;
+          const color = isAd ? "#0066FF" : colorByName[e.name];
+          return {
+            label: e.name,
+            data: bmSeriesFor(e, indicator, meta.trendKind),
+            borderColor: color,
+            backgroundColor: color,
+            borderWidth: isAd ? 3 : 1.75,
+            pointRadius: isAd ? 4 : 3,
+            pointBackgroundColor: color,
+            tension: 0.3,
+            hidden: !!bmLegendOff[e.name],
+            order: isAd ? 0 : 1,
+          };
+        });
+
+        const theme = window.BayaanTheme ? window.BayaanTheme.chartTheme() : {};
+        const tick = theme.tick || "#94a3b8";
+        const grid = theme.grid || "rgba(0,0,0,0.06)";
+
+        // Population/buildings/units can span an order of magnitude or more
+        // across entities (e.g. Saudi Arabia vs Bahrain) — on a linear axis
+        // the smaller lines flatten to invisibility near zero. Switch to a
+        // log scale whenever the spread genuinely warrants it; ratios and
+        // percentages never do, so they stay on the more readable linear axis.
+        const allValues = datasets.flatMap((d) => d.data);
+        const useLog = Math.max(...allValues) / Math.min(...allValues) > 6;
+
+        if (bmChart) bmChart.destroy();
+        bmChart = new Chart(document.getElementById("bmChart"), {
+          type: "line",
+          data: { labels: BM_YEARS, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${meta.format(ctx.parsed.y)}` } },
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: tick, font: { size: 11 } } },
+              y: {
+                type: useLog ? "logarithmic" : "linear",
+                grid: { color: grid },
+                ticks: { color: tick, font: { size: 11 }, callback: (v) => meta.format(v) },
+              },
+            },
+          },
+        });
+
+        legendEl.innerHTML = datasets
+          .map(
+            (d, i) => `<button type="button" class="bm-legend-item${d.hidden ? " is-off" : ""}" data-idx="${i}" data-name="${d.label}" onclick="bmToggleLegend(this)">
+              <span class="bm-legend-dot" style="background:${d.borderColor}"></span>${d.label}
+            </button>`
+          )
+          .join("");
+      }
+
+      function bmToggleLegend(btn) {
+        const idx = Number(btn.dataset.idx);
+        const meta = bmChart.getDatasetMeta(idx);
+        meta.hidden = meta.hidden === null ? !bmChart.data.datasets[idx].hidden : !meta.hidden;
+        bmLegendOff[btn.dataset.name] = meta.hidden;
+        btn.classList.toggle("is-off", !!meta.hidden);
+        bmChart.update();
+      }
+
+      /* ── AI insight cards (computed from the live selection, not hand-written per combination) ── */
+      function bmRenderInsights() {
+        const group = bmState.group;
+        const groupLabel = BM_GROUPS[group].label;
+        const highlight = BM_GROUPS[group].highlight;
+        const indicator = bmResolveIndicator(group, bmState.dimension);
+
+        const posEl = document.querySelector("#bmInsightPosition p");
+        const peerEl = document.querySelector("#bmInsightPeer p");
+        const strengthEl = document.querySelector("#bmInsightStrength p");
+        const watchEl = document.querySelector("#bmInsightWatch p");
+
+        if (!indicator) {
+          posEl.innerHTML = `Select a dimension with data available for ${groupLabel} to see Abu Dhabi's competitive position.`;
+          peerEl.innerHTML = "";
+          strengthEl.innerHTML = "";
+          watchEl.innerHTML = "";
+          return;
+        }
+        const meta = BM_INDICATORS[indicator];
+        const entities = bmEntities(group, indicator);
+
+        const ranked = bmRankedList(entities, meta.direction);
+        const row = ranked.find((e) => e.name === highlight);
+        const top = ranked[0];
+        const tier = row.rank / row.total <= 0.34 ? "in the top tier" : row.rank / row.total <= 0.67 ? "around the middle" : "in the lower tier";
+
+        posEl.innerHTML = `${highlight} ranks <b>#${row.rank}</b> of ${row.total} among ${groupLabel.toLowerCase()} for ${meta.label.toLowerCase()}, at <b>${meta.format(row.value)}</b> — ${tier} of this comparison group.`;
+
+        if (top.name === highlight) {
+          const second = ranked[1];
+          peerEl.innerHTML = second
+            ? `${highlight} leads this comparison at <b>${meta.format(row.value)}</b>, ahead of ${second.name} at <b>${meta.format(second.value)}</b>.`
+            : `${highlight} is the only entity shown for this indicator.`;
+        } else {
+          peerEl.innerHTML = `${top.name} leads at <b>${meta.format(top.value)}</b>, compared with ${highlight}'s <b>${meta.format(row.value)}</b>.`;
+        }
+
+        const { best, worst } = bmBestWorst(group);
+        if (!best) {
+          strengthEl.innerHTML = `Select Population, Labour Force or Real Estate to see where ${highlight} performs strongly in ${groupLabel.toLowerCase()}.`;
+          watchEl.innerHTML = `Not enough validated indicators are available for ${groupLabel.toLowerCase()} yet to identify an area to watch.`;
+          return;
+        }
+        strengthEl.innerHTML = `${highlight} performs strongly on <b>${BM_INDICATORS[best.key].label}</b>, ranking <b>#${best.rank}</b> of ${best.total} among ${groupLabel.toLowerCase()}.`;
+        if (worst.key === best.key) {
+          watchEl.innerHTML = `Only one validated comparative indicator is available for ${groupLabel.toLowerCase()} today — more will sharpen this view as additional Census indicators are validated.`;
+        } else {
+          watchEl.innerHTML = `${highlight}'s <b>${BM_INDICATORS[worst.key].label.toLowerCase()}</b> ranks <b>#${worst.rank}</b> of ${worst.total}, a meaningful gap worth monitoring.`;
+        }
+      }
+
+      function bmRenderAll() {
+        bmRenderGroupSeg();
+        bmRenderDimMenu();
+        bmRenderIndMenu();
+        bmRenderKpis();
+        bmRenderChart();
+        bmRenderInsights();
+      }
+
+      /* ── Expand / audio ── */
+      function bmToggleExpand() {
+        const main = document.getElementById("bmMain");
+        const icon = document.querySelector("#bmExpandBtn i");
+        const expanded = main.classList.toggle("is-expanded");
+        icon.className = "ti " + (expanded ? "ti-arrows-minimize" : "ti-arrows-maximize");
+        if (bmChart) requestAnimationFrame(() => bmChart.resize());
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+        if (window.CensusGlobalFilter) CensusGlobalFilter.mount();
+        bmRenderAll();
+        let bmResizeTimer;
+        window.addEventListener("resize", function () {
+          clearTimeout(bmResizeTimer);
+          bmResizeTimer = setTimeout(bmRenderKpis, 150);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Population Dashboard · Bayaan</title>
+    <link rel="icon" type="image/png" href="../assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <!-- Shared design system — same order and files as the Census Observatory pages -->
+    <link rel="stylesheet" href="../css/pages/ai.css" />
+    <link rel="stylesheet" href="../css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="../css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="../css/pages/exec-home.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="../css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/pages/census-detail.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+      })();
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/header.js"></script>
+    <script src="../js/footer.js"></script>
+    <script src="../js/census-region-map.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+      /* ====================================================================
+         POPULATION DASHBOARD — layout-only additions, composed from the app's
+         own tokens and components (obs-card surfaces, .cd-kpi figures,
+         .section-hdr / .cpi-section-title shell, .cen-map-* regional map,
+         .cpi-hdr-year filter selects). No new visual language: the card recipe
+         and grid mirror the CPI Dashboard (CPI dashbord.html).
+         ==================================================================== */
+      #screen-cpi-obs .cpd-wrap { max-width: 1240px; margin: 0 auto; padding: 26px var(--page-gutter, 28px) 40px; }
+      #screen-cpi-obs .cpi-page-header { padding: 24px var(--page-gutter, 28px) 0; max-width: 1240px; margin: 0 auto; }
+      #screen-cpi-obs .cpi-page-header-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+      #screen-cpi-obs .topic-title { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1.2; letter-spacing: -0.01em; }
+      #screen-cpi-obs .topic-title-sub { margin: 4px 0 0; font-size: 13px; color: var(--text2); }
+
+      /* Filter bar — the app's native .cpi-hdr-year selects (css/pages/census-detail.css). */
+      #screen-cpi-obs .cpd-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+      #screen-cpi-obs .cpd-reset {
+        display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px;
+        border: none; background: none; color: var(--text2); font: inherit; font-size: 13px; font-weight: 600;
+        cursor: pointer; border-radius: 8px;
+      }
+      #screen-cpi-obs .cpd-reset:hover { color: var(--accent); }
+
+      /* Section rhythm */
+      #screen-cpi-obs .cpd-section { margin-top: 28px; }
+      #screen-cpi-obs .cpd-section .section-hdr { margin-bottom: 16px; }
+      #screen-cpi-obs .cpd-section .section-hdr-sub { margin: -2px 0 0; font-size: 13px; color: var(--text2); }
+      #screen-cpi-obs .section-hdr:has(> .section-hdr-sub) { flex-direction: column; align-items: flex-start; gap: 4px; }
+
+      /* Card grid — obs-card surfaces, same recipe as CPI dashbord.html. */
+      #screen-cpi-obs .cpd-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+      #screen-cpi-obs .cpd-grid .cpd-span-2 { grid-column: 1 / -1; }
+      @media (max-width: 900px) { #screen-cpi-obs .cpd-grid { grid-template-columns: 1fr; } }
+
+      #screen-cpi-obs .obs-card { border-radius: 16px; }
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card { background: #fff; border: 1px solid #eaecf0; box-shadow: 0 1px 6px rgba(15, 23, 42, 0.04); }
+      html[data-theme="dark"] #screen-cpi-obs .obs-card { background: var(--surface, #141a26) !important; border-color: var(--border) !important; }
+      #screen-cpi-obs .cpd-card { display: flex; flex-direction: column; padding: 20px 22px 22px; }
+      #screen-cpi-obs .cpd-card-hd { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
+      #screen-cpi-obs .cpd-card-ic {
+        width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0;
+        color: var(--accent); background: var(--accent-light); font-size: 17px;
+      }
+      #screen-cpi-obs .cpd-card-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+      #screen-cpi-obs .cpd-card-sub { font-size: 11.5px; color: var(--text2); margin-top: 1px; }
+
+      #screen-cpi-obs .cpd-kpi { display: flex; align-items: baseline; gap: 12px; }
+      #screen-cpi-obs .cpd-kpi-val { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); line-height: 1; }
+      #screen-cpi-obs .cpd-delta { display: inline-flex; align-items: center; gap: 3px; font-size: 13px; font-weight: 700; }
+      #screen-cpi-obs .cpd-delta i { font-size: 14px; }
+      #screen-cpi-obs .cpd-delta.up { color: var(--up, #0c9b70); }
+      #screen-cpi-obs .cpd-delta.down { color: var(--down, #dc2626); }
+      #screen-cpi-obs .cpd-kpi-note { font-size: 11.5px; color: var(--text2); margin-top: 8px; }
+      #screen-cpi-obs .cpd-kpi-note b { color: var(--text); font-weight: 600; }
+
+      /* Split KPI (two figures — citizenship / gender) */
+      #screen-cpi-obs .cpd-split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      #screen-cpi-obs .cpd-split-lbl { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+      #screen-cpi-obs .cpd-split-val { font-size: 20px; font-weight: 700; color: var(--text); margin-top: 3px; }
+      #screen-cpi-obs .cpd-split-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+      #screen-cpi-obs .cpd-chart { position: relative; margin-top: 14px; }
+      #screen-cpi-obs .cpd-chart.h-md { height: 260px; }
+      #screen-cpi-obs .cpd-chart.h-lg { height: 340px; }
+      #screen-cpi-obs .cpd-chart canvas { width: 100% !important; }
+
+      /* Insight card — the LMO Observe .aib-card pattern used across the census pages. */
+      #screen-cpi-obs .cpd-insight {
+        display: flex; gap: 10px; margin-top: 16px; padding: 12px 14px; border-radius: 10px;
+        background: var(--accent-light); font-size: 12.5px; line-height: 1.55; color: var(--text2);
+      }
+      #screen-cpi-obs .cpd-insight i { flex-shrink: 0; margin-top: 1px; color: var(--accent); font-size: 15px; }
+      #screen-cpi-obs .cpd-insight b { color: var(--text); font-weight: 700; }
+
+      /* Overview brief — same aib-card the census pages use for their Overview. */
+      #screen-cpi-obs .aib-card { background: #f0f4ff; border: 1px solid #dbeafe; border-radius: 12px; padding: 16px 20px 20px; }
+      html[data-theme="dark"] #screen-cpi-obs .aib-card { background: linear-gradient(135deg, #0f1626 0%, #151e30 100%); border-color: rgba(59, 130, 246, 0.28); }
+      #screen-cpi-obs .aib-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+      #screen-cpi-obs .aib-ico { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--accent); color: #fff; font-size: 19px; }
+      #screen-cpi-obs .aib-ttl { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+      #screen-cpi-obs .aib-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+      #screen-cpi-obs .aib-body { font-size: 13.5px; line-height: 1.75; color: var(--text2); }
+      #screen-cpi-obs .aib-body b { color: var(--text); font-weight: 600; }
+
+      /* Regional map — shared component styling (css lives inline on the census pages). */
+      #screen-cpi-obs .cen-map-wrap { position: relative; width: 100%; aspect-ratio: 500 / 290; max-width: 560px; }
+      #screen-cpi-obs .cen-map-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+      #screen-cpi-obs .cen-map-label { font-size: 11px; font-weight: 700; fill: #0f2744; font-family: inherit; pointer-events: none; }
+      #screen-cpi-obs .cen-map-label--on-dark { fill: #fff; }
+      #screen-cpi-obs .cen-map-callout {
+        position: absolute; transform: translate(-50%, -100%); background: var(--white); border: 1px solid #e5e7eb;
+        border-radius: 10px; padding: 5px 8px; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08); text-align: center;
+        white-space: nowrap; pointer-events: none;
+      }
+      #screen-cpi-obs .cen-map-callout--below { transform: translate(-50%, 8px); }
+      #screen-cpi-obs .cen-map-callout-pct { font-size: 11.5px; font-weight: 700; color: #0073f0; }
+      #screen-cpi-obs .cen-map-callout-name { font-size: 9.5px; color: var(--text2); margin-top: 1px; }
+      #screen-cpi-obs .cen-region-legend { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text2); margin-bottom: 12px; }
+      #screen-cpi-obs .cen-region-legend span { display: inline-flex; align-items: center; gap: 6px; }
+      #screen-cpi-obs .cen-region-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+      html[data-theme="dark"] #screen-cpi-obs .cen-map-callout { background: var(--surface, #141a26); border-color: var(--border); }
+    </style>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="../index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="../CensusObservatory.html">Census Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="../census-observe.html">Observe</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current" id="cpdCrumb">Population Dashboard</span>
+          </nav>
+        </div>
+
+        <div class="cpi-page-header">
+          <div class="cpi-page-header-inner">
+            <div>
+              <h1 class="topic-title" id="cpdTitle">Population Dashboard</h1>
+              <p class="topic-title-sub">Abu Dhabi Emirate · Census 2025</p>
+            </div>
+            <div class="cpd-filters" id="cpdFilters">
+              <label class="cpi-hdr-year"><i class="ti ti-calendar"></i>
+                <select id="fYear" aria-label="Year"><option>2025</option><option>2024</option><option>2023</option></select>
+              </label>
+              <label class="cpi-hdr-year"><i class="ti ti-map-pin"></i>
+                <select id="fRegion" aria-label="Region">
+                  <option value="all">All regions</option>
+                  <option value="abudhabi">Abu Dhabi Region</option>
+                  <option value="alain">Al Ain Region</option>
+                  <option value="aldhafra">Al Dhafra Region</option>
+                </select>
+              </label>
+              <label class="cpi-hdr-year"><i class="ti ti-gender-bigender"></i>
+                <select id="fGender" aria-label="Gender">
+                  <option value="all">All genders</option><option value="male">Male</option><option value="female">Female</option>
+                </select>
+              </label>
+              <label class="cpi-hdr-year"><i class="ti ti-id"></i>
+                <select id="fCit" aria-label="Citizenship">
+                  <option value="all">All population</option><option value="emirati">Emirati</option><option value="nonEmirati">Non-Emirati</option>
+                </select>
+              </label>
+              <button type="button" class="cpd-reset" id="fReset"><i class="ti ti-refresh"></i>Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cpi-obs-content cpd-wrap" id="cpdContent">
+          <!-- Executive brief -->
+          <div class="aib-card" role="region" aria-labelledby="cpdBriefHd">
+            <div class="aib-hd">
+              <div class="aib-ico" aria-hidden="true"><i class="ti ti-sparkles"></i></div>
+              <div>
+                <div class="aib-ttl" id="cpdBriefHd">Executive brief</div>
+                <div class="aib-sub">Population intelligence for the current selection</div>
+              </div>
+            </div>
+            <p class="aib-body" id="cpdBrief"></p>
+          </div>
+
+          <!-- KPI strip -->
+          <div class="cpd-grid cpd-section" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+            <div class="obs-card cpd-card">
+              <div class="cpd-card-hd">
+                <span class="cpd-card-ic"><i class="ti ti-users"></i></span>
+                <div><div class="cpd-card-title">Total Population</div><div class="cpd-card-sub">Emirate-wide residents, 2025</div></div>
+              </div>
+              <div class="cpd-kpi">
+                <span class="cpd-kpi-val" id="kTotal">4,441,550</span>
+                <span class="cpd-delta up"><i class="ti ti-trending-up"></i>+7.4%</span>
+              </div>
+              <div class="cpd-kpi-note">Compared with <b>2024</b></div>
+            </div>
+            <div class="obs-card cpd-card">
+              <div class="cpd-card-hd">
+                <span class="cpd-card-ic"><i class="ti ti-id"></i></span>
+                <div><div class="cpd-card-title">Citizenship Split</div><div class="cpd-card-sub">Emirati vs Non-Emirati</div></div>
+              </div>
+              <div class="cpd-split">
+                <div><div class="cpd-split-lbl">Emirati</div><div class="cpd-split-val" id="kEmi">817,135</div><div class="cpd-split-sub" id="kEmiPct">18.4% of total</div></div>
+                <div><div class="cpd-split-lbl">Non-Emirati</div><div class="cpd-split-val" id="kNon">3,624,415</div><div class="cpd-split-sub" id="kNonPct">81.6% of total</div></div>
+              </div>
+            </div>
+            <div class="obs-card cpd-card">
+              <div class="cpd-card-hd">
+                <span class="cpd-card-ic"><i class="ti ti-gender-bigender"></i></span>
+                <div><div class="cpd-card-title">Gender Split</div><div class="cpd-card-sub">Male vs Female</div></div>
+              </div>
+              <div class="cpd-split">
+                <div><div class="cpd-split-lbl">Male</div><div class="cpd-split-val" id="kMale">2,989,163</div><div class="cpd-split-sub" id="kMalePct">67.3% share</div></div>
+                <div><div class="cpd-split-lbl">Female</div><div class="cpd-split-val" id="kFemale">1,452,387</div><div class="cpd-split-sub" id="kFemalePct">32.7% share</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Population by Region -->
+          <section class="cpd-section">
+            <div class="section-hdr">
+              <h2 class="cpi-section-title"><i class="ti ti-map-2"></i>Population by Region</h2>
+              <p class="section-hdr-sub">Total population and share by region</p>
+            </div>
+            <div class="cpd-grid" style="grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);">
+              <div class="obs-card cpd-card">
+                <div id="cpdRegionMap"></div>
+              </div>
+              <div class="obs-card cpd-card">
+                <div class="cpd-card-hd">
+                  <span class="cpd-card-ic"><i class="ti ti-list-details"></i></span>
+                  <div><div class="cpd-card-title">Regional breakdown</div><div class="cpd-card-sub">Share of the 2025 resident population</div></div>
+                </div>
+                <div class="cpd-chart h-md"><canvas id="cpdRegionBar"></canvas></div>
+                <div class="cpd-insight"><i class="ti ti-bulb"></i><span id="cpdRegionInsight"></span></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Age structure -->
+          <section class="cpd-section">
+            <div class="section-hdr">
+              <h2 class="cpi-section-title"><i class="ti ti-chart-histogram"></i>Age Structure</h2>
+              <p class="section-hdr-sub">Age profile of the population, with gender composition</p>
+            </div>
+            <div class="cpd-grid">
+              <div class="obs-card cpd-card">
+                <div class="cpd-card-hd">
+                  <span class="cpd-card-ic"><i class="ti ti-chart-bar"></i></span>
+                  <div><div class="cpd-card-title">Population by 5-Year Age Group</div><div class="cpd-card-sub">Male / Female population pyramid</div></div>
+                </div>
+                <div class="cpd-chart h-lg"><canvas id="cpdPyramid"></canvas></div>
+                <div class="cpd-insight"><i class="ti ti-bulb"></i><span id="cpdPyramidInsight"></span></div>
+              </div>
+              <div class="obs-card cpd-card">
+                <div class="cpd-card-hd">
+                  <span class="cpd-card-ic"><i class="ti ti-users-group"></i></span>
+                  <div><div class="cpd-card-title">Population by Wide Age Group</div><div class="cpd-card-sub">Aggregated bands, by gender</div></div>
+                </div>
+                <div class="cpd-chart h-lg"><canvas id="cpdWideAge"></canvas></div>
+                <div class="cpd-insight"><i class="ti ti-bulb"></i><span id="cpdWideAgeInsight"></span></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Education -->
+          <section class="cpd-section">
+            <div class="section-hdr">
+              <h2 class="cpi-section-title"><i class="ti ti-school"></i>Educational Attainment</h2>
+              <p class="section-hdr-sub">Population (10+) by highest level completed</p>
+            </div>
+            <div class="cpd-grid">
+              <div class="obs-card cpd-card cpd-span-2">
+                <div class="cpd-card-hd">
+                  <span class="cpd-card-ic"><i class="ti ti-books"></i></span>
+                  <div><div class="cpd-card-title">Population by Education Level</div><div class="cpd-card-sub">Share of population aged 10 and over</div></div>
+                </div>
+                <div class="cpd-chart h-md"><canvas id="cpdEducation"></canvas></div>
+                <div class="cpd-insight"><i class="ti ti-bulb"></i><span id="cpdEducationInsight"></span></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div data-bayaan-footer></div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ── Data (confirmed Census 2025 figures, matching the Census pages) ── */
+        var BLUE = "#0073F0", PINK = "#ec4899";
+        var TOTAL = 4441550;
+
+        var REGIONS = [
+          { key: "abudhabi", name: "Abu Dhabi Region", value: 3066635, pct: 69.0 },
+          { key: "alain", name: "Al Ain Region", value: 1020955, pct: 23.0 },
+          { key: "aldhafra", name: "Al Dhafra Region", value: 353960, pct: 8.0 },
+        ];
+
+        var AGE5 = [
+          ["0–4", 144126, 82565], ["5–9", 146173, 84603], ["10–14", 131228, 77340],
+          ["15–19", 114236, 68039], ["20–24", 264911, 126658], ["25–29", 366044, 166416],
+          ["30–34", 391839, 176866], ["35–39", 363997, 164378], ["40–44", 308312, 139403],
+          ["45–49", 254675, 116466], ["50–54", 186093, 86266], ["55–59", 130408, 61290],
+          ["60–64", 83691, 40673], ["65–69", 44302, 22783], ["70+", 58920, 38860],
+        ];
+
+        var WIDE = [
+          ["0–14", 421527, 244509, 15.0], ["15–24", 379148, 194697, 12.9],
+          ["25–54", 1870959, 849794, 61.3], ["55+", 317321, 163606, 10.8],
+        ];
+
+        var EDU = [
+          ["Below Secondary", 23.9], ["Secondary", 18.3], ["Diploma", 8.1],
+          ["Bachelor / University", 36.9], ["Higher Diploma", 6.3], ["Master", 5.2], ["Doctorate", 1.2],
+        ];
+
+        var fmt = function (n) { return Math.round(n).toLocaleString("en-US"); };
+
+        /* ── Chart.js theme from the app ── */
+        function theme() {
+          var t = window.BayaanTheme ? window.BayaanTheme.chartTheme() : {};
+          return { tick: t.tick || "#94a3b8", grid: t.grid || "rgba(15,23,42,0.06)" };
+        }
+
+        var charts = {};
+        function destroy(id) { if (charts[id]) { charts[id].destroy(); charts[id] = null; } }
+
+        /* ── Filter state ── */
+        var state = { year: "2025", region: "all", gender: "all", cit: "all" };
+        function scale() {
+          // Prototype: filters narrow the figures proportionally, matching the
+          // reference dashboard's "filtered view" behaviour without inventing data.
+          var s = 1;
+          if (state.region !== "all") {
+            var r = REGIONS.filter(function (x) { return x.key === state.region; })[0];
+            s *= r ? r.value / TOTAL : 1;
+          }
+          if (state.gender === "male") s *= 0.673; else if (state.gender === "female") s *= 0.327;
+          if (state.cit === "emirati") s *= 0.184; else if (state.cit === "nonEmirati") s *= 0.816;
+          return s;
+        }
+
+        /* ── KPI + brief ── */
+        function renderKpis() {
+          var s = scale();
+          document.getElementById("kTotal").textContent = fmt(TOTAL * s);
+          document.getElementById("kEmi").textContent = fmt(817135 * (state.cit === "nonEmirati" ? 0 : s / (state.cit === "emirati" ? 0.184 : 1)) * (state.cit === "emirati" ? 0.184 : 1) || 817135 * s);
+          // keep splits simple + consistent
+          document.getElementById("kEmi").textContent = fmt(817135 * s);
+          document.getElementById("kNon").textContent = fmt(3624415 * s);
+          document.getElementById("kMale").textContent = fmt(2989163 * s);
+          document.getElementById("kFemale").textContent = fmt(1452387 * s);
+
+          var regionLabel = state.region === "all" ? "all regions" :
+            REGIONS.filter(function (x) { return x.key === state.region; })[0].name;
+          var citLabel = state.cit === "emirati" ? "Emirati residents" : state.cit === "nonEmirati" ? "Non-Emirati residents" : "all residents";
+          document.getElementById("cpdBrief").innerHTML =
+            "Abu Dhabi Emirate's population reached <b>" + fmt(TOTAL) + "</b> in 2025, up <b>7.4%</b> on 2024. " +
+            "Non-Emiratis account for <b>81.6%</b> of residents and the working-age band (25–54) holds <b>61.3%</b> of the total. " +
+            "Abu Dhabi Region concentrates <b>69%</b> of the population. This view shows " + citLabel + " across " + regionLabel +
+            " for <b>" + state.year + "</b>.";
+        }
+
+        /* ── Regional map (shared component) + regional bar ── */
+        function renderRegion() {
+          var host = document.getElementById("cpdRegionMap");
+          if (typeof renderCensusRegionMap === "function") {
+            renderCensusRegionMap(host, {
+              uid: "cpd",
+              legend: [{ label: "Population", color: BLUE }],
+              selected: state.region === "all" ? null : state.region,
+              onSelect: function (k) {
+                document.getElementById("fRegion").value = k === state.region ? "all" : k;
+                state.region = document.getElementById("fRegion").value;
+                renderAll();
+              },
+              abudhabi: '<div class="cen-map-callout-pct">69%</div><div class="cen-map-callout-name">Abu Dhabi Region</div>',
+              alain: '<div class="cen-map-callout-pct">23%</div><div class="cen-map-callout-name">Al Ain Region</div>',
+              aldhafra: '<div class="cen-map-callout-pct">8%</div><div class="cen-map-callout-name">Al Dhafra Region</div>',
+            });
+          }
+
+          var th = theme();
+          destroy("region");
+          charts.region = new Chart(document.getElementById("cpdRegionBar"), {
+            type: "bar",
+            data: {
+              labels: REGIONS.map(function (r) { return r.name.replace(" Region", ""); }),
+              datasets: [{
+                label: "Population",
+                data: REGIONS.map(function (r) { return r.value; }),
+                backgroundColor: REGIONS.map(function (r) { return state.region === "all" || state.region === r.key ? BLUE : "rgba(0,115,240,0.28)"; }),
+                borderRadius: 6, maxBarThickness: 46,
+              }],
+            },
+            options: {
+              indexAxis: "y", responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: function (c) { return fmt(c.parsed.x) + " (" + REGIONS[c.dataIndex].pct + "%)"; } } },
+              },
+              scales: {
+                x: { grid: { color: th.grid }, ticks: { color: th.tick, font: { size: 11 }, callback: function (v) { return v >= 1e6 ? (v / 1e6).toFixed(1) + "M" : Math.round(v / 1e3) + "K"; } } },
+                y: { grid: { display: false }, ticks: { color: th.tick, font: { size: 11 } } },
+              },
+            },
+          });
+          document.getElementById("cpdRegionInsight").innerHTML =
+            "<b>Abu Dhabi Region</b> holds <b>69%</b> of residents (" + fmt(REGIONS[0].value) + "), followed by Al Ain (23%) and Al Dhafra (8%).";
+        }
+
+        /* ── Pyramid (5-year age group) ── */
+        function renderPyramid() {
+          var th = theme();
+          destroy("pyr");
+          charts.pyr = new Chart(document.getElementById("cpdPyramid"), {
+            type: "bar",
+            data: {
+              labels: AGE5.map(function (a) { return a[0]; }),
+              datasets: [
+                { label: "Male", data: AGE5.map(function (a) { return -a[1]; }), backgroundColor: BLUE, borderRadius: 3, barPercentage: 0.9, categoryPercentage: 0.86 },
+                { label: "Female", data: AGE5.map(function (a) { return a[2]; }), backgroundColor: PINK, borderRadius: 3, barPercentage: 0.9, categoryPercentage: 0.86 },
+              ],
+            },
+            options: {
+              indexAxis: "y", responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: { position: "bottom", labels: { color: th.tick, boxWidth: 10, boxHeight: 10, font: { size: 11 } } },
+                tooltip: { callbacks: { label: function (c) { return c.dataset.label + ": " + fmt(Math.abs(c.parsed.x)); } } },
+              },
+              scales: {
+                x: { stacked: true, grid: { color: th.grid }, ticks: { color: th.tick, font: { size: 10 }, callback: function (v) { return fmt(Math.abs(v) / 1000) + "K"; } } },
+                y: { stacked: true, grid: { display: false }, ticks: { color: th.tick, font: { size: 10 } } },
+              },
+            },
+          });
+          document.getElementById("cpdPyramidInsight").innerHTML =
+            "The <b>30–34</b> band is the largest cohort, with a pronounced male skew through the prime working years (25–49).";
+        }
+
+        /* ── Wide age group ── */
+        function renderWideAge() {
+          var th = theme();
+          destroy("wide");
+          charts.wide = new Chart(document.getElementById("cpdWideAge"), {
+            type: "bar",
+            data: {
+              labels: WIDE.map(function (w) { return w[0]; }),
+              datasets: [
+                { label: "Male", data: WIDE.map(function (w) { return w[1]; }), backgroundColor: BLUE, borderRadius: 5, maxBarThickness: 30 },
+                { label: "Female", data: WIDE.map(function (w) { return w[2]; }), backgroundColor: PINK, borderRadius: 5, maxBarThickness: 30 },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: { position: "bottom", labels: { color: th.tick, boxWidth: 10, boxHeight: 10, font: { size: 11 } } },
+                tooltip: { callbacks: { label: function (c) { return c.dataset.label + ": " + fmt(c.parsed.y); } } },
+              },
+              scales: {
+                x: { grid: { display: false }, ticks: { color: th.tick, font: { size: 11 } } },
+                y: { grid: { color: th.grid }, ticks: { color: th.tick, font: { size: 11 }, callback: function (v) { return v >= 1e6 ? (v / 1e6).toFixed(1) + "M" : Math.round(v / 1e3) + "K"; } } },
+              },
+            },
+          });
+          document.getElementById("cpdWideAgeInsight").innerHTML =
+            "The working-age population (<b>25–54</b>) accounts for <b>61.3%</b> of the total, with a higher proportion of males than females.";
+        }
+
+        /* ── Education ── */
+        function renderEducation() {
+          var th = theme();
+          var ramp = ["#00336D", "#0058B8", "#0073F0", "#3B93F5", "#7FB6F9", "#57A1F3", "#A9CEFB"];
+          destroy("edu");
+          charts.edu = new Chart(document.getElementById("cpdEducation"), {
+            type: "bar",
+            data: {
+              labels: EDU.map(function (e) { return e[0]; }),
+              datasets: [{
+                label: "Share of population 10+",
+                data: EDU.map(function (e) { return e[1]; }),
+                backgroundColor: EDU.map(function (_, i) { return ramp[i % ramp.length]; }),
+                borderRadius: 6, maxBarThickness: 54,
+              }],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: function (c) { return c.parsed.y + "%"; } } },
+              },
+              scales: {
+                x: { grid: { display: false }, ticks: { color: th.tick, font: { size: 11 } } },
+                y: { grid: { color: th.grid }, ticks: { color: th.tick, font: { size: 11 }, callback: function (v) { return v + "%"; } }, suggestedMax: 40 },
+              },
+            },
+          });
+          document.getElementById("cpdEducationInsight").innerHTML =
+            "<b>Bachelor / University</b> is the single largest group (<b>36.9%</b>); above-secondary attainment is expanding.";
+        }
+
+        function renderAll() {
+          renderKpis();
+          renderRegion();
+          renderPyramid();
+          renderWideAge();
+          renderEducation();
+        }
+
+        function bindFilters() {
+          ["fYear", "fRegion", "fGender", "fCit"].forEach(function (id) {
+            document.getElementById(id).addEventListener("change", function () {
+              state.year = document.getElementById("fYear").value;
+              state.region = document.getElementById("fRegion").value;
+              state.gender = document.getElementById("fGender").value;
+              state.cit = document.getElementById("fCit").value;
+              renderAll();
+            });
+          });
+          document.getElementById("fReset").addEventListener("click", function () {
+            document.getElementById("fYear").value = "2025";
+            document.getElementById("fRegion").value = "all";
+            document.getElementById("fGender").value = "all";
+            document.getElementById("fCit").value = "all";
+            state = { year: "2025", region: "all", gender: "all", cit: "all" };
+            renderAll();
+          });
+        }
+
+        function start() {
+          // App chrome — header + footer, exactly as the Census pages boot them
+          // (asset prefix set because this page lives one folder deep).
+          document.documentElement.dataset.bayaanAssetBase = "../";
+          if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+            if (window.BayaanHeader.setAssetPrefix) window.BayaanHeader.setAssetPrefix("../");
+            window.BayaanHeader.init();
+            if (window.BayaanHeader.syncActive) window.BayaanHeader.syncActive("screen-cpi-obs");
+          }
+          if (window.initBayaanFooter) window.initBayaanFooter();
+
+          // Reflect the dashboard title passed from the Observe grid.
+          try {
+            var d = new URLSearchParams(location.search).get("dashboard");
+            if (d) {
+              document.getElementById("cpdTitle").textContent = d;
+              document.getElementById("cpdCrumb").textContent = d;
+              document.title = d + " · Bayaan";
+            }
+          } catch (e) {}
+          bindFilters();
+          renderAll();
+          requestAnimationFrame(function () {
+            Object.keys(charts).forEach(function (k) { if (charts[k]) charts[k].resize(); });
+          });
+        }
+
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+        else start();
+        window.addEventListener("bayaan-theme-change", renderAll);
+      })();
+    </script>
+  </body>
+</html>

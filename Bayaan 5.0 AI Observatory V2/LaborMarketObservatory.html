@@ -1,0 +1,4401 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consumer Price Index — Briefing Desk · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <!-- Shared design system (same order as the main application) -->
+    <link rel="stylesheet" href="css/pages/ai.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/pages/exec-home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" ? "dark" : "light"
+        );
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/favourites-shared.js"></script>
+    <!-- Interactive product-card charts (same version/config as the home page) -->
+    <script src="https://cdn.jsdelivr.net/npm/highcharts@11.4.8/highcharts.js"></script>
+    <style>
+      /* Section headings styled like the home page module titles: bold black
+         title + prominent accent icon (replaces the section pip).
+         Mirrors .screen-home .home-module-title / .home-module-title-icon. */
+      /* Section containers styled like home-page modules — gradient card,
+         radius, soft shadow, padding. Values mirror .home-section-module. */
+      #screen-cpi-obs #cpi-obs-content > section {
+        background:
+          linear-gradient(-76deg, #f3fbff 1.2%, rgba(255, 255, 255, 0) 40%),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
+        border-radius: 28px;
+        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.03);
+        padding: 24px 28px 28px;
+        margin-bottom: 24px;
+      }
+      #screen-cpi-obs .section-hdr {
+        margin-bottom: 20px;
+      }
+
+      /* Header ↔ banner spacing: tighten the title's line-height and drop the
+         divider + bottom padding so the hero sits neatly below the subtitle. */
+      #screen-cpi-obs .topic-title {
+        line-height: 1.2;
+      }
+      #screen-cpi-obs .cpi-page-header-inner {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      /* Hero banner — CPI trend callout with the illustration anchored right. */
+      #screen-cpi-obs .cpi-hero {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        min-height: 150px;
+        padding: 24px;
+        margin-bottom: 24px;
+        border-radius: 20px;
+        background:
+          linear-gradient(90deg, #e8f0ff 0%, #eef4ff 42%, rgba(238, 244, 255, 0.35) 100%);
+      }
+      #screen-cpi-obs .cpi-hero-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        flex: 1;
+        min-width: 0;
+        max-width: 100%;
+      }
+      /* "Data as of" date, moved from the header into the hero, pinned to its
+         top-right corner. */
+      #screen-cpi-obs .cpi-hero-date {
+        position: relative;
+        z-index: 2;
+        align-self: flex-start;
+        flex-shrink: 0;
+        margin-left: 16px;
+      }
+      #screen-cpi-obs .cpi-hero-ico {
+        flex-shrink: 0;
+        color: var(--accent);
+        font-size: 22px;
+        line-height: 1;
+        margin-top: 1px;
+      }
+      #screen-cpi-obs .cpi-hero-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f2744;
+        letter-spacing: -0.01em;
+      }
+      #screen-cpi-obs .cpi-hero-sub {
+        margin-top: 8px;
+        max-width: 100%;
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--text2);
+      }
+      /* Summary card body — mirrors the .cpi-hero-sub body-copy tokens
+         (13px / 1.55 / --text2). The .obs-card + .kpi-card shell and
+         .ov-card-title supply everything else. Layout-only; no shared files. */
+      #screen-cpi-obs .lmo-summary-text {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--text2);
+      }
+
+      /* ── Audio brief — ported from the home page's Daily Brief listen
+         control (css/pages/daily-brief.css), re-scoped under the CPI hero.
+         Keep in sync with `.daily-brief--split .brief-*` there. ── */
+      #screen-cpi-obs .cpi-hero {
+        --brief-blue: #246bfd;
+        --brief-red: #e5484d;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: fit-content;
+        margin-top: 14px;
+        height: 30px;
+        padding: 2px 3px 2px 2px;
+        border-radius: 15px;
+        background: linear-gradient(120deg, rgba(237, 244, 255, 0.95), rgba(255, 255, 255, 0.9));
+        box-shadow: inset 0 0 0 1px rgba(185, 205, 232, 0.72), 0 4px 12px rgba(36, 76, 130, 0.08);
+        transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: linear-gradient(110deg, rgba(36, 107, 253, 0.22), transparent 42%);
+        opacity: 0;
+        z-index: -1;
+        transition: 0.3s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech.is-active {
+        box-shadow: inset 0 0 0 1px rgba(120, 166, 236, 0.55), 0 5px 14px rgba(36, 107, 253, 0.13);
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech.is-active::before {
+        opacity: 1;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 26px;
+        padding: 0 10px 0 1px;
+        border: 0;
+        border-radius: 13px;
+        background: transparent;
+        color: #28415f;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: 0.22s ease;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen:hover .brief-listen__icon {
+        transform: scale(1.06);
+        box-shadow: 0 5px 12px rgba(36, 107, 253, 0.32);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen:focus-visible,
+      #screen-cpi-obs .cpi-hero .brief-audio-action:focus-visible {
+        outline: 3px solid rgba(36, 107, 253, 0.17);
+        outline-offset: 2px;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__icon {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        color: #fff;
+        background: linear-gradient(145deg, #1f5ef0, #5b97f8);
+        box-shadow: 0 3px 8px rgba(36, 107, 253, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+        transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__icon::after {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border: 1px solid rgba(36, 107, 253, 0.22);
+        border-radius: 50%;
+        transform: scale(0.84);
+        opacity: 0;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__speaker,
+      #screen-cpi-obs .cpi-hero .brief-listen__play,
+      #screen-cpi-obs .cpi-hero .brief-listen__pause {
+        grid-area: 1 / 1;
+        font-size: 12px;
+        line-height: 1;
+        transition: opacity 0.15s, transform 0.15s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__play {
+        margin-left: 1px;
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__pause {
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__speaker {
+        opacity: 1;
+        transform: scale(1);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__speaker,
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__speaker {
+        opacity: 0;
+        transform: scale(0.85);
+        pointer-events: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__pause {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__play {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__icon {
+        background: linear-gradient(145deg, #3b7af5, #7aafff);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__icon::after {
+        animation: brief-voice-ring 1.8s ease-out infinite;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__copy {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+        line-height: 1.05;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__text {
+        color: #2b4462;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__text,
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__text {
+        display: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        height: 14px;
+        color: var(--brief-blue);
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave i {
+        display: block;
+        width: 2px;
+        height: 5px;
+        border-radius: 2px;
+        background: currentColor;
+        animation: brief-wave 0.72s ease-in-out infinite;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave i:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave i:nth-child(3) {
+        animation-delay: 0.24s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen__wave i:nth-child(4) {
+        animation-delay: 0.36s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="speaking"] .brief-listen__wave,
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__wave {
+        display: inline-flex;
+      }
+      #screen-cpi-obs .cpi-hero .brief-listen[data-state="paused"] .brief-listen__wave i {
+        height: 8px;
+        animation-play-state: paused;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech__actions {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateX(-6px);
+        transition: max-width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s, transform 0.3s;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech.is-active .brief-speech__actions {
+        max-width: 56px;
+        opacity: 1;
+        transform: none;
+      }
+      #screen-cpi-obs .cpi-hero .brief-speech__actions::before {
+        content: "";
+        width: 1px;
+        height: 14px;
+        margin: 0 2px 0 0;
+        background: #d7e2f0;
+      }
+      #screen-cpi-obs .cpi-hero .brief-audio-action {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: #6d7f95;
+        font-size: 12px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+      #screen-cpi-obs .cpi-hero .brief-audio-action:hover {
+        color: var(--brief-blue);
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(36, 75, 125, 0.1);
+        transform: scale(1.06);
+      }
+      #screen-cpi-obs .cpi-hero .brief-stop-box {
+        display: block;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: currentColor;
+      }
+      #screen-cpi-obs .cpi-hero .brief-audio-action--stop:hover {
+        color: var(--brief-red);
+        background: #fff5f5;
+      }
+      #screen-cpi-obs .cpi-hero .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      @keyframes brief-wave {
+        0%,
+        100% {
+          height: 5px;
+        }
+        50% {
+          height: 14px;
+        }
+      }
+      @keyframes brief-voice-ring {
+        0% {
+          transform: scale(0.82);
+          opacity: 0.8;
+        }
+        80%,
+        100% {
+          transform: scale(1.35);
+          opacity: 0;
+        }
+      }
+
+      /* Page-header actions (right side): date picker + download button.
+         Date pill mirrors the sibling pages' .tr-datepick; download uses the
+         brand primary fill. */
+      #screen-cpi-obs .cpi-hdr-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .cpi-hdr-search {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        min-width: 240px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--white);
+        color: var(--text2);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        font-size: 13px;
+        cursor: text;
+        transition: border-color 0.15s;
+      }
+      #screen-cpi-obs .cpi-hdr-search[hidden] {
+        display: none;
+      }
+      #screen-cpi-obs .cpi-hdr-search:hover,
+      #screen-cpi-obs .cpi-hdr-search:focus-within {
+        border-color: var(--accent);
+      }
+      #screen-cpi-obs .cpi-hdr-search > i {
+        font-size: 16px;
+        color: var(--text2);
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .cpi-hdr-kbd {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--accent-light);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .cpi-hdr-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--white);
+        color: var(--text);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        font-size: 13px;
+        font-weight: 600;
+        transition: border-color 0.15s;
+      }
+      #screen-cpi-obs .cpi-hdr-date:hover,
+      #screen-cpi-obs .cpi-hdr-date:focus-within {
+        border-color: var(--accent);
+      }
+      #screen-cpi-obs .cpi-hdr-date > i {
+        color: var(--accent);
+        font-size: 17px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .cpi-hdr-date input {
+        border: 0;
+        outline: none;
+        background: none;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        color: inherit;
+        cursor: pointer;
+      }
+      #screen-cpi-obs .cpi-hdr-date input::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        display: none;
+      }
+      #screen-cpi-obs .cpi-hdr-download {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        height: 40px;
+        padding: 0 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--white);
+        color: var(--text);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .cpi-hdr-download:hover {
+        border-color: var(--accent);
+        background: var(--bg);
+      }
+      #screen-cpi-obs .cpi-hdr-download i {
+        font-size: 16px;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .section-hdr h2.cpi-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #000;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+      }
+      #screen-cpi-obs .section-hdr h2.cpi-section-title i {
+        font-size: 21px;
+        line-height: 1;
+        color: var(--accent);
+      }
+
+      /* Overview — wireframe-accurate grouped metric cards, composed from the
+         app's existing tokens/components. Layout-only additions; no changes to
+         the shared design system. */
+      #screen-cpi-obs .cpi-overview-grid {
+        display: grid;
+        /* Equal thirds — the Inflation internals are sized down to fit rather
+           than the track being widened to accommodate them. */
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        align-items: stretch;
+      }
+      /* Cards inside each section — matched to the home page "subcard" recipe
+         (:is(.screen-home, …) .exec-subcard / .product-card in style.css).
+         Tokens redeclared here because the originals are scoped to .screen-home. */
+      #screen-cpi-obs {
+        --figma-subcard-bg: rgba(255, 255, 255, 0.6);
+        --figma-subcard-shadow: 0 24px 30px 0 rgba(42, 61, 76, 0.03);
+      }
+      #screen-cpi-obs .obs-card {
+        border-radius: 16px;
+        transition:
+          box-shadow 0.22s ease,
+          border-color 0.22s ease,
+          transform 0.22s ease,
+          background 0.22s ease;
+      }
+      /* Surface colours are light-theme only — dark theme already restyles
+         .obs-card in css/theme.css and must be left to win. */
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card {
+        background: var(--figma-subcard-bg);
+        border: 1px solid #eaecf0;
+        box-shadow: var(--figma-subcard-shadow);
+      }
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card:hover {
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-md);
+      }
+      /* Pre-existing: the light border shorthand in cpi-obs.css outranks the
+         dark `border-color` in theme.css, leaving pale edges on dark cards. */
+      html[data-theme="dark"] #screen-cpi-obs .obs-card {
+        border-color: var(--border);
+      }
+
+      /* Inflation card — icon chip + large value + muted unit, so the card
+         carries the same weight as its sparkline-bearing neighbours instead of
+         trailing off into empty space. Icon treatment matches the Key Impacts
+         rows below (and the home Daily Brief points they came from). */
+      #screen-cpi-obs .infl-rows {
+        display: flex;
+        flex-direction: column;
+        margin-top: 4px;
+      }
+      #screen-cpi-obs .infl-row {
+        --tone: #8b93a7;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 0;
+        min-width: 0;
+      }
+      /* Tighter gutters than the other two cards — this one packs an icon and
+         two text runs per metric, so it needs the horizontal room. */
+      #screen-cpi-obs .kpi-card--infl .ov-metric {
+        padding: 0 10px;
+      }
+      #screen-cpi-obs .kpi-card--infl .ov-metric:first-child {
+        padding-left: 0;
+      }
+      #screen-cpi-obs .kpi-card--infl .ov-metric:last-child {
+        padding-right: 0;
+      }
+      /* Same reasoning for CPI by — three tracks sharing one card, and its
+         26px figures are the widest content in the row. */
+      #screen-cpi-obs .kpi-card--essentials .ov-metric {
+        padding: 0 8px;
+      }
+      #screen-cpi-obs .kpi-card--essentials .ov-metric:first-child {
+        padding-left: 0;
+      }
+      #screen-cpi-obs .kpi-card--essentials .ov-metric:last-child {
+        padding-right: 0;
+      }
+      /* Value and unit sit inline, but wrap instead of overflowing when the
+         column is tight — these metrics live in a narrow grid track. */
+      #screen-cpi-obs .infl-figure {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 1px 5px;
+        min-width: 0;
+      }
+      #screen-cpi-obs .infl-row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+      #screen-cpi-obs .infl-row--up {
+        --tone: #e5484d;
+      }
+      #screen-cpi-obs .infl-row--down {
+        --tone: #0c9b70;
+      }
+      #screen-cpi-obs .infl-icon {
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        flex-shrink: 0;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 9%, white);
+      }
+      #screen-cpi-obs .infl-icon i {
+        font-size: 13px;
+        line-height: 1;
+      }
+      #screen-cpi-obs .infl-val {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--tone);
+      }
+      #screen-cpi-obs .infl-unit {
+        font-size: 10px;
+        font-weight: 500;
+        color: #8492a6;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .infl-row {
+        border-color: var(--border);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .infl-icon {
+        background: color-mix(in srgb, var(--tone) 18%, transparent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .infl-unit {
+        color: var(--text-secondary);
+      }
+
+      /* No rule under the page title/subtitle. Zero width rather than a colour
+         override, so the dark-theme border-bottom-color in css/theme.css can't
+         bring it back. The padding-bottom stays as spacing. */
+      #screen-cpi-obs .cpi-page-header-inner {
+        border-bottom: 0;
+      }
+
+      /* Driver date badge as a standard pill — geometry from the page's own
+         .kpi-badge (css/pages/cpi-obs.css): flat, inline-flex, fully rounded,
+         no border. Single line, so the rounded-rect + <br> version is gone. */
+      #screen-cpi-obs .dc-date {
+        display: inline-flex;
+        align-items: center;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 9px;
+        border: 0;
+        border-radius: 100px;
+        background: var(--accent-light);
+        color: var(--accent);
+        line-height: 1.5;
+        white-space: nowrap;
+        text-align: initial;
+      }
+
+      /* Key Impacts — matched to the home page Daily Brief summary points
+         (.brief-point in css/pages/daily-brief.css). Tone lives on the icon;
+         the copy stays neutral with bold dark emphasis, as in the reference.
+         Laid out as a 2×2 grid with a horizontal rule between the rows only. */
+      #screen-cpi-obs .impacts-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      #screen-cpi-obs .impacts-list .impact-item {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 11px;
+        align-items: start;
+        padding: 10px 18px;
+        border-bottom: 1px solid #edf1f6;
+        font-size: 12px;
+        line-height: 1.5;
+        color: #536277;
+        transition: transform 0.22s ease;
+      }
+      /* Bottom row carries no horizontal rule. */
+      #screen-cpi-obs .impacts-list .impact-item:nth-last-child(-n + 2) {
+        border-bottom: 0;
+      }
+      #screen-cpi-obs .impacts-list .impact-item:hover {
+        background: none;
+        transform: translateX(3px);
+      }
+
+      #screen-cpi-obs .impacts-list .impact-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 9%, white);
+      }
+      #screen-cpi-obs .impacts-list .impact-icon i {
+        font-size: 17px;
+        line-height: 1;
+      }
+      #screen-cpi-obs .impacts-list .impact-icon--up {
+        --tone: #e5484d;
+      }
+      #screen-cpi-obs .impacts-list .impact-icon--down {
+        --tone: #0c9b70;
+      }
+      #screen-cpi-obs .impacts-list .impact-icon--neutral {
+        --tone: #246bfd;
+      }
+
+      /* Reference emphasis is bold ink, not a tone colour. */
+      #screen-cpi-obs .impacts-list .impact-val {
+        color: #172033;
+        font-weight: 700;
+      }
+
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-item {
+        border-color: var(--border);
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-val {
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .impacts-list .impact-icon {
+        background: color-mix(in srgb, var(--tone) 18%, transparent);
+      }
+
+      /* Card sparklines — mirrors .brief-kpi__spark-area / -line
+         (css/pages/daily-brief.css) from the home page cards. */
+      #screen-cpi-obs .obs-spark-area {
+        opacity: 1;
+      }
+      #screen-cpi-obs .obs-spark-line {
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* Single trend line — a compact sparkline height is enough now that the
+         five separated year-lines are gone. */
+      #screen-cpi-obs .cpiby-spark,
+      #screen-cpi-obs .cpiby-spark svg,
+      #screen-cpi-obs .dc-spark,
+      #screen-cpi-obs .dc-spark svg {
+        height: 44px;
+      }
+
+      /* Year x-axis — five evenly-spaced ticks under the chart, spanning its
+         full width (first tick at the left edge, last at the right). */
+      #screen-cpi-obs .obs-year-axis {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 7px;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        color: #9aa7b8;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .obs-year-axis {
+        color: var(--text-tertiary);
+      }
+      /* Lift on hover for grid cards only — full-width list cards stay put,
+         same as the home page's list modules. */
+      #screen-cpi-obs .obs-card:not(.impacts-list):hover {
+        transform: translateY(-1px);
+      }
+      /* Home subcards have no coloured top rule. */
+      #screen-cpi-obs .kpi-card::before {
+        display: none;
+      }
+      #screen-cpi-obs .ov-card-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #screen-cpi-obs .ov-card-title i {
+        font-size: 15px;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .ov-metrics {
+        display: grid;
+        gap: 0;
+      }
+      #screen-cpi-obs .ov-metrics.cols-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      #screen-cpi-obs .ov-metrics.cols-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      #screen-cpi-obs .ov-metric {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+        padding: 0 14px;
+      }
+      #screen-cpi-obs .ov-metric:first-child {
+        padding-left: 0;
+      }
+      #screen-cpi-obs .ov-metric:last-child {
+        padding-right: 0;
+      }
+      #screen-cpi-obs .ov-metric + .ov-metric {
+        border-left: 1px solid rgba(15, 23, 42, 0.06);
+      }
+
+      /* ── Labor Market Overview — comparison matrix ─────────────────────────
+         A native Bayaan matrix built entirely from the page's own tokens: the
+         .obs-card shell, --text/--text2/--border colours, the --up (#dc2626) /
+         --down (#16a34a) semantic pair, the accent icon-chip recipe (cf.
+         .impact-icon), and the existing subtle divider rgba(15,23,42,.06).
+         Layout-only; no shared files touched. */
+      #screen-cpi-obs .lmo-matrix-card {
+        padding: 0;
+        overflow: hidden; /* clip cell dividers to the card's 16px radius */
+      }
+      #screen-cpi-obs .lmo-matrix {
+        display: grid;
+        grid-template-columns: max-content repeat(3, minmax(0, 1fr));
+      }
+      /* Row wrappers dissolve into the parent grid so every column stays aligned
+         across the header and all three body rows. */
+      #screen-cpi-obs .lmo-matrix-row {
+        display: contents;
+      }
+      #screen-cpi-obs .lmo-matrix-corner,
+      #screen-cpi-obs .lmo-matrix-colhead,
+      #screen-cpi-obs .lmo-matrix-rowlabel,
+      #screen-cpi-obs .lmo-matrix-cell {
+        padding: 16px;
+        min-width: 0;
+      }
+      /* Header — icon chip above the column title. */
+      #screen-cpi-obs .lmo-matrix-colhead {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      #screen-cpi-obs .lmo-matrix-ico {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 9%, white);
+      }
+      #screen-cpi-obs .lmo-matrix-ico i {
+        font-size: 16px;
+        line-height: 1;
+      }
+      #screen-cpi-obs .lmo-matrix-coltitle {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      /* Row label column. */
+      #screen-cpi-obs .lmo-matrix-rowlabel {
+        display: flex;
+        align-items: center;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text2);
+        white-space: nowrap;
+      }
+      /* Intersection cell — large bold metric + trend change. */
+      #screen-cpi-obs .lmo-matrix-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      #screen-cpi-obs .lmo-cell-val {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      #screen-cpi-obs .lmo-cell-chg {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+      }
+      #screen-cpi-obs .lmo-cell-chg i {
+        font-size: 13px;
+      }
+      #screen-cpi-obs .lmo-cell-chg--pos {
+        color: var(--down); /* green = positive */
+      }
+      #screen-cpi-obs .lmo-cell-chg--neg {
+        color: var(--up); /* red = negative */
+      }
+      /* Dividers — reuse the page's subtle rule colour. Column dividers on the
+         left edge of every data/header column (never the label column); row
+         dividers on the top edge of each body row (header carries none). */
+      #screen-cpi-obs .lmo-matrix-colhead,
+      #screen-cpi-obs .lmo-matrix-cell {
+        border-left: 1px solid rgba(15, 23, 42, 0.06);
+      }
+      #screen-cpi-obs .lmo-matrix-row:not(.lmo-matrix-row--head) .lmo-matrix-rowlabel,
+      #screen-cpi-obs .lmo-matrix-row:not(.lmo-matrix-row--head) .lmo-matrix-cell {
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-matrix-colhead,
+      html[data-theme="dark"] #screen-cpi-obs .lmo-matrix-cell,
+      html[data-theme="dark"] #screen-cpi-obs .lmo-matrix-row:not(.lmo-matrix-row--head) .lmo-matrix-rowlabel,
+      html[data-theme="dark"] #screen-cpi-obs .lmo-matrix-row:not(.lmo-matrix-row--head) .lmo-matrix-cell {
+        border-color: var(--border);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-matrix-ico {
+        background: color-mix(in srgb, var(--accent) 20%, transparent);
+      }
+      /* Responsive — scroll horizontally on very narrow viewports rather than
+         collapsing the comparison (values stay aligned under their columns). */
+      @media (max-width: 720px) {
+        #screen-cpi-obs .lmo-matrix-card {
+          overflow-x: auto;
+        }
+        #screen-cpi-obs .lmo-matrix {
+          min-width: 480px;
+        }
+      }
+
+      /* ── Emiratization section ─────────────────────────────────────────────
+         Built from the page's existing atoms — .obs-card, the .ov-metric
+         divided-column pattern, .section-hdr, .driver-grid, buildObsSparkline —
+         plus the --up/--down semantic pair and accent tokens. Tone helpers
+         .lmo-pos/.lmo-neg map positive→green(var(--down)), negative→red(var(--up)).
+         Layout only; no shared files touched. */
+      #screen-cpi-obs .lmo-emir {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      #screen-cpi-obs .lmo-emir-hdr .section-hdr {
+        margin-bottom: 6px;
+      }
+      #screen-cpi-obs .lmo-emir-sub {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text2);
+        line-height: 1.5;
+      }
+      #screen-cpi-obs .lmo-subhdr {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.01em;
+      }
+      #screen-cpi-obs .lmo-pos { color: var(--down); }
+      #screen-cpi-obs .lmo-neg { color: var(--up); }
+
+      /* Executive Overview KPI cards — additive slots on the .lmo-kpi component:
+         a title eyebrow, an optional secondary caption, and a bottom-aligned
+         sector-chip footer. Tokens mirror existing .lmo-kpi-label / .lmo-tag. */
+      #screen-cpi-obs .lmo-subhdr i { font-size: 17px; color: var(--accent); }
+      #screen-cpi-obs .lmo-ovv-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.3;
+      }
+      #screen-cpi-obs .lmo-ovv-caption {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      #screen-cpi-obs .lmo-ovv-foot {
+        margin-top: auto; /* pin chip to the bottom so all cards align */
+        padding-top: 4px;
+      }
+      /* Keep the top-right status pill centred with the icon chip. */
+      #screen-cpi-obs .lmo-ovv .lmo-kpi-top .lmo-badge {
+        margin-top: 0;
+        align-self: center;
+      }
+      /* Executive Overview KPI cards are static — no click/hover affordance.
+         Neutralize the global .obs-card hover lift + shadow and any pointer. */
+      #screen-cpi-obs .lmo-ovv { cursor: default; }
+      #screen-cpi-obs .lmo-ovv:hover { transform: none; }
+      html:not([data-theme="dark"]) #screen-cpi-obs .lmo-ovv:hover {
+        border-color: #eaecf0;
+        box-shadow: var(--figma-subcard-shadow);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-ovv:hover {
+        border-color: var(--border);
+        box-shadow: none;
+      }
+
+      /* ── Workforce Localization Progress by Sector — subsection header with
+         carousel actions + insight cards. Reuses .lmo-subhdr, .lmo-qa, the
+         home-carousel nav, .dg-card, and the .lmo-bar progress bar. ── */
+      #screen-cpi-obs .lmo-subhdr-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      #screen-cpi-obs .lmo-subhdr-lead .lmo-subhdr { margin-bottom: 4px; }
+      #screen-cpi-obs .lmo-subhdr-sub {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text2);
+        line-height: 1.5;
+      }
+      #screen-cpi-obs .lmo-subhdr-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      /* Header-mounted carousel nav — drop the default centred/margin layout
+         and the dots (the header exposes only prev/next). */
+      /* Compound selector so margin-top:0 beats the base .dg-carousel-nav's
+         14px (the header nav sits inline with the AI/Download actions, not
+         below a track). */
+      #screen-cpi-obs .dg-carousel-nav.lmo-hdr-nav {
+        margin-top: 0;
+        gap: 2px;
+      }
+      /* Keep the header prev/next arrows visible even when nothing currently
+         overflows (compound selector outranks the base .dg-carousel-nav.is-single
+         display:none). Arrows enable/disable per scroll position via the app's
+         carousel controller. */
+      #screen-cpi-obs .dg-carousel-nav.lmo-hdr-nav.is-single { display: flex; }
+      #screen-cpi-obs .lmo-hdr-nav .home-carousel-dots { display: none; }
+
+      /* 3 cards per view (the shared .dg-slide is 2-up; scope the override). */
+      #screen-cpi-obs .lmo-loc-track .dg-slide {
+        flex: 0 0 calc((100% - 28px) / 3);
+      }
+      #screen-cpi-obs .lmo-loc-card { gap: 12px; }
+      #screen-cpi-obs .lmo-loc-valrow {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      #screen-cpi-obs .lmo-loc-val {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+      }
+      #screen-cpi-obs .lmo-loc-insight {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .lmo-loc-foot { gap: 4px; }
+
+      /* ── Localization cards (Sector + Domain carousels) adopt the home-page
+         indicator (.product-card) look: category pill + actions, bold name,
+         large value, coloured change, a sparkline graph (replacing the old
+         progress bar) and a footer AI insight. Scoped to .lmo-ind-card so the
+         Key Indicators cards (which share .lmo-loc-card) are untouched. The
+         shared .product-card rules in style.css only apply under a
+         .products-grid ancestor, so the recipe is restated here. ── */
+      #screen-cpi-obs .lmo-ind-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 14px 16px;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-card-toprow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-cat-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: #6b7280;
+        background: #f3f4f6;
+        border-radius: 5px;
+        padding: 2px 8px;
+        max-width: 70%;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-cat-tag i { font-size: 11px; }
+      #screen-cpi-obs .lmo-ind-card .product-cat-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-actions {
+        display: flex;
+        gap: 1px;
+        color: #9ca3af;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-actions i {
+        font-size: 15px;
+        cursor: pointer;
+        padding: 3px;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-actions i:hover { color: var(--accent); }
+      #screen-cpi-obs .lmo-ind-card .product-name-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 8px;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-name {
+        font-size: 14px;
+        font-weight: 600;
+        min-height: 40px;
+        color: var(--text);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-val {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.1;
+      }
+      /* Key Indicators keep the "Good" status badge inline beside the value. */
+      #screen-cpi-obs .lmo-ind-card .lmo-key-valrow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-change {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-top: 3px;
+        margin-bottom: 8px;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-change i { font-size: 13px; }
+      #screen-cpi-obs .lmo-ind-card .product-change.val-green { color: #059669; }
+      #screen-cpi-obs .lmo-ind-card .product-change.val-red { color: #dc2626; }
+      #screen-cpi-obs .lmo-ind-card .product-viz {
+        width: 100%;
+        height: 92px;
+        position: relative;
+        margin-bottom: 2px;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-viz svg,
+      #screen-cpi-obs .lmo-ind-card .product-viz .highcharts-container {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-viz .highcharts-container {
+        overflow: visible !important;
+      }
+      /* Highcharts injects the axis labels, so hide the static fallback axis
+         once a chart mounts (matches the home page's data-hc-axis behaviour). */
+      #screen-cpi-obs .lmo-ind-card[data-hc-axis="1"] .product-axis {
+        display: none !important;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-axis {
+        display: flex;
+        justify-content: space-between;
+        font-size: 9.5px;
+        color: #9ca3af;
+        margin-bottom: 10px;
+      }
+      #screen-cpi-obs .lmo-ind-card .product-ai-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 5px;
+        font-size: 11px;
+        color: var(--text2);
+        line-height: 1.5;
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px solid var(--border);
+      }
+      #screen-cpi-obs .lmo-ind-card .product-ai-row .ti-bulb {
+        font-size: 12px;
+        color: var(--accent);
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      @media (max-width: 1080px) {
+        #screen-cpi-obs .lmo-loc-track .dg-slide { flex: 0 0 calc((100% - 14px) / 2); }
+      }
+      @media (max-width: 620px) {
+        #screen-cpi-obs .lmo-loc-track .dg-slide { flex: 0 0 100%; }
+        #screen-cpi-obs .lmo-subhdr-row { flex-direction: column; }
+      }
+
+      /* ── Key Indicators — same insight-card carousel, 4-up, with a section
+         header (matching the app's 20px .cpi-section-title) + reused actions. */
+      #screen-cpi-obs .lmo-key-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      /* 4 cards per view (3 gaps of 14px). */
+      #screen-cpi-obs .lmo-key-track .dg-slide {
+        flex: 0 0 calc((100% - 42px) / 4);
+      }
+      #screen-cpi-obs .lmo-key-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      #screen-cpi-obs .lmo-key-top .lmo-badge {
+        margin-top: 0;
+        align-self: center;
+      }
+      #screen-cpi-obs .lmo-key-title { min-height: 2.5em; }
+      @media (max-width: 1080px) {
+        #screen-cpi-obs .lmo-key-track .dg-slide { flex: 0 0 calc((100% - 14px) / 2); }
+      }
+      @media (max-width: 620px) {
+        #screen-cpi-obs .lmo-key-track .dg-slide { flex: 0 0 100%; }
+        #screen-cpi-obs .lmo-key-hdr { flex-direction: column; align-items: flex-start; }
+      }
+
+      /* ── Labor Supply–Demand Analysis — tabs + Sankey/table visualization
+         card. Reuses .obs-card, the .dg-view-toggle segmented control (year +
+         Sankey/Table), .dg-table, .lmo-qa actions, and the app's colour tokens.
+         The Sankey is a hand-built SVG (no charting lib is loaded). ── */
+      #screen-cpi-obs .lmo-lsd-tabs {
+        display: flex;
+        gap: 20px;
+        border-bottom: 1px solid var(--border, #eaecf0);
+        margin-bottom: 16px;
+      }
+      #screen-cpi-obs .lmo-lsd-tab {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        padding: 10px 2px;
+        margin-bottom: -1px;
+        font-family: inherit;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--text2);
+        border-bottom: 2px solid transparent;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      #screen-cpi-obs .lmo-lsd-tab:hover { color: var(--text); }
+      #screen-cpi-obs .lmo-lsd-tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+      #screen-cpi-obs .lmo-lsd-card { position: relative; }
+      #screen-cpi-obs .lmo-lsd-topbar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 12px;
+      }
+      /* Compound selectors (…dg-view-toggle.lmo-lsd-*) so these beat the base
+         .dg-view-toggle button rule regardless of source order. */
+      #screen-cpi-obs .dg-view-toggle.lmo-lsd-years {
+        margin: 0;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 3px;
+        max-width: 100%;
+      }
+      #screen-cpi-obs .dg-view-toggle.lmo-lsd-years button {
+        width: auto;
+        min-width: 40px;
+        height: 26px;
+        padding: 0 9px;
+        font-size: 11.5px;
+        font-weight: 600;
+        line-height: 1;
+      }
+      #screen-cpi-obs .lmo-lsd-body { display: flex; align-items: stretch; gap: 12px; }
+      #screen-cpi-obs .dg-view-toggle.lmo-lsd-viztoggle {
+        flex-direction: column;
+        margin: 0;
+        align-self: flex-start;
+      }
+      #screen-cpi-obs .lmo-lsd-viz { flex: 1; min-width: 0; }
+      #screen-cpi-obs .lmo-lsd-sankey svg { width: 100%; height: auto; display: block; }
+      #screen-cpi-obs .lmo-lsd-footactions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      /* Sankey nodes */
+      #screen-cpi-obs .lsd-node { cursor: pointer; }
+      #screen-cpi-obs .lsd-node--supply { fill: #0f2744; }
+      #screen-cpi-obs .lsd-node--emirati { fill: var(--accent); }
+      #screen-cpi-obs .lsd-node--nonemirati { fill: #64748b; }
+      #screen-cpi-obs .lsd-node--group { fill: #94a3b8; }
+      #screen-cpi-obs .lsd-node--demand { fill: var(--down); }
+      #screen-cpi-obs .lsd-node--gap { fill: var(--up); }
+      /* Sankey links */
+      #screen-cpi-obs .lsd-link { transition: opacity 0.15s; cursor: pointer; }
+      #screen-cpi-obs .lsd-link--emirati { fill: var(--accent); opacity: 0.26; }
+      #screen-cpi-obs .lsd-link--nonemirati { fill: #64748b; opacity: 0.2; }
+      #screen-cpi-obs .lsd-link--demand { fill: var(--down); opacity: 0.22; }
+      #screen-cpi-obs .lsd-link--gap { fill: var(--up); opacity: 0.32; }
+      #screen-cpi-obs .lmo-lsd-sankey.is-hi .lsd-link { opacity: 0.06; }
+      #screen-cpi-obs .lmo-lsd-sankey.is-hi .lsd-link.lsd-on { opacity: 0.55; }
+      /* Sankey labels */
+      #screen-cpi-obs .lsd-label { font-size: 9px; fill: var(--text2); font-weight: 600; }
+      #screen-cpi-obs .lsd-label--strong { fill: var(--text); font-weight: 700; font-size: 10px; }
+      #screen-cpi-obs .lsd-glabel {
+        font-size: 8.5px;
+        fill: var(--text2);
+        paint-order: stroke;
+        stroke: var(--white, #fff);
+        stroke-width: 2.6px;
+        stroke-linejoin: round;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lsd-glabel { stroke: var(--surface, #0f141d); }
+      /* Tooltip — app-style dark chip */
+      #screen-cpi-obs .lmo-lsd-tip {
+        position: absolute;
+        pointer-events: none;
+        z-index: 5;
+        opacity: 0;
+        transition: opacity 0.12s;
+        background: #0f2744;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1.35;
+        padding: 6px 9px;
+        border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.25);
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .lmo-lsd-tip.on { opacity: 1; }
+      #screen-cpi-obs .lmo-lsd-tip b { font-weight: 700; }
+      #screen-cpi-obs .lmo-lsd-note {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      #screen-cpi-obs .lmo-lsd-note i { color: var(--accent); }
+      @media (max-width: 760px) {
+        #screen-cpi-obs .lmo-lsd-body { flex-direction: column; }
+        #screen-cpi-obs .lmo-lsd-viztoggle { flex-direction: row; align-self: center; }
+      }
+
+      /* ── Built for every stakeholder / What can we do? — informational card
+         rows. Shared 4-up responsive grid (same 1080/620 breakpoints as the
+         KPI band); .obs-card shell; icon-chip recipe. Stakeholder cards read
+         lighter (circular tinted icon + categorical accent + subtle base line);
+         solution cards read more functional (solid accent tile). ── */
+      #screen-cpi-obs .lmo-quad {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        align-items: stretch;
+      }
+      #screen-cpi-obs .lmo-persona,
+      #screen-cpi-obs .lmo-solution {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px;
+      }
+      /* Stakeholder — circular tinted icon + categorical accent. */
+      #screen-cpi-obs .lmo-persona { position: relative; overflow: hidden; }
+      #screen-cpi-obs .lmo-persona--a { --persona-accent: var(--accent); }
+      #screen-cpi-obs .lmo-persona--b { --persona-accent: #16a34a; }
+      #screen-cpi-obs .lmo-persona--c { --persona-accent: #b5730a; }
+      #screen-cpi-obs .lmo-persona--d { --persona-accent: #7c3aed; }
+      #screen-cpi-obs .lmo-persona-ic {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--persona-accent, var(--accent));
+        background: color-mix(in srgb, var(--persona-accent, var(--accent)) 12%, white);
+      }
+      #screen-cpi-obs .lmo-persona-ic i { font-size: 22px; }
+      #screen-cpi-obs .lmo-persona::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        background: color-mix(in srgb, var(--persona-accent, var(--accent)) 55%, transparent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-persona-ic {
+        background: color-mix(in srgb, var(--persona-accent, var(--accent)) 22%, transparent);
+      }
+      /* Solution — solid accent tile (rounded square) for a functional feel. */
+      #screen-cpi-obs .lmo-solution { cursor: pointer; }
+      #screen-cpi-obs .lmo-solution-ic {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: var(--accent);
+      }
+      #screen-cpi-obs .lmo-solution-ic i { font-size: 22px; }
+      /* Shared text styles. */
+      #screen-cpi-obs .lmo-persona-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      #screen-cpi-obs .lmo-persona-desc {
+        margin: 0;
+        font-size: 12.5px;
+        line-height: 1.5;
+        color: var(--text2);
+      }
+      @media (max-width: 1080px) {
+        #screen-cpi-obs .lmo-quad { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 620px) {
+        #screen-cpi-obs .lmo-quad { grid-template-columns: 1fr; }
+      }
+
+      /* ── News — editorial image cards in the app's home-carousel (3-up).
+         Section-header nav on the right (reuses .home-carousel arrows). Cards
+         are full-bleed image + navy gradient overlay + overlaid content. ── */
+      #screen-cpi-obs .lmo-news-hdr {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      #screen-cpi-obs .lmo-news-hdr-lead .section-hdr { margin-bottom: 6px; }
+      #screen-cpi-obs .lmo-news-track .dg-slide { flex: 0 0 calc((100% - 28px) / 3); }
+      #screen-cpi-obs .lmo-news-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px;
+        min-height: 340px;
+        padding: 0;
+        display: flex;
+        color: #fff;
+        isolation: isolate;
+      }
+      #screen-cpi-obs .lmo-news-media {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background-color: #0b172c;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: transform 0.5s ease;
+      }
+      #screen-cpi-obs .lmo-news-card:hover .lmo-news-media { transform: scale(1.05); }
+      #screen-cpi-obs .lmo-news-shade {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(180deg, rgba(11, 23, 44, 0.1) 0%, rgba(11, 23, 44, 0.32) 42%, rgba(11, 23, 44, 0.9) 100%);
+      }
+      #screen-cpi-obs .lmo-news-inner {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        padding: 16px;
+      }
+      #screen-cpi-obs .lmo-news-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      #screen-cpi-obs .lmo-news-badge {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        padding: 3px 9px;
+        border-radius: 100px;
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        backdrop-filter: blur(4px);
+      }
+      #screen-cpi-obs .lmo-news-date {
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.85);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      #screen-cpi-obs .lmo-news-foot { display: flex; flex-direction: column; gap: 8px; }
+      #screen-cpi-obs .lmo-news-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+      }
+      #screen-cpi-obs .lmo-news-sum {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.86);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      #screen-cpi-obs .lmo-news-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+      #screen-cpi-obs .lmo-news-act {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font: inherit;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 8px;
+        padding: 5px 9px;
+        transition: background 0.15s;
+      }
+      #screen-cpi-obs .lmo-news-act:hover { background: rgba(255, 255, 255, 0.26); }
+      #screen-cpi-obs .lmo-news-act i { font-size: 14px; }
+      #screen-cpi-obs .lmo-news-more {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #fff;
+        text-decoration: none;
+      }
+      #screen-cpi-obs .lmo-news-more:hover { text-decoration: underline; }
+      #screen-cpi-obs .lmo-news-more i { font-size: 14px; }
+      @media (max-width: 1080px) {
+        #screen-cpi-obs .lmo-news-track .dg-slide { flex: 0 0 calc((100% - 14px) / 2); }
+      }
+      @media (max-width: 620px) {
+        #screen-cpi-obs .lmo-news-track .dg-slide { flex: 0 0 100%; }
+        #screen-cpi-obs .lmo-news-hdr { flex-direction: column; }
+      }
+
+      /* Shared quick-action icon button — the app's subtle icon control. */
+      #screen-cpi-obs .lmo-qa {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+      }
+      #screen-cpi-obs .lmo-qa:hover {
+        background: var(--accent-light);
+        color: var(--accent);
+        border-color: #bfdbfe;
+      }
+      #screen-cpi-obs .lmo-qa i { font-size: 15px; }
+
+      /* Standard home-page section AI button — mirrors .home-module-sparkle in
+         style.css: a transparent Figma-navy sparkle with the continuous
+         sparkleGlow pulse. Used for every "Ask Bayaan AI" action here. */
+      #screen-cpi-obs .home-module-sparkle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        color: #0073f0;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+      }
+      #screen-cpi-obs .home-module-sparkle i {
+        font-size: 20px;
+        animation: sparkleGlow 2.4s ease-in-out infinite;
+      }
+      #screen-cpi-obs .home-module-sparkle:hover { opacity: 0.8; }
+      @keyframes sparkleGlow {
+        0%,
+        100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.75; transform: scale(1.18) rotate(12deg); }
+      }
+
+      /* KPI headline band — separate stat cards, each with a mini sparkline. */
+      #screen-cpi-obs .lmo-kpi-band {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+      #screen-cpi-obs .lmo-kpi {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 16px 18px;
+      }
+      #screen-cpi-obs .lmo-kpi-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      #screen-cpi-obs .lmo-kpi-ico {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 9%, white);
+      }
+      #screen-cpi-obs .lmo-kpi-ico i { font-size: 16px; }
+      #screen-cpi-obs .lmo-kpi-chg {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11.5px;
+        font-weight: 700;
+      }
+      #screen-cpi-obs .lmo-kpi-chg i { font-size: 13px; }
+      #screen-cpi-obs .lmo-kpi-val {
+        margin-top: 2px;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+      }
+      #screen-cpi-obs .lmo-kpi-label {
+        font-size: 11.5px;
+        color: var(--text2);
+        line-height: 1.35;
+      }
+      #screen-cpi-obs .lmo-kpi-spark { height: 30px; margin-top: 4px; }
+      #screen-cpi-obs .lmo-kpi-spark svg { width: 100%; height: 100%; }
+
+      /* Two-column analytical split (bar chart + donut / brief + movers). */
+      #screen-cpi-obs .lmo-split {
+        display: grid;
+        grid-template-columns: 1.55fr 1fr;
+        gap: 12px;
+        align-items: stretch;
+      }
+      #screen-cpi-obs .lmo-panel {
+        display: flex;
+        flex-direction: column;
+        padding: 18px 20px;
+      }
+      #screen-cpi-obs .lmo-panel-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      #screen-cpi-obs .lmo-panel-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #screen-cpi-obs .lmo-panel-title i { font-size: 16px; color: var(--accent); }
+      #screen-cpi-obs .lmo-panel-note {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        background: var(--bg);
+        border-radius: 100px;
+        padding: 3px 10px;
+      }
+
+      /* Ranked horizontal bar chart. */
+      #screen-cpi-obs .lmo-bars { display: flex; flex-direction: column; gap: 16px; }
+      #screen-cpi-obs .lmo-bar-row {
+        display: grid;
+        grid-template-columns: minmax(120px, 210px) 1fr auto;
+        align-items: center;
+        gap: 14px;
+      }
+      #screen-cpi-obs .lmo-bar-name {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      #screen-cpi-obs .lmo-bar-ico {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 9%, white);
+      }
+      #screen-cpi-obs .lmo-bar-ico i { font-size: 14px; }
+      #screen-cpi-obs .lmo-bar-track {
+        height: 8px;
+        border-radius: 100px;
+        background: #edf1f6;
+        overflow: hidden;
+      }
+      #screen-cpi-obs .lmo-bar-fill { display: block; height: 100%; border-radius: 100px; }
+      #screen-cpi-obs .lmo-fill-pos { background: var(--down); }
+      #screen-cpi-obs .lmo-fill-neg { background: var(--up); }
+      #screen-cpi-obs .lmo-fill-flat { background: var(--muted); }
+      #screen-cpi-obs .lmo-bar-figs {
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-end;
+        gap: 8px;
+        min-width: 116px;
+      }
+      #screen-cpi-obs .lmo-bar-pct {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      #screen-cpi-obs .lmo-bar-chg {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      #screen-cpi-obs .lmo-bar-chg.lmo-flat { color: var(--muted); }
+      #screen-cpi-obs .lmo-bar-chg i { font-size: 12px; }
+
+      /* Donut composition card. */
+      #screen-cpi-obs .lmo-panel--donut { --lmo-donut-track: #e6ebf2; }
+      #screen-cpi-obs .lmo-donut-wrap {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex: 1;
+      }
+      #screen-cpi-obs .lmo-donut-svg { width: 116px; height: 116px; flex-shrink: 0; }
+      #screen-cpi-obs .lmo-donut-num {
+        text-anchor: middle;
+        font-size: 8px;
+        font-weight: 700;
+        fill: var(--text);
+        letter-spacing: -0.02em;
+      }
+      #screen-cpi-obs .lmo-donut-lbl {
+        text-anchor: middle;
+        font-size: 3.4px;
+        font-weight: 600;
+        fill: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      #screen-cpi-obs .lmo-donut-legend { display: flex; flex-direction: column; gap: 8px; }
+      #screen-cpi-obs .lmo-legend-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .lmo-legend-row b { margin-left: auto; padding-left: 10px; color: var(--text); }
+      #screen-cpi-obs .lmo-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+      #screen-cpi-obs .lmo-donut-insight {
+        margin: 16px 0 0;
+        padding-top: 14px;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .lmo-donut-insight b { color: var(--text); }
+
+      /* ── Overview composition cards (one donut per labor status) ── */
+      #screen-cpi-obs .lmo-ov-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+      #screen-cpi-obs .lmo-ov-card {
+        --lmo-donut-track: #e6ebf2;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 18px 20px;
+      }
+      #screen-cpi-obs .lmo-ov-head { display: flex; align-items: center; gap: 10px; }
+      #screen-cpi-obs .lmo-ov-ico {
+        width: 30px; height: 30px; border-radius: 9px;
+        display: grid; place-items: center;
+        background: #ebf3ff; color: var(--accent);
+        font-size: 16px; flex-shrink: 0;
+      }
+      #screen-cpi-obs .lmo-ov-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+      #screen-cpi-obs .lmo-ov-badgewrap {
+        margin-left: auto; display: flex; flex-direction: column;
+        align-items: flex-end; gap: 2px; text-align: right;
+      }
+      #screen-cpi-obs .lmo-ov-badge {
+        display: inline-flex; align-items: center; gap: 3px;
+        font-size: 12.5px; font-weight: 700; line-height: 1;
+      }
+      #screen-cpi-obs .lmo-ov-badge--pos { color: #16a34a; }
+      #screen-cpi-obs .lmo-ov-badge--neg { color: #dc2626; }
+      #screen-cpi-obs .lmo-ov-fav { font-size: 10px; color: var(--muted); }
+      #screen-cpi-obs .lmo-ov-body { display: flex; align-items: center; gap: 20px; }
+      #screen-cpi-obs .lmo-ov-donut { flex-shrink: 0; }
+      #screen-cpi-obs .lmo-ov-card .lmo-donut-svg { width: 104px; height: 104px; overflow: visible; }
+      #screen-cpi-obs .lmo-ov-seg { cursor: pointer; transition: stroke-width 0.15s ease; }
+      #screen-cpi-obs .lmo-ov-seg:hover { stroke-width: 6.1; }
+      /* Match the briefing-desk donut: circular legend dots, compact center. */
+      #screen-cpi-obs .lmo-ov-card .lmo-donut-num { font-size: 6.6px; }
+      #screen-cpi-obs .lmo-ov-card .lmo-donut-lbl { font-size: 3px; }
+      #screen-cpi-obs .lmo-ov-legrow .lmo-legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+      #screen-cpi-obs .lmo-ov-legend { flex: 1; display: flex; flex-direction: column; }
+      #screen-cpi-obs .lmo-ov-legrow { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); padding: 14px 0; }
+      #screen-cpi-obs .lmo-ov-legrow + .lmo-ov-legrow { border-top: 1px solid var(--border, #e6ebf2); }
+      #screen-cpi-obs .lmo-ov-legname { font-weight: 600; color: var(--text); }
+      #screen-cpi-obs .lmo-ov-legmeta { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; line-height: 1.2; }
+      #screen-cpi-obs .lmo-ov-legval { font-weight: 700; color: var(--text); }
+      #screen-cpi-obs .lmo-ov-legchg--pos { display: inline-flex; align-items: center; gap: 2px; color: #16a34a; font-weight: 600; }
+      #screen-cpi-obs .lmo-ov-legchg--neg { display: inline-flex; align-items: center; gap: 2px; color: #dc2626; font-weight: 600; }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-ov-card { --lmo-donut-track: rgba(255, 255, 255, 0.12); }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-ov-ico { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+      @media (max-width: 1100px) {
+        #screen-cpi-obs .lmo-ov-grid { grid-template-columns: 1fr; }
+      }
+
+      /* Executive-summary briefing + spotlight movers row. */
+      #screen-cpi-obs .lmo-split--brief { grid-template-columns: 1.15fr 1fr; }
+      #screen-cpi-obs .lmo-brief {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 18px 20px;
+      }
+      #screen-cpi-obs .lmo-brief-hdr { display: flex; align-items: center; gap: 11px; }
+      #screen-cpi-obs .lmo-brief-ico {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 10%, white);
+      }
+      #screen-cpi-obs .lmo-brief-ico i { font-size: 17px; }
+      #screen-cpi-obs .lmo-brief-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+      #screen-cpi-obs .lmo-brief-sub { font-size: 11px; color: var(--muted); }
+      #screen-cpi-obs .lmo-brief-text {
+        margin: 0;
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .lmo-brief-text b { color: var(--text); font-weight: 700; }
+      #screen-cpi-obs .lmo-brief-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+      #screen-cpi-obs .lmo-tag {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--accent);
+        background: var(--accent-light);
+        border-radius: 100px;
+        padding: 3px 10px;
+      }
+
+      /* Spotlight "mover" cards. */
+      #screen-cpi-obs .lmo-spot-stack { display: flex; flex-direction: column; gap: 12px; }
+      #screen-cpi-obs .lmo-spot {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 16px 18px;
+        flex: 1;
+      }
+      #screen-cpi-obs .lmo-spot-ico {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        color: var(--down);
+        background: color-mix(in srgb, var(--down) 12%, white);
+      }
+      #screen-cpi-obs .lmo-spot-ico i { font-size: 20px; }
+      #screen-cpi-obs .lmo-spot-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      #screen-cpi-obs .lmo-spot-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+      }
+      #screen-cpi-obs .lmo-spot-val {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      #screen-cpi-obs .lmo-spot-val i { font-size: 17px; }
+      #screen-cpi-obs .lmo-spot-desc { font-size: 12px; color: var(--text2); line-height: 1.4; }
+
+      /* Shared badge pill (carried over from the previous build). */
+      #screen-cpi-obs .lmo-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        align-self: flex-start;
+        max-width: 100%;
+        margin-top: 4px;
+        padding: 3px 9px;
+        border-radius: 100px;
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--down);
+        background: color-mix(in srgb, var(--down) 10%, white);
+      }
+      #screen-cpi-obs .lmo-badge i { font-size: 12px; flex-shrink: 0; }
+      #screen-cpi-obs .lmo-badge span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+      /* Dark theme — tracks/tints/dividers defer to the page's dark tokens. */
+      html[data-theme="dark"] #screen-cpi-obs .lmo-bar-track,
+      html[data-theme="dark"] #screen-cpi-obs .lmo-panel-note {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-panel--donut { --lmo-donut-track: rgba(255, 255, 255, 0.12); }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-donut-insight { border-color: var(--border); }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-kpi-ico,
+      html[data-theme="dark"] #screen-cpi-obs .lmo-bar-ico,
+      html[data-theme="dark"] #screen-cpi-obs .lmo-brief-ico {
+        background: color-mix(in srgb, var(--accent) 20%, transparent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .lmo-spot-ico { background: color-mix(in srgb, var(--down) 22%, transparent); }
+
+      /* Responsive. */
+      @media (max-width: 1100px) {
+        #screen-cpi-obs .lmo-kpi-band { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        #screen-cpi-obs .lmo-split,
+        #screen-cpi-obs .lmo-split--brief { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 620px) {
+        #screen-cpi-obs .lmo-kpi-band { grid-template-columns: 1fr; }
+        #screen-cpi-obs .lmo-bar-row { grid-template-columns: 1fr auto; }
+        #screen-cpi-obs .lmo-bar-track { grid-column: 1 / -1; order: 3; }
+      }
+      /* Raised from 1100px: with equal thirds, three cards side by side need
+         ~1250px before CPI-by's 26px figures start colliding with their track. */
+      @media (max-width: 1250px) {
+        #screen-cpi-obs .cpi-overview-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* The breadcrumb sits outside .page-wrap, so it clears neither the 120px
+         sidebar rail nor the page gutter — it falls back to the global
+         .container inline padding of 32px. Realign it with the content column
+         (rail + --page-gutter on the left, --page-gutter on the right). */
+      #screen-cpi-obs .crisis-scroll > .container {
+        /* mirrors .sidebar-rail min-width in css/pages/obs-sidebar.css */
+        --obs-rail-w: 120px;
+        padding-inline: calc(var(--obs-rail-w) + var(--page-gutter))
+          var(--page-gutter);
+      }
+
+      /* Sidebar on brand primary (--accent / #0066FF) instead of the legacy
+         navy #0c4a8e, mirroring the #screen-topic variant already in
+         css/pages/obs-sidebar.css. Dark theme is left alone — it resolves to
+         var(--accent) already. */
+      html:not([data-theme="dark"]) #screen-cpi-obs .sidebar-icon {
+        background: #ebf3ff;
+        color: var(--accent);
+      }
+      html:not([data-theme="dark"])
+        #screen-cpi-obs
+        .sidebar-item:hover:not(.active):not(.sidebar-item--ai)
+        .sidebar-icon {
+        background: #dbe9ff;
+      }
+      html:not([data-theme="dark"])
+        #screen-cpi-obs
+        .sidebar-item.active:not(.sidebar-item--ai)
+        .sidebar-icon {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      /* AI entry point on the app's AI gradient — same fill as .ai-mode-btn in
+         style.css, the "AI Mode" button in the top nav. Replaces the pale blue
+         tint, which read as just another idle item. */
+      /* .sidebar in the chain so this outranks both the light-theme
+         .sidebar-icon rule above and the dark-theme one in css/theme.css. */
+      html #screen-cpi-obs .sidebar .sidebar-item--ai .sidebar-icon {
+        background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+        color: #fff;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        transition: transform 0.15s, box-shadow 0.2s;
+      }
+      html #screen-cpi-obs .sidebar .sidebar-item--ai:hover .sidebar-icon {
+        background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+        transform: scale(1.04);
+      }
+
+      /* Standard expanding icon rail — icon-only by default; hovering the pill
+         reveals every label at once (labels slide out to the right of every
+         icon together, no per-item tooltips). */
+      #screen-cpi-obs .sidebar {
+        top: calc(50% + 34px);
+        max-width: none;
+        border-radius: 999px;
+        align-items: stretch;
+        transition: none;
+      }
+      /* When expanded (labels out), soften to a rounded rectangle so the long
+         pill doesn't get awkward capsule ends. */
+      #screen-cpi-obs .sidebar:hover {
+        border-radius: 28px;
+      }
+      #screen-cpi-obs .sidebar-item {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        padding: 4px 4px;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-item {
+        justify-content: flex-start;
+        gap: 10px;
+      }
+      #screen-cpi-obs .sidebar-label {
+        max-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        opacity: 0;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text2);
+        transition: max-width 0.22s ease, opacity 0.18s ease;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-label {
+        max-width: 120px;
+        opacity: 1;
+      }
+      #screen-cpi-obs .sidebar-item.active:not(.sidebar-item--ai) .sidebar-label {
+        color: #272829;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .sidebar-label {
+        color: #cdd6e0;
+      }
+      #screen-cpi-obs .sidebar-item--ai .sidebar-label {
+        color: #0066ff;
+      }
+      /* Divider between the AI entry and the view switcher. Stretches to the
+         sidebar's inner width, so it grows as the pill expands on hover. */
+      #screen-cpi-obs .sidebar-divider {
+        width: 16px;
+        height: 2px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        margin: 1px 0 1px 15px;
+        align-self: flex-start;
+        transition: width 0.22s ease, margin-left 0.22s ease;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-divider {
+        width: calc(100% - 12px);
+        margin-left: 6px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .sidebar-divider {
+        background: #3a4453;
+      }
+
+      /* ====================================================================
+         DIAGNOSE VIEW
+         Styled to the CPI page's own design system: neutral .obs-card surfaces,
+         the shared section-module shell, .kpi-label typography, the --up/--down
+         semantic tones, and the app's home-carousel navigation for every
+         overflow row. No new colour language is introduced — tone lives only on
+         values, the risk pill, and header/insight icons.
+         ==================================================================== */
+      #screen-cpi-obs #cpi-diagnose-content {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+      /* The view containers carry `display` rules that would otherwise beat the
+         [hidden] attribute the tab switch toggles — restore hide behaviour with
+         a higher-specificity rule (id + attribute). */
+      #screen-cpi-obs #cpi-obs-content[hidden],
+      #screen-cpi-obs #cpi-diagnose-content[hidden] {
+        display: none;
+      }
+
+      /* ── View header ── */
+      #screen-cpi-obs .dg-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      #screen-cpi-obs .dg-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      #screen-cpi-obs .dg-scan {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: var(--accent-light);
+        color: var(--accent);
+        font-size: 21px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .dg-month {
+        display: inline-flex;
+        align-items: center;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 3px 9px;
+        border-radius: 100px;
+        background: var(--accent-light);
+        color: var(--accent);
+        line-height: 1.4;
+      }
+      #screen-cpi-obs .dg-title-col {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      #screen-cpi-obs .dg-h1 {
+        font-size: 21px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+        line-height: 1.1;
+      }
+      #screen-cpi-obs .dg-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 240px;
+        padding: 9px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border, #eaecf0);
+        background: var(--surface, #fff);
+        color: var(--text2);
+        font-size: 13px;
+      }
+      #screen-cpi-obs .dg-search i {
+        font-size: 16px;
+      }
+      #screen-cpi-obs .dg-search .dg-kbd {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--accent-light);
+        color: var(--accent);
+      }
+
+      /* ── Two-panel row — each panel is a section module (same shell as the
+         Analytics section and the Interpret view's sections). ── */
+      #screen-cpi-obs .dg-panels {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+      }
+      /* Raised from 640px: each panel carries an AI Summary plus a category
+         carousel, so two side by side start clipping their cards well before
+         640px. Stack them (Stable & optimized drops below Needs attention)
+         once the content column tightens. */
+      @media (max-width: 1024px) {
+        #screen-cpi-obs .dg-panels {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Section body — the AI Summary stacked above the category carousel
+         (full width), mirroring the Briefing Desk content order. */
+      #screen-cpi-obs .dg-body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      #screen-cpi-obs .dg-indicators {
+        min-width: 0;
+      }
+
+      /* AI Summary callout — the app's AI-insight treatment: blue→violet
+         gradient tint, sparkle + "AI Summary" header. Ref: .hw-ai-insight in
+         css/pages/built-widget-module.css. */
+      #screen-cpi-obs .dg-aisummary {
+        position: relative;
+        padding: 0;
+        border-radius: 14px;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.06), rgba(124, 58, 237, 0.04));
+        border: 1px solid rgba(0, 102, 255, 0.12);
+      }
+      /* Text spans the full width so the summary height is driven purely by the
+         copy — this keeps the taller "Needs attention" box in step with the
+         shorter "Stable" one instead of the art squeezing the text into extra
+         wrapped lines. A right pad reserves room for the overlaid illustration. */
+      #screen-cpi-obs .dg-aisummary-text {
+        padding: 15px 88px 15px 18px;
+      }
+      /* Illustration is taken out of flow and anchored to the top/bottom/right
+         edges, so it fills the summary height without inflating it. No fixed
+         dimensions: width is a share of the summary, height follows the box. */
+      #screen-cpi-obs .dg-aisummary-art {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 30%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center right;
+      }
+      /* "Needs attention" copy is longer, so its art is narrowed to leave room
+         for the text on single lines — this keeps the box the same height as the
+         shorter "Stable" summary instead of wrapping into a taller block.
+         The magnifier illustration is near-square, so it's contained (not
+         cover-cropped) to keep the whole icon in frame. */
+      #screen-cpi-obs .dg-panel--warn .dg-aisummary-art {
+        width: 20%;
+        object-fit: contain;
+        object-position: top right;
+      }
+      /* Extra right-pad reserves room for the enlarged magnifier so the copy
+         still clears it (the summary grows a little taller as a result). */
+      #screen-cpi-obs .dg-panel--warn .dg-aisummary-text {
+        padding-right: 92px;
+      }
+      /* On narrow screens the summary is too tight for the overlaid art without
+         cropping it or pushing it out of place, so drop it and let the copy
+         reclaim the full width. */
+      @media (max-width: 768px) {
+        #screen-cpi-obs .dg-aisummary-art {
+          display: none;
+        }
+        #screen-cpi-obs .dg-aisummary-text,
+        #screen-cpi-obs .dg-panel--warn .dg-aisummary-text {
+          padding-right: 18px;
+        }
+      }
+      #screen-cpi-obs .dg-aisummary-hd {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent, #0066ff);
+        margin-bottom: 8px;
+      }
+      #screen-cpi-obs .dg-aisummary-hd i {
+        font-size: 14px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-aisummary {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.12), rgba(124, 58, 237, 0.10));
+        border-color: rgba(0, 102, 255, 0.25);
+      }
+      /* In the "Needs attention" panel the AI Summary reads as an alert, so it
+         takes the red chip tint (matches .dg-pill--accel) instead of the blue
+         AI gradient. The "Stable & optimized" panel keeps the blue treatment. */
+      #screen-cpi-obs .dg-panel--warn .dg-aisummary {
+        background: color-mix(in srgb, var(--up, #e5484d) 10%, white);
+        border-color: color-mix(in srgb, var(--up, #e5484d) 20%, transparent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-panel--warn .dg-aisummary {
+        background: color-mix(in srgb, var(--up, #e5484d) 22%, transparent);
+        border-color: color-mix(in srgb, var(--up, #e5484d) 35%, transparent);
+      }
+      /* "Stable & optimized" panel — AI Summary takes the green chip tint
+         (matches .dg-pill--stable / --down) to read as healthy. */
+      #screen-cpi-obs .dg-panel--ok .dg-aisummary {
+        background: color-mix(in srgb, var(--down, #0c9b70) 12%, white);
+        border-color: color-mix(in srgb, var(--down, #0c9b70) 22%, transparent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-panel--ok .dg-aisummary {
+        background: color-mix(in srgb, var(--down, #0c9b70) 22%, transparent);
+        border-color: color-mix(in srgb, var(--down, #0c9b70) 35%, transparent);
+      }
+      #screen-cpi-obs .dg-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: #718198;
+        margin-bottom: 12px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-eyebrow {
+        color: var(--text-secondary);
+      }
+
+      /* Summary points — compact text rows: a tone-coloured bold label followed
+         by the copy, no icon and no dividers. */
+      #screen-cpi-obs .dg-points {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      #screen-cpi-obs .dg-point {
+        --tone: #246bfd;
+        font-size: 12px;
+        line-height: 1.55;
+        color: #536277;
+      }
+      #screen-cpi-obs .dg-point--critical {
+        --tone: var(--up, #e5484d);
+      }
+      #screen-cpi-obs .dg-point--good {
+        --tone: var(--down, #0c9b70);
+      }
+      #screen-cpi-obs .dg-point--info {
+        --tone: var(--text-primary, #0f172a);
+      }
+      #screen-cpi-obs .dg-point-tx b {
+        color: var(--tone);
+        font-weight: 700;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-point {
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-point-tx b {
+        color: var(--text-primary);
+      }
+      #screen-cpi-obs .dg-panel,
+      #screen-cpi-obs .dg-section {
+        background:
+          linear-gradient(-76deg, #f3fbff 1.2%, rgba(255, 255, 255, 0) 40%),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
+        border-radius: 28px;
+        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.03);
+        padding: 24px 28px 28px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-panel,
+      html[data-theme="dark"] #screen-cpi-obs .dg-section {
+        background: var(--surface, #141a26);
+        border: 1px solid var(--border);
+      }
+      #screen-cpi-obs .dg-panel-hdr {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #screen-cpi-obs .dg-panel-hdr .dg-lead {
+        font-size: 21px;
+        line-height: 1;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .dg-panel--warn .dg-lead {
+        color: var(--up, #e5484d);
+      }
+      #screen-cpi-obs .dg-panel--ok .dg-lead {
+        color: var(--down, #0c9b70);
+      }
+      #screen-cpi-obs .dg-panel-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      #screen-cpi-obs .dg-panel-sub {
+        font-size: 12.5px;
+        color: var(--text2);
+        margin: 4px 0 16px 31px;
+      }
+
+      /* ── Insight / status callout — neutral obs-card surface, tone only on the
+         icon chip so it reads as advisory, not alarming. ── */
+      #screen-cpi-obs .dg-insight {
+        position: relative;
+        display: flex;
+        gap: 11px;
+        align-items: flex-start;
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: var(--text2);
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid var(--border, #eaecf0);
+        box-shadow: 0 24px 30px 0 rgba(42, 61, 76, 0.03);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-insight {
+        background: color-mix(in srgb, var(--accent) 6%, transparent);
+        border-color: var(--border);
+        color: var(--text-secondary);
+      }
+      #screen-cpi-obs .dg-insight-ic {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        margin-top: 1px;
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .dg-insight--warn .dg-insight-ic {
+        color: var(--up, #e5484d);
+        background: color-mix(in srgb, var(--up, #e5484d) 10%, white);
+      }
+      #screen-cpi-obs .dg-insight--ok .dg-insight-ic {
+        color: var(--down, #0c9b70);
+        background: color-mix(in srgb, var(--down, #0c9b70) 10%, white);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-insight--warn .dg-insight-ic {
+        background: color-mix(in srgb, var(--up, #e5484d) 20%, transparent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-insight--ok .dg-insight-ic {
+        background: color-mix(in srgb, var(--down, #0c9b70) 20%, transparent);
+      }
+      #screen-cpi-obs .dg-insight b {
+        color: var(--text);
+        font-weight: 700;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-insight b {
+        color: var(--text-primary);
+      }
+
+      /* ── Carousel — reuses the app's home-carousel nav. The track is a scroll
+         row with the scrollbar hidden; paging is driven by the arrows/dots. ── */
+      #screen-cpi-obs .dg-carousel {
+        position: relative;
+      }
+      #screen-cpi-obs .dg-track {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        padding: 2px 2px 4px;
+      }
+      #screen-cpi-obs .dg-track::-webkit-scrollbar {
+        display: none;
+      }
+      /* 2 cards per view — the rest page through the carousel. */
+      #screen-cpi-obs .dg-slide {
+        flex: 0 0 calc((100% - 14px) / 2);
+        box-sizing: border-box;
+        min-width: 0;
+      }
+      #screen-cpi-obs .dg-carousel-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 14px;
+      }
+      #screen-cpi-obs .dg-carousel-nav.is-single {
+        display: none;
+      }
+      #screen-cpi-obs .home-carousel-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text2);
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .home-carousel-arrow:hover:not(:disabled) {
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .home-carousel-arrow:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+      #screen-cpi-obs .home-carousel-arrow i {
+        font-size: 16px;
+      }
+      #screen-cpi-obs .home-carousel-dots {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      #screen-cpi-obs .home-carousel-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 3px;
+        background: #d3dfec;
+        flex-shrink: 0;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+        transition: width 0.2s, background 0.2s;
+      }
+      #screen-cpi-obs .home-carousel-dot.active {
+        width: 16px;
+        background: var(--accent);
+      }
+
+      /* ── Category card — standard obs-card; tone only on values + risk pill. ── */
+      #screen-cpi-obs .dg-card {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+        border-radius: 16px;
+        padding: 14px;
+      }
+      #screen-cpi-obs .dg-card-id {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        min-width: 0;
+      }
+      #screen-cpi-obs .dg-card-ic {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        color: var(--text2);
+        background: rgba(15, 23, 42, 0.045);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-card-ic {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-secondary);
+      }
+      #screen-cpi-obs .dg-card-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.25;
+      }
+      #screen-cpi-obs .dg-card-tag {
+        font-size: 10.5px;
+        color: var(--text2);
+        margin-top: 1px;
+      }
+      #screen-cpi-obs .dg-pill {
+        display: inline-flex;
+        align-self: flex-start;
+        align-items: center;
+        gap: 3px;
+        flex-shrink: 0;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 3px 8px;
+        border-radius: 100px;
+      }
+      #screen-cpi-obs .dg-pill i {
+        font-size: 11px;
+      }
+      #screen-cpi-obs .dg-pill--moderate {
+        background: #fdf0d5;
+        color: #b5730a;
+      }
+      #screen-cpi-obs .dg-pill--stable {
+        background: color-mix(in srgb, var(--down, #0c9b70) 12%, white);
+        color: var(--down, #0c9b70);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-pill--moderate {
+        background: color-mix(in srgb, #f5a623 20%, transparent);
+        color: #f0b25a;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-pill--stable {
+        background: color-mix(in srgb, var(--down, #0c9b70) 22%, transparent);
+        color: #34c99a;
+      }
+      #screen-cpi-obs .dg-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px 10px;
+      }
+      #screen-cpi-obs .dg-stat-k {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text2);
+        margin-bottom: 2px;
+      }
+      #screen-cpi-obs .dg-stat-v {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #screen-cpi-obs .dg-stat-v.up {
+        color: var(--up, #e5484d);
+      }
+      #screen-cpi-obs .dg-stat-v.down {
+        color: var(--down, #0c9b70);
+      }
+      #screen-cpi-obs .dg-card-foot {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        margin-top: auto;
+        border-top: 1px solid var(--border, #edf1f6);
+        padding-top: 11px;
+      }
+      #screen-cpi-obs .dg-pill--accel {
+        background: color-mix(in srgb, var(--up, #e5484d) 10%, white);
+        color: var(--up, #e5484d);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-pill--accel {
+        background: color-mix(in srgb, var(--up, #e5484d) 22%, transparent);
+        color: #ff6b6b;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-card-foot {
+        border-color: var(--border);
+      }
+
+      /* ── Analytics section header + table ── */
+      #screen-cpi-obs .dg-analytics-hdr {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      #screen-cpi-obs .dg-view-toggle {
+        display: inline-flex;
+        gap: 2px;
+        padding: 3px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.05);
+        margin-left: auto;
+      }
+      #screen-cpi-obs .dg-view-toggle button {
+        width: 30px;
+        height: 28px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text2);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+      }
+      #screen-cpi-obs .dg-view-toggle button.active {
+        background: var(--surface, #fff);
+        color: var(--accent);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-view-toggle {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-view-toggle button.active {
+        background: var(--surface-2, #0f141d);
+      }
+      #screen-cpi-obs .dg-analytics-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      #screen-cpi-obs .dg-analytics-title i {
+        font-size: 20px;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .dg-table-wrap {
+        overflow-x: auto;
+      }
+      #screen-cpi-obs .dg-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 640px;
+      }
+      #screen-cpi-obs .dg-table th {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text2);
+        text-align: right;
+        padding: 0 16px 12px;
+        border-bottom: 1px solid var(--border, #eaecf0);
+        white-space: nowrap;
+      }
+      #screen-cpi-obs .dg-table th:first-child,
+      #screen-cpi-obs .dg-table td:first-child {
+        text-align: left;
+        padding-left: 4px;
+      }
+      #screen-cpi-obs .dg-table td {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        text-align: right;
+        padding: 13px 16px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        white-space: nowrap;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .dg-table td {
+        border-color: color-mix(in srgb, var(--border) 60%, transparent);
+      }
+      #screen-cpi-obs .dg-table tbody tr {
+        transition: background 0.15s ease;
+      }
+      #screen-cpi-obs .dg-table tbody tr:hover {
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .dg-cat-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+      #screen-cpi-obs .dg-cat-cell i {
+        font-size: 17px;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .dg-risk {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      #screen-cpi-obs .dg-risk--moderate {
+        color: #b5730a;
+      }
+      #screen-cpi-obs .dg-risk--stable {
+        color: var(--down, #0c9b70);
+      }
+      #screen-cpi-obs .dg-cell {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 7px;
+        font-weight: 600;
+        font-size: 12.5px;
+      }
+      #screen-cpi-obs .dg-cell--up {
+        color: var(--up, #e5484d);
+        background: color-mix(in srgb, var(--up, #e5484d) 9%, transparent);
+      }
+      #screen-cpi-obs .dg-cell--down {
+        color: var(--down, #0c9b70);
+        background: color-mix(in srgb, var(--down, #0c9b70) 9%, transparent);
+      }
+      #screen-cpi-obs .dg-cell--flat {
+        color: var(--text2);
+        background: rgba(102, 112, 133, 0.08);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==================== SCREEN: CPI OBSERVATORY (standalone) ==================== -->
+    <div id="screen-cpi-obs" class="screen ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="#" onclick="goTo('screen-home'); return false;">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="openObservatories(event); return false;">Overview</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Labor Market Observatory</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <aside class="sidebar" aria-label="CPI views">
+              <button
+                type="button"
+                class="sidebar-item sidebar-item--ai"
+                onclick="openObsSidebarAI(this, 'bayaan-ai', 'Bayaan AI', 'ti-sparkles')"
+              >
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Bayaan AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <button type="button" class="sidebar-item active" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </button>
+              <button type="button" class="sidebar-item" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-search"></i></div>
+                <span class="sidebar-label">Diagnose</span>
+              </button>
+              <!-- Forecast/Benchmark/Observe/Trade get their own pages later —
+                   kept as buttons for now (no links until those pages exist). -->
+              <button type="button" class="sidebar-item" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+                <span class="sidebar-label">Forecast</span>
+              </button>
+              <button type="button" class="sidebar-item" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </button>
+              <button type="button" class="sidebar-item" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </button>
+              <button type="button" class="sidebar-item" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-arrows-exchange"></i></div>
+                <span class="sidebar-label">Trade</span>
+              </button>
+            </aside>
+          </div>
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <h1 class="topic-title">Labor Market Observatory</h1>
+                    <p class="topic-title-sub">Abu Dhabi · May 2026 data</p>
+                  </div>
+                  <div class="cpi-hdr-actions">
+                    <div class="cpi-hdr-search" id="cpi-hdr-search" hidden>
+                      <i class="ti ti-search" aria-hidden="true"></i> Search… <span class="cpi-hdr-kbd">Ctrl+K</span>
+                    </div>
+                    <button type="button" class="cpi-hdr-download">
+                      <i class="ti ti-download" aria-hidden="true"></i> Download
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div id="cpi-obs-content" class="cpi-obs-content"></div>
+              <div id="cpi-diagnose-content" class="cpi-obs-content" hidden></div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ============================================================
+         Standalone stubs — this page is intentionally isolated and
+         does NOT link back into the main application. The shared
+         top navigation and breadcrumb are kept for visual parity;
+         their cross-screen actions are no-ops here.
+         ============================================================ */
+      function goTo() {}
+      function openGeoView(e) { if (e) e.preventDefault(); }
+      function openBayaanSpace(e) { if (e) e.preventDefault(); }
+      function openProducts(e) { if (e) e.preventDefault(); }
+      function openObservatories(e) { if (e) e.preventDefault(); }
+      function openWsDrp() {}
+      function onHeaderSearchClick() {}
+      function openObsSidebarAI(el) { activateSidebar(el); }
+      function toast() {}
+
+      function activateSidebar(el) {
+        const sidebar = el.closest(".sidebar");
+        (sidebar || document)
+          .querySelectorAll(".sidebar-item")
+          .forEach((s) => s.classList.remove("active"));
+        el.classList.add("active");
+
+        /* Only Interpret has content today; every other item (Diagnose,
+           Forecast, Benchmark, Observe, Trade) is a placeholder that will get
+           its own page later, so they all fall back to Interpret and the page
+           never goes blank. */
+        const interpret = document.getElementById("cpi-obs-content");
+        const diagnose = document.getElementById("cpi-diagnose-content");
+        if (!interpret) return;
+        interpret.hidden = false;
+        if (diagnose) diagnose.hidden = true;
+        const hdrSearch = document.getElementById("cpi-hdr-search");
+        if (hdrSearch) hdrSearch.hidden = true;
+      }
+
+      /* ── Observatory content builders (shared with the main app) ── */
+      function buildObsSectionHdr(title, icon, action) {
+        const actionHtml = action
+          ? `<span class="obs-section-action">${action} <i class="ti ti-arrow-right"></i></span>`
+          : "";
+        return `<div class="section-hdr">
+  <h2 class="cpi-section-title"><i class="ti ${icon || "ti-circle"}" aria-hidden="true"></i>${title}</h2>
+  ${actionHtml}
+</div>`;
+      }
+
+      /* Sparklines follow the home page card chart (renderBriefKpi in
+         index.html): a tinted area path under a round-joined line, drawn in an
+         84×30 box with the baseline at y=27. Point data stays in its original
+         100×32 space and is rescaled here, so the data arrays are untouched. */
+      const OBS_SPARK_COLOR = {
+        "sp-up": "#e5484d",
+        "sp-down": "#0c9b70",
+        "sp-neutral": "#246bfd",
+        "sp-flat": "#8b93a7",
+      };
+
+      /* Unique gradient id per sparkline so each SVG's fill fade is isolated. */
+      let obsSparkId = 0;
+
+      function buildObsSparkline(points, cls) {
+        const color = OBS_SPARK_COLOR[cls] || OBS_SPARK_COLOR["sp-flat"];
+        const pts = points
+          .trim()
+          .split(/\s+/)
+          .map((pair) => {
+            const [x, y] = pair.split(",").map(Number);
+            /* x → [1,83], y → [0,27] so the curve never dips below baseline */
+            return [1 + (x / 100) * 82, (y / 32) * 27];
+          });
+        if (!pts.length) return "";
+
+        const fmt = (n) => Math.round(n * 100) / 100;
+
+        /* Smooth line via Catmull-Rom → cubic bézier, matching the smooth
+           gradient sparklines used by the Indicators screen on the home page
+           (indBuildSparkline / Chart.js tension: 0.4). */
+        let line = `M${fmt(pts[0][0])} ${fmt(pts[0][1])}`;
+        if (pts.length < 3) {
+          line = `M${pts.map(([x, y]) => `${fmt(x)} ${fmt(y)}`).join(" L")}`;
+        } else {
+          for (let i = 0; i < pts.length - 1; i++) {
+            const p0 = pts[i - 1] || pts[i];
+            const p1 = pts[i];
+            const p2 = pts[i + 1];
+            const p3 = pts[i + 2] || p2;
+            const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+            const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+            const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+            const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+            line += ` C${fmt(c1x)} ${fmt(c1y)}, ${fmt(c2x)} ${fmt(c2y)}, ${fmt(p2[0])} ${fmt(p2[1])}`;
+          }
+        }
+
+        const first = pts[0];
+        const last = pts[pts.length - 1];
+        const area = `${line} L${fmt(last[0])} 27 L${fmt(first[0])} 27 Z`;
+        const gid = "obsSparkGrad" + obsSparkId++;
+
+        /* preserveAspectRatio="none" lets the chart fill the full card width;
+           non-scaling-stroke keeps the line an even weight despite the stretch.
+           The area is a top-down gradient fade, same as the Indicators charts. */
+        return `<svg viewBox="0 0 84 30" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${color}" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="${color}" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+  <path class="obs-spark-area" fill="url(#${gid})" d="${area}"/>
+  <path class="obs-spark-line" stroke="${color}" vector-effect="non-scaling-stroke" d="${line}"/>
+</svg>`;
+      }
+
+      /* ── Year-over-year comparison charts ──
+         Same multi-line, legended chart the home page's GCC comparison uses,
+         but the series are the five most recent years rather than six GCC
+         economies. Sequential blue scale: older years muted, the latest year
+         emphasised (heavier stroke, on top). */
+      const OBS_YEARS = [
+        { year: "2022", color: "#c3d3ec" },
+        { year: "2023", color: "#93b4e8" },
+        { year: "2024", color: "#5b8bd9" },
+        { year: "2025", color: "#2f66cf" },
+        { year: "2026", color: "#1a3f86" },
+      ];
+
+      /* Catmull-Rom → cubic bézier, shared with buildObsSparkline's smoothing. */
+      function obsSmoothPath(pts, fmt) {
+        if (pts.length < 3) {
+          return `M${pts.map(([x, y]) => `${fmt(x)} ${fmt(y)}`).join(" L")}`;
+        }
+        let d = `M${fmt(pts[0][0])} ${fmt(pts[0][1])}`;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p0 = pts[i - 1] || pts[i];
+          const p1 = pts[i];
+          const p2 = pts[i + 1];
+          const p3 = pts[i + 2] || p2;
+          const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+          const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+          const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+          const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+          d += ` C${fmt(c1x)} ${fmt(c1y)}, ${fmt(c2x)} ${fmt(c2y)}, ${fmt(p2[0])} ${fmt(p2[1])}`;
+        }
+        return d;
+      }
+
+      /* Derives five year-lines from one base spark: each year is the base
+         trend shifted vertically (older years sit lower), with a little shape
+         variation so the lines read as distinct traces. */
+      /* One trend line spanning the five years (2022→2026), drawn in the app's
+         Indicators sparkline style — a tinted blue area fade under a rounded
+         line (buildObsSparkline). The years are read off the x-axis. */
+      function buildObsYearChart(points) {
+        return buildObsSparkline(points, "sp-neutral");
+      }
+
+      /* Five evenly-spaced year ticks under the chart (replaces the old colour
+         legend). */
+      function buildObsYearAxis() {
+        return `<div class="obs-year-axis" aria-hidden="true">${OBS_YEARS.map(
+          (yr) => `<span>&rsquo;${yr.year.slice(2)}</span>`
+        ).join("")}</div>`;
+      }
+
+      function buildObsDriverCard(d) {
+        return `<div class="obs-card driver-card">
+  <div class="dc-head">
+    <div class="dc-icon-wrap"><i class="ti ${d.icon}"></i></div>
+    <div class="dc-title-col">
+      <div class="dc-title">${d.title}</div>
+      ${d.sub ? `<div class="dc-subtitle">${d.sub}</div>` : ""}
+    </div>
+    <div class="dc-date">${d.date}</div>
+  </div>
+  <div class="dc-value">${d.value}${d.unit ? `<small>${d.unit}</small>` : ""}</div>
+  <div class="dc-changes">${d.changes}</div>
+  <div class="dc-spark">${buildObsYearChart(d.spark)}</div>
+  ${buildObsYearAxis()}
+</div>`;
+      }
+
+      /* ── EMIRATIZATION SECTION (Labor Market Observatory) ──
+         A from-scratch executive dashboard assembled only from this page's own
+         patterns: the .obs-card shell, .dc-value figures, buildObsSparkline, the
+         accent icon-chip recipe, .section-hdr, and the --up/--down semantic pair.
+         Charts (ranked bars, donut) are hand-built SVG in the same idiom as the
+         page's sparklines — no external chart library is loaded here. The
+         reference image supplied only the metrics; the layout is original.
+         Tone: "pos" → green (var(--down)), "neg" → red (var(--up)), "flat" → grey. */
+
+      /* Headline KPI band — reframed from the executive summary's key figures. */
+      /* Executive Overview KPI cards. Each reuses the .lmo-kpi component; the
+         top-right slot carries the trend/status signal (status pill or growth
+         chg), and an optional sector chip sits in the footer. */
+      const lmoKpis = [
+        {
+          icon: "ti-award",
+          title: "Highest Emiratization",
+          value: "67.11%",
+          support: "Sector: Public administration & defence; compulsory social security",
+          status: { text: "Leading", icon: "ti-circle-check" },
+          chip: "Public administration & defence",
+        },
+        {
+          icon: "ti-trending-up",
+          title: "Fastest Improvement",
+          value: "183.13 pp",
+          caption: "Growth vs 2024",
+          support: "Sector: Agriculture, forestry & fishing",
+          chip: "Agriculture, forestry & fishing",
+        },
+        {
+          icon: "ti-users-group",
+          title: "Emirati Workforce",
+          value: "274K",
+          support: "Across all sectors (2025)",
+        },
+        {
+          icon: "ti-user-plus",
+          title: "Emirati Hires (YTD)",
+          value: "274K",
+          support: "Year 2025",
+          growth: { text: "14.09% vs 2024" },
+        },
+      ];
+      function buildLmoKpi(k) {
+        const topRight = k.status
+          ? `<span class="lmo-badge"><i class="ti ${k.status.icon}"></i><span>${k.status.text}</span></span>`
+          : k.growth
+          ? `<span class="lmo-kpi-chg lmo-pos"><i class="ti ti-arrow-up"></i>${k.growth.text}</span>`
+          : "";
+        return `<div class="obs-card lmo-kpi lmo-ovv">
+  <div class="lmo-kpi-top">
+    <span class="lmo-kpi-ico"><i class="ti ${k.icon}"></i></span>
+    ${topRight}
+  </div>
+  <div class="lmo-ovv-title">${k.title}</div>
+  <div class="lmo-kpi-val">${k.value}</div>
+  ${k.caption ? `<div class="lmo-ovv-caption">${k.caption}</div>` : ""}
+  <div class="lmo-kpi-label">${k.support}</div>
+  ${k.chip ? `<div class="lmo-ovv-foot"><span class="lmo-tag">${k.chip}</span></div>` : ""}
+</div>`;
+      }
+
+      /* Ranked horizontal bar chart — sector localization, sorted descending. */
+      const lmoBars = [
+        { icon: "ti-building-bank", name: "Government", pct: "54.34%", pctNum: 54.34, dir: "pos", chg: "1.44%", insight: "A 43.34% Emiratization rate in the government sector signals strong national workforce presence versus private-sector localization." },
+        { icon: "ti-clock-hour-4", name: "Joint (Gov. & Private)", pct: "22.1%", pctNum: 22.1, dir: "neg", chg: "6.99%", insight: "Emirati female Emiratization reaches 55.37% across joint sectors — strong public-sector representation, weaker private inclusion." },
+        { icon: "ti-heart-handshake", name: "Non-profit organizations", pct: "15.17%", pctNum: 15.17, dir: "pos", chg: "44.75%", insight: "Non-profit female Emiratization hit 100.00% in 2025 — full national localization in this segment." },
+        { icon: "ti-briefcase-2", name: "Private / foreign enterprises", pct: "5.3%", pctNum: 5.3, dir: "flat", chg: "", insight: "Emiratis hold ~9% of private-sector jobs; private/foreign Emiratization sits at 5.3% — the primary segmentation gap." },
+      ];
+      function buildLmoBar(b) {
+        const arrow = b.dir === "pos" ? "ti-trending-up" : b.dir === "neg" ? "ti-trending-down" : "ti-minus";
+        const chg = b.chg
+          ? `<span class="lmo-bar-chg lmo-${b.dir}"><i class="ti ${arrow}"></i>${b.chg}</span>`
+          : `<span class="lmo-bar-chg lmo-flat">n/a</span>`;
+        return `<div class="lmo-bar-row" title="${b.insight}">
+  <div class="lmo-bar-name"><span class="lmo-bar-ico"><i class="ti ${b.icon}"></i></span>${b.name}</div>
+  <div class="lmo-bar-track"><span class="lmo-bar-fill lmo-fill-${b.dir}" style="width:${b.pctNum}%"></span></div>
+  <div class="lmo-bar-figs"><span class="lmo-bar-pct">${b.pct}</span>${chg}</div>
+</div>`;
+      }
+
+      /* ── Workforce Localization Progress by Sector — insight cards in the
+         app's home-carousel (.dg-carousel + initDgCarousel). Each card reuses
+         the .dg-card shell, the .lmo-bar progress bar, the .lmo-pos/.lmo-neg
+         semantic pair, and the .lmo-qa subtle icon control for card actions. */
+      const lmoLocSectors = [
+        { icon: "ti-building-bank", cat: "Government", name: "Government", pct: "54.34%", pctNum: 54.34, dir: "pos", chg: "1.44%", series: [48.1, 49.6, 49.0, 51.8, 53.6, 54.34], insight: "A 43.34% Emiratization rate in Abu Dhabi's government sector indicates strong national workforce presence, highlighting significant progress compared to private sector localization levels in the region." },
+        { icon: "ti-building-community", cat: "Joint sector", name: "Joint (Government & Private)", pct: "22.1%", pctNum: 22.1, dir: "neg", chg: "6.99%", series: [26.4, 25.5, 24.6, 23.8, 23.0, 22.1], insight: "Abu Dhabi Emirati female Emiratization rate stands at 55.37% across both government and private sectors, signaling strong public sector representation but challenges in private sector inclusion persist." },
+        { icon: "ti-heart-handshake", cat: "Non-profit", name: "Non Profit Organization", pct: "15.17%", pctNum: 15.17, dir: "pos", chg: "44.75%", series: [7.9, 9.1, 10.6, 12.2, 13.8, 15.17], insight: "In Abu Dhabi's non-profit organizations, the Emiratization rate among all female employees reached 100.00% in 2025, indicating total national workforce localization in this segment." },
+      ];
+      /* Same reusable card/carousel pattern, different dataset: by domain. */
+      const lmoDomains = [
+        { icon: "ti-shield", cat: "Public sector", name: "Public administration & defence; compulsory social security", pct: "67.11%", pctNum: 67.11, dir: "neg", chg: "7.13%", series: [74.2, 72.4, 71.0, 69.3, 68.1, 67.11], insight: "In Abu Dhabi's public administration and defence sector, the Emiratization rate stands at 67.11%, reflecting strong national representation but highlighting further scope for private sector alignment." },
+        { icon: "ti-pick", cat: "Industry", name: "Mining and quarrying", pct: "25.45%", pctNum: 25.45, dir: "pos", chg: "21.25%", series: [17.8, 19.4, 21.0, 22.6, 24.0, 25.45], insight: "The Emiratization rate in mining and quarrying reached 25.45% for Emiratis in Abu Dhabi, indicating strong localization progress and robust integration of nationals in this sector." },
+        { icon: "ti-school", cat: "Education", name: "Education", pct: "20.26%", pctNum: 20.26, dir: "pos", chg: "10.11%", series: [16.1, 17.0, 18.0, 18.9, 19.6, 20.26], insight: "In Abu Dhabi's education sector for 2025, Emiratis account for a 20.26% Emiratization rate, indicating strong progress and expanded national employment opportunities." },
+      ];
+      const LMO_LOC_YEARS = ["2020", "2021", "2022", "2023", "2024", "2025"];
+      function favAttr(s) {
+        return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+      }
+      function favSlug(s) {
+        return String(s == null ? "" : s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      }
+      function buildLmoLocCard(c) {
+        const arrow = c.dir === "pos" ? "ti-arrow-up" : "ti-arrow-down";
+        const chgCls = c.dir === "pos" ? "val-green" : "val-red";
+        /* Stash the chart config on the card so initLmoLocCharts() can mount an
+           interactive Highcharts areaspline into .product-viz (same recipe as
+           the home page's indicator cards). */
+        const cfg = { type: "area", data: c.series, categories: LMO_LOC_YEARS, baseColor: "#0066FF" };
+        const favId = "lmoloc-" + favSlug(c.cat + "-" + c.name);
+        return `<div class="obs-card dg-card dg-slide lmo-loc-card lmo-ind-card" data-lmo-chart='${JSON.stringify(cfg).replace(/'/g, "&#39;")}'>
+  <div class="product-card-toprow">
+    <span class="product-cat-tag"><i class="ti ${c.icon}"></i> <span class="product-cat-text">${c.cat}</span></span>
+    <div class="product-actions">
+      <i class="ti ti-sparkles ai-sparkle-action" title="AI Summary"></i>
+      <i class="ti ti-bookmark" data-fav-toggle data-fav-store="indicators" data-fav-id="${favId}" data-fav-name="${favAttr(c.name)}" data-fav-val="${favAttr(c.pct)}" data-fav-change="${favAttr(c.chg + " vs 2024")}" data-fav-change-class="${favAttr(chgCls)}" data-fav-cat="${favAttr(c.cat)}" data-fav-cat-icon="${favAttr(c.icon)}" data-fav-ai="${favAttr(c.insight)}"></i>
+      <i class="ti ti-arrow-up-right" title="Expand"></i>
+    </div>
+  </div>
+  <div class="product-name-row"><div class="product-name">${c.name}</div></div>
+  <div class="product-val">${c.pct}</div>
+  <div class="product-change ${chgCls}"><i class="ti ${arrow}"></i>${c.chg} vs 2024</div>
+  <div class="product-viz"></div>
+  <div class="product-axis">${LMO_LOC_YEARS.map((y) => `<span>${y}</span>`).join("")}</div>
+  <div class="product-ai-row">
+    <i class="ti ti-bulb"></i>
+    <span><span class="product-ai-lbl">AI Summary</span> <span class="product-ai-text">${c.insight}</span></span>
+  </div>
+</div>`;
+      }
+
+      /* ── Interactive product-card charts — ported verbatim from index.html so
+         the localization cards render the same live Highcharts areaspline (with
+         hover tooltips + markers) as the home page's indicator cards, instead
+         of a static SVG. ── */
+      const LMO_CHART_BASE_COLOR = "#0066FF";
+      function lmoBuildAreaZoneFill(color) {
+        return {
+          linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+          stops: [
+            [0, Highcharts.color(color).setOpacity(0.22).get("rgba")],
+            [1, Highcharts.color(color).setOpacity(0).get("rgba")],
+          ],
+        };
+      }
+      function lmoMountProductHighchart(viz, cfg) {
+        if (!viz || typeof Highcharts === "undefined") return null;
+        const cats = cfg.categories || LMO_LOC_YEARS;
+        const isColumn = cfg.type === "column" || cfg.type === "bar";
+        const lineColor = cfg.lineColor || cfg.baseColor || LMO_CHART_BASE_COLOR;
+        const pointData = (cfg.data || []).map((v) => ({
+          y: typeof v === "object" && v != null ? v.y : v,
+          color: lineColor,
+        }));
+        if (viz._hc) {
+          try { viz._hc.destroy(); } catch (e) {}
+          viz._hc = null;
+        }
+        viz.innerHTML = "";
+        const chart = Highcharts.chart(viz, {
+          chart: {
+            type: isColumn ? "column" : "areaspline",
+            backgroundColor: "transparent",
+            margin: [6, 2, 22, 2],
+            height: 92,
+            style: { fontFamily: "Inter, sans-serif" },
+          },
+          title: { text: null },
+          credits: { enabled: false },
+          legend: { enabled: false },
+          tooltip: {
+            enabled: true,
+            outside: true,
+            headerFormat: '<span style="font-size:11px">{point.key}</span><br/>',
+            pointFormat: `<b>{point.y}${cfg.valueSuffix != null ? cfg.valueSuffix : "%"}</b>`,
+          },
+          xAxis: {
+            categories: cats,
+            lineWidth: 0,
+            tickLength: 0,
+            tickWidth: 0,
+            gridLineWidth: 0,
+            labels: {
+              enabled: true,
+              style: { fontSize: "9.5px", color: "#9CA3AF", fontFamily: "Inter, sans-serif" },
+              y: 14,
+              autoRotation: false,
+              overflow: "allow",
+            },
+          },
+          yAxis: { visible: false, title: { text: null }, gridLineWidth: 0 },
+          plotOptions: {
+            series: {
+              animation: false,
+              enableMouseTracking: true,
+              states: { hover: { enabled: true } },
+            },
+            column: { borderWidth: 0, borderRadius: 3, pointPadding: 0.12, groupPadding: 0.08, colorByPoint: true },
+            areaspline: {
+              fillOpacity: 0.18,
+              lineWidth: 2,
+              marker: { enabled: false, radius: 3, lineWidth: 0, states: { hover: { enabled: true, radius: 4 } } },
+            },
+          },
+          series: [
+            isColumn
+              ? { type: "column", data: pointData, name: "Value" }
+              : {
+                  type: "areaspline",
+                  data: pointData.map((p) => ({ y: p.y, marker: { enabled: false } })),
+                  color: lineColor,
+                  fillColor: lmoBuildAreaZoneFill(lineColor),
+                },
+          ],
+        });
+        viz._hc = chart;
+        return chart;
+      }
+      function initLmoLocCharts(root) {
+        (root || document)
+          .querySelectorAll(".lmo-ind-card[data-lmo-chart]")
+          .forEach((card) => {
+            const viz = card.querySelector(".product-viz");
+            if (!viz) return;
+            let cfg;
+            try { cfg = JSON.parse(card.getAttribute("data-lmo-chart")); }
+            catch (e) { return; }
+            if (typeof Highcharts !== "undefined") {
+              lmoMountProductHighchart(viz, cfg);
+              const axisEl = card.querySelector(".product-axis");
+              if (axisEl) axisEl.style.display = "none";
+              card.setAttribute("data-hc-axis", "1");
+            }
+          });
+      }
+
+      /* ── Key Indicators — same insight-card + carousel pattern, with a status
+         badge and a YoY comparison in place of the progress bar. tone: "pos"
+         (green/good) · "neg" (red). All four read as "Good", so the falling
+         unemployment metric carries a down arrow but the positive/green tone. */
+      const lmoKeyIndicators = [
+        { icon: "ti-user-x", status: "Good", title: "Total Workforce, Abu Dhabi - Unemployment", value: "-17.4%", cmp: "vs 2025", arrow: "down", tone: "pos", series: [100, 96.2, 93.1, 90.4, 87.6, 82.6], insight: "Unemployment among all workers in Abu Dhabi fell significantly, indicating improved job opportunities across the emirate." },
+        { icon: "ti-coin", status: "Good", title: "Total Workforce, Abu Dhabi - Wages and Income (AED)", value: "9.8%", cmp: "vs 2025", arrow: "up", tone: "pos", series: [100, 101.8, 103.9, 105.7, 107.9, 109.8], insight: "Total wage income for all workers in Abu Dhabi grew, indicating broad income improvement across the emirate's workforce." },
+        { icon: "ti-users-group", status: "Good", title: "Total Workforce, Abu Dhabi - Labor Force", value: "9.5%", cmp: "vs 2025", arrow: "up", tone: "pos", series: [100, 101.6, 103.2, 105.1, 107.2, 109.5], insight: "All genders and citizenships saw Abu Dhabi's total labor force increase, supporting overall economic expansion." },
+        { icon: "ti-briefcase", status: "Good", title: "Total Workforce, Abu Dhabi - Employment", value: "10.9%", cmp: "vs 2025", arrow: "up", tone: "pos", series: [100, 102.2, 104.6, 107.0, 108.9, 110.9], insight: "Total employment for all citizens and genders in Abu Dhabi rose significantly, indicating broad-based labor market expansion." },
+      ];
+      /* Key Indicators reuse the same home-page indicator (.product-card) recipe
+         as the localization cards — cat-tag + actions, bold title, large value,
+         coloured YoY change, an interactive Highcharts chart and an AI Summary
+         footer — but keep the distinctive "Good" status badge in the top row. */
+      function buildLmoKeyCard(k) {
+        const chgCls = k.tone === "pos" ? "val-green" : "val-red";
+        const cfg = { type: "area", data: k.series, categories: LMO_LOC_YEARS, baseColor: "#0066FF", valueSuffix: "" };
+        const title = k.title.replace(/^Total Workforce, Abu Dhabi - /, "");
+        const favId = "lmokey-" + favSlug(k.title);
+        return `<div class="obs-card dg-card dg-slide lmo-loc-card lmo-key-card lmo-ind-card" data-lmo-chart='${JSON.stringify(cfg).replace(/'/g, "&#39;")}'>
+  <div class="product-card-toprow">
+    <span class="product-cat-tag"><i class="ti ${k.icon}"></i> <span class="product-cat-text">${title}</span></span>
+    <div class="product-actions">
+      <i class="ti ti-sparkles ai-sparkle-action" title="AI Summary"></i>
+      <i class="ti ti-bookmark" data-fav-toggle data-fav-store="indicators" data-fav-id="${favId}" data-fav-name="${favAttr(k.title)}" data-fav-val="${favAttr(k.value)}" data-fav-change="${favAttr(k.cmp)}" data-fav-change-class="${favAttr(chgCls)}" data-fav-cat="${favAttr(title)}" data-fav-cat-icon="${favAttr(k.icon)}" data-fav-ai="${favAttr(k.insight)}"></i>
+      <i class="ti ti-arrow-up-right" title="Expand"></i>
+    </div>
+  </div>
+  <div class="product-name-row"><div class="product-name">${k.title}</div></div>
+  <div class="lmo-key-valrow">
+    <span class="product-val">${k.value}</span>
+    <span class="lmo-badge"><i class="ti ti-circle-check"></i><span>${k.status}</span></span>
+  </div>
+  <div class="product-change ${chgCls}"><i class="ti ti-arrow-${k.arrow}"></i>${k.cmp}</div>
+  <div class="product-viz"></div>
+  <div class="product-axis">${LMO_LOC_YEARS.map((y) => `<span>${y}</span>`).join("")}</div>
+  <div class="product-ai-row">
+    <i class="ti ti-bulb"></i>
+    <span><span class="product-ai-lbl">AI Summary</span> <span class="product-ai-text">${k.insight}</span></span>
+  </div>
+</div>`;
+      }
+
+      /* ══════════════════════════════════════════════════════════════════
+         LABOR SUPPLY–DEMAND ANALYSIS — one reusable renderer drives both the
+         Age and Education datasets, and both the Sankey and Table views. No
+         charting lib is loaded, so the Sankey is a hand-built SVG (same
+         approach as the donut/sparklines) in the app's visual language. */
+      const LSD_DATA = {
+        age: {
+          label: "Age group",
+          supply: 3000000, emirati: 294800, nonEmirati: 2700000, demand: 2900000, gap: 112900,
+          groups: [
+            { name: "15–19", value: 22400 }, { name: "20–24", value: 260000 },
+            { name: "25–29", value: 474700 }, { name: "30–34", value: 619600 },
+            { name: "35–39", value: 558500 }, { name: "40–44", value: 441800 },
+            { name: "45–49", value: 301700 }, { name: "50–54", value: 180800 },
+            { name: "55–59", value: 104100 },
+          ],
+        },
+        education: {
+          label: "Education level",
+          placeholder: true,
+          supply: 3000000, emirati: 294800, nonEmirati: 2700000, demand: 2900000, gap: 112900,
+          /* Illustrative attainment split — replace with the official SCAD
+             education dataset when available (same structure, real values). */
+          groups: [
+            { name: "Below Secondary", value: 651000 }, { name: "Secondary", value: 861000 },
+            { name: "Diploma", value: 474000 }, { name: "Bachelor", value: 772000 },
+            { name: "Postgraduate", value: 205600 },
+          ],
+        },
+      };
+      function lsdForYear(base, year) {
+        const f = 1 - (2025 - year) * 0.032; /* ~3.2% lower per year back */
+        const s = (v) => Math.round(v * f);
+        return {
+          ...base,
+          supply: s(base.supply), emirati: s(base.emirati), nonEmirati: s(base.nonEmirati),
+          demand: s(base.demand), gap: s(base.gap),
+          groups: base.groups.map((g) => ({ name: g.name, value: s(g.value) })),
+        };
+      }
+      function lsdFmt(v) {
+        const t = (n) => n.toFixed(1).replace(/\.0$/, "");
+        if (Math.abs(v) >= 1e6) return t(v / 1e6) + "M";
+        if (Math.abs(v) >= 1e3) return t(v / 1e3) + "K";
+        return String(Math.round(v));
+      }
+      function lsdSankeySVG(d) {
+        const W = 980, H = 440, nodeW = 13, mL = 78, mR = 84;
+        const eShare = d.emirati / (d.emirati + d.nonEmirati);
+        const dShare = d.demand / (d.demand + d.gap);
+        const cols = [
+          [{ id: "supply", name: "Labor Supply", value: d.supply, tone: "supply" }],
+          [{ id: "emirati", name: "Emirati", value: d.emirati, tone: "emirati" },
+           { id: "nonemirati", name: "Non-Emirati", value: d.nonEmirati, tone: "nonemirati" }],
+          d.groups.map((g, i) => ({ id: "g" + i, name: g.name, value: g.value, tone: "group" })),
+          [{ id: "demand", name: "Demand", value: d.demand, tone: "demand" },
+           { id: "gap", name: "Gap", value: d.gap, tone: "gap" }],
+        ];
+        const chartW = W - mL - mR;
+        const xs = [mL, Math.round(mL + chartW * 0.30), Math.round(mL + chartW * 0.60), mL + chartW - nodeW];
+        const gaps = [0, 30, 7, 30];
+        const totals = cols.map((c) => c.reduce((s, n) => s + n.value, 0));
+        const scale = (H * 0.86) / Math.max(...totals);
+        const N = {};
+        cols.forEach((c, ci) => {
+          const g = gaps[ci];
+          const stackH = c.reduce((s, n) => s + Math.max(2, n.value * scale), 0) + (c.length - 1) * g;
+          let y = (H - stackH) / 2;
+          c.forEach((n) => { const h = Math.max(2, n.value * scale); N[n.id] = { ...n, x: xs[ci], y, h, outY: y, inY: y }; y += h + g; });
+        });
+        const links = [];
+        links.push({ s: "supply", t: "emirati", v: d.emirati, tone: "emirati" });
+        links.push({ s: "supply", t: "nonemirati", v: d.nonEmirati, tone: "nonemirati" });
+        d.groups.forEach((g, i) => {
+          links.push({ s: "emirati", t: "g" + i, v: g.value * eShare, tone: "emirati" });
+          links.push({ s: "nonemirati", t: "g" + i, v: g.value * (1 - eShare), tone: "nonemirati" });
+        });
+        d.groups.forEach((g, i) => {
+          links.push({ s: "g" + i, t: "demand", v: g.value * dShare, tone: "demand" });
+          links.push({ s: "g" + i, t: "gap", v: g.value * (1 - dShare), tone: "gap" });
+        });
+        const linkSVG = links.map((l) => {
+          const sn = N[l.s], tn = N[l.t], h = Math.max(0.6, l.v * scale);
+          const y0 = sn.outY; sn.outY += h;
+          const y1 = tn.inY; tn.inY += h;
+          const x0 = sn.x + nodeW, x1 = tn.x, xm = (x0 + x1) / 2;
+          const dp = `M${x0},${y0.toFixed(1)} C${xm},${y0.toFixed(1)} ${xm},${y1.toFixed(1)} ${x1},${y1.toFixed(1)} L${x1},${(y1 + h).toFixed(1)} C${xm},${(y1 + h).toFixed(1)} ${xm},${(y0 + h).toFixed(1)} ${x0},${(y0 + h).toFixed(1)} Z`;
+          return `<path class="lsd-link lsd-link--${l.tone}" data-s="${l.s}" data-t="${l.t}" data-tip="${sn.name} → ${tn.name}&#10;${lsdFmt(l.v)}" d="${dp}"></path>`;
+        }).join("");
+        let nodeSVG = "", labelSVG = "";
+        Object.values(N).forEach((n) => {
+          nodeSVG += `<rect class="lsd-node lsd-node--${n.tone}" data-id="${n.id}" data-tip="${n.name}&#10;${lsdFmt(n.value)}" x="${n.x}" y="${n.y.toFixed(1)}" width="${nodeW}" height="${n.h.toFixed(1)}" rx="2"></rect>`;
+          const cy = n.y + n.h / 2;
+          if (n.tone === "supply") {
+            labelSVG += `<text class="lsd-label lsd-label--strong" x="${n.x - 8}" y="${(cy - 2).toFixed(1)}" text-anchor="end">${n.name}</text><text class="lsd-label" x="${n.x - 8}" y="${(cy + 11).toFixed(1)}" text-anchor="end">${lsdFmt(n.value)}</text>`;
+          } else if (n.tone === "emirati" || n.tone === "nonemirati") {
+            labelSVG += `<text class="lsd-label lsd-label--strong" x="${n.x + nodeW / 2}" y="${(n.y - 10).toFixed(1)}" text-anchor="middle">${n.name}</text><text class="lsd-label" x="${n.x + nodeW / 2}" y="${(n.y - 1).toFixed(1)}" text-anchor="middle">${lsdFmt(n.value)}</text>`;
+          } else if (n.tone === "demand" || n.tone === "gap") {
+            labelSVG += `<text class="lsd-label lsd-label--strong" x="${n.x + nodeW + 8}" y="${(cy - 2).toFixed(1)}" text-anchor="start">${n.name}</text><text class="lsd-label" x="${n.x + nodeW + 8}" y="${(cy + 11).toFixed(1)}" text-anchor="start">${lsdFmt(n.value)}</text>`;
+          } else {
+            labelSVG += `<text class="lsd-glabel" x="${n.x + nodeW + 5}" y="${(cy + 3).toFixed(1)}" text-anchor="start">${n.name} · ${lsdFmt(n.value)}</text>`;
+          }
+        });
+        return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Labor supply-demand Sankey by ${d.label.toLowerCase()}">${linkSVG}${nodeSVG}${labelSVG}</svg>`;
+      }
+      function lsdTableHTML(d) {
+        const eShare = d.emirati / (d.emirati + d.nonEmirati);
+        const dShare = d.demand / (d.demand + d.gap);
+        const cats = [
+          { name: "Emirati", icon: "ti-user-star", share: eShare },
+          { name: "Non-Emirati", icon: "ti-users", share: 1 - eShare },
+        ];
+        const rows = cats.map((c) => d.groups.map((g) => {
+          const supply = g.value * c.share, demand = supply * dShare, gap = supply * (1 - dShare);
+          return `<tr><td><span class="dg-cat-cell"><i class="ti ${c.icon}"></i> ${c.name}</span></td><td>${g.name}</td><td>${lsdFmt(supply)}</td><td>${lsdFmt(demand)}</td><td><span class="lmo-neg">${lsdFmt(gap)}</span></td></tr>`;
+        }).join("")).join("");
+        return `<div class="dg-table-wrap"><table class="dg-table"><thead><tr><th>Workforce category</th><th>${d.label}</th><th>Supply</th><th>Demand</th><th>Gap</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      }
+      function initLsdSection() {
+        const root = document.getElementById("cpi-obs-content");
+        const sec = root && root.querySelector(".lmo-lsd");
+        if (!sec) return;
+        const viz = sec.querySelector("#lmoLsdViz");
+        const tip = sec.querySelector("#lmoLsdTip");
+        const card = sec.querySelector(".lmo-lsd-card");
+        const state = { dim: "age", year: 2025, view: "sankey" };
+        const setActive = (sel, el) => sec.querySelectorAll(sel).forEach((b) => {
+          const on = b === el; b.classList.toggle("active", on);
+          if (b.hasAttribute("aria-selected")) b.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        const note = () => LSD_DATA[state.dim].placeholder
+          ? `<div class="lmo-lsd-note"><i class="ti ti-info-circle"></i> Illustrative education-level split — connect the official SCAD attainment dataset to replace these values.</div>`
+          : "";
+        function showTip(e, el) {
+          const parts = (el.getAttribute("data-tip") || "").split("\n");
+          tip.innerHTML = `<b>${parts[0] || ""}</b>${parts[1] ? "<br>" + parts[1] : ""}`;
+          tip.classList.add("on");
+          const cr = card.getBoundingClientRect();
+          tip.style.left = (e.clientX - cr.left + 12) + "px";
+          tip.style.top = (e.clientY - cr.top + 12) + "px";
+        }
+        const hideTip = () => tip.classList.remove("on");
+        function wireSankey() {
+          const wrap = viz.querySelector(".lmo-lsd-sankey");
+          const svg = wrap && wrap.querySelector("svg");
+          if (!svg) return;
+          const clear = () => { wrap.classList.remove("is-hi"); svg.querySelectorAll(".lsd-on").forEach((x) => x.classList.remove("lsd-on")); hideTip(); };
+          svg.querySelectorAll(".lsd-node").forEach((node) => {
+            node.addEventListener("mouseenter", () => {
+              const id = node.dataset.id; wrap.classList.add("is-hi");
+              svg.querySelectorAll(".lsd-link").forEach((l) => l.classList.toggle("lsd-on", l.dataset.s === id || l.dataset.t === id));
+            });
+            node.addEventListener("mousemove", (e) => showTip(e, node));
+            node.addEventListener("mouseleave", clear);
+          });
+          svg.querySelectorAll(".lsd-link").forEach((link) => {
+            link.addEventListener("mouseenter", () => { wrap.classList.add("is-hi"); link.classList.add("lsd-on"); });
+            link.addEventListener("mousemove", (e) => showTip(e, link));
+            link.addEventListener("mouseleave", clear);
+          });
+        }
+        function render() {
+          const d = lsdForYear(LSD_DATA[state.dim], state.year);
+          if (state.view === "sankey") { viz.innerHTML = `<div class="lmo-lsd-sankey">${lsdSankeySVG(d)}</div>${note()}`; wireSankey(); }
+          else { viz.innerHTML = lsdTableHTML(d) + note(); }
+        }
+        sec.querySelectorAll("[data-lsd-dim]").forEach((b) => b.addEventListener("click", () => { state.dim = b.dataset.lsdDim; setActive("[data-lsd-dim]", b); render(); }));
+        sec.querySelectorAll("[data-lsd-year]").forEach((b) => b.addEventListener("click", () => { state.year = +b.dataset.lsdYear; setActive("[data-lsd-year]", b); render(); }));
+        sec.querySelectorAll("[data-lsd-view]").forEach((b) => b.addEventListener("click", () => { state.view = b.dataset.lsdView; setActive("[data-lsd-view]", b); render(); }));
+        render();
+      }
+
+      /* ── Built for every stakeholder — lighter, informational persona cards.
+         Circular tinted icon + categorical accent (existing token hues), plus a
+         subtle bottom accent line. Reuses .obs-card + the icon-chip recipe. */
+      const lmoStakeholders = [
+        { icon: "ti-building-bank", accent: "a", title: "Policy Maker", desc: "Shape workforce strategies with real-time labor market intelligence." },
+        { icon: "ti-trending-up", accent: "b", title: "Business & Investors", desc: "Identify talent trends and investment opportunities across sectors." },
+        { icon: "ti-school", accent: "c", title: "Research & Academic", desc: "Access rich datasets for research, analysis, and academic studies." },
+        { icon: "ti-user-search", accent: "d", title: "Job Seeker & Planners", desc: "Discover in-demand skills and plan career paths with confidence." },
+      ];
+      function buildStakeholderCard(c) {
+        return `<div class="obs-card lmo-persona lmo-persona--${c.accent}">
+  <div class="lmo-persona-ic"><i class="ti ${c.icon}"></i></div>
+  <div class="lmo-persona-title">${c.title}</div>
+  <p class="lmo-persona-desc">${c.desc}</p>
+</div>`;
+      }
+
+      /* ── What can we do? — capability cards. Same card system, but a solid
+         accent icon tile for a more functional/feature-oriented emphasis. */
+      const lmoSolutions = [
+        { icon: "ti-layout-dashboard", title: "Interactive Dashboard", desc: "Explore labor market data through dynamic, region-based visualizations." },
+        { icon: "ti-chart-line", title: "Skills Demand Forecast", desc: "Anticipate future skill needs with predictive analytics and trends." },
+        { icon: "ti-building-factory-2", title: "Sector & Industry Skills", desc: "Understand skill requirements across industries and economic sectors." },
+        { icon: "ti-users-group", title: "Workforce Demographics", desc: "Analyze workforce composition, diversity, and demographic shifts." },
+      ];
+      function buildSolutionCard(c) {
+        return `<div class="obs-card lmo-solution">
+  <div class="lmo-solution-ic"><i class="ti ${c.icon}"></i></div>
+  <div class="lmo-persona-title">${c.title}</div>
+  <p class="lmo-persona-desc">${c.desc}</p>
+</div>`;
+      }
+
+      /* ── News — editorial, image-driven cards in the app's home-carousel.
+         Data-driven: add items to lmoNews without touching the card component.
+         Images are free-license Unsplash photos (topic-relevant); swap the
+         `image` field for project assets when an image system exists. */
+      const lmoNews = [
+        {
+          cat: "LABOR MARKET", date: "Jul 28 2026",
+          title: "Abu Dhabi Private Sector Emirati Employment Surges 377% Since 2021",
+          summary: "Emirati participation in Abu Dhabi's private sector rose from 37,500 to approximately 170,000 between 2021 and 2025,…",
+          image: "assets/News%201.jpg",
+          alt: "Corporate office towers representing Abu Dhabi's private sector", url: "#",
+        },
+        {
+          cat: "LABOR MARKET", date: "Jul 28 2026",
+          title: "Women's Participation in Abu Dhabi Workforce Doubles Over Five Years",
+          summary: "Women's workforce participation in Abu Dhabi more than doubled over the past five years, with a 101.9% increase and…",
+          image: "assets/News%202.avif",
+          alt: "Professional woman working in a modern office", url: "#",
+        },
+        {
+          cat: "LABOR MARKET", date: "Jul 28 2026",
+          title: "Youth Account for 54.9% of Abu Dhabi Workforce in 2025",
+          summary: "In 2025, young people aged 18–35 comprise 54.9% of Abu Dhabi's workforce. This demographic shift resulted from…",
+          image: "assets/News%203.jpg",
+          alt: "Young professionals collaborating in a workplace", url: "#",
+        },
+      ];
+      function buildNewsCard(n) {
+        return `<div class="obs-card dg-slide lmo-news-card">
+  <div class="lmo-news-media" style="background-image:url('${n.image}')" role="img" aria-label="${n.alt}"></div>
+  <div class="lmo-news-shade"></div>
+  <div class="lmo-news-inner">
+    <div class="lmo-news-top">
+      <span class="lmo-news-badge">${n.cat}</span>
+      <span class="lmo-news-date">${n.date}</span>
+    </div>
+    <div class="lmo-news-foot">
+      <h3 class="lmo-news-title">${n.title}</h3>
+      <p class="lmo-news-sum">${n.summary}</p>
+      <div class="lmo-news-actions">
+        <button type="button" class="lmo-news-act"><i class="ti ti-sparkles"></i> AI Summarize</button>
+        <button type="button" class="lmo-news-act"><i class="ti ti-volume"></i> Listen</button>
+        <a class="lmo-news-more" href="${n.url}">Read more <i class="ti ti-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+</div>`;
+      }
+
+      /* Donut — hand-built SVG (circumference = 100 so values map 1:1 to %). */
+      function buildLmoDonut(pct, color, centerNum, centerLbl) {
+        const R = 15.9154943;
+        return `<svg viewBox="0 0 42 42" class="lmo-donut-svg" role="img" aria-label="${centerNum} ${centerLbl}">
+  <circle cx="21" cy="21" r="${R}" fill="none" style="stroke:var(--lmo-donut-track)" stroke-width="3.8"></circle>
+  <circle cx="21" cy="21" r="${R}" fill="none" style="stroke:${color}" stroke-width="3.8" stroke-dasharray="${pct} ${100 - pct}" stroke-dashoffset="25"></circle>
+  <text x="21" y="20.5" class="lmo-donut-num">${centerNum}</text>
+  <text x="21" y="26" class="lmo-donut-lbl">${centerLbl}</text>
+</svg>`;
+      }
+
+      /* Segmented composition donut — rounded, gapped arcs (circumference = 100
+         → values map 1:1 to %). Each segment reveals its value on hover: the
+         centre swaps to the hovered segment's value/label and the arc thickens.
+         `segments` = [{ lbl, val, pct, color }]. */
+      function buildLmoOvDonut(segments, centerNum, centerLbl) {
+        const R = 15.9154943;
+        const gap = segments.length > 1 ? 6 : 0;
+        let start = 0; // cumulative position from top, clockwise
+        const arcs = segments
+          .map((s) => {
+            const len = Math.max(s.pct - gap, 0.5);
+            const off = 25 - (start + gap / 2);
+            start += s.pct;
+            return `<circle class="lmo-ov-seg" cx="21" cy="21" r="${R}" fill="none" style="stroke:${s.color}" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="${len} ${100 - len}" stroke-dashoffset="${off}" data-val="${s.val}" data-lbl="${s.lbl}" onmouseenter="lmoOvSegHover(this, true)" onmouseleave="lmoOvSegHover(this, false)"><title>${s.lbl}: ${s.val}</title></circle>`;
+          })
+          .join("");
+        return `<svg viewBox="0 0 42 42" class="lmo-donut-svg" role="img" aria-label="${centerNum} ${centerLbl}" data-cnum="${centerNum}" data-clbl="${centerLbl}">
+  ${arcs}
+  <text x="21" y="20.5" class="lmo-donut-num">${centerNum}</text>
+  <text x="21" y="26" class="lmo-donut-lbl">${centerLbl}</text>
+</svg>`;
+      }
+
+      /* Hover a donut segment → show its value in the centre; restore the
+         default (Total) on leave. */
+      function lmoOvSegHover(seg, on) {
+        const svg = seg.closest("svg");
+        if (!svg) return;
+        const num = svg.querySelector(".lmo-donut-num");
+        const lbl = svg.querySelector(".lmo-donut-lbl");
+        if (!num || !lbl) return;
+        num.textContent = on ? seg.getAttribute("data-val") : svg.getAttribute("data-cnum");
+        lbl.textContent = on ? seg.getAttribute("data-lbl") : svg.getAttribute("data-clbl");
+      }
+
+      /* Spotlight "movers" — the reference's leader metrics, re-cast as cards. */
+      const lmoSpots = [
+        { icon: "ti-trophy", label: "Highest Emiratization", value: "67.11%", desc: "Public administration &amp; defence — the leading sector for national workforce share.", badge: { icon: "ti-award", text: "Leading sector" } },
+        { icon: "ti-rocket", label: "Fastest improvement", value: "183.13 pp", arrow: true, desc: "Agriculture, forestry &amp; fishing — the largest year-on-year localization gain.", badge: { icon: "ti-arrow-up-right", text: "Top mover · vs 2024" } },
+      ];
+      function buildLmoSpot(s) {
+        return `<div class="obs-card lmo-spot">
+  <span class="lmo-spot-ico"><i class="ti ${s.icon}"></i></span>
+  <div class="lmo-spot-main">
+    <div class="lmo-spot-label">${s.label}</div>
+    <div class="lmo-spot-val lmo-pos">${s.arrow ? `<i class="ti ti-arrow-up"></i>` : ""}${s.value}</div>
+    <div class="lmo-spot-desc">${s.desc}</div>
+    ${s.badge ? `<span class="lmo-badge"><i class="ti ${s.badge.icon}"></i><span>${s.badge.text}</span></span>` : ""}
+  </div>
+</div>`;
+      }
+
+      function buildEmiratizationSection() {
+        const summary = `Despite record employment growth (<b>96.2%</b> overall employment rate in 2025, <b>+0.9 pp</b>), Abu Dhabi's labor market remains deeply segmented: Emirati nationals form just <b>9%</b> of private-sector employment (<b>5.3%</b> Emiratization in private/foreign enterprises), with critical participation and youth-employment gaps persisting. While Emirati employment has surged (<b>+14.1% YoY</b>) and female inclusion is rising (<b>+6.0 pp</b> in the employment-to-population ratio), underemployment and skill mismatches — especially among Emirati youth — underscore an urgent need for targeted upskilling and deeper public–private coordination to realize Economic Vision 2030.`;
+        return `<section class="lmo-emir">
+  <div class="lmo-emir-hdr">
+    ${buildObsSectionHdr("Emiratization", "ti-user-star")}
+    <p class="lmo-emir-sub">National workforce localization intelligence across government, private, and priority economic domains.</p>
+  </div>
+
+  <div class="lmo-subsection">
+    <div class="lmo-subhdr">Executive Overview</div>
+    <div class="lmo-kpi-band">${lmoKpis.map(buildLmoKpi).join("")}</div>
+  </div>
+
+  <div class="lmo-subsection">
+    <div class="dg-carousel lmo-loc-carousel">
+      <div class="lmo-subhdr-row">
+        <div class="lmo-subhdr-lead">
+          <div class="lmo-subhdr">Workforce Localization Progress by Sector</div>
+          <p class="lmo-subhdr-sub">Percentages represent workforce localization by sector (2025 vs 2024).</p>
+        </div>
+        <div class="lmo-subhdr-actions">
+          <button type="button" class="home-module-sparkle" title="Ask Bayaan AI" aria-label="Ask Bayaan AI"><i class="ti ti-sparkles"></i></button>
+          <button type="button" class="lmo-qa" title="Download" aria-label="Download"><i class="ti ti-download"></i></button>
+        </div>
+      </div>
+      <div class="dg-track lmo-loc-track">${lmoLocSectors.map(buildLmoLocCard).join("")}</div>
+      <div class="dg-carousel-nav home-carousel-nav">
+        <button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+        <div class="home-carousel-dots"></div>
+        <button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="lmo-subsection">
+    <div class="dg-carousel lmo-loc-carousel">
+      <div class="lmo-subhdr-row">
+        <div class="lmo-subhdr-lead">
+          <div class="lmo-subhdr">Emiratization By Domain</div>
+          <p class="lmo-subhdr-sub">Percentages represent Emiratization by domain (2025 vs 2024).</p>
+        </div>
+        <div class="lmo-subhdr-actions">
+          <button type="button" class="lmo-qa" title="Download" aria-label="Download"><i class="ti ti-download"></i></button>
+          <button type="button" class="home-module-sparkle" title="Ask Bayaan AI" aria-label="Ask Bayaan AI"><i class="ti ti-sparkles"></i></button>
+        </div>
+      </div>
+      <div class="dg-track lmo-loc-track">${lmoDomains.map(buildLmoLocCard).join("")}</div>
+      <div class="dg-carousel-nav home-carousel-nav">
+        <button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+        <div class="home-carousel-dots"></div>
+        <button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+</section>`;
+      }
+
+      function initCpiObservatory() {
+        const root = document.getElementById("cpi-obs-content");
+        if (!root || root.dataset.ready) return;
+        root.dataset.ready = "1";
+
+        /* ── OVERVIEW: three grouped cards (CPI / Inflation / CPI by) ── */
+        const cpiMetrics = [
+          { label: "Overall", value: "108.07", spark: "0,28 12,24 25,26 38,19 50,21 62,15 75,17 88,11 100,9" },
+          { label: "Essentials", value: "111.86", spark: "0,26 12,22 25,24 38,17 50,19 62,13 75,15 88,9 100,6" },
+        ];
+        const inflationMetrics = [
+          {
+            label: "Overall",
+            rows: [
+              { value: "+6.23%", unit: "YoY", dir: "up" },
+              { value: "+0.59%", unit: "MoM", dir: "up" },
+            ],
+          },
+          {
+            label: "Essentials",
+            rows: [
+              { value: "+6.56%", unit: "YoY", dir: "up" },
+              { value: "+0.56%", unit: "MoM", dir: "up" },
+            ],
+          },
+        ];
+        const cpiByMetrics = [
+          { label: "Income", value: "108.05", tier: "Top High", chg: "+0.27%", spark: "0,25 20,20 40,22 60,15 80,13 100,8" },
+          { label: "Welfare", value: "107.84", tier: "Upper", chg: "+0.43%", spark: "0,24 20,19 40,21 60,14 80,16 100,10" },
+          { label: "Household", value: "107.75", tier: "Emirati", chg: "+1.21%", spark: "0,26 20,21 40,18 60,16 80,12 100,7" },
+        ];
+
+        /* ── INFLATION DRIVERS ── */
+        const driversGlobal = [
+          { icon: "ti-droplet", title: "Crude Oil Price", sub: "Murban (ADNOC)", date: "Jul 2026", value: "$70.74", changes: '<span class="down">↓ −0.99% YoY</span><span class="down">↓ −12.08% MoM</span>', spark: "0,10 12,12 25,11 38,14 50,13 62,17 75,16 88,20 100,22", sparkCls: "sp-down" },
+          { icon: "ti-ship", title: "Shipping Cost Index", date: "Jul 2026", value: "464.99", unit: "index", changes: '<span class="up">↑ +45.10% YoY</span><span class="down">↓ −1.44% MoM</span>', spark: "0,20 12,18 25,16 38,14 50,12 62,10 75,9 88,7 100,6", sparkCls: "sp-down" },
+          { icon: "ti-plant", title: "FAO Food Index", date: "Jun 2026", value: "130.32", unit: "index", changes: '<span class="up">↑ +1.75% YoY</span><span class="down">↓ −0.37% MoM</span>', spark: "0,15 12,13 25,16 38,14 50,17 62,15 75,18 88,16 100,17", sparkCls: "sp-down" },
+        ];
+        const driversInternal = [
+          { icon: "ti-percentage", title: "Interest Rate", sub: "EIBOR", date: "Jul 2026", value: "3.51", unit: "%", changes: '<span class="down">↓ −16.66% YoY</span><span class="up">↑ +1.92% MoM</span>', spark: "0,6 12,8 25,7 38,10 50,12 62,15 75,17 88,20 100,22", sparkCls: "sp-up" },
+          { icon: "ti-credit-card", title: "UAE Money Supply M1", date: "Feb 2026", value: "1,099.82", unit: "billion AED", changes: '<span class="up">↑ +11.94% YoY</span><span class="up">↑ +1.71% MoM</span>', spark: "0,22 12,19 25,17 38,14 50,12 62,9 75,7 88,5 100,3", sparkCls: "sp-up" },
+          { icon: "ti-users", title: "Median Real Wage", sub: "Overall", date: "Mar 2026", value: "5,461.54", unit: "AED", changes: '<span class="up">↑ +13.44% YoY</span><span class="down">↓ −2.05% MoM</span>', spark: "0,22 12,18 25,20 38,14 50,16 62,10 75,8 88,6 100,4", sparkCls: "sp-down" },
+        ];
+
+        /* ── KEY IMPACTS ── */
+        const impacts = [
+          { icon: "ti-trending-up", tone: "up", text: 'Median real wages up <span class="impact-val impact-val--up">+13.44%</span> YoY, boosting household purchasing power above inflation' },
+          { icon: "ti-home", tone: "up", text: 'Housing costs up <span class="impact-val impact-val--up">+4.50%</span> YoY, raising rental burdens for tenants amid strong demand' },
+          { icon: "ti-trending-up", tone: "up", text: 'Overall CPI up <span class="impact-val impact-val--up">+1.59%</span> YoY, eroding value for fixed-income earners' },
+          { icon: "ti-percentage", tone: "neutral", text: 'EIBOR at <span class="impact-val impact-val--up">3.65%</span>, lowering mortgage and business loan costs for borrowers' },
+        ];
+
+        /* ── LABOR MARKET OVERVIEW — comparison matrix ──
+           Columns: Employment · Unemployment · Outside Labor Force
+           Rows: Total · Emirati · Non Emirati
+           dir: "pos" → green + up arrow · "neg" → red + down arrow */
+        const laborColumns = [
+          { label: "Employment", icon: "ti-briefcase", fav: "Higher is favorable" },
+          { label: "Unemployment", icon: "ti-user-x", fav: "Lower is favorable" },
+          { label: "Outside Labor Force", icon: "ti-user-off", fav: "Lower is favorable" },
+        ];
+        const laborRows = [
+          { label: "Total", cells: [
+            { val: "2.68M", chg: "+3.4%", dir: "pos" },
+            { val: "2.9%",  chg: "−0.3pp", dir: "neg" },
+            { val: "1.12M", chg: "+1.2%", dir: "pos" },
+          ] },
+          { label: "Emirati", cells: [
+            { val: "0.38M", chg: "+5.1%", dir: "pos" },
+            { val: "5.8%",  chg: "−0.6pp", dir: "neg" },
+            { val: "0.44M", chg: "+0.8%", dir: "pos" },
+          ] },
+          { label: "Non Emirati", cells: [
+            { val: "2.30M", chg: "+3.0%", dir: "pos" },
+            { val: "1.7%",  chg: "−0.2pp", dir: "neg" },
+            { val: "0.68M", chg: "+1.5%", dir: "pos" },
+          ] },
+        ];
+
+        /* Composition cards — one per labor status, reusing the donut style.
+           The ring splits Emirati vs Non-Emirati; the centre shows the Total. */
+        const ovEmiColor = "#2563EB";
+        const ovNonColor = "#E2E8F0";
+        const pnum = (v) => parseFloat(String(v).replace(/[^0-9.]/g, "")) || 0;
+        const ovArrow = (d) => `<i class="ti ti-arrow-${d === "pos" ? "up" : "down"}"></i>`;
+        const overviewMatrix = `<div class="lmo-ov-grid">
+  ${laborColumns.map((c, i) => {
+    const total = laborRows[0].cells[i];
+    const emi = laborRows[1].cells[i];
+    const non = laborRows[2].cells[i];
+    const e = pnum(emi.val), n = pnum(non.val);
+    const emiPct = Math.round((e / (e + n || 1)) * 100);
+    const nonPct = 100 - emiPct;
+    return `<div class="obs-card lmo-ov-card">
+  <div class="lmo-ov-head">
+    <span class="lmo-ov-ico"><i class="ti ${c.icon}"></i></span>
+    <span class="lmo-ov-title">${c.label}</span>
+    <span class="lmo-ov-badgewrap">
+      <span class="lmo-ov-badge lmo-ov-badge--${total.dir}">${ovArrow(total.dir)}${total.chg}</span>
+      <span class="lmo-ov-fav">${c.fav}</span>
+    </span>
+  </div>
+  <div class="lmo-ov-body">
+  <div class="lmo-ov-donut">${buildLmoOvDonut([
+    { lbl: "Emirati", val: emi.val, pct: emiPct, color: ovEmiColor },
+    { lbl: "Non-Emirati", val: non.val, pct: nonPct, color: ovNonColor },
+  ], total.val, "Total")}</div>
+  <div class="lmo-ov-legend">
+    <div class="lmo-ov-legrow">
+      <span class="lmo-legend-dot" style="background:${ovEmiColor}"></span>
+      <span class="lmo-ov-legname">Emirati</span>
+      <span class="lmo-ov-legmeta">
+        <span class="lmo-ov-legval">${emi.val}</span>
+        <span class="lmo-ov-legchg--${emi.dir}">${ovArrow(emi.dir)}${emi.chg}</span>
+      </span>
+    </div>
+    <div class="lmo-ov-legrow">
+      <span class="lmo-legend-dot" style="background:${ovNonColor}"></span>
+      <span class="lmo-ov-legname">Non-Emirati</span>
+      <span class="lmo-ov-legmeta">
+        <span class="lmo-ov-legval">${non.val}</span>
+        <span class="lmo-ov-legchg--${non.dir}">${ovArrow(non.dir)}${non.chg}</span>
+      </span>
+    </div>
+  </div>
+  </div>
+</div>`;
+  }).join("")}
+</div>`;
+
+        root.innerHTML = `
+<div class="cpi-hero">
+  <div class="cpi-hero-inner">
+    <span class="cpi-hero-ico"><i class="ti ti-trending-up"></i></span>
+    <div class="cpi-hero-text">
+      <div class="cpi-hero-title">Labor Market Observatory is trending upward</div>
+      <p class="cpi-hero-sub">Abu Dhabi's labor market shows robust overall performance, with employment rates among residents reaching <strong>96.2%</strong> in 2025 and non-Emiratis at <strong>96.7%</strong>. Emirati employment rates surged to <strong>92.4% (+7.6 pp)</strong>, yet private sector Emiratization remains well below the 10% target at <strong>2.75%</strong>. Labor force participation, especially among Emirati females (<strong>45.3%</strong>), and skills mismatches among youth and graduates are ongoing headwinds. To achieve sustainability and diversification targets, Abu Dhabi must accelerate private sector nationalization and address structural gender and skills gaps.</p>
+      <div class="brief-speech" id="cpiBriefSpeech">
+        <button class="brief-listen" id="cpiBriefListen" type="button" data-state="idle" aria-label="Listen to the CPI brief" aria-pressed="false">
+          <span class="brief-listen__icon" aria-hidden="true">
+            <i class="ti ti-volume brief-listen__speaker"></i>
+            <i class="ti ti-player-play brief-listen__play"></i>
+            <i class="ti ti-player-pause brief-listen__pause"></i>
+          </span>
+          <span class="brief-listen__copy">
+            <span class="brief-listen__wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span class="brief-listen__text">Audio brief</span>
+          </span>
+        </button>
+        <span class="brief-speech__actions" aria-label="Playback options">
+          <button class="brief-audio-action" id="cpiBriefRestart" type="button" aria-label="Restart CPI brief" title="Restart">
+            <i class="ti ti-refresh" aria-hidden="true"></i>
+          </button>
+          <button class="brief-audio-action brief-audio-action--stop" id="cpiBriefStop" type="button" aria-label="Stop CPI brief" title="Stop">
+            <span class="brief-stop-box" aria-hidden="true"></span>
+          </button>
+        </span>
+      </div>
+      <div id="cpiBriefSpeechStatus" role="status" aria-live="polite" class="visually-hidden"></div>
+    </div>
+  </div>
+  <label class="cpi-hdr-date cpi-hero-date">
+    <i class="ti ti-calendar-event" aria-hidden="true"></i>
+    <input type="date" value="2026-05-31" aria-label="Data as of date" onclick="this.showPicker && this.showPicker()" />
+  </label>
+</div>
+<section>
+  ${buildObsSectionHdr("Overview", "ti-layout-grid")}
+  ${overviewMatrix}
+</section>
+${buildEmiratizationSection()}
+<section class="lmo-key">
+  <div class="dg-carousel lmo-loc-carousel lmo-key-carousel">
+    <div class="section-hdr lmo-key-hdr">
+      <h2 class="cpi-section-title"><i class="ti ti-chart-dots"></i> Key Indicators</h2>
+      <div class="lmo-subhdr-actions">
+        <button type="button" class="lmo-qa" title="Download" aria-label="Download"><i class="ti ti-download"></i></button>
+        <button type="button" class="home-module-sparkle" title="Ask Bayaan AI" aria-label="Ask Bayaan AI"><i class="ti ti-sparkles"></i></button>
+      </div>
+    </div>
+    <div class="dg-track lmo-key-track">${lmoKeyIndicators.map(buildLmoKeyCard).join("")}</div>
+    <div class="dg-carousel-nav home-carousel-nav">
+      <button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+      <div class="home-carousel-dots"></div>
+      <button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+    </div>
+  </div>
+</section>
+<section class="lmo-lsd">
+  ${buildObsSectionHdr("Labor Supply–Demand Analysis", "ti-git-fork")}
+  <div class="lmo-lsd-tabs" role="tablist" aria-label="Labor supply-demand dimension">
+    <button type="button" class="lmo-lsd-tab active" role="tab" aria-selected="true" data-lsd-dim="age">Labor Supply-Demand Gap by Age</button>
+    <button type="button" class="lmo-lsd-tab" role="tab" aria-selected="false" data-lsd-dim="education">Labor Supply-Demand Gap by Education</button>
+  </div>
+  <div class="obs-card lmo-lsd-card">
+    <div class="lmo-lsd-topbar">
+      <div class="dg-view-toggle lmo-lsd-years" role="group" aria-label="Year">
+        ${[2025,2024,2023,2022,2021,2020,2019,2018,2017,2016,2015,2014].map((y)=>`<button type="button" class="${y===2025?"active":""}" data-lsd-year="${y}">${y}</button>`).join("")}
+      </div>
+    </div>
+    <div class="lmo-lsd-body">
+      <div class="dg-view-toggle lmo-lsd-viztoggle" role="group" aria-label="Visualization type">
+        <button type="button" class="active" data-lsd-view="sankey" title="Sankey chart" aria-label="Sankey chart"><i class="ti ti-hierarchy-2"></i></button>
+        <button type="button" data-lsd-view="table" title="Table view" aria-label="Table view"><i class="ti ti-table"></i></button>
+      </div>
+      <div class="lmo-lsd-viz" id="lmoLsdViz"></div>
+    </div>
+    <div class="lmo-lsd-footactions">
+      <button type="button" class="home-module-sparkle" title="Ask Bayaan AI" aria-label="Ask Bayaan AI"><i class="ti ti-sparkles"></i></button>
+      <button type="button" class="lmo-qa" title="Download" aria-label="Download"><i class="ti ti-download"></i></button>
+    </div>
+    <div class="lmo-lsd-tip" id="lmoLsdTip" role="tooltip" aria-hidden="true"></div>
+  </div>
+</section>
+<section class="lmo-news">
+  <div class="dg-carousel lmo-loc-carousel lmo-news-carousel">
+    <div class="lmo-news-hdr">
+      <div class="lmo-emir-hdr lmo-news-hdr-lead">
+        <div class="section-hdr"><h2 class="cpi-section-title"><i class="ti ti-rss"></i> News</h2></div>
+        <p class="lmo-emir-sub">Authoritative news and statistical briefings to support data-driven decisions across Abu Dhabi's labour market.</p>
+      </div>
+    </div>
+    <div class="dg-track lmo-news-track">${lmoNews.map(buildNewsCard).join("")}</div>
+    <div class="dg-carousel-nav home-carousel-nav">
+      <button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+      <div class="home-carousel-dots"></div>
+      <button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+    </div>
+  </div>
+</section>`;
+
+        initCpiBriefSpeech();
+
+        /* Wire the Emiratization localization carousel — reuses the app's
+           home-carousel controller (same as the Diagnose pane). */
+        const obsRoot = document.getElementById("cpi-obs-content");
+        obsRoot.querySelectorAll(".dg-carousel").forEach(initDgCarousel);
+        initLmoLocCharts(obsRoot);
+        initLsdSection();
+        if (!window._obsCarouselResizeBound) {
+          window._obsCarouselResizeBound = true;
+          window.addEventListener("resize", () => {
+            document
+              .querySelectorAll("#cpi-obs-content .dg-carousel")
+              .forEach((c) => c._sync && c._sync());
+          });
+        }
+      }
+
+      /* ============================================================
+         AUDIO BRIEF — the home page's Daily Brief listen control, ported
+         under the CPI hero. Narrates the hero headline + summary via the
+         Web Speech API. Mirrors initDailyBriefSpeech() in index.html:
+         idle → speaking → paused, with restart + stop affordances. */
+      function initCpiBriefSpeech() {
+        const button = document.getElementById("cpiBriefListen");
+        const controls = document.getElementById("cpiBriefSpeech");
+        const restartButton = document.getElementById("cpiBriefRestart");
+        const stopButton = document.getElementById("cpiBriefStop");
+        const status = document.getElementById("cpiBriefSpeechStatus");
+        if (!button || !controls) return;
+
+        const label = button.querySelector(".brief-listen__text");
+        if (!("speechSynthesis" in window)) {
+          controls.hidden = true;
+          return;
+        }
+        const synth = window.speechSynthesis;
+        let utterance = null;
+        let state = "idle";
+
+        const setState = (next) => {
+          state = next;
+          button.dataset.state = next;
+          controls.classList.toggle("is-active", next !== "idle");
+          button.setAttribute("aria-pressed", String(next === "speaking"));
+          button.setAttribute(
+            "aria-label",
+            next === "speaking"
+              ? "Pause brief"
+              : next === "paused"
+                ? "Resume brief"
+                : "Listen to the CPI brief"
+          );
+          if (label) {
+            label.textContent =
+              next === "speaking" ? "Pause" : next === "paused" ? "Resume" : "Audio brief";
+          }
+          if (status) {
+            status.textContent =
+              next === "speaking"
+                ? "CPI brief is playing"
+                : next === "paused"
+                  ? "CPI brief paused"
+                  : "CPI brief stopped";
+          }
+        };
+
+        const getBriefText = () => {
+          const hero = button.closest(".cpi-hero");
+          const title = (hero.querySelector(".cpi-hero-title") || {}).textContent || "";
+          const sub = (hero.querySelector(".cpi-hero-sub") || {}).textContent || "";
+          return `${title.trim()}. ${sub.trim()}`;
+        };
+
+        const start = () => {
+          synth.cancel();
+          utterance = new SpeechSynthesisUtterance(getBriefText());
+          utterance.lang = "en-GB";
+          utterance.rate = 0.94;
+          utterance.pitch = 1;
+          utterance.onstart = () => setState("speaking");
+          utterance.onend = () => setState("idle");
+          utterance.onerror = (event) => {
+            if (event.error !== "canceled" && event.error !== "interrupted" && status) {
+              status.textContent = "Unable to play the CPI brief";
+            }
+            setState("idle");
+          };
+          synth.speak(utterance);
+        };
+
+        button.addEventListener("click", () => {
+          if (state === "speaking") {
+            synth.pause();
+            setState("paused");
+          } else if (state === "paused") {
+            synth.resume();
+            setState("speaking");
+          } else {
+            start();
+          }
+        });
+
+        if (restartButton) restartButton.addEventListener("click", start);
+        if (stopButton) {
+          stopButton.addEventListener("click", () => {
+            synth.cancel();
+            setState("idle");
+          });
+        }
+        window.addEventListener("beforeunload", () => synth.cancel());
+      }
+
+      /* ============================================================
+         DIAGNOSE VIEW — category risk triage.
+         Built lazily the first time the Diagnose tab is opened.
+         ============================================================ */
+      function dgTone(v) {
+        const n = parseFloat(String(v).replace(/[^0-9.\-]/g, ""));
+        if (isNaN(n) || n === 0) return "flat";
+        return n > 0 ? "up" : "down";
+      }
+      /* Percent classes for card stats (colour only). */
+      function dgStat(k, v, colour) {
+        const cls = colour ? " " + dgTone(v) : "";
+        return `<div><div class="dg-stat-k">${k}</div><div class="dg-stat-v${cls}">${v}</div></div>`;
+      }
+
+      /* Carousel driver — same paging behaviour as the app's initTrackCarousel
+         (home page), retargeted at the Diagnose track/nav markup. */
+      function initDgCarousel(carousel) {
+        const track = carousel.querySelector(".dg-track");
+        const nav = carousel.querySelector(".dg-carousel-nav");
+        if (!track || !nav) return;
+        const dotsWrap = nav.querySelector(".home-carousel-dots");
+        const arrows = nav.querySelectorAll(".home-carousel-arrow");
+        if (!dotsWrap || arrows.length < 2) return;
+
+        const cards = () => [...track.children];
+        const gap = () => {
+          const s = getComputedStyle(track);
+          return parseFloat(s.columnGap || s.gap) || 14;
+        };
+        const step = () => {
+          const first = cards()[0];
+          return first ? first.offsetWidth + gap() : track.clientWidth;
+        };
+        const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
+        const pageCount = () => {
+          const ms = maxScroll();
+          if (ms <= 2) return 1;
+          return Math.ceil(ms / step()) + 1;
+        };
+        const currentPage = () => {
+          const s = step();
+          return s <= 0 ? 0 : Math.round(track.scrollLeft / s);
+        };
+
+        function sync() {
+          const pages = pageCount();
+          const page = Math.min(currentPage(), pages - 1);
+          nav.classList.toggle("is-single", pages <= 1);
+          const dots = dotsWrap.querySelectorAll(".home-carousel-dot");
+          if (dots.length !== pages) {
+            dotsWrap.innerHTML = Array.from({ length: pages }, (_, i) =>
+              `<button type="button" class="home-carousel-dot${i === page ? " active" : ""}" aria-label="Go to page ${i + 1}"></button>`,
+            ).join("");
+            dotsWrap.querySelectorAll(".home-carousel-dot").forEach((dot, i) =>
+              dot.addEventListener("click", () => goTo(i)),
+            );
+          } else {
+            dots.forEach((dot, i) => dot.classList.toggle("active", i === page));
+          }
+          const ms = maxScroll();
+          arrows[0].disabled = track.scrollLeft <= 2;
+          arrows[1].disabled = ms <= 2 || track.scrollLeft >= ms - 2;
+        }
+
+        function goTo(i) {
+          const pages = pageCount();
+          const page = Math.max(0, Math.min(i, pages - 1));
+          track.scrollTo({ left: Math.min(page * step(), maxScroll()), behavior: "smooth" });
+          requestAnimationFrame(sync);
+        }
+
+        arrows[0].addEventListener("click", () => goTo(currentPage() - 1));
+        arrows[1].addEventListener("click", () => goTo(currentPage() + 1));
+        let tick = 0;
+        track.addEventListener("scroll", () => {
+          if (tick) return;
+          tick = requestAnimationFrame(() => { tick = 0; sync(); });
+        }, { passive: true });
+
+        carousel._sync = sync;
+        sync();
+      }
+
+      function initCpiDiagnose() {
+        const root = document.getElementById("cpi-diagnose-content");
+        if (!root || root.dataset.ready) return;
+        root.dataset.ready = "1";
+
+        /* ── NEEDS ATTENTION — categories outside expected range ── */
+        const attention = [
+          { name: "Transport", icon: "ti-car", index: "110.63", weight: "14.0%", yoy: "+5.58%", mom: "+3.36%" },
+          { name: "Food & Beverages", icon: "ti-tools-kitchen-2", index: "106.86", weight: "12.0%", yoy: "-4.29%", mom: "+1.09%" },
+          { name: "Personal Care", icon: "ti-sparkles", index: "109.95", weight: "4.6%", yoy: "+0.08%", mom: "-0.12%" },
+          { name: "Household Equipment", icon: "ti-armchair", index: "109.46", weight: "6.4%", yoy: "+11.84%", mom: "+6.58%" },
+          { name: "Communication", icon: "ti-device-mobile", index: "102.29", weight: "5.7%", yoy: "+2.75%", mom: "+0.10%" },
+        ];
+
+        /* ── STABLE & OPTIMIZED — CPI flat or declining ── */
+        const stable = [
+          { name: "Education", icon: "ti-school", index: "103.94", weight: "7.6%", yoy: "-0.41%", mom: "+0.00%" },
+          { name: "Restaurants & Hotels", icon: "ti-bed", index: "103.85", weight: "3.6%", yoy: "-18.79%", mom: "+2.89%" },
+          { name: "Insurance & Finance", icon: "ti-shield", index: "115.39", weight: "1.2%", yoy: "+4.60%", mom: "+2.23%" },
+          { name: "Alcohol & Tobacco", icon: "ti-bottle", index: "101.00", weight: "0.2%", yoy: "+0.69%", mom: "+0.68%" },
+          { name: "Clothing & Footwear", icon: "ti-shirt", index: "96.63", weight: "4.9%", yoy: "-9.65%", mom: "-0.92%" },
+          { name: "Housing & Utilities", icon: "ti-home", index: "108.96", weight: "33.6%", yoy: "+6.42%", mom: "+0.35%" },
+          { name: "Health", icon: "ti-heartbeat", index: "107.45", weight: "2.2%", yoy: "-4.37%", mom: "-0.29%" },
+          { name: "Recreation & Culture", icon: "ti-ticket", index: "118.34", weight: "3.9%", yoy: "-0.64%", mom: "-7.26%" },
+        ];
+
+        /* ── ANALYTICS — all categories, moderate risk first ── */
+        const analytics = [
+          { name: "Personal Care", icon: "ti-sparkles", risk: "moderate", cpi: "109.95", weight: "4.6%", mom: "-0.12%", yoy: "+0.08%" },
+          { name: "Food & Beverages", icon: "ti-tools-kitchen-2", risk: "moderate", cpi: "106.86", weight: "12.0%", mom: "+1.09%", yoy: "-4.29%" },
+          { name: "Household Equipment", icon: "ti-armchair", risk: "moderate", cpi: "109.46", weight: "6.4%", mom: "+6.58%", yoy: "+11.84%" },
+          { name: "Transport", icon: "ti-car", risk: "moderate", cpi: "110.63", weight: "14.0%", mom: "+3.36%", yoy: "+5.58%" },
+          { name: "Communication", icon: "ti-device-mobile", risk: "moderate", cpi: "102.29", weight: "5.7%", mom: "+0.10%", yoy: "+2.75%" },
+          { name: "Education", icon: "ti-school", risk: "stable", cpi: "103.94", weight: "7.6%", mom: "+0.00%", yoy: "-0.41%" },
+          { name: "Restaurants & Hotels", icon: "ti-bed", risk: "stable", cpi: "103.85", weight: "3.6%", mom: "+2.89%", yoy: "-18.79%" },
+          { name: "Insurance & Finance", icon: "ti-shield", risk: "stable", cpi: "115.39", weight: "1.2%", mom: "+2.23%", yoy: "+4.60%" },
+          { name: "Alcohol & Tobacco", icon: "ti-bottle", risk: "stable", cpi: "101.00", weight: "0.2%", mom: "+0.68%", yoy: "+0.69%" },
+          { name: "Housing & Utilities", icon: "ti-home", risk: "stable", cpi: "108.96", weight: "33.6%", mom: "+0.35%", yoy: "+6.42%" },
+          { name: "Health", icon: "ti-heartbeat", risk: "stable", cpi: "107.45", weight: "2.2%", mom: "-0.29%", yoy: "-4.37%" },
+          { name: "Recreation & Culture", icon: "ti-ticket", risk: "stable", cpi: "118.34", weight: "3.9%", mom: "-7.26%", yoy: "-0.64%" },
+          { name: "Clothing & Footwear", icon: "ti-shirt", risk: "stable", cpi: "96.63", weight: "4.9%", mom: "-0.92%", yoy: "-9.65%" },
+        ];
+
+        const attentionCards = attention.map((c) => `<div class="obs-card dg-card dg-slide">
+  <div class="dg-card-id">
+    <div class="dg-card-ic"><i class="ti ${c.icon}"></i></div>
+    <div><div class="dg-card-name">${c.name}</div><div class="dg-card-tag">Moderate increase</div></div>
+  </div>
+  <div class="dg-stats">
+    ${dgStat("Index", c.index)}${dgStat("Weight", c.weight)}
+    ${dgStat("YoY", c.yoy, true)}${dgStat("MoM", c.mom, true)}
+  </div>
+  <div class="dg-card-foot">
+    <span class="dg-pill dg-pill--moderate">MODERATE</span>
+    <span class="dg-pill dg-pill--accel"><i class="ti ti-trending-up"></i> accelerating</span>
+  </div>
+</div>`).join("");
+
+        const stableCards = stable.map((c) => `<div class="obs-card dg-card dg-slide">
+  <div class="dg-card-id">
+    <div class="dg-card-ic"><i class="ti ${c.icon}"></i></div>
+    <div><div class="dg-card-name">${c.name}</div><div class="dg-card-tag">Within range</div></div>
+  </div>
+  <div class="dg-stats">
+    ${dgStat("Index", c.index)}${dgStat("Weight", c.weight)}
+    ${dgStat("YoY", c.yoy, true)}${dgStat("MoM", c.mom, true)}
+  </div>
+  <div class="dg-card-foot">
+    <span class="dg-pill dg-pill--stable">STABLE</span>
+  </div>
+</div>`).join("");
+
+        /* Wrap a set of cards in the app's home-carousel (track + arrow/dot nav). */
+        const dgCarousel = (cardsHtml) => `<div class="dg-carousel">
+  <div class="dg-track">${cardsHtml}</div>
+  <div class="dg-carousel-nav home-carousel-nav">
+    <button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+    <div class="home-carousel-dots"></div>
+    <button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+  </div>
+</div>`;
+
+        /* Summary points — the Briefing Desk "Executive Summary" list style. */
+        const dgPoints = (pts) => `<div class="dg-points">${pts.map((p) =>
+          `<div class="dg-point dg-point--${p.tone}"><div class="dg-point-tx">${p.text}</div></div>`,
+        ).join("")}</div>`;
+
+        const attentionPoints = [
+          { tone: "critical", icon: "ti-alert-triangle", text: "<b>Alert:</b> Food and non-alcoholic beverages at −4.29% (MEDIUM)" },
+          { tone: "info", icon: "ti-droplet", text: "<b>Drivers:</b> Lower global oil prices, easing shipping costs" },
+          { tone: "info", icon: "ti-target", text: "<b>Action:</b> Monitor for reversal in global commodity or freight trends" },
+        ];
+        const stablePoints = [
+          { tone: "good", icon: "ti-circle-check", text: "<b>Status:</b> 2 categories within expected range" },
+          { tone: "info", icon: "ti-ship", text: "<b>Drivers:</b> global shipping costs, retail cycles" },
+          { tone: "info", icon: "ti-eye", text: "<b>Monitor:</b> inventory clearance trends" },
+        ];
+
+        const rows = analytics.map((c) => `<tr>
+  <td><span class="dg-cat-cell"><i class="ti ${c.icon}"></i> ${c.name}</span></td>
+  <td><span class="dg-risk dg-risk--${c.risk}"><i class="ti ${c.risk === "moderate" ? "ti-trending-up" : "ti-minus"}"></i> ${c.risk === "moderate" ? "Moderate" : "Stable"}</span></td>
+  <td>${c.cpi}</td>
+  <td>${c.weight}</td>
+  <td><span class="dg-cell dg-cell--${dgTone(c.mom)}">${c.mom}</span></td>
+  <td><span class="dg-cell dg-cell--${dgTone(c.yoy)}">${c.yoy}</span></td>
+</tr>`).join("");
+
+        root.innerHTML = `
+<div class="dg-panels">
+  <div class="dg-panel dg-panel--warn">
+    <div class="dg-panel-hdr">
+      <i class="ti ti-alert-triangle dg-lead"></i>
+      <div class="dg-panel-title">Needs attention</div>
+    </div>
+    <div class="dg-panel-sub">Categories outside expected range</div>
+    <div class="dg-body">
+      <div class="dg-aisummary">
+        <div class="dg-aisummary-text">
+          <div class="dg-aisummary-hd"><i class="ti ti-sparkles"></i> AI Summary</div>
+          ${dgPoints(attentionPoints)}
+        </div>
+        <img class="dg-aisummary-art" src="assets/Needs attenstion 1.png" alt="" aria-hidden="true">
+      </div>
+      <div class="dg-indicators">
+        ${dgCarousel(attentionCards)}
+      </div>
+    </div>
+  </div>
+
+  <div class="dg-panel dg-panel--ok">
+    <div class="dg-panel-hdr">
+      <i class="ti ti-package dg-lead"></i>
+      <div class="dg-panel-title">Stable &amp; optimized</div>
+    </div>
+    <div class="dg-panel-sub">CPI flat or declining</div>
+    <div class="dg-body">
+      <div class="dg-aisummary">
+        <div class="dg-aisummary-text">
+          <div class="dg-aisummary-hd"><i class="ti ti-sparkles"></i> AI Summary</div>
+          ${dgPoints(stablePoints)}
+        </div>
+        <img class="dg-aisummary-art" src="assets/stable 1.png" alt="" aria-hidden="true">
+      </div>
+      <div class="dg-indicators">
+        ${dgCarousel(stableCards)}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cpi-notice" style="margin:0">
+  <i class="ti ti-info-circle"></i>
+  <div class="cpi-notice-text">Preliminary outputs — methodology evolving. Expand for details.</div>
+  <button type="button" class="cpi-notice-dismiss" aria-label="Expand details"><i class="ti ti-chevron-down"></i></button>
+</div>
+
+<div class="dg-section">
+  <div class="dg-analytics-hdr">
+    <div class="dg-analytics-title"><i class="ti ti-chart-histogram"></i> Analytics</div>
+    <div class="dg-view-toggle">
+      <button type="button" class="active" aria-label="Table view"><i class="ti ti-table"></i></button>
+      <button type="button" aria-label="Grid view"><i class="ti ti-layout-grid"></i></button>
+    </div>
+  </div>
+  <div class="dg-table-wrap">
+    <table class="dg-table">
+      <thead>
+        <tr>
+          <th>Category</th><th>Risk</th><th>CPI</th><th>Weight</th><th>MoM</th><th>YoY</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+</div>`;
+
+        /* View toggle — visual state only (grid view not yet built). */
+        root.querySelectorAll(".dg-view-toggle button").forEach((b) => {
+          b.addEventListener("click", () => {
+            root.querySelectorAll(".dg-view-toggle button").forEach((x) => x.classList.remove("active"));
+            b.classList.add("active");
+          });
+        });
+
+        /* Carousels for the two overflow rows. */
+        root.querySelectorAll(".dg-carousel").forEach(initDgCarousel);
+        if (!window._dgResizeBound) {
+          window._dgResizeBound = true;
+          window.addEventListener("resize", () => {
+            document
+              .querySelectorAll("#cpi-diagnose-content .dg-carousel")
+              .forEach((c) => c._sync && c._sync());
+          });
+        }
+      }
+
+      /* ── Boot ── */
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        initCpiObservatory();
+
+        /* Deep link — #diagnose opens the Diagnose pane directly (used by the
+           Forecast page's sidebar link back into this page). */
+        if (location.hash === "#diagnose") {
+          const item = [...document.querySelectorAll(".sidebar-item")].find(
+            (el) => (el.textContent || "").trim().toLowerCase().startsWith("diagnose")
+          );
+          if (item) activateSidebar(item);
+        }
+      });
+    </script>
+  </body>
+</html>

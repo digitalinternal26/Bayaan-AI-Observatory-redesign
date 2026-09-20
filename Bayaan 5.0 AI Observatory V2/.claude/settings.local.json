@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node check_sections_back.js)",
+      "PowerShell($conn = Get-NetTCPConnection -LocalPort 5599 -State Listen -ErrorAction SilentlyContinue; if \\($conn\\) { Stop-Process -Id $conn.OwningProcess -Force; \"stopped\" } else { \"not running\" })",
+      "Bash(node -e ' *)",
+      "Bash(curl -sI http://localhost:5599/index.html)",
+      "Bash(node check_gap.js)",
+      "Bash(node check_hidden.js)",
+      "Bash(node check_generic_visual.js)",
+      "Bash(node check_sub_visual.js)",
+      "Bash(node check_scenario.js)",
+      "Bash(node check_removed.js)",
+      "Bash(node repro2.js)",
+      "Bash(node repro3.js)",
+      "Bash(node check_reload.js)",
+      "Bash(node check_print.js)",
+      "Bash(npm install *)",
+      "Bash(npx playwright *)"
+    ]
+  }
+}

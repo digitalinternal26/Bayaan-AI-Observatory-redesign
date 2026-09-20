@@ -1,0 +1,2000 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Census Observatory — Observe · Bayaan</title>
+  <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <!-- Shared design system — same stylesheets / #screen-cpi-obs shell as
+         CensusObservatory.html and every other CPI Observatory page. -->
+  <link rel="stylesheet" href="css/pages/ai.css" />
+  <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+  <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+  <link rel="stylesheet" href="css/pages/exec-home.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/pages/home-widgets.css" />
+  <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <script>
+    (function () {
+      var t = localStorage.getItem("bayaan-theme") || "light";
+      document.documentElement.setAttribute(
+        "data-theme",
+        t === "dark" ? "dark" : "light"
+      );
+    })();
+  </script>
+  <script src="js/theme.js"></script>
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="js/census-global-filter.js"></script>
+  <script src="js/census-ai-panel.js"></script>
+  <style>
+    /* ====================================================================
+         CENSUS OBSERVATORY — OBSERVE
+         Reuses: .ob-kpi (CPI.html Observe KPI strip), .dg-table (Diagnose /
+         Observe tables), .prod-filter-dd (Products filter menu), .obs-card,
+         section chrome from CensusObservatory.html. New rules below are only
+         for the region/district drill-down table, which has no existing
+         equivalent in the codebase.
+         ==================================================================== */
+    #screen-cpi-obs .cen-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 100px;
+      line-height: 1.5;
+    }
+
+    #screen-cpi-obs .cen-badge--up {
+      color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    #screen-cpi-obs .cen-badge--down {
+      color: #dc2626;
+      background: #fef2f2;
+    }
+
+    #screen-cpi-obs .cen-badge i {
+      font-size: 11px;
+    }
+
+    #screen-cpi-obs .topic-title-desc {
+      margin: 6px 0 0;
+      max-width: 640px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text2);
+    }
+
+    /* Header action row — AI Insights / Export / Generate Report. */
+    #screen-cpi-obs .cen-hdr-btns {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #screen-cpi-obs .cen-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #e5e7eb;
+      background: var(--white);
+      color: var(--text);
+    }
+
+    #screen-cpi-obs .cen-btn--ai {
+      border-color: rgba(0, 102, 255, 0.25);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    #screen-cpi-obs .cen-btn--primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .cen-btn {
+      background: var(--surface, #141a26);
+      border-color: var(--border);
+    }
+
+    #screen-cpi-obs .cen-hdr-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    #screen-cpi-obs .cpi-hdr-year {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: var(--white);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    #screen-cpi-obs .cpi-hdr-year select {
+      border: none;
+      background: transparent;
+      font: inherit;
+      color: inherit;
+      outline: none;
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .cpi-hdr-year {
+      background: var(--surface, #141a26);
+      border-color: var(--border);
+    }
+
+    /* ── .ob-kpi / .ob-panel base — these live inline per-page in this
+         codebase (CPI.html / observe.html each carry their own copy rather
+         than a shared file), so this page needs its own copy too. Ported
+         verbatim from observe.html. ── */
+    #screen-cpi-obs .ob-kpis {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    #screen-cpi-obs .ob-kpi {
+      --tone: var(--accent);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      border-radius: 16px;
+      padding: 16px 18px 18px;
+      min-width: 0;
+      text-align: left;
+      transition: box-shadow 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+    }
+
+    #screen-cpi-obs .ob-kpi:hover {
+      transform: translateY(-1px);
+    }
+
+    #screen-cpi-obs .ob-kpi .kpi-label {
+      margin: 0;
+    }
+
+    #screen-cpi-obs .ob-kpi-idblock {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    #screen-cpi-obs .ob-kpi-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #screen-cpi-obs .ob-kpi-ic {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      color: var(--tone);
+      background: color-mix(in srgb, var(--tone) 10%, white);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .ob-kpi-ic {
+      background: color-mix(in srgb, var(--tone) 20%, transparent);
+    }
+
+    #screen-cpi-obs .ob-kpi-ic i {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    #screen-cpi-obs .ob-kpi-val {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    #screen-cpi-obs .ob-kpi-val small {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text2);
+    }
+
+    #screen-cpi-obs .ob-kpi-val .cen-badge {
+      white-space: nowrap;
+      padding: 2px 6px;
+    }
+
+    /* ── KPI strip: domain accent per card + trend sparkline ──
+         --tone already drives the icon colour/background (existing rule
+         above); these five modifiers just set it per metric instead of
+         every card defaulting to var(--accent). The sparkline is a single
+         illustrative shape (not a second data source — see the HTML
+         comment at each <svg>), reusing the same path across all five
+         cards and only recolouring it via --tone, so it reads as a
+         consistent "trend indicator" motif rather than five distinct
+         (and unconfirmed) trend lines. */
+    #screen-cpi-obs .ob-kpi--pop {
+      --tone: #0073F0;
+    }
+
+    #screen-cpi-obs .ob-kpi--labour {
+      --tone: #0d9488;
+    }
+
+    #screen-cpi-obs .ob-kpi--buildings {
+      --tone: #d97706;
+    }
+
+    #screen-cpi-obs .ob-kpi--housing {
+      --tone: #7c3aed;
+    }
+
+    #screen-cpi-obs .ob-kpi--density {
+      --tone: #0891b2;
+    }
+
+    #screen-cpi-obs .ob-kpi-spark {
+      display: block;
+      width: 100%;
+      height: 32px;
+      margin-top: auto;
+      overflow: visible;
+    }
+
+    #screen-cpi-obs .ob-kpi-spark path.ob-kpi-spark-line {
+      stroke: var(--tone);
+    }
+
+    #screen-cpi-obs .ob-panel {
+      padding: 18px 20px 20px;
+      border-radius: 20px;
+    }
+
+    html:not([data-theme="dark"]) #screen-cpi-obs .ob-panel {
+      background: #fff;
+      border: 1px solid #eaecf0;
+      box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.04);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .ob-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    #screen-cpi-obs .ob-panel-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    #screen-cpi-obs .ob-kbd {
+      font-size: 10.5px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 1px 5px;
+    }
+
+    /* View tabs — By Location / By Building / By Unit / By Use / By Type. */
+    #screen-cpi-obs .cen-view-tabs {
+      display: flex;
+      gap: 6px;
+      margin: 22px 0 14px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    #screen-cpi-obs .cen-view-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 4px;
+      margin-right: 20px;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: none;
+      font-size: 13.5px;
+      font-weight: 400;
+      color: var(--text2);
+      cursor: pointer;
+    }
+
+    #screen-cpi-obs .cen-view-tab.is-active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    #screen-cpi-obs .cen-view-tab i {
+      font-size: 15px;
+    }
+
+    /* Region/district table. */
+    #screen-cpi-obs .cen-table-wrap {
+      overflow-x: auto;
+    }
+
+    #screen-cpi-obs .cen-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 920px;
+    }
+
+    #screen-cpi-obs .cen-table th {
+      text-align: right;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+      white-space: nowrap;
+    }
+
+    #screen-cpi-obs .cen-table th:first-child,
+    #screen-cpi-obs .cen-table td:first-child {
+      text-align: left;
+    }
+
+    #screen-cpi-obs .cen-table td {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: right;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+      white-space: nowrap;
+    }
+
+    #screen-cpi-obs .cen-table tbody tr:hover {
+      background: var(--accent-light);
+    }
+
+    #screen-cpi-obs .cen-row-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      color: var(--text);
+      padding: 0;
+    }
+
+    #screen-cpi-obs .cen-row-toggle i {
+      font-size: 14px;
+      color: var(--text2);
+      transition: transform 0.15s;
+    }
+
+    #screen-cpi-obs tr.is-expanded .cen-row-toggle i.ti-chevron-right {
+      transform: rotate(90deg);
+    }
+
+    #screen-cpi-obs .cen-row-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    #screen-cpi-obs tr.cen-row--district td:first-child {
+      padding-left: 44px;
+      color: var(--text2);
+      font-weight: 500;
+    }
+
+    #screen-cpi-obs tr.cen-row--district {
+      display: none;
+    }
+
+    #screen-cpi-obs tr.is-expanded+tr.cen-row--view-all,
+    #screen-cpi-obs tbody[data-expanded="1"] tr.cen-row--district {
+      display: table-row;
+    }
+
+    #screen-cpi-obs tr.cen-row--view-all {
+      display: none;
+    }
+
+    #screen-cpi-obs tr.cen-row--view-all td {
+      padding: 8px 14px 12px 44px;
+      text-align: left;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+    }
+
+    #screen-cpi-obs .cen-view-all-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    #screen-cpi-obs .cen-density-hi td.cen-col-density {
+      background: #fff7e6;
+      border-radius: 6px;
+    }
+
+    #screen-cpi-obs .cen-actions-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: none;
+      background: none;
+      color: var(--text2);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #screen-cpi-obs .cen-actions-btn:hover {
+      background: rgba(15, 23, 42, 0.06);
+    }
+
+    #screen-cpi-obs .cen-table-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 4px 0;
+      font-size: 12.5px;
+      color: var(--text2);
+    }
+
+    #screen-cpi-obs .cen-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: var(--white);
+      font-size: 13px;
+      color: var(--text2);
+      min-width: 220px;
+    }
+
+    #screen-cpi-obs .cen-search input {
+      border: none;
+      outline: none;
+      background: none;
+      font: inherit;
+      color: var(--text);
+      flex: 1;
+      min-width: 0;
+    }
+
+    #screen-cpi-obs .cen-search .ob-kbd {
+      flex-shrink: 0;
+      padding: 2px 7px;
+      border: 1px solid #dbe4f3;
+      border-radius: 6px;
+      background: #f5f8fd;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .cen-search {
+      background: var(--surface, #141a26);
+      border-color: var(--border);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .cen-search .ob-kbd {
+      border-color: var(--border-md);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-secondary);
+    }
+
+    #screen-cpi-obs .ob-panel-hdr.cen-panel-hdr {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* ── Ported from observe.html (CPI Observe) verbatim, for exact style
+         parity: the view-mode segmented toggle, the ghost icon buttons and
+         kebab overflow, and the left/right header split. ── */
+    #screen-cpi-obs .ob-hdr-left,
+    #screen-cpi-obs .ob-hdr-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    #screen-cpi-obs .ob-hdr-right {
+      flex: 1 1 auto;
+      justify-content: flex-end;
+    }
+
+    #screen-cpi-obs .ob-view-toggle {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      border-radius: 10px;
+      /* An explicit border (not just the tinted background) so this
+           always reads as one unified group with a clear edge, rather
+           than depending on a 5%-opacity tint that can look inconsistent
+           across displays/screenshots. Same border colour the rest of
+           this page's controls already use (.cen-btn, .cpi-hdr-year). */
+      border: 1px solid #e5e7eb;
+      background: rgba(15, 23, 42, 0.05);
+      box-sizing: border-box;
+    }
+
+    #screen-cpi-obs .ob-view-toggle button {
+      width: 34px;
+      height: 32px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      transition: color 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+
+    #screen-cpi-obs .ob-view-toggle button:hover:not(.is-active) {
+      color: var(--accent);
+    }
+
+    #screen-cpi-obs .ob-view-toggle button.is-active {
+      background: var(--white, #fff);
+      color: var(--accent);
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .ob-view-toggle {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--border);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .ob-view-toggle button.is-active {
+      background: var(--surface-2, #0f141d);
+    }
+
+    /* Table / Dashboards / Indicators — icon-only variant of the same
+         segmented toggle used above, just sized up slightly (40px square
+         buttons vs. the base 34x32) with a visible hover tint, a
+         pressed/press-down cue and an explicit focus-visible ring — all
+         scoped to .cen-subnav so the plain toggle this is ported from is
+         unaffected. */
+    #screen-cpi-obs .ob-view-toggle.cen-subnav {
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    #screen-cpi-obs .ob-view-toggle.cen-subnav button {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border-radius: 9px;
+      transition: color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.12s;
+    }
+
+    #screen-cpi-obs .ob-view-toggle.cen-subnav button i {
+      font-size: 17px;
+    }
+
+    #screen-cpi-obs .ob-view-toggle.cen-subnav button:hover:not(.is-active) {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    #screen-cpi-obs .ob-view-toggle.cen-subnav button:active {
+      transform: scale(0.97);
+    }
+
+    #screen-cpi-obs .ob-view-toggle.cen-subnav button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    #screen-cpi-obs .ob-icon-btn {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    #screen-cpi-obs .ob-icon-btn i {
+      font-size: 16px;
+    }
+
+    #screen-cpi-obs .ob-icon-btn--ghost {
+      background: var(--white, #fff);
+      color: var(--text2);
+      border-color: var(--border, #eaecf0);
+    }
+
+    #screen-cpi-obs .ob-icon-btn--ghost:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .ob-icon-btn--ghost {
+      background: var(--surface);
+      border-color: var(--border-md);
+      color: var(--text-secondary);
+    }
+
+    #screen-cpi-obs .ob-kebab.ob-icon-btn--ghost,
+    html[data-theme="dark"] #screen-cpi-obs .ob-kebab.ob-icon-btn--ghost {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    #screen-cpi-obs .ob-kebab.ob-icon-btn--ghost:hover,
+    #screen-cpi-obs .ob-kebab.ob-icon-btn--ghost[aria-expanded="true"] {
+      background: var(--accent-light);
+      border-color: transparent;
+      color: var(--accent);
+    }
+
+    #screen-cpi-obs .cen-kebab-wrap {
+      position: relative;
+    }
+
+    #screen-cpi-obs .cen-kebab-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 900;
+      min-width: 180px;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(11, 28, 61, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+      padding: 6px;
+    }
+
+    #screen-cpi-obs .cen-kebab-menu button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #0f2744;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    #screen-cpi-obs .cen-kebab-menu button:hover {
+      background: #f8fbff;
+      color: var(--accent);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .cen-kebab-menu {
+      background: var(--surface);
+      border-color: var(--border-md);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .cen-kebab-menu button {
+      color: var(--text-primary);
+    }
+
+    /* Info-circle hint after an ambiguous column header (unit in the
+         tooltip), matching observe.html's .ob-table th .ti-info-circle —
+         replaces the old two-line <br/> header. */
+    #screen-cpi-obs .cen-table th .ti-info-circle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: 3px;
+      vertical-align: -1px;
+      cursor: help;
+    }
+
+    #screen-cpi-obs .cen-placeholder {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text2);
+      font-size: 13.5px;
+    }
+
+    #screen-cpi-obs .cen-placeholder i {
+      display: block;
+      font-size: 26px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* Domain (Population / Labour Force / Real Estate) tables — same
+         .cen-table chrome as the Overview breakdown above, plus three
+         things Overview doesn't need: an Emirate-total footer row, a
+         marker for cells the confirmed reference has no value for, and
+         the per-domain source footnote. */
+    #screen-cpi-obs tr.cen-row--total td {
+      font-weight: 700;
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.03);
+      border-bottom: 0;
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs tr.cen-row--total td {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    #screen-cpi-obs .cen-cell-gap {
+      color: var(--muted);
+      cursor: help;
+    }
+
+    /* Rank chip on district rows whose value is a confirmed ranking but
+         whose figures aren't in the reference (Population's top-5 lists). */
+    #screen-cpi-obs .cen-rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 19px;
+      height: 19px;
+      margin-right: 9px;
+      border-radius: 5px;
+      background: rgba(15, 23, 42, 0.06);
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text2);
+    }
+
+    html[data-theme="dark"] #screen-cpi-obs .cen-rank {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    #screen-cpi-obs .cen-domain-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 12px 4px 0;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: var(--accent-light);
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: var(--text2);
+    }
+
+    #screen-cpi-obs .cen-domain-note i {
+      font-size: 14px;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Reuse the standard dashboard product card; these rules only set the
+       Census overview grid and its responsive layout. */
+    #screen-cpi-obs .cen-dashboard-view { padding: 18px; }
+    #screen-cpi-obs .cen-dashboard-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    #screen-cpi-obs .cen-dashboard-grid .product-card--dashboard { min-height: 212px; cursor: pointer; }
+    #screen-cpi-obs .cen-dashboard-grid .product-ai-row--dashboard { margin-bottom: 0; }
+    #screen-cpi-obs .cen-dashboard-grid .product-open-link {
+      border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit;
+    }
+
+    /* The indicator cards use the shared product-card component. */
+    #screen-cpi-obs .cen-indicator-view { padding: 18px; }
+    #screen-cpi-obs .cen-indicator-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    #screen-cpi-obs .cen-indicator-grid .product-val {
+      min-height: 25px; white-space: nowrap;
+    }
+    #screen-cpi-obs .cen-indicator-grid .product-unit {
+      font-size: 12px; font-weight: 500;
+    }
+    #screen-cpi-obs .cen-indicator-grid .product-change {
+      min-height: 16px;
+    }
+    #screen-cpi-obs .cen-indicator-grid .product-card {
+      padding-bottom: 14px;
+    }
+    #screen-cpi-obs .cen-indicator-grid .product-card-tags {
+      width: 100%; min-height: 22px; align-items: center;
+    }
+    #screen-cpi-obs .cen-indicator-grid .product-card-footer-actions {
+      position: static; margin-left: auto; color: #9ca3af;
+    }
+    #screen-cpi-obs .cen-indicator-status--open {
+      background: #f0fdf4; border-color: #86efac; color: #15803d;
+    }
+
+    @media (max-width: 1180px) {
+      #screen-cpi-obs .cen-indicator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 1180px) {
+      #screen-cpi-obs .cen-dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      #screen-cpi-obs .cen-dashboard-view, #screen-cpi-obs .cen-indicator-view { padding: 14px; }
+      #screen-cpi-obs .cen-dashboard-grid { grid-template-columns: 1fr; }
+      #screen-cpi-obs .cen-indicator-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Toast, same as CensusObservatory.html. */
+    #screen-cpi-obs .cen-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(12px);
+      background: #0f172a;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 18px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 999;
+    }
+
+    #screen-cpi-obs .cen-toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1100px) {
+      #screen-cpi-obs .ob-kpis.cen-kpis {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      #screen-cpi-obs .ob-kpis.cen-kpis {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      #screen-cpi-obs .ob-kpis.cen-kpis {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ==================== SCREEN: CENSUS OBSERVATORY — OBSERVE (standalone) ==================== -->
+  <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+    <div data-bayaan-header></div>
+    <div class="crisis-scroll">
+      <div class="container">
+        <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="ind-bc-sep">›</span>
+          <a href="#" onclick="return false;">Observatory</a>
+          <span class="ind-bc-sep">›</span>
+          <a href="CensusObservatory.html">Census Observatory</a>
+          <span class="ind-bc-sep">›</span>
+          <span class="ind-bc-current">Observe</span>
+        </nav>
+      </div>
+      <div class="page-wrap">
+        <div class="sidebar-rail">
+          <div id="census-global-filter-mount"></div>
+          <aside class="sidebar" aria-label="Census Observatory views">
+            <button type="button" class="sidebar-item sidebar-item--ai" onclick="openObsSidebarAI(this)">
+              <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+              <span class="sidebar-label">Census AI</span>
+            </button>
+            <span class="sidebar-divider" aria-hidden="true"></span>
+            <a class="sidebar-item" href="CensusObservatory.html">
+              <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+              <span class="sidebar-label">Overview</span>
+            </a>
+            <a class="sidebar-item" href="census-interpret.html">
+              <div class="sidebar-icon"><i class="ti ti-search"></i></div>
+              <span class="sidebar-label">Interpret</span>
+            </a>
+            <a class="sidebar-item" href="census-population-projection.html">
+              <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+              <span class="sidebar-label">Forecast</span>
+            </a>
+            <a class="sidebar-item" href="census-benchmark.html">
+              <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+              <span class="sidebar-label">Benchmark</span>
+            </a>
+            <button type="button" class="sidebar-item active" onclick="activateSidebar(this)">
+              <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+              <span class="sidebar-label">Observe</span>
+            </button>
+            <a class="sidebar-item" href="census-geo.html">
+              <div class="sidebar-icon"><i class="ti ti-map-2"></i></div>
+              <span class="sidebar-label">Geo View</span>
+            </a>
+          </aside>
+        </div>
+        <div class="obs-ai-split">
+          <main class="main">
+            <div class="cpi-page-header">
+              <div class="cpi-page-header-inner">
+                <div>
+                  <h1 class="topic-title">Census Observe</h1>
+                  <p class="topic-title-sub">View the latest population, labour and real estate indicators by region and location.</p>
+                </div>
+                <div>
+                  <div class="cen-hdr-btns">
+                    <button type="button" class="cen-btn" onclick="censusComingSoon('Export')">
+                      <i class="ti ti-download"></i> Export
+                    </button>
+                    <button type="button" class="cen-btn cen-btn--primary"
+                      onclick="censusComingSoon('Generate Report')">
+                      <i class="ti ti-file-text"></i> Generate Report
+                    </button>
+                  </div>
+                  <div class="cen-hdr-meta-row">
+                    <span style="font-size:12.5px;color:var(--text2)">Data as of</span>
+                    <label class="cpi-hdr-year">
+                      <select id="censusObsYear" aria-label="Census year"
+                        onchange="censusComingSoon('Switching to ' + this.value)">
+                        <option value="2025" selected>2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cpi-obs-content">
+              <!-- ── KPI summary ── -->
+              <div class="ob-kpis cen-kpis">
+                <div class="obs-card ob-kpi ob-kpi--pop">
+                  <div class="ob-kpi-head">
+                    <div class="ob-kpi-ic"><i class="ti ti-users"></i></div>
+                    <div class="ob-kpi-idblock">
+                      <div class="kpi-label">Total Population</div>
+                      <div class="ob-kpi-val">4.44M <span class="cen-badge cen-badge--up"><i
+                            class="ti ti-arrow-up"></i>3.1% vs 2024</span></div>
+                    </div>
+                  </div>
+                  <!-- Illustrative trend shape only — not a confirmed Census
+                         time series. Same generic path reused on every KPI
+                         card here, recoloured per metric. -->
+                  <svg class="ob-kpi-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="obSparkGrad-pop" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#0073F0" stop-opacity="0.14" />
+                        <stop offset="100%" stop-color="#0073F0" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7 L100,32 L0,32 Z"
+                      fill="url(#obSparkGrad-pop)" />
+                    <path class="ob-kpi-spark-line"
+                      d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7" fill="none"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div class="obs-card ob-kpi ob-kpi--labour">
+                  <div class="ob-kpi-head">
+                    <div class="ob-kpi-ic"><i class="ti ti-briefcase"></i></div>
+                    <div class="ob-kpi-idblock">
+                      <div class="kpi-label">Labour Force</div>
+                      <div class="ob-kpi-val">2.98M <span class="cen-badge cen-badge--up"><i
+                            class="ti ti-arrow-up"></i>2.4% vs 2024</span></div>
+                    </div>
+                  </div>
+                  <svg class="ob-kpi-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="obSparkGrad-labour" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#0d9488" stop-opacity="0.14" />
+                        <stop offset="100%" stop-color="#0d9488" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7 L100,32 L0,32 Z"
+                      fill="url(#obSparkGrad-labour)" />
+                    <path class="ob-kpi-spark-line"
+                      d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7" fill="none"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div class="obs-card ob-kpi ob-kpi--buildings">
+                  <div class="ob-kpi-head">
+                    <div class="ob-kpi-ic"><i class="ti ti-building"></i></div>
+                    <div class="ob-kpi-idblock">
+                      <div class="kpi-label">Buildings</div>
+                      <div class="ob-kpi-val">326K <span class="cen-badge cen-badge--up"><i
+                            class="ti ti-arrow-up"></i>2.8% vs 2024</span></div>
+                    </div>
+                  </div>
+                  <svg class="ob-kpi-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="obSparkGrad-buildings" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#d97706" stop-opacity="0.14" />
+                        <stop offset="100%" stop-color="#d97706" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7 L100,32 L0,32 Z"
+                      fill="url(#obSparkGrad-buildings)" />
+                    <path class="ob-kpi-spark-line"
+                      d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7" fill="none"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div class="obs-card ob-kpi ob-kpi--housing">
+                  <div class="ob-kpi-head">
+                    <div class="ob-kpi-ic"><i class="ti ti-home"></i></div>
+                    <div class="ob-kpi-idblock">
+                      <div class="kpi-label">Units</div>
+                      <div class="ob-kpi-val">900K <span class="cen-badge cen-badge--up"><i
+                            class="ti ti-arrow-up"></i>4.1% vs 2024</span></div>
+                    </div>
+                  </div>
+                  <svg class="ob-kpi-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="obSparkGrad-housing" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.14" />
+                        <stop offset="100%" stop-color="#7c3aed" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7 L100,32 L0,32 Z"
+                      fill="url(#obSparkGrad-housing)" />
+                    <path class="ob-kpi-spark-line"
+                      d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7" fill="none"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div class="obs-card ob-kpi ob-kpi--density">
+                  <div class="ob-kpi-head">
+                    <div class="ob-kpi-ic"><i class="ti ti-map-pin"></i></div>
+                    <div class="ob-kpi-idblock">
+                      <div class="kpi-label">Population Density</div>
+                      <div class="ob-kpi-val">66<small>/km²</small> <span class="cen-badge cen-badge--up"><i
+                            class="ti ti-arrow-up"></i>3.1% vs 2024</span></div>
+                    </div>
+                  </div>
+                  <svg class="ob-kpi-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="obSparkGrad-density" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#0891b2" stop-opacity="0.14" />
+                        <stop offset="100%" stop-color="#0891b2" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7 L100,32 L0,32 Z"
+                      fill="url(#obSparkGrad-density)" />
+                    <path class="ob-kpi-spark-line"
+                      d="M0,26 L11,24 L22,25 L33,19 L44,21 L56,15 L67,17 L78,10 L89,12 L100,7" fill="none"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- ── Domain tabs — which data domain (Overview / Population /
+                     Labour Force / Real Estate). ── -->
+              <div class="cen-view-tabs" role="tablist" aria-label="Census data domain">
+                <button type="button" class="cen-view-tab is-active" data-cen-domain="overview"
+                  onclick="setCenDomain(this)">
+                  <i class="ti ti-layout-dashboard"></i> Overview
+                </button>
+                <button type="button" class="cen-view-tab" data-cen-domain="population" onclick="setCenDomain(this)">
+                  <i class="ti ti-users"></i> Population
+                </button>
+                <button type="button" class="cen-view-tab" data-cen-domain="labour" onclick="setCenDomain(this)">
+                  <i class="ti ti-briefcase"></i> Labour Force
+                </button>
+                <button type="button" class="cen-view-tab" data-cen-domain="realestate" onclick="setCenDomain(this)">
+                  <i class="ti ti-building"></i> Real Estate
+                </button>
+              </div>
+
+              <!-- ── Content panel — exploration mode (Table / Dashboards /
+                     Indicators) for whichever domain tab is active above. ── -->
+              <section class="dg-section ob-panel" id="cenContentPanel" aria-label="Census data">
+                <div class="ob-panel-hdr cen-panel-hdr">
+                  <div class="ob-hdr-left">
+                    <div class="ob-view-toggle cen-subnav" role="tablist" aria-label="Exploration mode">
+                      <button type="button" class="cen-subnav-btn is-active" data-cen-mode="table" aria-pressed="true"
+                        title="Table" aria-label="Table" onclick="setCenMode(this)">
+                        <i class="ti ti-table" aria-hidden="true"></i>
+                      </button>
+                      <button type="button" class="cen-subnav-btn" data-cen-mode="dashboards" aria-pressed="false"
+                        title="Dashboards" aria-label="Dashboards" onclick="setCenMode(this)">
+                        <i class="ti ti-layout-grid" aria-hidden="true"></i>
+                      </button>
+                      <button type="button" class="cen-subnav-btn" data-cen-mode="indicators" aria-pressed="false"
+                        title="Indicators" aria-label="Indicators" onclick="setCenMode(this)">
+                        <i class="ti ti-list-details" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="ob-hdr-right">
+                    <div class="cen-search">
+                      <i class="ti ti-search" aria-hidden="true"></i>
+                      <input type="search" placeholder="Search region, district or area…"
+                        aria-label="Search region, district or area" />
+                      <span class="ob-kbd">Ctrl+K</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Table mode, Overview domain — existing cross-domain
+                       region/district table (unchanged). -->
+                <div id="cenTableView">
+                  <div class="cen-table-wrap" id="cenTableWrap">
+                    <table class="cen-table">
+                      <thead>
+                        <tr>
+                          <th>Location</th>
+                          <th>Population</th>
+                          <th>Labour Force</th>
+                          <th>Buildings</th>
+                          <th>Units</th>
+                          <th>Density <i class="ti ti-info-circle" title="People per sq. km"></i></th>
+                          <th>Units / Bldg <i class="ti ti-info-circle" title="Units per building"></i></th>
+                          <th></th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody id="cenLocationBody"></tbody>
+                    </table>
+                  </div>
+                  <div class="cen-table-foot">
+                    <span id="cenTableCount">Showing 1–3 of 3 regions</span>
+                  </div>
+                </div>
+
+                <!-- Table mode, Population / Labour Force / Real Estate —
+                       domain-specific region (→ district, where the data
+                       supports it) breakdown. Header row, body and footnote
+                       are all rendered from CEN_DOMAINS below, since the
+                       three domains don't share a column set. -->
+                <div id="cenDomainTableView" hidden>
+                  <div class="cen-table-wrap" id="cenDomainTableWrap">
+                    <table class="cen-table">
+                      <thead>
+                        <tr id="cenDomainTableHead"></tr>
+                      </thead>
+                      <tbody id="cenDomainTableBody"></tbody>
+                    </table>
+                  </div>
+                  <div class="cen-table-foot">
+                    <span id="cenDomainTableCount"></span>
+                  </div>
+
+                  <div class="cen-domain-note" id="cenDomainTableNote"></div>
+                </div>
+
+                <!-- Dashboards mode — Overview shows every dashboard, a
+                       domain tab shows only that domain's. -->
+                <div class="cen-dashboard-view" id="cenDashboardsView" hidden>
+                  <div class="products-grid cen-dashboard-grid" id="cenDashboardsGrid" aria-label="Census dashboards"></div>
+                </div>
+
+                <!-- Indicators mode — same Overview/domain filtering. -->
+                <div class="cen-indicator-view" id="cenIndicatorsView" hidden>
+                  <div class="products-grid cen-indicator-grid" id="cenIndicatorsGrid" aria-label="Census indicators"></div>
+                </div>
+              </section>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      <div data-bayaan-footer></div>
+    </div>
+    <div class="cen-toast" id="censusToast"></div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Standalone stubs — same convention as CPI.html / observe.html.
+       ============================================================ */
+    function goTo() { }
+    function openGeoView(e) { if (e) e.preventDefault(); }
+    function openBayaanSpace(e) { if (e) e.preventDefault(); }
+    function openProducts(e) { if (e) e.preventDefault(); }
+    function openObservatories(e) { if (e) e.preventDefault(); }
+    function openWsDrp() { }
+    function onHeaderSearchClick() { }
+    function toast() { }
+
+    function activateSidebar(el) {
+      const sidebar = el.closest(".sidebar");
+      (sidebar || document).querySelectorAll(".sidebar-item").forEach((s) => s.classList.remove("active"));
+      el.classList.add("active");
+    }
+
+    let censusToastTimer = null;
+    function censusComingSoon(label) {
+      const el = document.getElementById("censusToast");
+      if (!el) return;
+      el.textContent = label + " is coming soon.";
+      el.classList.add("is-visible");
+      clearTimeout(censusToastTimer);
+      censusToastTimer = setTimeout(() => el.classList.remove("is-visible"), 2200);
+    }
+
+    /* ============================================================
+       REGION / DISTRICT DATA — illustrative demo figures (this whole
+       prototype's CPI/LMO numbers are mock data in the same way).
+       Region totals sum close to the Interpret page's 2025 headline
+       figures (4.44M population, 2.98M labour force, 326K buildings,
+       900K units).
+       ============================================================ */
+    const CEN_REGIONS = [
+      {
+        name: "Abu Dhabi Region",
+        population: 2845300, popGrowth: 2.9,
+        labour: 1982400, labGrowth: 2.1,
+        buildings: 198450, bldGrowth: 2.5,
+        units: 542310, unitGrowth: 3.8,
+        density: 1215, unitsPerBuilding: 2.7,
+        districts: [],
+      },
+      {
+        name: "Al Ain Region",
+        population: 972600, popGrowth: 3.6,
+        labour: 632800, labGrowth: 3.1,
+        buildings: 87420, bldGrowth: 3.2,
+        units: 256190, unitGrowth: 4.9,
+        density: 431, unitsPerBuilding: 2.9,
+        districts: [
+          { name: "Al Ain City", population: 412800, popGrowth: 3.8, labour: 284600, labGrowth: 3.1, buildings: 28910, bldGrowth: 3.5, units: 96230, unitGrowth: 5.0, density: 1140, unitsPerBuilding: 3.3 },
+          { name: "Al Mutawa", population: 198700, popGrowth: 4.2, labour: 156300, labGrowth: 3.9, buildings: 18420, bldGrowth: 4.1, units: 54210, unitGrowth: 6.2, density: 620, unitsPerBuilding: 2.9 },
+          { name: "Al Hili", population: 156300, popGrowth: 2.7, labour: 98400, labGrowth: 2.1, buildings: 14670, bldGrowth: 2.8, units: 42510, unitGrowth: 4.1, density: 380, unitsPerBuilding: 2.9 },
+          { name: "Al Jimi", population: 122600, popGrowth: 3.1, labour: 76300, labGrowth: 2.8, buildings: 10340, bldGrowth: 3.0, units: 31280, unitGrowth: 4.6, density: 295, unitsPerBuilding: 3.0 },
+          { name: "Al Khabisi", population: 82200, popGrowth: 4.9, labour: 48200, labGrowth: 4.1, buildings: 7860, bldGrowth: 4.5, units: 23140, unitGrowth: 6.8, density: 210, unitsPerBuilding: 2.9 },
+        ],
+        districtsMoreCount: 3,
+      },
+      {
+        name: "Al Dhafra Region",
+        population: 618400, popGrowth: 2.1,
+        labour: 364500, labGrowth: 1.8,
+        buildings: 40130, bldGrowth: 2.0,
+        units: 101500, unitGrowth: 3.5,
+        density: 112, unitsPerBuilding: 2.5,
+        districts: [],
+      },
+    ];
+
+    function cenFmt(n) {
+      return n.toLocaleString("en-US");
+    }
+    function cenGrowthCell(v) {
+      const up = v >= 0;
+      return `<span class="cen-badge cen-badge--${up ? "up" : "down"}"><i class="ti ti-arrow-${up ? "up" : "down"}"></i>${up ? "+" : ""}${v.toFixed(1)}%</span>`;
+    }
+
+    function cenRegionRow(r, idx) {
+      const hasDistricts = r.districts && r.districts.length > 0;
+      const toggle = hasDistricts
+        ? `<button type="button" class="cen-row-toggle" onclick="cenToggleRegion(${idx})"><i class="ti ti-chevron-right"></i>${r.name}</button>`
+        : `<span class="cen-row-toggle" style="cursor:default"><i class="ti ti-chevron-right" style="visibility:hidden"></i>${r.name}</span>`;
+      return `<tr data-region="${idx}">
+      <td>${toggle}</td>
+      <td>${cenFmt(r.population)} ${cenGrowthCell(r.popGrowth)}</td>
+      <td>${cenFmt(r.labour)} ${cenGrowthCell(r.labGrowth)}</td>
+      <td>${cenFmt(r.buildings)} ${cenGrowthCell(r.bldGrowth)}</td>
+      <td>${cenFmt(r.units)} ${cenGrowthCell(r.unitGrowth)}</td>
+      <td class="cen-col-density">${cenFmt(r.density)}</td>
+      <td>${r.unitsPerBuilding.toFixed(1)}</td>
+      <td>${hasDistricts ? "" : ""}</td>
+      <td>
+        <button type="button" class="cen-actions-btn" aria-label="Row actions" onclick="censusComingSoon('Row actions')"><i class="ti ti-dots-vertical"></i></button>
+      </td>
+    </tr>`;
+    }
+
+    function cenDistrictRow(d, regionIdx) {
+      return `<tr class="cen-row--district" data-region="${regionIdx}">
+      <td>${d.name}</td>
+      <td>${cenFmt(d.population)} ${cenGrowthCell(d.popGrowth)}</td>
+      <td>${cenFmt(d.labour)} ${cenGrowthCell(d.labGrowth)}</td>
+      <td>${cenFmt(d.buildings)} ${cenGrowthCell(d.bldGrowth)}</td>
+      <td>${cenFmt(d.units)} ${cenGrowthCell(d.unitGrowth)}</td>
+      <td class="${d.density > 1000 ? "cen-col-density" : ""}">${cenFmt(d.density)}</td>
+      <td>${d.unitsPerBuilding.toFixed(1)}</td>
+      <td></td>
+      <td>
+        <button type="button" class="cen-actions-btn" aria-label="Row actions" onclick="censusComingSoon('Row actions')"><i class="ti ti-dots-vertical"></i></button>
+      </td>
+    </tr>`;
+    }
+
+    function cenViewAllRow(r, regionIdx) {
+      if (!r.districtsMoreCount) return "";
+      const total = r.districts.length + r.districtsMoreCount;
+      return `<tr class="cen-row--view-all" data-region="${regionIdx}">
+      <td colspan="9">
+        <a class="cen-view-all-link" href="#" onclick="censusComingSoon('Full district list'); return false;">
+          View all ${total} districts in ${r.name} <i class="ti ti-arrow-right"></i>
+        </a>
+      </td>
+    </tr>`;
+    }
+
+    function renderCenLocationTable() {
+      const body = document.getElementById("cenLocationBody");
+      if (!body) return;
+      let html = "";
+      CEN_REGIONS.forEach((r, idx) => {
+        html += cenRegionRow(r, idx);
+        r.districts.forEach((d) => (html += cenDistrictRow(d, idx)));
+        html += cenViewAllRow(r, idx);
+      });
+      body.innerHTML = html;
+      /* Al Ain Region ships expanded by default, matching the reference
+         layout — every other region starts collapsed. */
+      cenToggleRegion(1, true);
+    }
+
+    function cenToggleRegion(idx, forceOpen) {
+      const rows = document.querySelectorAll(`tr[data-region="${idx}"]`);
+      const headRow = document.querySelector(`tr[data-region="${idx}"]:not(.cen-row--district):not(.cen-row--view-all)`);
+      const isOpen = headRow.classList.contains("is-expanded");
+      const open = forceOpen !== undefined ? forceOpen : !isOpen;
+      headRow.classList.toggle("is-expanded", open);
+      rows.forEach((row) => {
+        if (row.classList.contains("cen-row--district")) {
+          row.style.display = open ? "table-row" : "none";
+        }
+        if (row.classList.contains("cen-row--view-all")) {
+          row.style.display = open ? "table-row" : "none";
+        }
+      });
+    }
+
+    /* ============================================================
+       DOMAIN (Overview/Population/Labour Force/Real Estate) × MODE
+       (Table/Dashboards/Indicators) navigation.
+       ============================================================ */
+    let cenActiveDomain = "overview";
+    let cenActiveMode = "table";
+    const CEN_DOMAIN_LABELS = {
+      overview: "Overview",
+      population: "Population",
+      labour: "Labour Force",
+      realestate: "Real Estate",
+    };
+
+    /* ============================================================
+       DOMAIN BREAKDOWNS — the Population / Labour Force / Real Estate
+       tabs' Table mode.
+
+       Unlike CEN_REGIONS above (illustrative demo figures), every
+       number here is traceable to docs/census-data-reference.md, so
+       these three tabs agree with the domain detail pages exactly:
+       population §1 (census-population.html), labour §2
+       (census-labour.html), real estate §3 (census-real-estate.html).
+
+       Where the reference confirms a district NAME or ranking but no
+       figure — Population's top-5-per-region lists (§1.10), Real
+       Estate's units-only districts (§3.5) — the row is still shown
+       with those cells marked as a data gap rather than dropped or
+       filled with an invented number, per §0 of the reference.
+
+       Row shape: { name, cells: [...] } where cells lines up with
+       columns after the first (Location) one. A cell is a number
+       (thousands-formatted), a string (rendered as-is) or null (a
+       confirmed gap).
+       ============================================================ */
+    const CEN_GAP_TITLE = "Not available in the confirmed Census data reference";
+
+    /* Single source of truth for which districts drill into which region,
+       shared by Population/Labour Force/Real Estate below (and matching
+       Overview's own CEN_REGIONS) so every tab is talking about the same
+       places. Al Ain's five are exactly Overview's Al Ain district list;
+       Abu Dhabi/Al Dhafra have no districts in Overview's demo data, so
+       these reuse the names Population's tab already used. Swap this one
+       map when real per-district source data arrives and every domain
+       tab below picks it up. */
+    const CEN_DISTRICT_NAMES = {
+      "Abu Dhabi Region": ["Musaffah", "Al Danah", "Mohamed Bin Zayed City", "Jarn Yafour", "Al Bahyah"],
+      "Al Ain Region": ["Al Ain City", "Al Mutawa", "Al Hili", "Al Jimi", "Al Khabisi"],
+      "Al Dhafra Region": ["Ghyathi", "Zayed City", "Central Al Dhafra", "Al Ghwaifat", "Delma and Surrounding Islands"],
+    };
+
+    const CEN_DOMAINS = {
+      population: {
+        icon: "ti-users",
+        /* §1.3 — the master region × citizenship × gender table (real,
+           confirmed 2025 figures). District rows are filled in by
+           cenFillDummyDistricts() below with illustrative demo data. */
+        columns: [
+          "Location", "Population", "Emirati", "Non-Emirati", "Male", "Female",
+          { label: "Population Share", hint: "Share of the Emirate's total population" },
+        ],
+        regions: [
+          { name: "Abu Dhabi Region", cells: [3066635, 502635, 2564000, 2060355, 1006285, "69.0%"] },
+          { name: "Al Ain Region", cells: [1020955, 272610, 748345, 640385, 380570, "23.0%"] },
+          { name: "Al Dhafra Region", cells: [353960, 41890, 312070, 288210, 65750, "8.0%"] },
+        ],
+        total: { name: "Emirate of Abu Dhabi", cells: [4441550, 817135, 3624415, 2988950, 1452600, "100%"] },
+        note:
+          "Region figures are the 2025 Census cross-section (Population by Region, Citizenship and Gender). " +
+          "District rows and every growth figure on this tab are illustrative demo data, proportioned off each " +
+          "region's real totals, using the same regions and districts as the Overview tab.",
+      },
+
+      labour: {
+        icon: "ti-briefcase",
+        /* §2.4 sankey (region × citizenship × gender, checksum-verified)
+           plus §2.8's Emirati jobseekers — real, confirmed 2025 figures
+           at region level. District rows are demo data, see below. */
+        columns: [
+          "Location", "Employed", "Emirati", "Non-Emirati", "Male", "Female",
+          { label: "Emirati jobseekers", hint: "Jobseekers are tracked for Emiratis only" },
+          { label: "Labour Force Share", hint: "Share of the Emirate's employed population" },
+        ],
+        regions: [
+          { name: "Abu Dhabi Region", cells: [2047185, 203850, 1843335, 1605275, 441910, 8110, "68.8%"] },
+          { name: "Al Ain Region", cells: [661245, 110525, 550720, 479630, 181615, 6940, "22.2%"] },
+          { name: "Al Dhafra Region", cells: [268090, 17860, 250230, 242115, 25975, 805, "9.0%"] },
+        ],
+        total: { name: "Emirate of Abu Dhabi", cells: [2976520, 332235, 2644285, 2327020, 649500, 15855, "100%"] },
+        note:
+          "In this data source \"labour force\" and \"employed population\" are the same series — there is no " +
+          "wider labour-force total that includes unemployed people, and jobseeking is tracked for Emiratis only " +
+          "(15,855 in 2025, 71% of them women). The source doesn't publish a district-level employment total, so " +
+          "district rows and growth figures on this tab are illustrative demo data, using the same regions and " +
+          "districts as the Overview and Population tabs.",
+      },
+
+      realestate: {
+        icon: "ti-building",
+        /* §3.3 — real, confirmed 2025 region totals. District rows are
+           demo data (see below), not the source's top-10 rankings. */
+        columns: [
+          "Location", "Buildings",
+          { label: "Building Share", hint: "Share of the Emirate's buildings" },
+          "Units",
+          { label: "Unit Share", hint: "Share of the Emirate's housing units" },
+          { label: "Units / Bldg", hint: "Units per building" },
+        ],
+        regions: [
+          { name: "Abu Dhabi Region", cells: [176905, "54.2%", 624455, "69.4%", "3.5"] },
+          { name: "Al Ain Region", cells: [117425, "36.0%", 207205, "23.0%", "1.8"] },
+          { name: "Al Dhafra Region", cells: [31805, "9.8%", 67910, "7.5%", "2.1"] },
+        ],
+        total: { name: "Emirate of Abu Dhabi", cells: [326130, "100.0%", 899575, "100.0%", "2.8"] },
+        note:
+          "Region totals are the 2025 Census cross-section (Number and Proportion of Buildings/Units by Region). " +
+          "District rows and growth figures on this tab are illustrative demo data, using the same regions and " +
+          "districts as the Overview and Population tabs.",
+      },
+    };
+
+    /* Rank-based share of a region's real total each demo district takes,
+       largest to smallest — tuned to sum close to the region total since
+       these domain tables show every district with no "view all" cutoff
+       (unlike Overview's list, which explicitly says how many more exist). */
+    const CEN_DISTRICT_WEIGHTS = [0.3, 0.24, 0.19, 0.15, 0.1];
+
+    function cenRoundTo(n, step) {
+      return Math.round(n / step) * step;
+    }
+
+    /* Fills every domain's regions[].districts with illustrative demo
+       rows — real per-district figures aren't published in the source for
+       any of these three domains (population §1.10 confirms only a
+       district ranking, not values; labour and real estate have none at
+       district level at all) — proportioned off each region's own real
+       total, using CEN_DISTRICT_NAMES so Population/Labour Force/Real
+       Estate all drill into the same places. Swap this whole function out
+       once real per-district data exists. */
+    (function cenFillDummyDistricts() {
+      const emirateTotals = {
+        population: CEN_DOMAINS.population.total.cells[0],
+        labour: CEN_DOMAINS.labour.total.cells[0],
+        buildings: CEN_DOMAINS.realestate.total.cells[0],
+        units: CEN_DOMAINS.realestate.total.cells[2],
+      };
+
+      CEN_DOMAINS.population.regions.forEach((region) => {
+        const [regionPop, regionEmirati, , regionMale] = region.cells;
+        const emiratiRatio = regionEmirati / regionPop;
+        const maleRatio = regionMale / regionPop;
+        region.districts = CEN_DISTRICT_NAMES[region.name].map((name, i) => {
+          const population = cenRoundTo(regionPop * CEN_DISTRICT_WEIGHTS[i], 10);
+          const emirati = cenRoundTo(population * emiratiRatio, 5);
+          const male = cenRoundTo(population * maleRatio, 5);
+          return {
+            name,
+            cells: [
+              population, emirati, population - emirati, male, population - male,
+              `${((population / emirateTotals.population) * 100).toFixed(1)}%`,
+            ],
+          };
+        });
+      });
+
+      CEN_DOMAINS.labour.regions.forEach((region) => {
+        const [regionEmployed, regionEmirati, , regionMale, , regionJobseekers] = region.cells;
+        const emiratiRatio = regionEmirati / regionEmployed;
+        const maleRatio = regionMale / regionEmployed;
+        const jobseekerRatio = regionJobseekers / regionEmployed;
+        region.districts = CEN_DISTRICT_NAMES[region.name].map((name, i) => {
+          const employed = cenRoundTo(regionEmployed * CEN_DISTRICT_WEIGHTS[i], 10);
+          const emirati = cenRoundTo(employed * emiratiRatio, 5);
+          const male = cenRoundTo(employed * maleRatio, 5);
+          const jobseekers = cenRoundTo(employed * jobseekerRatio, 5);
+          return {
+            name,
+            cells: [
+              employed, emirati, employed - emirati, male, employed - male, jobseekers,
+              `${((employed / emirateTotals.labour) * 100).toFixed(1)}%`,
+            ],
+          };
+        });
+      });
+
+      CEN_DOMAINS.realestate.regions.forEach((region) => {
+        const [regionBuildings, , regionUnits] = region.cells;
+        region.districts = CEN_DISTRICT_NAMES[region.name].map((name, i) => {
+          /* Slight per-rank variation so Units/Bldg isn't identical across
+             every district in a region. */
+          const unitsWeight = CEN_DISTRICT_WEIGHTS[i] * (0.85 + (i % 3) * 0.1);
+          const buildings = cenRoundTo(regionBuildings * CEN_DISTRICT_WEIGHTS[i], 5);
+          const units = cenRoundTo(regionUnits * unitsWeight, 5);
+          return {
+            name,
+            cells: [
+              buildings,
+              `${((buildings / emirateTotals.buildings) * 100).toFixed(1)}%`,
+              units,
+              `${((units / emirateTotals.units) * 100).toFixed(1)}%`,
+              (units / buildings).toFixed(1),
+            ],
+          };
+        });
+      });
+    })();
+
+    /* Abu Dhabi Region and Al Dhafra Region ship with no district rows in
+       CEN_REGIONS above (only Al Ain did) — so their row in the Overview
+       table had no expand chevron at all. Fill them in here, reusing the
+       same district names as the domain tabs (CEN_DISTRICT_NAMES) and the
+       same rank-weighted-split approach Al Ain's own (hand-authored)
+       district rows already follow, so every region in the Overview
+       table is expandable and consistent. */
+    (function cenFillOverviewDistricts() {
+      const weights = [0.42, 0.2, 0.16, 0.13, 0.09]; // matches Al Ain's existing district split
+      const densityFactors = [2.6, 1.5, 0.9, 0.7, 0.5];
+      [
+        { region: CEN_REGIONS[0], moreCount: 3 }, // Abu Dhabi Region
+        { region: CEN_REGIONS[2], moreCount: 2 }, // Al Dhafra Region
+      ].forEach(({ region, moreCount }) => {
+        region.districts = CEN_DISTRICT_NAMES[region.name].map((name, i) => {
+          const population = cenRoundTo(region.population * weights[i], 10);
+          const labour = cenRoundTo(region.labour * weights[i], 10);
+          const buildings = cenRoundTo(region.buildings * weights[i], 5);
+          const units = cenRoundTo(region.units * weights[i] * (0.85 + (i % 3) * 0.1), 5);
+          return {
+            name,
+            population,
+            popGrowth: cenDummyGrowth(`overview:${region.name}:${name}:pop`),
+            labour,
+            labGrowth: cenDummyGrowth(`overview:${region.name}:${name}:lab`),
+            buildings,
+            bldGrowth: cenDummyGrowth(`overview:${region.name}:${name}:bld`),
+            units,
+            unitGrowth: cenDummyGrowth(`overview:${region.name}:${name}:unit`),
+            density: cenRoundTo(region.density * densityFactors[i], 1),
+            unitsPerBuilding: +(units / buildings).toFixed(1),
+          };
+        });
+        region.districtsMoreCount = moreCount;
+      });
+    })();
+
+    /* Overview lists all of these; a domain tab lists the ones whose
+       `category` matches its CEN_DOMAIN_LABELS label. */
+    const CEN_DASHBOARDS = [
+      { category: "Population", icon: "ti-chart-line", title: "Population Growth", description: "Historical and recent population growth trends across regions." },
+      { category: "Population", icon: "ti-heart-handshake", title: "Marital Status", description: "Population by marital status, age group and gender." },
+      { category: "Population", icon: "ti-users", title: "Population Size", description: "Total population and its distribution across regions and districts." },
+      { category: "Population", icon: "ti-layout-dashboard", title: "Population Overview", description: "Explore the size, composition and distribution of Abu Dhabi's population." },
+      { category: "Labour Force", icon: "ti-chart-histogram", title: "Employment-Demographics", description: "Employment broken down by age, gender and citizenship." },
+      { category: "Labour Force", icon: "ti-briefcase", title: "Employment", description: "Employment, unemployment and labour force participation." },
+      { category: "Labour Force", icon: "ti-building-bank", title: "Employment by Sector", description: "Employed population by sector and citizenship, from government to private household." },
+      { category: "Labour Force", icon: "ti-user-search", title: "Emirati Jobseekers", description: "Emirati jobseekers by region, age group, education level and marital status." },
+      { category: "Real Estate", icon: "ti-building", title: "Buildings Dashboard", description: "Total buildings and their distribution across regions." },
+      { category: "Real Estate", icon: "ti-home", title: "Units Dashboard", description: "Total housing units and their distribution across regions." },
+      { category: "Real Estate", icon: "ti-category-2", title: "Buildings by Use and Type", description: "Building stock split by use — residential, commercial, multi-use — and by type." },
+      { category: "Real Estate", icon: "ti-list-numbers", title: "Top 10 Districts", description: "The two district rankings side by side: by buildings and by housing units." },
+    ];
+
+    /* Same Overview-lists-all / domain-tab-filters rule, on `domain`. */
+    /* Sourced verbatim from the "Register Based Census SVs" master indicator
+       list (indicator name + domain columns) — every title/domain pair below
+       matches that list exactly. No Real Estate indicators exist in that
+       list, so the Real Estate cards previously shown here (Number of
+       Units/Buildings) were removed rather than invented. Values/units/
+       filters are illustrative (the master list only names indicators, not
+       their data), reusing the confirmed Census figures already established
+       elsewhere on this page where the indicator overlaps with them. */
+    const CEN_INDICATORS = [
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", change: "305.8K (7.4%)", title: "Total Population - Annually", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "2.99M", unit: "People", change: "206.2K (7.4%)", title: "Population by Gender - Annually", filters: "Gender: Male", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "817.1K", unit: "People", change: "14.8K (2.0%)", title: "Population by Citizenship - Annually", filters: "Citizenship: Emirati", updated: "2026-07-15", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "3.07M", unit: "People", title: "Population by Region - Annually", filters: "Region: Abu Dhabi Region", updated: "2026-07-29", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "34", unit: "Years", title: "Population Median Age - Annually", filters: "Region: Emirate Of Abu Dhabi", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "32.6", unit: "Years", title: "Population Average Age - Annually", filters: "Region: Emirate Of Abu Dhabi", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "44.93", unit: "People / Square kilometer", change: "2.3 (6.0%)", title: "Population Density - Annually", filters: "Region: Emirate Of Abu Dhabi", updated: "2026-07-29", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "3.57M", unit: "People", title: "Working-Age Population (15-64) - Annually", updated: "2026-07-29", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "80.3", unit: "Percentage (%)", title: "Proportion of Working-Age Population (15-64) - Annually", updated: "2026-07-29", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "3.07M", unit: "People", title: "Population by Region and Citizenship - Annually", filters: "Region: Abu Dhabi Region | Citizenship: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "2.06M", unit: "People", title: "Population by Region and Gender - Annually", filters: "Region: Abu Dhabi Region | Gender: Male", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "3.07M", unit: "People", title: "Population by Region and Age Group - Annually", filters: "Region: Abu Dhabi Region | Age Group: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", title: "Population by Age Group - Annually", filters: "Age Group: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "80.3", unit: "Percentage (%)", title: "Proportion of Population by Age Group - Annually", filters: "Age Group: 15-64", updated: "2026-07-29", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", title: "Population by Region, Citizenship, Gender and Age Group - Annually", filters: "Region: Total | Citizenship: Total | Gender: Total | Age Group: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", title: "Population by Age, Citizenship, Gender and Region - Annually", filters: "Age Group: Total | Citizenship: Total | Gender: Total | Region: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", title: "Population by Region, Gender and Wide Age Group - Annually", filters: "Region: Total | Gender: Total | Age Group: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "3.62M", unit: "People", title: "Population by Country Group - Annually", filters: "Country Group: Total", updated: "2026-07-15", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", title: "Population by Urban and Rural Regions - Annually", filters: "Area Type: Urban", updated: "2026-07-29", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", title: "Population by Religion - Annually", filters: "Religion: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", title: "Population by Education Attainment - Annually", filters: "Education Attainment: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "4.4M", unit: "People", title: "Population by Citizenship, Gender and Marital Status - Annually", filters: "Citizenship: Total | Gender: Total | Marital Status: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "56.1", unit: "Percentage (%)", title: "Proportion of Population by Citizenship, Gender and Marital Status - Annually", filters: "Citizenship: Non-Emirati | Gender: Male | Marital Status: Married", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "7.4", unit: "Percentage (%)", title: "Population Growth Rate by Gender - Annually", filters: "Gender: Total", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "7.4", unit: "Percentage (%)", title: "Population Growth Rate by Citizenship - Annually", filters: "Citizenship: Total", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "7.4", unit: "Percentage (%)", title: "Population Growth Rate by Region - Annually", filters: "Region: Total", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "7.4", unit: "Percentage (%)", title: "Population Growth Rate by Region, Citizenship and Gender - Annually", filters: "Region: Total | Citizenship: Total | Gender: Total", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "1.05M", unit: "Number", title: "Total Households - Annually", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "724.5K", unit: "Number", title: "Households by Region - Annually", filters: "Region: Abu Dhabi Region", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "4.2", unit: "People per Household", title: "Average Household Size by Household Type - Annually", filters: "Household Type: Total", updated: "2026-07-29", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "12.4", unit: "Percentage (%)", title: "Proportion of Emirati Households With A Female Head of Household - Annually", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "38.6", unit: "Percentage (%)", title: "Proportion of Emirati Households With Female Head of Household Who Have Dependent Children (15 Years and Less) - Annually", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "9.1", unit: "Percentage (%)", title: "Proportion of Emirati Households With Female Head of Household Who Have Dependent Senior Emiratis (60 Years and Above) - Annually", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Labour Force", icon: "ti-briefcase", value: "2.1", unit: "Workers per Household", title: "Average Number of Domestic Workers in Emirati Households - Annually", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Labour Force", icon: "ti-briefcase", value: "0.4", unit: "Workers per Household", title: "Average Number of Domestic Workers in Non-Emirati Households - Annually", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "812.4K", unit: "People", title: "School-Age Population (6-18) - Annually", updated: "2026-07-15", status: "Open" },
+      { domain: "Population", icon: "ti-users", value: "38.6K", unit: "People", title: "Population of People of Determination - Annually", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "20.1K", unit: "People", title: "Population of People of Determination by Gender - Annually", filters: "Gender: Male", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "26.6K", unit: "People", title: "Population of People of Determination by Region - Annually", filters: "Region: Abu Dhabi Region", updated: "2026-07-29", status: "Confidential" },
+      { domain: "Population", icon: "ti-users", value: "9.8K", unit: "People", title: "Population of People of Determination by Age Group - Annually", filters: "Age Group: 0-14", updated: "2026-07-29", status: "Confidential" },
+    ];
+
+    const CEN_DASHBOARD_URL = "census-dashboard/index.html";
+
+    function cenDashboardCardHTML(dashboard) {
+      return `<article class="card product-card product-card--dashboard card-hover" tabindex="0" role="link" aria-label="Open ${dashboard.title}" data-dashboard-title="${dashboard.title}">
+        <div class="obs-list-hd">
+          <div class="obs-list-icon"><i class="ti ${dashboard.icon}" aria-hidden="true"></i></div>
+          <span class="product-usecase-tag">${dashboard.category}</span>
+        </div>
+        <div class="product-name">${dashboard.title}</div>
+        <div class="product-ai-row product-ai-row--dashboard"><span class="product-ai-text">${dashboard.description}</span></div>
+        <div class="product-card-footer">
+          <button type="button" class="product-open-link" data-dashboard-title="${dashboard.title}">Open dashboard <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+        </div>
+      </article>`;
+    }
+
+    function cenOpenDashboard(title) {
+      window.location.href = CEN_DASHBOARD_URL + "?dashboard=" + encodeURIComponent(title);
+    }
+
+    /* Cards are re-rendered on every domain change, so the two delegated
+       listeners are bound once at boot instead of per render. */
+    function bindCenDashboardGrid() {
+      const grid = document.getElementById("cenDashboardsGrid");
+      if (!grid) return;
+      grid.addEventListener("click", (event) => {
+        const el = event.target.closest("[data-dashboard-title]");
+        if (el) cenOpenDashboard(el.dataset.dashboardTitle);
+      });
+      grid.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        const card = event.target.closest("article[data-dashboard-title]");
+        if (card && event.target === card) {
+          event.preventDefault();
+          cenOpenDashboard(card.dataset.dashboardTitle);
+        }
+      });
+    }
+
+    function cenIndicatorCardHTML(indicator) {
+      const changeClass = indicator.changeType || "val-green";
+      const statusClass = indicator.status === "Open" ? " cen-indicator-status--open" : "";
+      const change = indicator.change
+        ? `<div class="product-change ${changeClass}"><i class="ti ti-triangle-filled" aria-hidden="true"></i> ${indicator.change}</div>`
+        : `<div class="product-change" aria-hidden="true">&nbsp;</div>`;
+      const summary = "Trend is broadly stable in the latest reporting period. Explore the indicator to compare regional and demographic variation.";
+      return `<article class="card product-card card-hover aos-init aos-animate" tabindex="0" aria-label="Open ${indicator.title}">
+        <div class="product-card-toprow">
+          <span class="product-cat-tag"><i class="ti ${indicator.icon}" aria-hidden="true"></i> ${indicator.domain}</span>
+          <div class="product-actions"><i class="ti ti-bookmark" aria-label="Save ${indicator.title}" role="button" tabindex="0"></i></div>
+        </div>
+        <div class="product-name-row"><div class="product-name">${indicator.title}</div></div>
+        <div class="product-val">${indicator.value} <span class="product-unit">${indicator.unit}</span></div>
+        ${change}
+        <div class="product-viz" aria-hidden="true">
+          <svg viewBox="0 0 250 92" preserveAspectRatio="none">
+            <defs><linearGradient id="cenIndicatorFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#1677ff" stop-opacity=".16"/><stop offset="100%" stop-color="#1677ff" stop-opacity="0"/></linearGradient></defs>
+            <path d="M8 42 C31 39, 48 38, 72 39 S103 42, 123 36 S153 33, 174 34 S207 37, 242 27 L242 88 L8 88 Z" fill="url(#cenIndicatorFill)"></path>
+            <path d="M8 42 C31 39, 48 38, 72 39 S103 42, 123 36 S153 33, 174 34 S207 37, 242 27" fill="none" stroke="#1677ff" stroke-width="2.4" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div class="product-axis"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span></div>
+        <div class="product-ai-row"><i class="ti ti-sparkles" aria-hidden="true"></i><span><span class="product-ai-lbl">AI Summary</span> <span class="product-ai-text">${summary}</span></span></div>
+        <div class="product-card-tags"><span class="product-confidential-tag${statusClass}">${indicator.status}</span><div class="product-card-footer-actions"><button type="button" class="product-card-download" aria-label="Download ${indicator.title}"><i class="ti ti-download" aria-hidden="true"></i></button><i class="ti ti-sparkles ai-sparkle-action" aria-hidden="true"></i></div></div>
+      </article>`;
+    }
+
+    /* Overview keeps the full list; a domain tab narrows it to its own
+       label. Both card grids follow the same rule. */
+    function cenFilterByDomain(items, key) {
+      if (cenActiveDomain === "overview") return items;
+      const label = CEN_DOMAIN_LABELS[cenActiveDomain];
+      return items.filter((item) => item[key] === label);
+    }
+
+    function renderCenDashboards() {
+      const grid = document.getElementById("cenDashboardsGrid");
+      if (grid) grid.innerHTML = cenFilterByDomain(CEN_DASHBOARDS, "category").map(cenDashboardCardHTML).join("");
+    }
+
+    function renderCenIndicators() {
+      const grid = document.getElementById("cenIndicatorsGrid");
+      if (grid) grid.innerHTML = cenFilterByDomain(CEN_INDICATORS, "domain").map(cenIndicatorCardHTML).join("");
+    }
+
+    /* ── Domain table (Population / Labour Force / Real Estate) ──
+       Growth: every "count" column (not the share/ratio columns, same rule
+       Overview already follows — Density and Units/Bldg don't carry a
+       growth badge there either) gets an inline growth figure shown the
+       same way Overview shows it. These are illustrative demo figures —
+       generated deterministically per row/column so they stay stable
+       across re-renders — the same way CEN_REGIONS' own growth numbers
+       are illustrative placeholders (see the comment above CEN_REGIONS). */
+    const CEN_DOMAIN_GROWTH_COLS = {
+      population: [0, 1, 2, 3, 4], // Population, Emirati, Non-Emirati, Male, Female
+      labour: [0, 1, 2, 3, 4, 5], // Employed, Emirati, Non-Emirati, Male, Female, Emirati jobseekers
+      realestate: [0, 2], // Buildings, Units
+    };
+
+    /* Deterministic "random" 1.5%–6.0% figure, seeded off a string key so
+       the same cell always shows the same demo value on re-render. */
+    function cenDummyGrowth(key) {
+      let hash = 0;
+      for (let i = 0; i < key.length; i++) {
+        hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+      }
+      return 1.5 + (hash % 451) / 100;
+    }
+
+    function cenDomainGrowthForRow(rowName, domainKey, cells) {
+      const cols = CEN_DOMAIN_GROWTH_COLS[domainKey];
+      if (!cols) return null;
+      const growth = {};
+      cols.forEach((idx) => {
+        if (cells[idx] === null || cells[idx] === undefined) return;
+        growth[idx] = cenDummyGrowth(`${domainKey}:${rowName}:${idx}`);
+      });
+      return growth;
+    }
+
+    function cenDomainCell(value, growthValue) {
+      if (value === null || value === undefined) {
+        return `<span class="cen-cell-gap" title="${CEN_GAP_TITLE}">—</span>`;
+      }
+      const text = typeof value === "number" ? cenFmt(value) : value;
+      const growth = typeof growthValue === "number" ? ` ${cenGrowthCell(growthValue)}` : "";
+      return `${text}${growth}`;
+    }
+
+    function cenDomainCells(cells, growthByIndex) {
+      return cells
+        .map((c, i) => `<td>${cenDomainCell(c, growthByIndex ? growthByIndex[i] : undefined)}</td>`)
+        .join("");
+    }
+
+    function cenDomainRegionRow(region, idx, icon, domainKey) {
+      const hasDistricts = region.districts && region.districts.length > 0;
+      const label = hasDistricts
+        ? `<button type="button" class="cen-row-toggle" onclick="cenToggleDomainRegion(${idx})"><i class="ti ti-chevron-right"></i>${region.name}</button>`
+        : `<span class="cen-row-toggle" style="cursor:default"><i class="ti ti-chevron-right" style="visibility:hidden"></i>${region.name}</span>`;
+      const growth = cenDomainGrowthForRow(region.name, domainKey, region.cells);
+      return `<tr data-cen-domain-row="${idx}"><td>${label}</td>${cenDomainCells(region.cells, growth)}</tr>`;
+    }
+
+    /* A district is either a plain name (Population — the ranking is
+       confirmed, the figures aren't) or a {name, cells} object. */
+    function cenDomainDistrictRow(district, regionIdx, rank, columnCount, domainKey) {
+      const isNamed = typeof district === "string";
+      const name = isNamed ? district : district.name;
+      const cells = isNamed ? new Array(columnCount - 1).fill(null) : district.cells;
+      const rankChip = isNamed ? `<span class="cen-rank">${rank}</span>` : "";
+      const growth = cenDomainGrowthForRow(`${name}#${regionIdx}`, domainKey, cells);
+      return `<tr class="cen-row--district" data-cen-domain-row="${regionIdx}">
+      <td>${rankChip}${name}</td>${cenDomainCells(cells, growth)}
+    </tr>`;
+    }
+
+    function renderCenDomainTable() {
+      const domainKey = cenActiveDomain;
+      const domain = CEN_DOMAINS[domainKey];
+      const head = document.getElementById("cenDomainTableHead");
+      const body = document.getElementById("cenDomainTableBody");
+      if (!domain || !head || !body) return;
+
+      head.innerHTML = domain.columns
+        .map((col) => {
+          if (typeof col === "string") return `<th>${col}</th>`;
+          return `<th>${col.label} <i class="ti ti-info-circle" title="${col.hint}"></i></th>`;
+        })
+        .join("");
+
+      let html = "";
+      let districtCount = 0;
+      domain.regions.forEach((region, idx) => {
+        html += cenDomainRegionRow(region, idx, domain.icon, domainKey);
+        (region.districts || []).forEach((district, i) => {
+          districtCount += 1;
+          html += cenDomainDistrictRow(district, idx, i + 1, domain.columns.length, domainKey);
+        });
+      });
+      const totalGrowth = cenDomainGrowthForRow(domain.total.name, domainKey, domain.total.cells);
+      html += `<tr class="cen-row--total"><td>${domain.total.name}</td>${cenDomainCells(domain.total.cells, totalGrowth)}</tr>`;
+      body.innerHTML = html;
+
+      const count = document.getElementById("cenDomainTableCount");
+      if (count) {
+        count.textContent = districtCount
+          ? `Showing ${domain.regions.length} regions and ${districtCount} districts`
+          : `Showing ${domain.regions.length} regions`;
+      }
+      const note = document.getElementById("cenDomainTableNote");
+      if (note) note.innerHTML = `<i class="ti ti-info-circle" aria-hidden="true"></i><span>${domain.note}</span>`;
+
+      /* First region ships expanded like the Overview table does — but
+         only where its districts carry figures. Population's districts
+         are a confirmed ranking with no values behind it yet, and five
+         rows of "—" is a poor thing to open on, so those stay collapsed
+         until asked for. */
+      const first = domain.regions[0];
+      if (first && first.districts && typeof first.districts[0] === "object") {
+        cenToggleDomainRegion(0, true);
+      }
+    }
+
+    function cenToggleDomainRegion(idx, forceOpen) {
+      const headRow = document.querySelector(`tr[data-cen-domain-row="${idx}"]:not(.cen-row--district)`);
+      if (!headRow) return;
+      const open = forceOpen !== undefined ? forceOpen : !headRow.classList.contains("is-expanded");
+      headRow.classList.toggle("is-expanded", open);
+      document
+        .querySelectorAll(`tr.cen-row--district[data-cen-domain-row="${idx}"]`)
+        .forEach((row) => (row.style.display = open ? "table-row" : "none"));
+    }
+
+    function setCenDomain(btn) {
+      document.querySelectorAll(".cen-view-tabs .cen-view-tab").forEach((b) => b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      cenActiveDomain = btn.dataset.cenDomain;
+      cenRenderContent();
+    }
+
+    function setCenMode(btn) {
+      document.querySelectorAll(".cen-subnav .cen-subnav-btn").forEach((b) => {
+        b.classList.remove("is-active");
+        b.setAttribute("aria-pressed", "false");
+      });
+      btn.classList.add("is-active");
+      btn.setAttribute("aria-pressed", "true");
+      cenActiveMode = btn.dataset.cenMode;
+      cenRenderContent();
+    }
+
+    /* Table mode swaps between the Overview cross-domain table and the
+       per-domain one; Dashboards/Indicators keep the same grid and only
+       change which cards it holds. */
+    function cenRenderContent() {
+      const tableView = document.getElementById("cenTableView");
+      const domainTableView = document.getElementById("cenDomainTableView");
+      const dashboardsView = document.getElementById("cenDashboardsView");
+      const indicatorsView = document.getElementById("cenIndicatorsView");
+      [tableView, domainTableView, dashboardsView, indicatorsView].forEach((el) => {
+        if (el) el.hidden = true;
+      });
+
+      if (cenActiveMode === "table") {
+        if (cenActiveDomain === "overview") {
+          tableView.hidden = false;
+        } else {
+          renderCenDomainTable();
+          domainTableView.hidden = false;
+        }
+      } else if (cenActiveMode === "dashboards") {
+        renderCenDashboards();
+        dashboardsView.hidden = false;
+      } else if (cenActiveMode === "indicators") {
+        renderCenIndicators();
+        indicatorsView.hidden = false;
+      }
+    }
+
+    /* ── Boot ── */
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+        window.BayaanHeader.init();
+        window.BayaanHeader.syncActive("screen-cpi-obs");
+      }
+      if (window.initBayaanFooter) initBayaanFooter();
+      if (window.CensusGlobalFilter) CensusGlobalFilter.mount();
+      renderCenLocationTable();
+      bindCenDashboardGrid();
+      // Deep-link support: ?domain=population|labour|realestate pre-selects
+      // the matching domain tab (used by "View all"/"Ranked district
+      // comparison" links on the Interpret page).
+      var domainParam = new URLSearchParams(window.location.search).get("domain");
+      var domainTab = domainParam && document.querySelector('.cen-view-tabs .cen-view-tab[data-cen-domain="' + domainParam + '"]');
+      if (domainTab) {
+        document.querySelectorAll(".cen-view-tabs .cen-view-tab").forEach(function (b) { b.classList.remove("is-active"); });
+        domainTab.classList.add("is-active");
+        cenActiveDomain = domainParam;
+      }
+      cenRenderContent();
+    });
+  </script>
+</body>
+
+</html>

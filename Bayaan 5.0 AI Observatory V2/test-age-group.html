@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Population by Age Group — Redesign Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: #f5f7fa;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       POPULATION BY AGE GROUP — Equal-height two-column layout redesign
+       Left: Population Pyramid (1.15fr / 56-58% width)
+       Right: Wide Age Group (0.85fr / 42-44% width)
+       Both panels: same height, padding, visual treatment
+       ════════════════════════════════════════════════════════════════════ */
+    .pd-age-group-section {
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(42, 61, 76, 0.07);
+      padding: 24px;
+    }
+
+    .pd-age-group-hdr {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .pd-age-group-hdr-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .pd-age-group-hdr-left h2 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .pd-age-group-subtitle {
+      margin: 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .glance-card-ic {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      color: #0073F0;
+      background: #e0f2fe;
+      font-size: 18px;
+    }
+
+    .pd-age-group-hdr-right {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .pd-age-group-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+      align-items: stretch;
+      min-height: 400px;
+    }
+
+    .pd-age-group-panel {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      background: #fafcff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+    }
+
+    .pd-panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 12px;
+    }
+
+    .pd-panel-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin: 0 0 12px;
+      font-size: 11.5px;
+      color: #64748b;
+    }
+
+    .pd-panel-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pd-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .pd-panel-controls {
+      display: inline-flex;
+      gap: 0;
+      margin-bottom: 12px;
+      align-self: flex-end;
+    }
+
+    .pd-toggle-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pd-toggle-btn:first-child {
+      border-radius: 6px 0 0 6px;
+    }
+
+    .pd-toggle-btn:last-child {
+      border-radius: 0 6px 6px 0;
+      border-left: 0;
+    }
+
+    .pd-toggle-btn--active {
+      background: #0073F0;
+      color: white;
+      border-color: #0073F0;
+    }
+
+    /* Pyramid container — uses remaining flex space */
+    .pd-pyramid-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-height: 0;
+      background: linear-gradient(135deg, rgba(0, 115, 240, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);
+      border-radius: 8px;
+      padding: 12px;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+    }
+
+    /* Wide age group list container — uses remaining flex space */
+    .pd-wage-list-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-height: 0;
+    }
+
+    .pd-wage-insight {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: rgba(0, 115, 240, 0.1);
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #1e293b;
+    }
+
+    .pd-wage-insight i {
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: #0073F0;
+    }
+
+    .pd-pyramid-summary {
+      display: flex;
+      justify-content: space-around;
+      gap: 12px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
+      width: 100%;
+    }
+
+    .pd-pyramid-summary > div {
+      text-align: center;
+      flex: 1;
+    }
+
+    .pd-pyramid-summary-label {
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+
+    .pd-pyramid-summary-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Placeholder content */
+    .placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: #cbd5e1;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @media (max-width: 1100px) {
+      .pd-age-group-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .pd-age-group-panel {
+        padding: 12px;
+      }
+
+      .pd-panel-title {
+        font-size: 13px;
+      }
+    }
+
+    /* Test indicator */
+    .test-info {
+      background: #dbeafe;
+      border: 1px solid #0284c7;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: #0c4a6e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="test-info">
+      ✓ <strong>Layout Test:</strong> Both panels should have exactly the same height. Left panel (1.15fr) wider than right panel (0.85fr).
+    </div>
+
+    <section class="pd-age-group-section">
+      <div class="pd-age-group-hdr">
+        <div class="pd-age-group-hdr-left">
+          <div class="glance-card-ic">📊</div>
+          <div>
+            <h2>Population by Age Group</h2>
+            <p class="pd-age-group-subtitle">Age distribution of Abu Dhabi Emirate population, 2025</p>
+          </div>
+        </div>
+        <div class="pd-age-group-hdr-right">
+          <span>All population</span>
+        </div>
+      </div>
+
+      <div class="pd-age-group-grid">
+        <div class="pd-age-group-panel">
+          <div class="pd-panel-title">Population Pyramid</div>
+          <div class="pd-panel-legend">
+            <span><span class="pd-legend-dot" style="background:#0073F0"></span>Male</span>
+            <span><span class="pd-legend-dot" style="background:#ec4899"></span>Female</span>
+          </div>
+          <div class="pd-pyramid-container">
+            <div class="placeholder">Pyramid Chart<br>(56-58% width)</div>
+          </div>
+          <div class="pd-pyramid-summary">
+            <div>
+              <div class="pd-pyramid-summary-label">Male</div>
+              <div class="pd-pyramid-summary-value">67.3%</div>
+            </div>
+            <div>
+              <div class="pd-pyramid-summary-label">Female</div>
+              <div class="pd-pyramid-summary-value">32.7%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pd-age-group-panel">
+          <div class="pd-panel-title">Population by Wide Age Group</div>
+          <div class="pd-panel-controls">
+            <button class="pd-toggle-btn pd-toggle-btn--active">Number</button>
+            <button class="pd-toggle-btn">Percentage</button>
+          </div>
+          <div class="pd-panel-legend">
+            <span><span class="pd-legend-dot" style="background:#0073F0"></span>Male</span>
+            <span><span class="pd-legend-dot" style="background:#ec4899"></span>Female</span>
+          </div>
+          <div class="pd-wage-list-container">
+            <div class="placeholder">
+              Wide Age Group<br>Visualization<br>(42-44% width)
+            </div>
+          </div>
+          <div class="pd-wage-insight">
+            <i>ℹ️</i>
+            <span>The largest age group is 25–34 years, representing 32.7% of the total population.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labour Market Observatory — Indicator Detail · Bayaan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-common.css">
+<link rel="stylesheet" href="../style.css" />
+<link rel="stylesheet" href="../css/theme.css" />
+<script>
+  (function () {
+    var t = localStorage.getItem("bayaan-theme") || "light";
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  })();
+</script>
+<script src="../js/theme.js"></script>
+<script src="../js/header.js"></script>
+<script src="../js/lmo-chrome.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-indicator-detail.css">
+<script src="lmo-sidenav.js"></script>
+<script src="lmo-shared.js"></script>
+<script src="lmo-indicators.js"></script>
+</head>
+<body class="lmo lmo--indicator-detail" data-lmo-active="observe" data-lmo-ai-onclick="openChat('Summarise this indicator and key policy implications','Indicator AI')">
+
+<div id="screen-lmo-obs" class="ws-screen header-flush">
+<div data-bayaan-header></div>
+
+<div id="lmo-sidenav-mount"></div>
+
+<div class="app-shell">
+<div class="wrap">
+<div class="page" id="page-content">
+
+  <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+    <a href="#" data-lmo-bc="home">Home</a>
+    <span class="ind-bc-sep">›</span>
+    <a href="#" data-lmo-bc="observatory">Observatory</a>
+    <span class="ind-bc-sep">›</span>
+    <a href="#" id="bc-observe">Observe</a>
+    <span class="ind-bc-sep">›</span>
+    <span class="ind-bc-current" id="bc-ind">Indicator</span>
+  </nav>
+
+  <div class="ph">
+    <div class="ph-l">
+      <div class="ind-detail-domain-tag" id="page-domain-tag"><i class="ti ti-chart-dots" aria-hidden="true"></i><span id="page-domain-text">—</span></div>
+      <h1 class="ph-title" id="page-title">—</h1>
+    </div>
+    <div class="ph-r">
+      <div class="ind-detail-updated" id="page-updated"></div>
+    </div>
+  </div>
+
+  <div class="ind-detail-card ind-detail-overview" id="overview-card">
+    <div class="ind-detail-ov-main">
+      <div class="ind-detail-ov-hd"><i class="ti ti-search" aria-hidden="true"></i> Overview</div>
+      <p class="ind-detail-ov-text" id="ov-text"></p>
+    </div>
+    <div class="ind-detail-kpi-row" id="kpi-row"></div>
+  </div>
+
+  <div class="ind-detail-grid">
+    <div class="ind-detail-card ind-detail-perf">
+      <div class="ind-detail-col-hd"><i class="ti ti-activity" aria-hidden="true"></i> Performance
+        <div class="ind-detail-tr-row prod-tabs" id="tr-row">
+          <button type="button" class="chip tr-pill" data-yrs="2">2 years</button>
+          <button type="button" class="chip tr-pill" data-yrs="3">3 years</button>
+          <button type="button" class="chip tr-pill" data-yrs="5">5 years</button>
+          <button type="button" class="chip tr-pill act" data-yrs="recent">Recent</button>
+        </div>
+      </div>
+      <div class="ind-detail-perf-body">
+        
+        <div class="ind-detail-chart-box"><canvas id="perf-chart"></canvas></div>
+        <div class="ind-detail-chart-leg"><span class="ind-detail-chart-leg-dot"></span><span id="chart-leg-label">Indicator trend</span></div>
+        <div class="ai-insights-card ind-detail-insights">
+          <div class="ai-insights-hd">
+            <div class="ai-insights-title">
+              AI-Generated Insights
+              <button type="button" class="ai-sparkle-action" id="insights-ai-btn" title="Deep-dive with AI" aria-label="Deep-dive with AI"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+            </div>
+            <span class="ai-live">Live</span>
+          </div>
+          <div class="ai-insight-list" id="insight-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-detail-card ind-detail-impacts">
+      <div class="ind-detail-col-hd"><i class="ti ti-activity-heartbeat" aria-hidden="true"></i> Impacts</div>
+      <div class="ind-detail-side-col" id="impacts-col"></div>
+    </div>
+
+    <div class="ind-detail-card ind-detail-actions">
+      <div class="ind-detail-col-hd"><i class="ti ti-bulb" aria-hidden="true"></i> Suggested Actions</div>
+      <div class="ind-detail-side-col" id="actions-col"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<aside class="cpanel ai-panel" id="cpanel" role="complementary" aria-label="Bayaan AI Panel">
+  <div class="bai-header">
+    <div class="bai-header-left">
+      <img class="bai-icon-wrap" src="../assets/ai-chat-thumb.svg" alt="Bayaan AI" width="38" height="38">
+      <div><div class="bai-header-title">Bayaan AI</div></div>
+    </div>
+    <div class="bai-header-right">
+      <button class="bai-close-btn" type="button" onclick="closeChat()" title="Close AI Panel"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+  <div class="bai-context-strip">
+    <span class="bai-ctx-label">Analysing</span>
+    <span class="bai-ctx-pill" id="ctx-val">Indicator Detail</span>
+    <span class="bai-ctx-dot"></span>
+    <span class="bai-ctx-dot-label">Generating</span>
+  </div>
+  <div class="bai-messages msgs" id="msgs"></div>
+  <div class="suggs" id="suggs"></div>
+  <div class="bai-input-area">
+    <div class="bai-input-row">
+      <textarea class="bai-input" id="cin" placeholder="Ask about this indicator…" rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendC()}"></textarea>
+      <button class="bai-send-btn" type="button" onclick="sendC()" title="Send"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</aside>
+</div>
+</div>
+
+<script>
+const YEAR_LABELS = ['2021', '2022', '2023', '2024', '2025', '2026'];
+const BADGE_CLS = { stable: 'badge-high', watch: 'badge-amber', moderate: 'badge-teal', critical: 'badge-red' };
+const BADGE_LBL = { stable: 'Stable', watch: 'Watch', moderate: 'Moderate', critical: 'Critical' };
+const CAT_META = {
+  employment: { icon: 'ti-briefcase', label: 'Employment' },
+  unemployment: { icon: 'ti-user-x', label: 'Unemployment' },
+  wages: { icon: 'ti-coin', label: 'Wages & Compensation' },
+  demographics: { icon: 'ti-users', label: 'Demographics' },
+  skills: { icon: 'ti-school', label: 'Skills & Education' },
+  sectors: { icon: 'ti-building', label: 'Sectors & Activity' },
+  flows: { icon: 'ti-arrows-exchange', label: 'Flow Analysis' }
+};
+
+let mainChart = null;
+let currentInd = null;
+
+function formatSparkVal(v, ind) {
+  if (ind.unit === 'AED' || ind.unit === '%' || ind.unit === 'r') {
+    return v + (ind.unit === '%' ? '%' : ind.unit === 'r' ? '' : ind.unit === 'AED' ? 'K AED' : '');
+  }
+  if (v >= 1000) return (v / 1000).toFixed(1) + 'M';
+  if (v >= 100) return v.toFixed(1) + 'K';
+  return v;
+}
+
+function buildOverview(ind) {
+  const dirWord = ind.dir === 'up' ? 'increased' : ind.dir === 'dn' ? 'decreased' : 'remained flat';
+  const chgSign = ind.chg > 0 ? '+' : '';
+  const unitSuffix = ind.unit === '%' ? '%' : ind.unit === 'AED' ? ' AED' : '';
+  return `Current ${ind.title.toLowerCase()}${ind.sub ? ' (' + ind.sub + ')' : ''} stands at <strong>${ind.value}${unitSuffix}</strong>, having ${dirWord} <strong>${chgSign}${ind.chg}%</strong> ${ind.chgLbl || 'year-on-year'}. Signal status is <strong>${BADGE_LBL[ind.status] || ind.status}</strong> within the ${ind.subcat} sub-category. ${ind.insight}`;
+}
+
+function buildNarrative(ind) {
+  const latest = ind.spark[ind.spark.length - 1];
+  const prior = ind.spark[ind.spark.length - 2];
+  const delta = ((latest - prior) / prior * 100).toFixed(1);
+  const trend = latest >= prior ? 'upward' : 'downward';
+  return `The indicator shows a ${trend} trajectory over the recent period, moving from ${formatSparkVal(prior, ind)} to ${formatSparkVal(latest, ind)} (approx. ${delta}% change). ${ind.insight} Data sourced from SCAD Labour Force Survey and administrative registers; methodology aligned with Q1 2025 LFS revision.`;
+}
+
+function renderKpis(ind) {
+  const chgSign = ind.chg > 0 ? '+' : '';
+  const momEst = (ind.chg / 4).toFixed(1);
+  const momSign = Number(momEst) > 0 ? '+' : '';
+  const valueSuffix = ind.unit === '%' ? '%' : '';
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="ind-detail-kpi">
+      <div class="ind-detail-kpi-ico blue"><i class="ti ti-activity" aria-hidden="true"></i></div>
+      <div class="ind-detail-kpi-val">${ind.value}${valueSuffix}</div>
+      <div class="ind-detail-kpi-lbl">Current</div>
+    </div>
+    <div class="ind-detail-kpi">
+      <div class="ind-detail-kpi-ico ${ind.dir === 'dn' ? 'red' : 'green'}"><i class="ti ti-trending-up" aria-hidden="true"></i></div>
+      <div class="ind-detail-kpi-val">${chgSign}${ind.chg}%</div>
+      <div class="ind-detail-kpi-lbl">YoY</div>
+    </div>
+    <div class="ind-detail-kpi">
+      <div class="ind-detail-kpi-ico orange"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+      <div class="ind-detail-kpi-val">${momSign}${momEst}%</div>
+      <div class="ind-detail-kpi-lbl">QoQ Est.</div>
+    </div>`;
+}
+
+function renderSideCards(containerId, items) {
+  const el = document.getElementById(containerId);
+  const type = containerId === 'impacts-col' ? 'impact' : 'action';
+  el.innerHTML = items.map((it) => `
+    <div class="ind-detail-side-card">
+      <button type="button" class="ai-btn ind-detail-card-chat" onclick="openCardChat('${escAttr(it.title)}','${type}')" title="Ask AI" aria-label="Ask AI about ${escAttr(it.title)}"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+      <h4>${it.title}</h4>
+      <p>${it.text}</p>
+    </div>`).join('');
+}
+
+function openCardChat(title, type) {
+  openChat(`Explain the ${type === 'impact' ? 'impact' : 'recommended action'}: ${title} in the context of ${currentInd?.title || 'this indicator'}.`, title);
+}
+
+function chartColor(ind) {
+  if (ind.status === 'watch') return '#B45309';
+  if (ind.status === 'critical') return '#DC2626';
+  if (ind.status === 'moderate') return '#0284C7';
+  return '#2563EB';
+}
+
+function buildChart(ind, sliceCount) {
+  const canvas = document.getElementById('perf-chart');
+  if (!canvas || typeof Chart === 'undefined') return;
+  if (mainChart) mainChart.destroy();
+  const labels = YEAR_LABELS.slice(6 - sliceCount);
+  const data = ind.spark.slice(6 - sliceCount);
+  const color = chartColor(ind);
+  const chartType = ind.bar ? 'bar' : 'line';
+  const dataset = chartType === 'bar'
+    ? { data, backgroundColor: data.map((v) => (v >= 0 ? color + '99' : '#7C3AED99')), borderRadius: 4, borderSkipped: false }
+    : { data, borderColor: color, borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: color, tension: 0.35, fill: true, backgroundColor: color + '18' };
+  mainChart = new Chart(canvas, {
+    type: chartType,
+    data: { labels, datasets: [{ ...dataset, label: ind.title }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: Object.assign({}, LMO.chartJsTooltip(), {
+          callbacks: { label: (ctx) => `${ind.title}: ${formatSparkVal(ctx.raw, ind)}` }
+        })
+      },
+      scales: LMO.chartJsScales(true, (v) => formatSparkVal(v, ind))
+    }
+  });
+}
+
+function renderInsights(ind) {
+  document.getElementById('insight-list').innerHTML =
+    `<p class="ai-insight-text">${buildNarrative(ind)}</p>`;
+}
+
+function renderIndicator(ind) {
+  currentInd = ind;
+  const fullTitle = ind.title + (ind.sub ? ' — ' + ind.sub : '');
+  document.title = `${ind.title} — LMO Observe · Bayaan`;
+  document.getElementById('bc-ind').textContent = ind.title;
+  const catMeta = CAT_META[ind.cat] || { icon: 'ti-chart-dots', label: ind.cat };
+  document.getElementById('page-domain-tag').querySelector('i').className = 'ti ' + catMeta.icon;
+  document.getElementById('page-domain-text').textContent = catMeta.label;
+  document.getElementById('page-title').innerHTML = `${fullTitle}<span class="badge ind-detail-title-badge ${BADGE_CLS[ind.status]}">${BADGE_LBL[ind.status]}</span>`;
+  document.getElementById('page-updated').textContent = 'Last updated on ' + ind.updated;
+  document.getElementById('ov-text').innerHTML = buildOverview(ind);
+  document.getElementById('chart-leg-label').textContent = ind.title + (ind.sub ? ' · ' + ind.sub : '');
+  renderKpis(ind);
+  renderInsights(ind);
+  const catDetail = window.LMO_CAT_DETAIL[ind.cat] || window.LMO_CAT_DETAIL.employment;
+  renderSideCards('impacts-col', catDetail.impacts);
+  renderSideCards('actions-col', catDetail.actions);
+  buildChart(ind, 6);
+  document.getElementById('insights-ai-btn').onclick = () => openChat(buildOverview(ind), ind.title);
+}
+
+function showNotFound() {
+  document.getElementById('page-content').innerHTML = `
+    <div class="ind-detail-not-found">
+      <h2>Indicator not found</h2>
+      <p>The requested indicator does not exist.</p>
+      <p style="margin-top:16px"><a href="#" id="not-found-back">← Back to Observe</a></p>
+    </div>`;
+  document.getElementById('not-found-back').addEventListener('click', (e) => LMO.goToObserve(e));
+}
+
+function initFromUrl() {
+  const id = new URLSearchParams(location.search).get('id');
+  const ind = window.LMO_INDICATORS.find((i) => i.id === id);
+  if (!ind) { showNotFound(); return; }
+  renderIndicator(ind);
+}
+
+function openChat(ctx, title) {
+  if (document.body.classList.contains('embed') && window.parent !== window) {
+    window.parent.postMessage({ type: 'lmo-chat', ctx, title: title || 'Indicator Detail' }, '*');
+    return;
+  }
+  document.getElementById('ctx-val').textContent = title || 'Indicator Detail';
+  document.getElementById('msgs').innerHTML = '';
+  addMsg('ai', 'Based on <strong>' + (title || 'this indicator') + '</strong>: ' + ctx);
+  document.getElementById('suggs').innerHTML = ['What changed this quarter?', 'Compare to GCC peers', 'Link to forecasts', 'Recommended interventions'].map((s) => `<button type="button" class="sugg" onclick="sendCT('${escAttr(s)}')">${s}</button>`).join('');
+  document.getElementById('cpanel').classList.add('open');
+}
+
+function closeChat() { document.getElementById('cpanel').classList.remove('open'); }
+
+function addMsg(role, text) {
+  const ms = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  const b = document.createElement('div');
+  b.className = 'bubble ' + role;
+  b.innerHTML = text;
+  d.appendChild(b);
+  ms.appendChild(d);
+  ms.scrollTop = ms.scrollHeight;
+}
+
+function sendC() {
+  const inp = document.getElementById('cin');
+  const t = inp.value.trim();
+  if (!t) return;
+  sendCT(t);
+  inp.value = '';
+}
+
+function sendCT(text) {
+  addMsg('user', text);
+  setTimeout(() => addMsg('ai', 'Analysis for your query on this indicator is being prepared. In production this connects to Bayaan AI with live LFS and administrative data.'), 700);
+}
+
+document.getElementById('bc-observe').addEventListener('click', (e) => LMO.goToObserve(e));
+
+window.addEventListener('load', () => {
+  LMO.initLmoEmbed();
+  initFromUrl();
+  if (LMO.onThemeChange) {
+    LMO.onThemeChange(() => {
+      if (currentInd) buildChart(currentInd, 6);
+    });
+  }
+  setTimeout(LMO.reportEmbedHeight, 100);
+});
+window.addEventListener('resize', () => setTimeout(LMO.reportEmbedHeight, 200));
+</script>
+</body>
+</html>

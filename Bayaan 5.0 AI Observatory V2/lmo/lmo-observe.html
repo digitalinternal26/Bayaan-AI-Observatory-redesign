@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labour Market Observatory — Observe · Bayaan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-common.css">
+<link rel="stylesheet" href="../css/pages/lmo-briefing.css">
+<link rel="stylesheet" href="../style.css" />
+<link rel="stylesheet" href="../css/theme.css" />
+<script>
+  (function () {
+    var t = localStorage.getItem("bayaan-theme") || "light";
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  })();
+</script>
+<script src="../js/theme.js"></script>
+<script src="../js/header.js"></script>
+<script src="../js/lmo-chrome.js"></script>
+<script src="../js/favourites-shared.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-observe.css">
+<script src="lmo-sidenav.js"></script>
+<script src="lmo-shared.js"></script>
+<script src="lmo-indicators.js"></script>
+<script src="lmo-insights.js"></script>
+<script src="lmo-observe.js"></script>
+</head>
+<body class="lmo" data-lmo-active="observe" data-lmo-ai-onclick="openChat('Summarise all labour market signals and highlight watch items','Observe Layer Overview')">
+
+<div id="screen-lmo-obs" class="ws-screen header-flush">
+<div data-bayaan-header></div>
+
+<div id="lmo-sidenav-mount"></div>
+
+<div class="app-shell">
+<div class="wrap">
+<div class="page">
+
+  <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+    <a href="#" data-lmo-bc="home">Home</a>
+    <span class="ind-bc-sep">›</span>
+    <a href="#" data-lmo-bc="observatory">Observatory</a>
+    <span class="ind-bc-sep">›</span>
+    <span class="ind-bc-current">Labour Market Observatory</span>
+  </nav>
+
+  <div class="ph">
+    <div class="ph-l">
+      <h1 class="ph-title">Labour Market Observatory (LMO)</h1>
+    </div>
+    <div class="ph-r">
+      <button class="btn btn-ghost" type="button"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+    </div>
+  </div>
+
+  <section class="sec" aria-labelledby="overview-heading">
+    <div class="aib-card obs-overview-card">
+      <div class="aib-hd">
+        <div class="aib-hd-main">
+          <div class="aib-ico" aria-hidden="true"><i class="ti ti-layout-grid"></i></div>
+          <div class="aib-hd-text">
+            <div class="aib-ttl" id="overview-heading">Overview</div>
+          </div>
+        </div>
+      </div>
+      <div class="aib-body" id="sum-text">Abu Dhabi labour market signals remain broadly stable with employment at 2.9M and unemployment easing to 5.8%. High-skill Non-Emirati employment is accelerating (+24.6% YoY) while youth unemployment and construction sector deceleration warrant continued monitoring. Emiratisation is on pace at 13.3% against a 13.5% Q3 target.</div>
+    </div>
+  </section>
+
+  <div class="prod-tabs-bar" id="view-tabs" role="tablist" aria-label="Observe views">
+    <button type="button" class="prod-tab active" data-tab="insights" role="tab" aria-selected="true">Insights <span class="tab-count" id="insights-count">0</span></button>
+    <button type="button" class="prod-tab" data-tab="official" role="tab" aria-selected="false">Official SVs <span class="tab-count" id="official-count">0</span></button>
+  </div>
+
+  <div class="ctrl-bar">
+    <div class="ctrl-l">
+      <div class="obs-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" id="obs-search" placeholder="Search Indicators">
+      </div>
+      <!-- <select class="obs-sel" id="subcat-filter">
+        <option value="">Sub-categories</option>
+      </select>
+      <select class="obs-sel" id="sev-filter">
+        <option value="">Severity</option>
+        <option value="stable">Stable</option>
+        <option value="moderate">Moderate</option>
+        <option value="watch">Watch</option>
+        <option value="critical">Critical</option>
+      </select> -->
+    </div>
+    <!-- <div class="prod-tabs--mb ctrl-r" id="time-range">
+      <button type="button" class="chip tr-pill" data-yrs="2">2 years</button>
+      <button type="button" class="chip tr-pill" data-yrs="3">3 years</button>
+      <button type="button" class="chip tr-pill" data-yrs="5">5 years</button>
+      <button type="button" class="chip tr-pill act" data-yrs="recent">Recent</button>
+    </div> -->
+  </div>
+
+  <div class="products-grid" id="ind-grid"></div>
+  <div class="pag-bar" id="pag-bar" hidden>
+    <div class="pag-info" id="pag-info"></div>
+    <div class="pag-ctrls" id="pag-ctrls"></div>
+  </div>
+
+</div>
+</div>
+
+<aside class="cpanel ai-panel" id="cpanel" role="complementary" aria-label="Bayaan AI Panel">
+  <div class="bai-header">
+    <div class="bai-header-left">
+      <img class="bai-icon-wrap" src="../assets/ai-chat-thumb.svg" alt="Bayaan AI" width="38" height="38">
+      <div><div class="bai-header-title">Bayaan AI</div></div>
+    </div>
+    <div class="bai-header-right">
+      <button class="bai-close-btn" type="button" onclick="closeChat()" title="Close AI Panel"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+  <div class="bai-context-strip">
+    <span class="bai-ctx-label">Analysing</span>
+    <span class="bai-ctx-pill" id="ctx-val">Observe Layer</span>
+    <span class="bai-ctx-dot"></span>
+    <span class="bai-ctx-dot-label">Generating</span>
+  </div>
+  <div class="bai-messages msgs" id="msgs"></div>
+  <div class="suggs" id="suggs"></div>
+  <div class="bai-input-area">
+    <div class="bai-input-row">
+      <textarea class="bai-input" id="cin" placeholder="Ask about this indicator…" rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendC()}"></textarea>
+      <button class="bai-send-btn" type="button" onclick="sendC()" title="Send"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</aside>
+</div>
+</div>
+
+<script>
+function openChat(ctx, title) {
+  if (document.body.classList.contains("embed") && window.parent !== window) {
+    window.parent.postMessage({ type: "lmo-chat", ctx, title: title || "Observe Layer" }, "*");
+    return;
+  }
+  document.getElementById("ctx-val").textContent = title || "Observe Layer";
+  document.getElementById("msgs").innerHTML = "";
+  addMsg("ai", "Based on current signals for <strong>" + (title || "this indicator") + "</strong>: " + ctx);
+  document.getElementById("suggs").innerHTML = [
+    "What changed this quarter?",
+    "Compare to GCC peers",
+    "Show related forecasts",
+    "What should policymakers do?",
+  ]
+    .map((s) => `<button type="button" class="sugg" onclick="sendCT('${s}')">${s}</button>`)
+    .join("");
+  document.getElementById("cpanel").classList.add("open");
+}
+
+function closeChat() {
+  document.getElementById("cpanel").classList.remove("open");
+}
+
+function addMsg(role, text) {
+  const ms = document.getElementById("msgs");
+  const d = document.createElement("div");
+  d.className = "msg " + role;
+  const b = document.createElement("div");
+  b.className = "bubble " + role;
+  b.innerHTML = text;
+  d.appendChild(b);
+  ms.appendChild(d);
+  ms.scrollTop = ms.scrollHeight;
+}
+
+function sendC() {
+  const inp = document.getElementById("cin");
+  const t = inp.value.trim();
+  if (!t) return;
+  sendCT(t);
+  inp.value = "";
+}
+
+function sendCT(text) {
+  addMsg("user", text);
+  setTimeout(
+    () =>
+      addMsg(
+        "ai",
+        "Analysis for your query on labour market indicators is being prepared. In production this connects to Bayaan AI with live LFS and administrative data."
+      ),
+    700
+  );
+}
+</script>
+</body>
+</html>

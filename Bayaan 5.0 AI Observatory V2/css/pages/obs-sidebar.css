@@ -1,0 +1,714 @@
+/* === Embedded iframe shells (Geo View, LMO, …) === */
+:is(#screen-lmo-obs, #screen-geo-view).screen.active {
+  display: flex !important;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:is(#screen-lmo-obs, #screen-geo-view) .screen-embed {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+:is(#screen-lmo-obs, #screen-geo-view) .screen-embed iframe {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  min-height: 0;
+  display: block;
+  background: #f4f7fa;
+}
+
+/* === Shared observatory layout + floating pill sidebar === */
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic) .crisis-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic) .ind-page-breadcrumb {
+  margin-top: 16px;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic) .page-wrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: stretch;
+  min-height: calc(100vh - 120px);
+  box-sizing: border-box;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic) .sidebar-rail {
+  /* display: flex;
+  align-items: center;
+  align-self: stretch; */
+  /* flex-shrink: 0; */
+  /* padding-inline-start: var(--page-gutter); */
+  min-width: 120px;
+
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic) .sidebar {
+  position: fixed;
+  left: var(--page-gutter);
+  top: 50%;
+  transform: translateY(-50%);
+  width: max-content;
+  max-width: 108px;
+  background: var(--surface, #fff);
+  border: none;
+  border-radius: 999px;
+  box-shadow:
+    0 8px 32px rgba(42, 61, 76, 0.1),
+    0 2px 8px rgba(42, 61, 76, 0.06);
+  padding: 22px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 5;
+  margin-inline-start: 0;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+html:not([data-theme="dark"]) :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-icon {
+  background: #eff4f7;
+  color: #0c4a8e;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-icon i {
+  font-size: 20px;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+html:not([data-theme="dark"]) :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item:hover:not(.active):not(.sidebar-item--ai),
+html:not([data-theme="dark"]) :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item.active:not(.sidebar-item--ai) {
+  background: none;
+  color: #272829;
+}
+
+html:not([data-theme="dark"]) :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item:hover:not(.active):not(.sidebar-item--ai) .sidebar-icon {
+  background: #e3ecf3;
+}
+
+html:not([data-theme="dark"]) :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item.active:not(.sidebar-item--ai) .sidebar-icon {
+  background: #0c4a8e;
+  color: #fff;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item--ai {
+  font-weight: 600;
+}
+
+html:not([data-theme="dark"]) :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item--ai {
+  color: #0066ff;
+}
+
+html:not([data-theme="dark"]) :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item--ai .sidebar-icon {
+  background: linear-gradient(135deg, #ebf5ff 0%, #dbeafe 100%);
+  color: #0066ff;
+}
+
+html:not([data-theme="dark"]) :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item--ai:hover .sidebar-icon {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+/* === Standard expanding icon rail (observatory + LMO) === */
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar {
+  max-width: none;
+  border-radius: 999px;
+  align-items: stretch;
+  padding: 8px 10px;
+  gap: 9px;
+  transition: none;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar:hover {
+  border-radius: 28px;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 4px 4px;
+  font-size: 10.5px;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar:hover .sidebar-item {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-icon {
+  width: 38px;
+  height: 38px;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-icon i {
+  font-size: 17px;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-label {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text2, var(--t2, #475569));
+  transition: max-width 0.22s ease, opacity 0.18s ease;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar:hover .sidebar-label {
+  max-width: 120px;
+  opacity: 1;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item.active:not(.sidebar-item--ai) .sidebar-label {
+  color: #272829;
+}
+
+html[data-theme="dark"] :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-label {
+  color: #cdd6e0;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-item--ai .sidebar-label {
+  color: #0066ff;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-divider {
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  margin: 1px 0 1px 15px;
+  align-self: flex-start;
+  transition: width 0.22s ease, margin-left 0.22s ease;
+}
+
+:is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar:hover .sidebar-divider {
+  width: calc(100% - 12px);
+  margin-left: 6px;
+}
+
+html[data-theme="dark"] :is(#screen-crisis-obs, #screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-divider {
+  background: #3a4453;
+}
+
+/* Brand primary icon fills (CPI / LMO / Topic light theme) */
+html:not([data-theme="dark"]) :is(#screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo) .sidebar-icon {
+  background: #ebf3ff;
+  color: var(--accent, var(--ac, #0066ff));
+}
+
+html:not([data-theme="dark"])
+  :is(#screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo)
+  .sidebar-item:hover:not(.active):not(.sidebar-item--ai)
+  .sidebar-icon {
+  background: #dbe9ff;
+}
+
+html:not([data-theme="dark"])
+  :is(#screen-cpi-obs, #screen-cpi-dashboard, #screen-topic, body.lmo)
+  .sidebar-item.active:not(.sidebar-item--ai)
+  .sidebar-icon {
+  background: var(--accent, var(--ac, #0066ff));
+  color: #fff;
+}
+
+/* AI entry — app gradient (CPI / LMO) */
+html :is(#screen-cpi-obs, body.lmo) .sidebar .sidebar-item--ai .sidebar-icon {
+  background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+html :is(#screen-cpi-obs, body.lmo) .sidebar .sidebar-item--ai:hover .sidebar-icon {
+  background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+  transform: scale(1.04);
+}
+
+/* LMO mount: center the sidebar pill; filter floats above it */
+body.lmo .sidebar-rail {
+  position: fixed;
+  left: var(--page-gutter, 32px);
+  top: calc(50% + 34px);
+  transform: translateY(-50%);
+  z-index: 200;
+  width: max-content;
+}
+
+body.lmo .sidebar {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  z-index: auto;
+  width: max-content;
+  background: var(--surface, #fff);
+  border: none;
+  border-radius: 999px;
+  box-shadow:
+    0 8px 32px rgba(42, 61, 76, 0.1),
+    0 2px 8px rgba(42, 61, 76, 0.06);
+}
+
+/* ====================================================================
+   CENSUS OBSERVATORY GLOBAL FILTER
+   Same component/interaction pattern as the LMO global filter above
+   (lmo/lmo-sidenav.js + the body.lmo rules immediately above this
+   block) — ".cgf-*" is a parallel, Census-scoped class family so it
+   never collides with LMO's ".lmo-filter-*"/".lsb-fp-*" (which stay
+   untouched) or with any page-local ".cen-filter-*"/".cen-fp-*" filter
+   a single Census section may already define for itself. Structure,
+   spacing, radius, shadow and interaction are ported 1:1; colours are
+   re-pointed to Census's own tokens (var(--accent)/var(--text)/etc.)
+   instead of LMO's local --ac/--t1/--t2 custom properties.
+
+   Positioning mirrors LMO's exact technique: turn the rail itself into
+   the fixed anchor (rather than the pill) so the filter trigger can
+   float directly above it via plain position:absolute. Only
+   #screen-cpi-obs (Census Observatory's own screen id — Crisis/CPI
+   Dashboard/Topic use different ids) gets this; the shared
+   :is(...) rule above stays exactly as it was for those screens. The
+   .page-wrap column width is pinned to the same 120px the rail already
+   occupied (previously via min-width) so removing the rail from grid
+   flow doesn't collapse that column and shift the content next to it. */
+#screen-cpi-obs .page-wrap {
+  grid-template-columns: 120px 1fr;
+}
+#screen-cpi-obs .sidebar-rail {
+  position: fixed;
+  left: var(--page-gutter, 32px);
+  /* Anchored a fixed distance below the global header — NOT vertically
+     centered on the viewport or content. The fixed topnav + breadcrumb
+     row together occupy ~103px (measured on this screen); the "Filter"
+     toggle floats directly above this rail via .cgf-wrap's own
+     `bottom: calc(100% + 10px)`, so it's really THAT toggle's top edge
+     that needs to clear the breadcrumb (with a margin), which is what the
+     extra ~87px here (a margin, plus the toggle's own height, plus the
+     10px gap) accounts for. Because this is a static offset from the
+     (also fixed) header rather than anything viewport-height- or
+     content-height-based, it's correct at any zoom level or window size
+     with no JS: see .sidebar below for how a pill taller than the
+     remaining space is handled (scrolls internally instead of running
+     off the bottom of the screen). */
+  --obs-sidebar-top: 190px;
+  top: var(--obs-sidebar-top);
+  transform: none;
+  z-index: 200;
+  width: max-content;
+  /* Cancel the shared :is(...) rule's `min-width: 120px` above (a
+     leftover from the old in-flow rail, kept only so .page-wrap's grid
+     column doesn't collapse — see that rule's own comment). Now that
+     the rail floats via position:fixed like LMO's, that min-width just
+     stretches this box wider than the actual pill it wraps, which pulls
+     .cgf-wrap's `left: 50%` centering off the pill's true center. LMO's
+     rail never had this min-width, so it never had this bug. */
+  min-width: 0;
+  grid-column: 1;
+}
+/* Grid auto-placement skips absolutely/fixed-positioned items, so once
+   .sidebar-rail (above) leaves flow, the content column right after it
+   would otherwise auto-place into column 1 instead of 2 — pin it back
+   explicitly rather than depending on each page's own class name for
+   its main-content wrapper. */
+#screen-cpi-obs .page-wrap > .sidebar-rail + * {
+  grid-column: 2;
+  /* Grid items default to `min-width: auto`, which lets this track demand
+     its content's full max-content width and overflow the 1fr track at
+     narrow viewports (mobile) instead of shrinking with it. This is the
+     standard fix — safe at every width, only removes the unwanted floor. */
+  min-width: 0;
+}
+#screen-cpi-obs .sidebar-rail .sidebar {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  z-index: auto;
+  /* No max-height/overflow here on purpose — matching the CIO/Crisis
+     Intelligence reference implementation (:is(...) rule far above),
+     which has never had one. An earlier version of this rule added a
+     `max-height` + `overflow-y: auto` "safety net" sized from `100vh`,
+     reasoning that a fixed (non-centered) top offset could in theory let
+     a tall pill run past the bottom of a short window. In practice this
+     fired at completely ordinary desktop sizes: `100vh` is the layout
+     viewport, but a real browser's browser-chrome (tab strip, bookmarks
+     bar, extensions row) can easily eat 100-200px of the ACTUAL window
+     before the page ever sees it, so the margin that looked safe against
+     a bare 1366×768 was often already gone — producing exactly the
+     persistent internal scrollbar this rule now avoids by not attempting
+     the calculation at all. The pill (~405px of content) plus the rail's
+     fixed top offset comfortably fits in real desktop usage without any
+     constraint; a pathologically short window is expected to behave the
+     same way it would on the CIO reference — no special handling. */
+}
+
+#screen-cpi-obs .cgf-wrap {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  z-index: 1;
+}
+
+#screen-cpi-obs .cgf-toggle {
+  position: relative;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  width: max-content;
+  font-family: inherit;
+}
+
+#screen-cpi-obs .cgf-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #ebf3ff;
+  color: var(--accent);
+  box-shadow:
+    0 4px 14px rgba(42, 61, 76, 0.12),
+    0 1px 4px rgba(42, 61, 76, 0.08);
+  transition: background 0.15s, color 0.15s;
+}
+
+#screen-cpi-obs .cgf-icon i {
+  font-size: 17px;
+}
+
+#screen-cpi-obs .cgf-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text2);
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#screen-cpi-obs .cgf-toggle:hover:not(.active) .cgf-icon {
+  background: #dbe9ff;
+}
+
+#screen-cpi-obs .cgf-toggle.active .cgf-icon {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.28);
+}
+
+#screen-cpi-obs .cgf-toggle.active .cgf-label {
+  color: var(--text);
+  font-weight: 600;
+}
+
+#screen-cpi-obs .cgf-badge {
+  position: absolute;
+  top: 0;
+  right: calc(50% - 26px);
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+
+#screen-cpi-obs .cgf-badge[hidden] {
+  display: none;
+}
+
+#screen-cpi-obs .cgf-panel {
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 0;
+  bottom: auto;
+  width: min(320px, calc(100vw - 120px));
+  max-height: min(520px, 70vh);
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 32px rgba(42, 61, 76, 0.12),
+    0 2px 8px rgba(42, 61, 76, 0.06);
+  border: 1px solid #e8edf2;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 260;
+}
+
+#screen-cpi-obs .cgf-panel.open {
+  display: flex;
+}
+
+#screen-cpi-obs .cgf-panel-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+#screen-cpi-obs .cgf-panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#screen-cpi-obs .cgf-panel-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s;
+}
+
+#screen-cpi-obs .cgf-panel-close:hover {
+  background: #e2e8f0;
+  color: var(--text);
+}
+
+#screen-cpi-obs .cgf-panel-body {
+  padding: 14px 18px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+}
+
+#screen-cpi-obs .cgf-section {
+  display: flex;
+  flex-direction: column;
+}
+
+#screen-cpi-obs .cgf-section-hd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#screen-cpi-obs .cgf-section-hd .ti {
+  font-size: 16px;
+  color: var(--accent);
+}
+
+#screen-cpi-obs .cgf-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#screen-cpi-obs .cgf-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text2);
+  background: var(--white);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+#screen-cpi-obs .cgf-pill .ti {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+#screen-cpi-obs .cgf-pill:hover {
+  border-color: #d3dfec;
+  color: var(--text);
+}
+
+#screen-cpi-obs .cgf-pill.act {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+#screen-cpi-obs .cgf-pill.act .ti {
+  color: var(--accent);
+}
+
+#screen-cpi-obs .cgf-panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px 14px;
+  border-top: 1px solid #eef2f6;
+  background: #f8fafc;
+}
+
+#screen-cpi-obs .cgf-count {
+  font-size: 12.5px;
+  color: var(--text2);
+}
+
+#screen-cpi-obs .cgf-count[hidden] {
+  display: none;
+}
+
+#screen-cpi-obs .cgf-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+#screen-cpi-obs .cgf-reset:disabled {
+  color: #cbd5e1;
+  cursor: default;
+}
+
+#screen-cpi-obs .cgf-reset:not(:disabled):hover {
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-icon {
+  background: var(--surface, #141a26);
+  color: var(--accent);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-toggle:hover:not(.active) .cgf-icon {
+  background: #1e283d;
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-toggle.active .cgf-icon {
+  background: var(--accent);
+  color: #fff;
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-panel {
+  background: var(--surface, #141a26);
+  border-color: var(--border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-panel-hd,
+html[data-theme="dark"] #screen-cpi-obs .cgf-panel-foot {
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-panel-close {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text2);
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-panel-close:hover {
+  background: #1e283d;
+  color: var(--text);
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-pill {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text2);
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-pill.act {
+  background: rgba(0, 115, 240, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+html[data-theme="dark"] #screen-cpi-obs .cgf-reset:disabled {
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  #screen-cpi-obs .cgf-panel {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    top: auto;
+    bottom: 16px;
+    width: auto;
+    max-height: min(70vh, 520px);
+  }
+}

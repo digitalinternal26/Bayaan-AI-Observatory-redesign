@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labour Market Observatory — Geospatial · Bayaan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css">
+<link rel="stylesheet" href="../css/variables.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/pages/lmo-common.css">
+<link rel="stylesheet" href="../css/pages/lmo-geospatial.css">
+<link rel="stylesheet" href="../css/pages/studio-builder-shell.css">
+<link rel="stylesheet" href="../style.css">
+<script>
+  (function () {
+    var t = localStorage.getItem("bayaan-theme") || "light";
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  })();
+</script>
+<script src="../js/theme.js"></script>
+<script src="../js/header.js"></script>
+<script src="../js/lmo-chrome.js"></script>
+<script src="lmo-sidenav.js"></script>
+<script src="lmo-shared.js"></script>
+<script src="data/uae-emirates-data.js"></script>
+<script src="data/abu-dhabi-regions-data.js"></script>
+</head>
+<body class="lmo lmo--geospatial" data-lmo-active="geospatial" data-lmo-ai-onclick="openChat('Show workforce distribution across Abu Dhabi emirates','Geospatial AI')">
+
+<div id="screen-lmo-obs" class="ws-screen header-flush">
+<div data-bayaan-header></div>
+
+<div id="lmo-sidenav-mount"></div>
+
+<div class="geo-main" id="geoMain">
+
+  <button type="button" class="geo-exit-fullscreen" id="geoExitFullscreen" onclick="LmoGeo.toggleFullscreen()" title="Exit full view (Esc)">
+    <i class="ti ti-arrow-left"></i> Exit full view
+  </button>
+
+  <div class="geo-map-stage" id="mapStage">
+    <div id="geoMapView" aria-label="Abu Dhabi workforce map"></div>
+
+    <div class="geo-map-top-controls">
+      <aside class="geo-filter-panel" id="geoFilterPanel" aria-hidden="true">
+        <div class="geo-filter-panel-head">
+          <strong class="geo-filter-panel-title">Map filters</strong>
+          <button type="button" class="geo-filter-reset" id="geoFilterReset">
+            <i class="ti ti-rotate-2"></i> Reset filters
+          </button>
+        </div>
+        <div class="geo-filter-sections" id="geoFilterSections"></div>
+      </aside>
+      <button type="button" class="geo-filter-toggle" id="geoFilterToggle" title="Open map filters" aria-expanded="false" aria-controls="geoFilterPanel">
+        <i class="ti ti-adjustments-horizontal"></i>
+        <span class="geo-filter-badge" id="geoFilterBadge" hidden>0</span>
+      </button>
+    </div>
+
+    <div class="geo-map-tools">
+      <button type="button" class="geo-tool-btn" id="geoZoomIn" title="Zoom in"><i class="ti ti-plus"></i></button>
+      <button type="button" class="geo-tool-btn" id="geoZoomOut" title="Zoom out"><i class="ti ti-minus"></i></button>
+      <button type="button" class="geo-tool-btn" id="geoResetView" title="Reset view"><i class="ti ti-rotate-2"></i></button>
+      <button type="button" class="geo-tool-btn" id="geoFullscreen" title="Expand to fullscreen"><i class="ti ti-arrows-maximize"></i></button>
+    </div>
+
+    <div class="ai-launcher">
+      <div class="ai-bar">
+        <i class="ti ti-sparkles spark"></i>
+        <input type="text" id="aiInput" placeholder="Ask the map anything — e.g. 'Compare Al Ain and Abu Dhabi'" aria-label="Ask the map">
+        <button type="button" class="ai-history-btn" id="aiHistoryBtn" title="Conversation history" aria-label="Conversation history">
+          <i class="ti ti-history"></i>
+          <span class="ai-history-badge" id="aiHistoryBadge">0</span>
+        </button>
+        <button type="button" class="ai-send" id="aiSendBtn" title="Send"><i class="ti ti-arrow-up"></i></button>
+      </div>
+    </div>
+
+    <div class="ai-response-stack" id="aiResponseStack" aria-live="polite"></div>
+  </div>
+
+  <aside class="geo-sidebar" id="sidebar">
+
+    <button
+      type="button"
+      class="geo-sidebar-toggle"
+      id="sidebarToggle"
+      aria-expanded="true"
+      aria-controls="sidebarContent"
+      title="Collapse panel"
+    >
+      <i class="ti ti-chevron-right"></i>
+    </button>
+
+    <div id="sidebarContent">
+
+      <div class="geo-panel-hero">
+        <div class="geo-eyebrow" id="geoRegionEyebrow">Abu Dhabi Emirate</div>
+        <div class="geo-hero-row">
+          <div>
+            <div class="geo-hero-number">2,762,715</div>
+            <div class="geo-hero-label">Total employed</div>
+          </div>
+          <span class="geo-date-chip"><i class="ti ti-calendar"></i> Sep 2024</span>
+        </div>
+      </div>
+
+      <div class="geo-tabs geo-tabs--pill" id="wfTabs" role="tablist" aria-label="Workforce views">
+        <button type="button" class="geo-tab active" data-wf-tab="residency" role="tab" aria-selected="true">Workforce by place of residency</button>
+        <button type="button" class="geo-tab" data-wf-tab="workplace" role="tab" aria-selected="false">Workforce by place of work</button>
+      </div>
+
+      <div class="geo-panel-body">
+
+        <div class="wf-donut-row geo-metric-section">
+          <div class="wf-donut-card">
+            <div class="wf-donut-caption">By nationality</div>
+            <div class="wf-donut" style="background: conic-gradient(#008fc4 0 10.9%, #1a4a5c 10.9% 100%);" aria-hidden="true"></div>
+            <div class="wf-donut-legend">
+              <div class="wf-donut-leg">
+                <span class="wf-donut-leg-key"><span class="wf-donut-dot" style="background:#008fc4"></span> Emirati</span>
+                <span class="wf-donut-leg-val">300,225</span>
+              </div>
+              <div class="wf-donut-leg">
+                <span class="wf-donut-leg-key"><span class="wf-donut-dot" style="background:#1a4a5c"></span> Non-Emirati</span>
+                <span class="wf-donut-leg-val">2,462,495</span>
+              </div>
+            </div>
+          </div>
+          <div class="wf-donut-card">
+            <div class="wf-donut-caption">By gender</div>
+            <div class="wf-donut" style="background: conic-gradient(#008fc4 0 78.3%, #5a9eb5 78.3% 100%);" aria-hidden="true"></div>
+            <div class="wf-donut-legend">
+              <div class="wf-donut-leg">
+                <span class="wf-donut-leg-key"><span class="wf-donut-dot" style="background:#008fc4"></span> Male</span>
+                <span class="wf-donut-leg-val">2,164,300</span>
+              </div>
+              <div class="wf-donut-leg">
+                <span class="wf-donut-leg-key"><span class="wf-donut-dot" style="background:#5a9eb5"></span> Female</span>
+                <span class="wf-donut-leg-val">598,420</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="geo-metric-section">
+          <div class="geo-section-heading">
+            <i class="ti ti-briefcase"></i>
+            <h3>Employed Economic Activities</h3>
+          </div>
+        <div class="bar-item">
+          <div class="bar-item-top">
+            <span class="name">Administrative and support service activities</span>
+            <span class="num">217,955 <span class="pct">(8%)</span></span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:80%"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-item-top">
+            <span class="name">Manufacturing</span>
+            <span class="num">186,990 <span class="pct">(7%)</span></span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
+        </div>
+        </div>
+
+        <div class="geo-metric-section">
+          <div class="geo-section-heading">
+            <i class="ti ti-school"></i>
+            <h3>Emirati jobseekers by Education level</h3>
+          </div>
+        <div class="bar-item">
+          <div class="bar-item-top"><span class="name">Secondary</span><span class="num">10.1k</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-item-top"><span class="name">Above Secondary</span><span class="num">6.9k</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:68%"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-item-top"><span class="name">Below Secondary</span><span class="num">930</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:9%"></div></div>
+        </div>
+        </div>
+
+        <div class="geo-metric-section geo-metric-section--last">
+          <div class="geo-section-heading">
+            <i class="ti ti-users"></i>
+            <h3>Emirati jobseekers by Age Group</h3>
+          </div>
+          <div class="geo-age-grid">
+            <div class="geo-age-stat">
+              <strong>4.2k</strong>
+              <span>18–24 years</span>
+            </div>
+            <div class="geo-age-stat">
+              <strong>6.8k</strong>
+              <span>25–34 years</span>
+            </div>
+            <div class="geo-age-stat">
+              <strong>3.1k</strong>
+              <span>35–44 years</span>
+            </div>
+            <div class="geo-age-stat">
+              <strong>1.4k</strong>
+              <span>45+ years</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="sidebar-resizer" id="sidebarResizer" title="Drag to resize panel"></div>
+  </aside>
+
+  <div class="history-backdrop" id="historyBackdrop"></div>
+  <div class="history-drawer" id="historyDrawer">
+    <div class="history-drawer-head">
+      <div class="history-drawer-title">
+        <h2><i class="ti ti-history"></i> Conversation history</h2>
+        <button type="button" class="geo-drawer-close" id="historyCloseBtn" title="Close" aria-label="Close conversation history"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="history-drawer-search">
+        <i class="ti ti-search"></i>
+        <input type="text" id="historySearchInput" placeholder="Search past questions" aria-label="Search past questions" />
+      </div>
+    </div>
+    <div class="history-list" id="historyList"></div>
+    <div class="history-drawer-foot">
+      <button type="button" class="history-drawer-clear" id="historyClearBtn"><i class="ti ti-trash"></i> Clear all history</button>
+    </div>
+  </div>
+
+  <div class="explore-backdrop" id="exploreBackdrop"></div>
+  <aside class="explore-drawer studio-builder-shell" id="exploreDrawer">
+    <div class="studio-chat">
+      <div class="sc-head">
+        <div class="sc-head-left">
+          <img class="msg-av ai" src="../assets/ai-chat-thumb.svg" alt="Bayaan AI" width="32" height="32" />
+          <div>
+            <div class="sc-title">Geospatial AI</div>
+            <div class="explore-head-sub" id="exploreSub">Workforce · Abu Dhabi Emirate</div>
+          </div>
+        </div>
+        <button type="button" class="geo-drawer-close" id="exploreCloseBtn" title="Close panel" aria-label="Close Geospatial AI panel"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="explore-scroll">
+        <div class="explore-body" id="exploreBody"></div>
+        <div class="chat-msgs" id="exploreChatMsgs"></div>
+      </div>
+      <div class="bai-input-area">
+        <div class="bai-input-row">
+          <textarea
+            class="bai-input"
+            id="exploreChatInput"
+            rows="2"
+            placeholder="Ask a follow-up question…"
+            aria-label="Follow-up question"
+          ></textarea>
+          <button type="button" class="bai-send-btn" id="exploreSendBtn" title="Send">
+            <i class="ti ti-send"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/studio-chat-helpers.js"></script>
+<script src="lmo-geospatial.js"></script>
+<script src="lmo-geospatial-ai.js"></script>
+<script>
+function openChat(ctx, title) {
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: "lmo-chat", ctx: ctx, title: title || "Geospatial AI" }, "*");
+    return;
+  }
+}
+</script>
+</body>
+</html>

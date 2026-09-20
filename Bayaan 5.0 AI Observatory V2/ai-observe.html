@@ -1,0 +1,1171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Observatory — Observe · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/pages/ai-observatory.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/ai-observatory.js" defer></script>
+    <style>
+      /* ============ OBSERVE — indicator monitoring & exploration layer (page-local) ============
+         Philosophy: not a story, not a diagnosis — a structured, searchable,
+         filterable catalogue of the published AI indicators, with evidence
+         (definition/source/reference period/dimensions) one click away.
+         Executive layer = 5 headline cards. Analyst layer = search → filter
+         → inspect → explore dimensions → export. All figures sourced from
+         SCAD "Abu Dhabi AI Statistics" (Enterprise & Individual AI Adoption
+         Surveys, 2026); this is the first published cycle, so every
+         period-over-period change is "—" by design, never invented. */
+
+      #screen-cpi-obs .ob-export { position: relative; }
+      #screen-cpi-obs .ob-export-menu {
+        position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; min-width: 200px;
+        background: var(--surface); border: 1px solid var(--border-solid); border-radius: var(--r-md);
+        box-shadow: var(--shadow-lg); padding: 6px; display: none; flex-direction: column;
+      }
+      #screen-cpi-obs .ob-export.is-open .ob-export-menu { display: flex; }
+      #screen-cpi-obs .ob-export-opt {
+        display: flex; align-items: center; gap: 9px; padding: 9px 10px; border: none; border-radius: 8px;
+        background: transparent; font-family: inherit; font-size: var(--fs-sm); font-weight: 500;
+        color: var(--text-secondary); text-align: left; cursor: pointer; transition: background 0.12s, color 0.12s; width: 100%;
+      }
+      #screen-cpi-obs .ob-export-opt:hover { background: var(--accent-light); color: var(--accent-dark); }
+      #screen-cpi-obs .ob-export-opt .ti { font-size: var(--fs-lg); color: var(--accent); }
+
+      #screen-cpi-obs .ob-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+      #screen-cpi-obs .ob-head-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      #screen-cpi-obs .ob-dataof { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--r-md); border: 1px solid var(--border-solid); background: var(--surface); font-size: var(--fs-xs); color: var(--text-secondary); }
+      #screen-cpi-obs .ob-dataof b { color: var(--text-primary); font-weight: 700; }
+      #screen-cpi-obs .ob-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      #screen-cpi-obs .ob-btn-primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+
+      /* Page rhythm — tighter, grouped vertical spacing */
+      #screen-cpi-obs .aiobs-content { gap: 28px; }
+      #screen-cpi-obs .ob-page-hero { display: flex; flex-direction: column; gap: 20px; }
+      #screen-cpi-obs .ob-explore { display: flex; flex-direction: column; gap: 12px; }
+      #screen-cpi-obs .ob-page-hero .aiobs-subtitle { max-width: none; white-space: nowrap; }
+
+      /* Headline cards — executive KPI strip */
+      #screen-cpi-obs .ob-headline-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; align-items: stretch; }
+      #screen-cpi-obs .ob-headline-card {
+        padding: 18px 18px 16px; display: flex; flex-direction: column; align-items: flex-start;
+        cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s;
+      }
+      #screen-cpi-obs .ob-headline-card:hover { border-color: var(--border); box-shadow: var(--shadow-md); }
+      #screen-cpi-obs .ob-headline-ic {
+        width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
+        font-size: 17px; flex-shrink: 0; margin-bottom: 12px;
+      }
+      #screen-cpi-obs .ob-headline-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--surface2); color: var(--text-tertiary); white-space: nowrap; }
+      #screen-cpi-obs .ob-headline-val {
+        font-size: var(--fs-3xl); font-weight: 800; color: var(--text-primary);
+        letter-spacing: -0.02em; line-height: 1; margin-bottom: 8px;
+      }
+      #screen-cpi-obs .ob-headline-name {
+        font-size: var(--fs-sm); font-weight: 700; color: var(--text-primary);
+        line-height: 1.3; margin-bottom: 3px;
+      }
+      #screen-cpi-obs .ob-headline-label {
+        font-size: 11px; font-weight: 500; color: var(--text-tertiary); line-height: 1.4;
+      }
+
+      /* By Region view — structural match to Census Observe's region→district
+         table (census-observe.html .cen-table/.cen-row-toggle/.cen-row--district/
+         .cen-view-all-link, reference only, not edited): expandable region rows
+         (chevron toggle), indented district child rows (hidden until expanded),
+         a "View all N districts" link. Every value in this table is a dummy/
+         illustrative placeholder — flagged via the note banner, never presented
+         as sourced. */
+      #screen-cpi-obs .ob-regtbl-wrap { display: flex; flex-direction: column; gap: 10px; }
+      #screen-cpi-obs .ob-regtbl-note {
+        display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px;
+        background: var(--warning-bg); border-radius: var(--r-md); font-size: 11.5px;
+        color: var(--text-secondary); line-height: 1.5;
+      }
+      #screen-cpi-obs .ob-regtbl-note .ti { color: var(--warning); font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+      #screen-cpi-obs .ob-regtbl th, #screen-cpi-obs .ob-regtbl td { text-align: left; }
+      #screen-cpi-obs .ob-regtbl-toggle {
+        display: inline-flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer;
+        font: inherit; font-weight: 700; color: var(--text-primary); padding: 0;
+      }
+      #screen-cpi-obs .ob-regtbl-toggle i { font-size: 14px; color: var(--text-tertiary); transition: transform 0.15s; }
+      #screen-cpi-obs .ob-regtbl tr.is-expanded .ob-regtbl-toggle i.ti-chevron-right { transform: rotate(90deg); }
+      #screen-cpi-obs .ob-regtbl tr.ob-regtbl-row--district td:first-child { padding-left: 42px; color: var(--text-secondary); font-weight: 500; }
+      #screen-cpi-obs .ob-regtbl tr.ob-regtbl-row--district,
+      #screen-cpi-obs .ob-regtbl tr.ob-regtbl-row--viewall { display: none; }
+      #screen-cpi-obs .ob-regtbl tr.ob-regtbl-row--viewall td { padding: 8px 16px 12px 42px; }
+      #screen-cpi-obs .ob-regtbl-viewall { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; }
+      #screen-cpi-obs .ob-regtbl-foot { font-size: var(--fs-xs); color: var(--text-tertiary); padding: 2px 2px 0; }
+
+      /* Category pills */
+      #screen-cpi-obs .ob-cats { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      #screen-cpi-obs .ob-cat-pill {
+        display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: 999px;
+        border: 1px solid var(--border-solid); background: var(--surface); color: var(--text-secondary);
+        font-size: var(--fs-xs); font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+      }
+      #screen-cpi-obs .ob-cat-pill:hover { border-color: var(--accent); color: var(--accent); }
+      #screen-cpi-obs .ob-cat-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+      #screen-cpi-obs .ob-cat-pill .ti { font-size: 14px; }
+      #screen-cpi-obs .ob-cat-pill .ob-cat-count { opacity: 0.7; font-weight: 500; }
+
+      /* Filter bar (dropdown-style chips) */
+      #screen-cpi-obs .ob-filterbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border-solid); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
+      #screen-cpi-obs .ob-filter-chip { display: flex; align-items: center; gap: 9px; padding: 8px 12px; border-radius: var(--r-md); border: 1px solid var(--border-solid); background: var(--surface); cursor: pointer; font-family: inherit; }
+      #screen-cpi-obs .ob-filter-chip .ti { font-size: 15px; color: var(--text-tertiary); }
+      #screen-cpi-obs .ob-filter-chip-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
+      #screen-cpi-obs .ob-filter-chip-label { font-size: 10px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+      #screen-cpi-obs .ob-filter-chip-val { font-size: var(--fs-xs); color: var(--text-primary); font-weight: 600; }
+      #screen-cpi-obs .ob-filter-chip select { border: none; background: none; font-family: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--text-primary); cursor: pointer; appearance: none; -webkit-appearance: none; padding-right: 2px; }
+      #screen-cpi-obs .ob-filter-chip select:focus { outline: none; }
+      #screen-cpi-obs .ob-filterbar-spacer { flex: 1; }
+      #screen-cpi-obs .ob-morefilters { position: relative; display: flex; align-items: center; }
+      #screen-cpi-obs .ob-morefilters-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 10.5px; font-weight: 700; padding: 0 5px; margin-inline-start: 6px; }
+      #screen-cpi-obs .ob-morefilters-panel {
+        position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: 280px;
+        background: var(--surface); border: 1px solid var(--border-solid); border-radius: var(--r-lg);
+        box-shadow: var(--shadow-lg); padding: 16px; display: none; flex-direction: column; gap: 14px;
+      }
+      #screen-cpi-obs .ob-morefilters.is-open .ob-morefilters-panel { display: flex; }
+      #screen-cpi-obs .ob-mf-group label { display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 6px; }
+      #screen-cpi-obs .ob-mf-group select { width: 100%; padding: 8px 10px; border-radius: var(--r-md); border: 1px solid var(--border-solid); font-family: inherit; font-size: var(--fs-xs); color: var(--text-primary); background: var(--surface2); }
+      #screen-cpi-obs .ob-mf-note { font-size: 10.5px; color: var(--text-tertiary); line-height: 1.5; }
+      #screen-cpi-obs .ob-clearall { display: inline-flex; align-items: center; gap: 6px; border: none; background: none; font-family: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--text-tertiary); cursor: pointer; padding: 8px 4px; }
+      #screen-cpi-obs .ob-clearall:hover { color: var(--danger); }
+
+      /* Toolbar: view toggle + search */
+      #screen-cpi-obs .ob-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; min-height: 36px; }
+      #screen-cpi-obs .ob-toolbar-start { display: flex; align-items: center; gap: 12px; }
+      #screen-cpi-obs .ob-toolbar-label { font-size: var(--fs-xs); font-weight: 600; color: var(--text-tertiary); white-space: nowrap; }
+      #screen-cpi-obs .ob-viewtoggle { display: flex; gap: 3px; padding: 3px; background: var(--surface2); border-radius: var(--r-md); }
+      #screen-cpi-obs .ob-viewtoggle button { width: 32px; height: 30px; border: none; background: none; border-radius: 8px; color: var(--text-tertiary); cursor: pointer; display: grid; place-items: center; font-size: 15px; }
+      #screen-cpi-obs .ob-viewtoggle button.active { background: var(--surface); color: var(--accent); box-shadow: var(--shadow-sm); }
+      #screen-cpi-obs .ob-search { position: relative; flex: 1; max-width: 420px; }
+      #screen-cpi-obs .ob-search .ti-search { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 15px; }
+      #screen-cpi-obs .ob-search input { width: 100%; padding: 9px 14px 9px 36px; border-radius: var(--r-md); border: 1px solid var(--border-solid); font-family: inherit; font-size: var(--fs-xs); color: var(--text-primary); background: var(--surface); box-sizing: border-box; }
+      #screen-cpi-obs .ob-search input:focus { outline: none; border-color: var(--accent); }
+      #screen-cpi-obs .ob-search kbd { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-tertiary); background: var(--surface2); border-radius: 5px; padding: 2px 6px; }
+
+      /* Table */
+      #screen-cpi-obs .ob-table-wrap { overflow-x: auto; border-radius: var(--r-lg); border: 1px solid var(--border-solid); background: var(--surface); }
+      #screen-cpi-obs .ob-table { width: 100%; border-collapse: collapse; min-width: 880px; }
+      #screen-cpi-obs .ob-table thead th { text-align: left; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); padding: 12px 16px; border-bottom: 1px solid var(--border-solid); background: var(--surface2); white-space: nowrap; }
+      #screen-cpi-obs .ob-table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--surface2); font-size: var(--fs-xs); color: var(--text-secondary); vertical-align: middle; }
+      #screen-cpi-obs .ob-table tbody tr:last-child td { border-bottom: none; }
+      #screen-cpi-obs .ob-table tbody tr:hover { background: var(--accent-light); }
+      #screen-cpi-obs .ob-domain-dot { width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; font-size: 12px; flex-shrink: 0; }
+      #screen-cpi-obs .ob-tag-global { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: #7C3AED; background: #F3E8FF; padding: 2px 7px; border-radius: 999px; margin-inline-start: 6px; }
+      #screen-cpi-obs .ob-actions-cell { position: relative; text-align: right; }
+      #screen-cpi-obs .ob-actions-btn { width: 30px; height: 30px; border-radius: 8px; border: none; background: none; color: var(--text-tertiary); cursor: pointer; display: inline-grid; place-items: center; font-size: 16px; }
+      #screen-cpi-obs .ob-actions-btn:hover { background: var(--surface2); color: var(--text-primary); }
+      /* Cards view */
+      #screen-cpi-obs .ob-cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+      #screen-cpi-obs .ob-icard { padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; }
+      #screen-cpi-obs .ob-icard:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); }
+      #screen-cpi-obs .ob-icard-top { display: flex; align-items: center; justify-content: space-between; }
+      #screen-cpi-obs .ob-icard-val { font-size: var(--fs-3xl); font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+      #screen-cpi-obs .ob-icard-name { font-size: var(--fs-xs); font-weight: 700; color: var(--text-primary); }
+      #screen-cpi-obs .ob-icard-meta { font-size: 10.5px; color: var(--text-tertiary); display: flex; justify-content: space-between; margin-top: 2px; }
+
+      /* Pagination */
+      #screen-cpi-obs .ob-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 4px 2px; }
+      #screen-cpi-obs .ob-pg-count { font-size: var(--fs-xs); color: var(--text-tertiary); }
+      #screen-cpi-obs .ob-pg-right { display: flex; align-items: center; gap: 14px; }
+      #screen-cpi-obs .ob-pg-rpp { display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); color: var(--text-tertiary); }
+      #screen-cpi-obs .ob-pg-rpp select { padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border-solid); font-family: inherit; font-size: var(--fs-xs); background: var(--surface); }
+      #screen-cpi-obs .ob-pg-btns { display: flex; align-items: center; gap: 4px; }
+      #screen-cpi-obs .ob-pg-btn { min-width: 28px; height: 28px; padding: 0 6px; border-radius: 7px; border: 1px solid var(--border-solid); background: var(--surface); color: var(--text-secondary); font-size: var(--fs-xs); font-weight: 600; cursor: pointer; font-family: inherit; }
+      #screen-cpi-obs .ob-pg-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+      #screen-cpi-obs .ob-pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+      #screen-cpi-obs .ob-pg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+      /* Drawer */
+      #screen-cpi-obs .ob-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.42); z-index: 200; display: none; }
+      #screen-cpi-obs .ob-overlay.is-open { display: block; }
+      #screen-cpi-obs .ob-drawer {
+        position: fixed; top: 0; right: -460px; width: 440px; max-width: 92vw; height: 100vh; background: var(--surface);
+        box-shadow: -12px 0 40px rgba(15,23,42,0.18); z-index: 201; transition: right 0.25s ease; display: flex; flex-direction: column;
+      }
+      #screen-cpi-obs .ob-drawer.is-open { right: 0; }
+      #screen-cpi-obs .ob-drawer-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 22px; border-bottom: 1px solid var(--border-solid); }
+      #screen-cpi-obs .ob-drawer-close { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--surface2); color: var(--text-secondary); cursor: pointer; display: grid; place-items: center; flex-shrink: 0; }
+      #screen-cpi-obs .ob-drawer-body { flex: 1; overflow-y: auto; padding: 22px; display: flex; flex-direction: column; gap: 20px; }
+      #screen-cpi-obs .ob-drawer-val { font-size: 40px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; line-height: 1; }
+      #screen-cpi-obs .ob-drawer-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      #screen-cpi-obs .ob-drawer-meta-item { background: var(--surface2); border-radius: var(--r-md); padding: 10px 12px; }
+      #screen-cpi-obs .ob-drawer-meta-item dt { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin: 0 0 3px; }
+      #screen-cpi-obs .ob-drawer-meta-item dd { font-size: var(--fs-xs); font-weight: 600; color: var(--text-primary); margin: 0; line-height: 1.4; }
+      #screen-cpi-obs .ob-drawer-section h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin: 0 0 10px; }
+      #screen-cpi-obs .ob-drawer-p { font-size: var(--fs-xs); color: var(--text-secondary); line-height: 1.6; margin: 0; }
+      #screen-cpi-obs .ob-dimbar-row { display: grid; grid-template-columns: 96px 1fr 56px; gap: 10px; align-items: center; margin-bottom: 9px; }
+      #screen-cpi-obs .ob-dimbar-name { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+      #screen-cpi-obs .ob-dimbar-track { height: 9px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+      #screen-cpi-obs .ob-dimbar-fill { height: 100%; border-radius: 999px; background: var(--accent); }
+      #screen-cpi-obs .ob-dimbar-val { font-size: 11px; font-weight: 700; color: var(--text-primary); text-align: right; }
+      #screen-cpi-obs .ob-related-row { display: flex; justify-content: space-between; font-size: var(--fs-xs); padding: 7px 0; border-bottom: 1px solid var(--surface2); }
+      #screen-cpi-obs .ob-related-row:last-child { border-bottom: none; }
+      #screen-cpi-obs .ob-related-row span:first-child { color: var(--text-secondary); }
+      #screen-cpi-obs .ob-related-row span:last-child { color: var(--text-primary); font-weight: 700; }
+      #screen-cpi-obs .ob-drawer-foot { padding: 16px 22px; border-top: 1px solid var(--border-solid); display: flex; gap: 8px; flex-wrap: wrap; }
+      #screen-cpi-obs .ob-drawer-foot .aiobs-btn { flex: 1; justify-content: center; }
+      #screen-cpi-obs .ob-unavail-note { display: flex; gap: 10px; padding: 12px 14px; background: var(--warning-bg); border-radius: var(--r-md); }
+      #screen-cpi-obs .ob-unavail-note i { color: var(--warning); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+      #screen-cpi-obs .ob-unavail-note p { font-size: var(--fs-xs); color: var(--text-secondary); line-height: 1.55; margin: 0; }
+
+      /* Compare / Report modal */
+      #screen-cpi-obs .ob-modal { position: fixed; inset: 0; z-index: 210; display: none; align-items: center; justify-content: center; padding: 20px; }
+      #screen-cpi-obs .ob-modal.is-open { display: flex; }
+      #screen-cpi-obs .ob-modal-card { position: relative; z-index: 1; width: 540px; max-width: 100%; max-height: 84vh; overflow-y: auto; background: var(--surface); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); }
+      #screen-cpi-obs .ob-modal-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 22px; border-bottom: 1px solid var(--border-solid); }
+      #screen-cpi-obs .ob-modal-hd h3 { font-size: var(--fs-lg); font-weight: 800; color: var(--text-primary); margin: 0 0 4px; }
+      #screen-cpi-obs .ob-modal-hd p { font-size: 11.5px; color: var(--text-tertiary); margin: 0; }
+      #screen-cpi-obs .ob-modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+      #screen-cpi-obs .ob-modal-foot { padding: 16px 22px; border-top: 1px solid var(--border-solid); display: flex; justify-content: flex-end; gap: 8px; }
+      #screen-cpi-obs .ob-check-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--surface2); }
+      #screen-cpi-obs .ob-check-row:last-child { border-bottom: none; }
+      #screen-cpi-obs .ob-check-row label { font-size: var(--fs-xs); color: var(--text-primary); font-weight: 500; }
+      #screen-cpi-obs .ob-check-row input { width: 16px; height: 16px; accent-color: var(--accent); }
+
+      @media (max-width: 1180px) {
+        #screen-cpi-obs .ob-headline-grid { grid-template-columns: repeat(3, 1fr); }
+        #screen-cpi-obs .ob-cardgrid { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 720px) {
+        #screen-cpi-obs .ob-headline-grid, #screen-cpi-obs .ob-cardgrid { grid-template-columns: 1fr; }
+        #screen-cpi-obs .ob-drawer-meta-grid { grid-template-columns: 1fr; }
+        #screen-cpi-obs .ob-page-hero .aiobs-subtitle { white-space: normal; max-width: 62ch; }
+        #screen-cpi-obs .aiobs-page-header { align-items: flex-start; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen-cpi-obs" class="screen screen--cpi-obs ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Products</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="ai-overview.html">AI Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Observe</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <aside class="sidebar" aria-label="AI Observatory views">
+              <button type="button" class="sidebar-item sidebar-item--ai" onclick="AIObs.toast('AI Observatory assistant — coming soon in this preview')">
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Survey AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <a class="sidebar-item" href="ai-overview.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Overview</span>
+              </a>
+              <a class="sidebar-item" href="ai-interpret.html">
+                <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item active" href="ai-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="ai-benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+            </aside>
+          </div>
+
+          <main class="main">
+            <div class="aiobs-content">
+
+              <!-- ══════════ PAGE HEADER + KPI STRIP ══════════ -->
+              <div class="ob-page-hero">
+                <div class="aiobs-page-header">
+                  <div>
+                    <span class="aiobs-eyebrow"><i class="ti ti-sparkles"></i>AI Observatory</span>
+                    <h1 class="aiobs-title">Observe</h1>
+                    <p class="aiobs-subtitle">Browse AI indicators — search, filter, inspect, and export evidence.</p>
+                  </div>
+                  <div class="aiobs-hdr-actions ob-head-actions">
+                    <div class="ob-export" id="obExport">
+                      <button class="aiobs-btn" type="button" onclick="obToggleExport(event)"><i class="ti ti-download"></i> Export</button>
+                      <div class="ob-export-menu">
+                        <button class="ob-export-opt" type="button" onclick="AIObs.toast('Download CSV — coming soon in this preview')"><i class="ti ti-file-type-csv"></i>Download CSV</button>
+                        <button class="ob-export-opt" type="button" onclick="AIObs.toast('Download Excel — coming soon in this preview')"><i class="ti ti-file-spreadsheet"></i>Download Excel</button>
+                        <button class="ob-export-opt" type="button" onclick="AIObs.toast('Exporting current filtered view — coming soon in this preview')"><i class="ti ti-filter"></i>Export current view</button>
+                      </div>
+                    </div>
+                    <button class="aiobs-btn ob-btn-primary" type="button" onclick="obOpenReport()"><i class="ti ti-file-report"></i> Generate Report</button>
+                    <div class="ob-dataof"><i class="ti ti-calendar" style="color:var(--text-tertiary)"></i>Data as of <b>2026</b></div>
+                  </div>
+                </div>
+
+                <div class="ob-headline-grid" id="obHeadlineGrid"></div>
+              </div>
+
+              <!-- ══════════ EXPLORE: FILTERS + TABLE / CARDS ══════════ -->
+              <div class="ob-explore">
+              <div class="ob-cats" id="obCats" style="display:none"></div>
+
+              <!-- ══════════ FILTER BAR ══════════ -->
+              <div class="ob-filterbar" style="display:none">
+                <div class="ob-filter-chip">
+                  <i class="ti ti-users-group"></i>
+                  <div class="ob-filter-chip-text">
+                    <span class="ob-filter-chip-label">Population group</span>
+                    <select id="obPopFilter">
+                      <option value="all">All groups</option>
+                      <option value="enterprises">Enterprises</option>
+                      <option value="individuals">Individuals</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="ob-filter-chip">
+                  <i class="ti ti-calendar-stats"></i>
+                  <div class="ob-filter-chip-text">
+                    <span class="ob-filter-chip-label">Year</span>
+                    <select id="obYearFilter" title="First published cycle — only 2026 is available today">
+                      <option value="2026">2026</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="ob-morefilters" id="obMoreFilters">
+                  <button class="ob-filter-chip" type="button" onclick="obToggleMoreFilters(event)">
+                    <i class="ti ti-adjustments-horizontal"></i>
+                    <div class="ob-filter-chip-text">
+                      <span class="ob-filter-chip-label">More filters</span>
+                      <span class="ob-filter-chip-val">Enterprise size, Age band</span>
+                    </div>
+                    <span class="ob-morefilters-badge" id="obMoreFiltersBadge" hidden>0</span>
+                  </button>
+                  <div class="ob-morefilters-panel">
+                    <div class="ob-mf-group">
+                      <label>Enterprise size</label>
+                      <select id="obSizeFilter">
+                        <option value="all">All sizes</option>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                      </select>
+                    </div>
+                    <div class="ob-mf-group">
+                      <label>Age band (individuals)</label>
+                      <select id="obAgeFilter">
+                        <option value="all">All ages</option>
+                        <option value="15-24">15–24</option>
+                        <option value="25-34">25–34</option>
+                        <option value="35-44">35–44</option>
+                        <option value="45+">45+</option>
+                      </select>
+                    </div>
+                    <p class="ob-mf-note">Only applied where the source publishes that breakdown — currently Enterprise AI adoption (by size) and AI use (by age band). Other indicators keep their overall value.</p>
+                  </div>
+                </div>
+                <div class="ob-filterbar-spacer"></div>
+                <button class="ob-clearall" type="button" onclick="obClearAll()"><i class="ti ti-x"></i>Clear all</button>
+              </div>
+
+              <!-- ══════════ TOOLBAR: VIEW + SEARCH ══════════ -->
+              <div class="ob-toolbar">
+                <div class="ob-toolbar-start">
+                  <span class="ob-toolbar-label" id="obToolbarLabel">By region</span>
+                  <div class="ob-viewtoggle">
+                    <button class="active" data-view="region" onclick="obSetView('region')" title="By region"><i class="ti ti-map-pin"></i></button>
+                    <button data-view="cards" onclick="obSetView('cards')" title="Card view"><i class="ti ti-layout-grid"></i></button>
+                  </div>
+                </div>
+                <div class="ob-search" id="obSearchWrap" style="display:none">
+                  <i class="ti ti-search"></i>
+                  <input type="text" id="obSearch" placeholder="Search indicators, topics or keywords…" />
+                </div>
+              </div>
+
+              <!-- ══════════ BY REGION VIEW — same region→district drill-down
+                     pattern as Census Observe's location table (census-observe.html
+                     .cen-table, reference only): expandable region rows, indented
+                     district child rows, a "View all N districts" link. Every value
+                     here is a dummy/illustrative placeholder, not yet computed from
+                     the survey — the Table/Card views above stay 100% real data. ══════════ -->
+              <div class="ob-regtbl-wrap" id="obRegionView">
+                <div class="ob-regtbl-note">
+                  <i class="ti ti-info-circle"></i>
+                  <span>Prototype layout — values below are illustrative placeholders, not yet computed at region or district level.</span>
+                </div>
+                <div class="ob-table-wrap">
+                  <table class="ob-table ob-regtbl">
+                    <thead>
+                      <tr>
+                        <th title="Region — click to expand and see its districts">Location</th>
+                        <th data-metric="ai-use-individuals" title="AI use (individuals 15+)">AI Use</th>
+                        <th data-metric="enterprise-adoption" title="Enterprise AI adoption">Enterprise Adoption</th>
+                        <th data-metric="training-reach" title="AI training reach (current/formal)">Training Reach</th>
+                        <th data-metric="enterprise-governance" title="Enterprises with AI governance in place">Governance</th>
+                        <th data-metric="advanced-capability" title="Individuals with advanced AI capability">Advanced Capability</th>
+                        <th style="text-align:right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="obRegionBody"></tbody>
+                  </table>
+                </div>
+                <div class="ob-regtbl-foot">Showing 1–3 of 3 regions · figures are illustrative</div>
+              </div>
+
+              <!-- ══════════ CARDS VIEW ══════════ -->
+              <div class="ob-cardgrid" id="obCardView" hidden></div>
+
+              <!-- ══════════ PAGINATION ══════════ -->
+              <div class="ob-pagination" style="display:none">
+                <span class="ob-pg-count" id="obPgCount">Showing indicators</span>
+                <div class="ob-pg-right">
+                  <div class="ob-pg-rpp">
+                    Rows per page
+                    <select id="obRpp">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="1000">All</option>
+                    </select>
+                  </div>
+                  <div class="ob-pg-btns" id="obPgBtns"></div>
+                </div>
+              </div>
+              </div>
+
+            </div>
+          </main>
+        </div>
+      </div>
+
+      <!-- ══════════ INDICATOR DETAIL DRAWER ══════════
+           Kept INSIDE #screen-cpi-obs on purpose — every .ob-drawer /
+           .ob-modal / .ob-overlay rule above is scoped "#screen-cpi-obs .x"
+           to match this shell's convention, so these must be descendants
+           of it or their display:none / position:fixed rules never match
+           and they'd render inline and permanently visible instead. -->
+      <div class="ob-overlay" id="obOverlay" onclick="obCloseDrawer();obCloseModal()"></div>
+      <aside class="ob-drawer" id="obDrawer" aria-label="Indicator detail">
+        <div class="ob-drawer-hd">
+          <div>
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-tertiary);margin-bottom:6px" id="obDrawerDomain">Domain</div>
+            <div style="font-size:var(--fs-lg);font-weight:800;color:var(--text-primary)" id="obDrawerName">Indicator name</div>
+          </div>
+          <button class="ob-drawer-close" onclick="obCloseDrawer()"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="ob-drawer-body" id="obDrawerBody"></div>
+        <div class="ob-drawer-foot">
+          <button class="aiobs-btn" id="obDrawerExploreBtn" onclick="AIObs.toast('Explore indicator — coming soon in this preview')"><i class="ti ti-compass"></i>Explore</button>
+          <button class="aiobs-btn" onclick="AIObs.toast('View data — coming soon in this preview')"><i class="ti ti-table"></i>View data</button>
+          <button class="aiobs-btn" id="obDrawerCompareBtn" style="display:none" onclick="AIObs.toast('Compare — coming soon in this preview')"><i class="ti ti-arrows-left-right"></i>Compare</button>
+          <button class="aiobs-btn" onclick="AIObs.toast('Download — coming soon in this preview')"><i class="ti ti-download"></i>Download</button>
+          <button class="aiobs-btn aiobs-btn--ai" id="obDrawerAskBtn" onclick="AIObs.askAI('Explain this indicator')"><i class="ti ti-sparkles"></i>Ask Bayaan AI</button>
+        </div>
+      </aside>
+
+      <!-- ══════════ COMPARE MODAL ══════════ -->
+      <div class="ob-modal" id="obCompareModal">
+        <div class="ob-modal-card">
+          <div class="ob-modal-hd">
+            <div>
+              <h3 id="obCompareTitle">Compare</h3>
+              <p id="obCompareNote">Different populations/methodology — see labels.</p>
+            </div>
+            <button class="ob-drawer-close" onclick="obCloseModal()"><i class="ti ti-x"></i></button>
+          </div>
+          <div class="ob-modal-body" id="obCompareBody"></div>
+          <div class="ob-modal-foot">
+            <button class="aiobs-btn" onclick="obCloseModal()">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ GENERATE REPORT MODAL ══════════ -->
+      <div class="ob-modal" id="obReportModal">
+        <div class="ob-modal-card">
+          <div class="ob-modal-hd">
+            <div>
+              <h3>Generate AI Observatory Report</h3>
+              <p>Bundles the current view into a shareable document.</p>
+            </div>
+            <button class="ob-drawer-close" onclick="obCloseModal()"><i class="ti ti-x"></i></button>
+          </div>
+          <div class="ob-modal-body">
+            <div class="ob-check-row"><input type="checkbox" id="obChk1" checked /><label for="obChk1">Current filters &amp; search scope</label></div>
+            <div class="ob-check-row"><input type="checkbox" id="obChk2" checked /><label for="obChk2">Selected indicators (visible rows)</label></div>
+            <div class="ob-check-row"><input type="checkbox" id="obChk3" /><label for="obChk3">Charts &amp; dimension breakdowns</label></div>
+            <div class="ob-check-row"><input type="checkbox" id="obChk4" /><label for="obChk4">Metadata (definitions, sources)</label></div>
+            <div class="ob-check-row"><input type="checkbox" id="obChk5" /><label for="obChk5">Methodology notes</label></div>
+          </div>
+          <div class="ob-modal-foot">
+            <button class="aiobs-btn" onclick="obCloseModal()">Cancel</button>
+            <button class="aiobs-btn ob-btn-primary" onclick="obGenerateReport()"><i class="ti ti-file-report"></i> Generate Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ============ DATA — every value traced to SCAD "Abu Dhabi AI
+         Statistics" (Sep 2026) or, where flagged, the Microsoft Global
+         AI Diffusion benchmark. No fabricated history: changeText is
+         "—" everywhere (first published cycle). Unavailable indicators
+         (AI-occupation headcount/vacancies) are shown as such, not
+         invented. ============ */
+      var DOMAIN_META = {
+        people:      { label: "People",              icon: "ti-users",              color: "#0066FF" },
+        education:   { label: "Education",            icon: "ti-school",             color: "#0F6E56" },
+        skills:      { label: "Skills",                icon: "ti-gauge",              color: "#7C3AED" },
+        workforce:   { label: "Workforce",             icon: "ti-briefcase",          color: "#D97706" },
+        enterprises: { label: "Enterprises",           icon: "ti-building",           color: "#0052CC" },
+        technology:  { label: "Technology",            icon: "ti-cpu",                color: "#475569" },
+        impact:      { label: "Impact",                icon: "ti-chart-arrows-vertical", color: "#059669" },
+        trust:       { label: "Trust & Governance",    icon: "ti-shield-check",       color: "#B45309" }
+      };
+
+      var OBS_INDICATORS = [
+        {
+          id: "ai-use-individuals", name: "AI use (individuals 15+)", domain: "people",
+          value: "86.0%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Individual Survey", sourceFull: "SCAD Individual AI Adoption Survey, 2026",
+          population: "15,042 respondents, weighted to 2,540,268 residents aged 15+",
+          definition: "Share of individuals aged 15+ who have used AI tools in any form.",
+          dims: { label: "Adoption by age band", unit: "%", rows: [
+            { name: "15–24", value: 93, valueLabel: "93%" }, { name: "25–34", value: 92, valueLabel: "92%" },
+            { name: "35–44", value: 85, valueLabel: "85%" }, { name: "45+", value: 73, valueLabel: "73%" }
+          ]},
+          related: [{ label: "45–49", value: "81.7%" }, { label: "50–54", value: "75.9%" }, { label: "55–59", value: "53.6%" }],
+          compareId: "global-diffusion", keywords: "adoption use individuals people ai use resident",
+          quickFilter: "age"
+        },
+        {
+          id: "enterprise-adoption", name: "Enterprise AI adoption", domain: "enterprises",
+          value: "73%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Enterprise Survey", sourceFull: "SCAD AI Enterprise Adoption Survey, 2026",
+          population: "4,189 of 5,160 enterprises surveyed (81% response), all sectors and size bands; excl. Public Administration & Defence and Compulsory Social Security",
+          definition: "Share of surveyed enterprises reporting AI use in any business function.",
+          dims: { label: "Adoption by enterprise size", unit: "%", rows: [
+            { name: "Large", value: 88, valueLabel: "88%" }, { name: "Medium", value: 79, valueLabel: "79%" }, { name: "Small", value: 72, valueLabel: "72%" }
+          ]},
+          related: [{ label: "Top sector — Electricity (utility)", value: "86%" }, { label: "Lowest sector — Other Service Activities", value: "66%" }],
+          compareId: "intl-benchmark", keywords: "enterprise adoption business company ai use",
+          quickFilter: "size"
+        },
+        {
+          id: "training-reach", name: "AI training reach (current/formal)", domain: "education",
+          value: "17.5%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Individual Survey", sourceFull: "SCAD Individual AI Adoption Survey, 2026",
+          population: "15,042 respondents, weighted to 2,540,268 residents aged 15+",
+          definition: "Composite reach of current or formal AI training among individuals.",
+          related: [{ label: "Currently enrolled", value: "1.3%" }, { label: "Intend to enrol within 6 months", value: "32.9%" }, { label: "Hold a certificate today", value: "2.3%" }, { label: "Prefer 1–2 day workshops", value: "44.3%" }],
+          keywords: "training education certification certificate enrol workshop skills"
+        },
+        {
+          id: "advanced-capability", name: "Individuals with advanced AI capability", domain: "skills",
+          value: "12.4%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Individual Survey", sourceFull: "SCAD Individual AI Adoption Survey, 2026",
+          population: "15,042 respondents, weighted to 2,540,268 residents aged 15+",
+          definition: "Share of individuals self-assessing at the \"advanced\" tier of AI conceptual knowledge.",
+          dims: { label: "Depth of AI literacy", unit: "%", rows: [
+            { name: "Advanced", value: 13.3, valueLabel: "13.3%" }, { name: "Good", value: 32.1, valueLabel: "32.1%" },
+            { name: "Basic", value: 12.1, valueLabel: "12.1%" }, { name: "No knowledge", value: 42.5, valueLabel: "42.5%" }
+          ]},
+          notes: "The headline capability figure (12.4%) and the literacy-tier breakdown (13.3% advanced) come from slightly different rebased cuts of the same survey; both are reported in the source.",
+          keywords: "capability skills knowledge literacy advanced ai understanding"
+        },
+        {
+          id: "skills-gap", name: "AI skills gap (want minus have)", domain: "skills",
+          value: "+26.2pp", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Individual Survey", sourceFull: "SCAD Individual AI Adoption Survey, 2026",
+          population: "15,042 respondents, weighted to 2,540,268 residents aged 15+",
+          definition: "AI skills individuals report wanting, minus the skills they currently hold, in percentage points. Widest gap shown: programming / developing AI apps.",
+          dims: { label: "Gap by skill type (pp)", unit: "pp", rows: [
+            { name: "Programming / developing AI apps", value: 26.2, valueLabel: "+26.2pp" },
+            { name: "Data analysis", value: 22.2, valueLabel: "+22.2pp" },
+            { name: "Creative design using AI", value: 18.9, valueLabel: "+18.9pp" },
+            { name: "Problem-solving & decision-making", value: 15.2, valueLabel: "+15.2pp" },
+            { name: "AI ethics & responsible use", value: 10.8, valueLabel: "+10.8pp" },
+            { name: "Basic understanding of AI (oversupplied)", value: 27.6, valueLabel: "−27.6pp" }
+          ]},
+          notes: "Average gap widens with age: 6.5pp at 15–24, rising to 10.4pp at 45+.",
+          keywords: "skills gap programming data analysis ethics training want have"
+        },
+        {
+          id: "enterprise-governance", name: "Enterprises with AI governance in place", domain: "trust",
+          value: "29%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Enterprise Survey", sourceFull: "SCAD AI Enterprise Adoption Survey, 2026",
+          population: "4,189 of 5,160 enterprises surveyed, adopting enterprises",
+          definition: "Adopting enterprises with a formal AI strategy (11%) or internal AI policies/guidelines (18%) in place.",
+          dims: { label: "AI strategy & governance status", unit: "%", rows: [
+            { name: "No plans yet, but planned", value: 37.7, valueLabel: "37.7%" },
+            { name: "No AI strategy or policy in place", value: 33.1, valueLabel: "33.1%" },
+            { name: "Internal AI policies / guidelines", value: 18.2, valueLabel: "18.2%" },
+            { name: "Formal AI strategy", value: 11.1, valueLabel: "11.1%" }
+          ]},
+          keywords: "governance strategy policy oversight enterprise",
+        },
+        {
+          id: "planning-adopt", name: "Non-adopters planning to adopt AI (3–5 yrs)", domain: "enterprises",
+          value: "47%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Enterprise Survey", sourceFull: "SCAD AI Enterprise Adoption Survey, 2026",
+          population: "Non-adopting enterprises among those surveyed",
+          definition: "Share of non-adopting enterprises that plan to adopt AI within the next 3–5 years, led by Manufacturing and Trade.",
+          dims: { label: "Top barriers to adoption (% of non-adopters)", unit: "%", rows: [
+            { name: "Lack of relevant expertise", value: 16.7, valueLabel: "16.7%" },
+            { name: "Incompatibility with existing systems", value: 16.1, valueLabel: "16.1%" },
+            { name: "Not useful for the enterprise", value: 13.9, valueLabel: "13.9%" },
+            { name: "Costs too high", value: 13.8, valueLabel: "13.8%" },
+            { name: "Data availability or quality issues", value: 10.6, valueLabel: "10.6%" },
+            { name: "Other reasons", value: 8.5, valueLabel: "8.5%" },
+            { name: "Data protection & privacy concerns", value: 8.1, valueLabel: "8.1%" },
+            { name: "Unclear legal consequences", value: 7.3, valueLabel: "7.3%" },
+            { name: "Ethical considerations", value: 4.9, valueLabel: "4.9%" }
+          ]},
+          keywords: "barriers non-adopters expertise cost readiness planning enterprise"
+        },
+        {
+          id: "rd-use", name: "AI use directed to R&D or innovation", domain: "impact",
+          value: "2%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Enterprise Survey", sourceFull: "SCAD AI Enterprise Adoption Survey, 2026",
+          population: "Adopting enterprises",
+          definition: "Share of reported AI use directed at R&D or innovation, versus operational functions.",
+          dims: { label: "Purpose of AI use", unit: "%", rows: [
+            { name: "Administration", value: 26, valueLabel: "26%" }, { name: "Production / service processes", value: 23, valueLabel: "23%" },
+            { name: "Marketing or sales", value: 22, valueLabel: "22%" }, { name: "Finance management", value: 13, valueLabel: "13%" },
+            { name: "ICT Security", value: 9, valueLabel: "9%" }, { name: "Logistics", value: 5, valueLabel: "5%" },
+            { name: "R&D or innovation", value: 2, valueLabel: "2%" }
+          ]},
+          related: [{ label: "R&D use — Information & Comm.", value: "41.1%" }, { label: "R&D use — Professional activities", value: "24.6%" }],
+          keywords: "r&d innovation research use purpose business function"
+        },
+        {
+          id: "productivity", name: "Enterprises reporting increased productivity", domain: "impact",
+          value: "73.6%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Enterprise Survey", sourceFull: "SCAD AI Enterprise Adoption Survey, 2026",
+          population: "Adopting enterprises",
+          definition: "Share of enterprises reporting AI increased worker productivity; almost none report a decline.",
+          dims: { label: "Reported effect of AI on the workplace", unit: "%", rows: [
+            { name: "Productivity", value: 73.6, valueLabel: "73.6%" }, { name: "Worker satisfaction", value: 65.8, valueLabel: "65.8%" },
+            { name: "Performance measurement", value: 57.9, valueLabel: "57.9%" }, { name: "Workforce, expected in 3–5 yrs", value: 57.2, valueLabel: "57.2%" },
+            { name: "Health & safety", value: 47.7, valueLabel: "47.7%" }, { name: "Employment, current effect", value: 36.9, valueLabel: "36.9%" }
+          ]},
+          notes: "Figures are enterprises reporting an increase on each dimension; figures are self-reported, not a causal estimate of AI's effect.",
+          keywords: "productivity impact workplace employment satisfaction performance"
+        },
+        {
+          id: "uae-future", name: "Positive about UAE's AI future", domain: "impact",
+          value: "88.6%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Individual Survey", sourceFull: "SCAD Individual AI Adoption Survey, 2026",
+          population: "15,042 respondents, weighted to 2,540,268 residents aged 15+",
+          definition: "Share of individuals holding a positive view of the UAE's AI future specifically.",
+          dims: { label: "By population segment", unit: "%", rows: [
+            { name: "Overall", value: 88.6, valueLabel: "88.6%" }, { name: "Emirati jobseekers", value: 94.1, valueLabel: "94.1%" }
+          ]},
+          keywords: "sentiment future optimism positive uae outlook"
+        },
+        {
+          id: "trust-decisions", name: "Trust in AI decision-making", domain: "trust",
+          value: "43.3%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Individual Survey", sourceFull: "SCAD Individual AI Adoption Survey, 2026",
+          population: "15,042 respondents, weighted to 2,540,268 residents aged 15+",
+          definition: "Share of individuals who trust AI specifically in decision-making — distinct from general positive sentiment about AI (70.1%).",
+          related: [{ label: "Positive about AI overall", value: "70.1%" }, { label: "Gap (sentiment − trust)", value: "26.8pp" }],
+          keywords: "trust decision-making sentiment confidence"
+        },
+        {
+          id: "privacy-concern", name: "Privacy concern (AI use)", domain: "trust",
+          value: "56.0%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Individual Survey", sourceFull: "SCAD Individual AI Adoption Survey, 2026",
+          population: "15,042 respondents, weighted to 2,540,268 residents aged 15+",
+          definition: "Share of individuals citing privacy as their leading concern about AI — the single most-cited concern.",
+          keywords: "privacy concern data protection trust"
+        },
+        {
+          id: "regulation-support", name: "Support for clear AI regulation", domain: "trust",
+          value: "88.3%", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Individual Survey", sourceFull: "SCAD Individual AI Adoption Survey, 2026",
+          population: "15,042 respondents, weighted to 2,540,268 residents aged 15+",
+          definition: "Share of individuals who support clear regulation of AI.",
+          keywords: "regulation governance policy support trust"
+        },
+        {
+          id: "tech-types", name: "Technology types in enterprise AI use", domain: "technology",
+          value: "8,719 uses", changeText: "—", refPeriod: "2026",
+          sourceShort: "SCAD Enterprise Survey", sourceFull: "SCAD AI Enterprise Adoption Survey, 2026",
+          population: "Adopting enterprises (multi-select; totals exceed respondent count)",
+          definition: "Number of responses citing generative language/code/content as an AI technology in use — the leading type. Enterprises could select multiple technology types.",
+          dims: { label: "Technology types — number of responses", unit: "", rows: [
+            { name: "Generative language, code & content", value: 8719, valueLabel: "8,719" }, { name: "Text mining & language analysis", value: 5752, valueLabel: "5,752" },
+            { name: "Image, video & audio generation", value: 4597, valueLabel: "4,597" }, { name: "Speech recognition", value: 4408, valueLabel: "4,408" },
+            { name: "Machine learning for data analysis", value: 3668, valueLabel: "3,668" }, { name: "Image & object recognition", value: 2268, valueLabel: "2,268" },
+            { name: "Workflow automation & decision support", value: 2040, valueLabel: "2,040" }, { name: "Autonomous robots & self-driving systems", value: 180, valueLabel: "180" }
+          ]},
+          keywords: "technology generative ai types tools automation robots"
+        },
+        {
+          id: "global-diffusion", name: "AI diffusion — UAE (global benchmark)", domain: "technology",
+          value: "70.1%", changeText: "—", refPeriod: "Q1 2026", isGlobal: true,
+          sourceShort: "Microsoft AI Economy Institute", sourceFull: "Microsoft AI Economy Institute, Global AI Diffusion Q1 2026",
+          population: "UAE, ages 15–64 — modelled from device/usage activity, not a SCAD survey",
+          definition: "Externally modelled share of the UAE population aged 15–64 actively using AI (≥90 minutes/month). Ranked 1st of 147 countries. This is a UAE-level global benchmark, not an Abu Dhabi statistic, and uses a different methodology from the SCAD surveys elsewhere on this page.",
+          dims: { label: "Global AI diffusion, selected economies", unit: "%", rows: [
+            { name: "Abu Dhabi (SCAD survey, own methodology)", value: 86.0, valueLabel: "86.0%" },
+            { name: "UAE — #1 of 147", value: 70.1, valueLabel: "70.1%" }, { name: "Singapore — #2", value: 63.4, valueLabel: "63.4%" },
+            { name: "Norway — #3", value: 48.6, valueLabel: "48.6%" }, { name: "Qatar — #10", value: 41.8, valueLabel: "41.8%" },
+            { name: "Global average", value: 15.0, valueLabel: "15.0%" }
+          ]},
+          notes: "Shown for context only — do not read as a direct restatement of Abu Dhabi's own 86.0% survey figure; population and method differ.",
+          compareId: "intl-benchmark", keywords: "global uae benchmark diffusion microsoft ranking international"
+        },
+        {
+          id: "fte-employees", name: "AI-related FTE employees", domain: "workforce",
+          value: null, changeText: "—", refPeriod: "—", unavailable: true,
+          sourceShort: "—", sourceFull: "Not yet published",
+          definition: "Dedicated AI-occupation headcount is not yet part of the published 2026 survey.",
+          keywords: "workforce fte employees headcount occupation"
+        },
+        {
+          id: "vacancies", name: "AI-related vacancies", domain: "workforce",
+          value: null, changeText: "—", refPeriod: "—", unavailable: true,
+          sourceShort: "—", sourceFull: "Not yet published",
+          definition: "Dedicated AI-occupation vacancy and hiring-demand statistics are not yet part of the published 2026 survey. Occupational AI demand is currently tracked qualitatively and will be quantified as this measurement programme matures.",
+          keywords: "workforce vacancy hiring jobs occupation demand"
+        }
+      ];
+
+      /* ============ REGION / DISTRICT DATA — "By Region" table ============
+         Structural match to Census Observe's region→district table
+         (census-observe.html CEN_REGIONS/CEN_DISTRICT_NAMES, reference
+         only, not edited): same 3 regions and same 15 district names (real
+         Abu Dhabi geography, not invented) so both Observatories agree on
+         place names. The 5 metric columns reuse this page's own existing
+         headline indicators. Every metric value here — region AND district
+         — is a dummy/illustrative placeholder built by scaling the real
+         emirate-wide figure by an arbitrary multiplier; there is no real
+         per-region AI survey breakdown yet (see project memory). This never
+         touches OBS_INDICATORS or the real Table/Card views above. */
+      var OB_METRIC_COLS = ["ai-use-individuals", "enterprise-adoption", "training-reach", "enterprise-governance", "advanced-capability"];
+      var OB_DISTRICT_OFFSETS = [1.04, 0.97, 1.02, 0.94, 1.07];
+
+      function obMetricsFor(mult) {
+        var out = {};
+        OB_METRIC_COLS.forEach(function (id) {
+          var base = OBS_INDICATORS.filter(function (i) { return i.id === id; })[0].value;
+          out[id] = obScaleValueString(base, mult);
+        });
+        return out;
+      }
+
+      var OB_REGIONS = [
+        { name: "Abu Dhabi Region", mult: 1.05, moreCount: 3, districts: ["Musaffah", "Al Danah", "Mohamed Bin Zayed City", "Jarn Yafour", "Al Bahyah"] },
+        { name: "Al Ain Region", mult: 0.88, moreCount: 3, districts: ["Al Ain City", "Al Mutawa", "Al Hili", "Al Jimi", "Al Khabisi"] },
+        { name: "Al Dhafra Region", mult: 0.80, moreCount: 2, districts: ["Ghyathi", "Zayed City", "Central Al Dhafra", "Al Ghwaifat", "Delma and Surrounding Islands"] }
+      ];
+      OB_REGIONS.forEach(function (r) {
+        r.metrics = obMetricsFor(r.mult);
+        r.districtRows = r.districts.map(function (name, i) {
+          return { name: name, metrics: obMetricsFor(r.mult * OB_DISTRICT_OFFSETS[i]) };
+        });
+      });
+
+      var COMPARE_SETS = {
+        "intl-benchmark": {
+          title: "Enterprise AI adoption — international benchmark",
+          note: "Abu Dhabi applies the Eurostat AI questionnaire; North America and Greater China are directional context only.",
+          rows: [
+            { name: "North America", value: 90, tag: "directional only" }, { name: "Greater China", value: 88, tag: "directional only" },
+            { name: "Abu Dhabi", value: 73, tag: "SCAD survey", highlight: true }, { name: "Denmark", value: 42, tag: "Eurostat/OECD, 2025" },
+            { name: "Finland", value: 38, tag: "Eurostat/OECD, 2025" }, { name: "Sweden", value: 35, tag: "Eurostat/OECD, 2025" },
+            { name: "South Korea", value: 30, tag: "Eurostat/OECD, 2025" }, { name: "Saudi Arabia", value: 28, tag: "KSA Statistics, 2025" },
+            { name: "Germany", value: 26, tag: "Eurostat/OECD, 2025" }, { name: "European Union", value: 20, tag: "Eurostat/OECD, 2025" },
+            { name: "Japan", value: 19, tag: "Eurostat/OECD, 2025" }, { name: "United Kingdom", value: 16, tag: "Eurostat/OECD, 2025" }
+          ]
+        },
+        "global-diffusion": {
+          title: "AI use — Abu Dhabi survey vs. UAE global benchmark",
+          note: "Different populations and methodology — Abu Dhabi's figure is SCAD's own survey; the rest are Microsoft's externally modelled estimates.",
+          rows: [
+            { name: "Abu Dhabi (SCAD survey)", value: 86.0, tag: "own survey", highlight: true }, { name: "UAE — #1 of 147", value: 70.1, tag: "Microsoft, Q1 2026" },
+            { name: "Singapore — #2", value: 63.4, tag: "Microsoft, Q1 2026" }, { name: "Norway — #3", value: 48.6, tag: "Microsoft, Q1 2026" },
+            { name: "Qatar — #10", value: 41.8, tag: "Microsoft, Q1 2026" }, { name: "Global average", value: 15.0, tag: "Microsoft, Q1 2026" }
+          ]
+        }
+      };
+
+      var obState = { domain: "all", pop: "all", size: "all", age: "all", search: "", page: 1, rpp: 10, view: "region" };
+
+      function obFmtChange() { return "—"; }
+
+      /* Scales a formatted value string ("86.0%", "+26.2pp", "8,719 uses")
+         by a multiplier, preserving its sign/decimal/unit formatting.
+         Percentages are clamped to 0–100; other units are not. Used only to
+         build the dummy By Region table below — never applied to the real
+         indicator Table/Card views above. */
+      function obScaleValueString(str, mult) {
+        if (str == null) return str;
+        var m = String(str).match(/^([+\-]?)([\d,]+(?:\.\d+)?)(.*)$/);
+        if (!m) return str;
+        var sign = m[1], rawNum = m[2], suffix = m[3];
+        var num = parseFloat(rawNum.replace(/,/g, ""));
+        var scaled = num * mult;
+        if (suffix.indexOf("%") === 0) scaled = Math.max(0, Math.min(100, scaled));
+        var hasDecimal = rawNum.indexOf(".") > -1;
+        var out = hasDecimal ? scaled.toFixed(1) : String(Math.round(scaled));
+        if (!hasDecimal && rawNum.indexOf(",") > -1) out = Number(out).toLocaleString("en-US");
+        return sign + out + suffix;
+      }
+
+      function obDomainIcon(domainKey, size) {
+        var d = DOMAIN_META[domainKey];
+        size = size || 22;
+        return '<span class="ob-domain-dot" style="width:' + size + 'px;height:' + size + 'px;background:' + d.color + '1a;color:' + d.color + '"><i class="ti ' + d.icon + '"></i></span>';
+      }
+
+      function obQuickValue(item) {
+        if (item.unavailable) return null;
+        if (item.quickFilter === "size" && obState.size !== "all" && item.dims) {
+          var map = { small: "Small", medium: "Medium", large: "Large" };
+          var row = item.dims.rows.find(function (r) { return r.name === map[obState.size]; });
+          if (row) return { value: row.valueLabel, tag: map[obState.size] + " enterprises" };
+        }
+        if (item.quickFilter === "age" && obState.age !== "all" && item.dims) {
+          var row2 = item.dims.rows.find(function (r) { return r.name === obState.age; });
+          if (row2) return { value: row2.valueLabel, tag: "ages " + obState.age };
+        }
+        return null;
+      }
+
+      function obMatches(item) {
+        if (obState.domain !== "all" && item.domain !== obState.domain) return false;
+        if (obState.pop === "enterprises" && !(item.domain === "enterprises" || ["enterprise-governance", "rd-use", "productivity", "tech-types", "fte-employees", "vacancies"].indexOf(item.id) > -1)) return false;
+        if (obState.pop === "individuals" && !(item.domain === "people" || item.domain === "skills" || item.domain === "education" || ["uae-future", "trust-decisions", "privacy-concern", "regulation-support"].indexOf(item.id) > -1)) return false;
+        if (obState.search) {
+          var hay = (item.name + " " + item.keywords + " " + (item.definition || "")).toLowerCase();
+          if (hay.indexOf(obState.search.toLowerCase()) === -1) return false;
+        }
+        return true;
+      }
+
+      function obFilteredList() { return OBS_INDICATORS.filter(obMatches); }
+
+      function obRenderCats() {
+        var counts = { all: OBS_INDICATORS.length };
+        OBS_INDICATORS.forEach(function (i) { counts[i.domain] = (counts[i.domain] || 0) + 1; });
+        var order = ["all", "people", "education", "skills", "workforce", "enterprises", "technology", "impact", "trust"];
+        var html = order.map(function (key) {
+          var label = key === "all" ? "All" : DOMAIN_META[key].label;
+          var icon = key === "all" ? "ti-apps" : DOMAIN_META[key].icon;
+          var active = obState.domain === key ? " active" : "";
+          return '<button class="ob-cat-pill' + active + '" data-cat="' + key + '" onclick="obSetCategory(\'' + key + '\')"><i class="ti ' + icon + '"></i>' + label + ' <span class="ob-cat-count">(' + (counts[key] || 0) + ')</span></button>';
+        }).join("");
+        document.getElementById("obCats").innerHTML = html;
+      }
+
+      function obSetCategory(key) { obState.domain = key; obState.page = 1; obRenderCats(); obRenderAll(); }
+      function obSetView(v) {
+        obState.view = v;
+        document.querySelectorAll(".ob-viewtoggle button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-view") === v); });
+        var toolbarLabel = document.getElementById("obToolbarLabel");
+        if (toolbarLabel) toolbarLabel.textContent = v === "region" ? "By region" : "All indicators";
+        /* Plain `hidden` conflicts with this file's `display:flex/grid` rules
+           on several of these elements (author CSS beats the UA [hidden]
+           rule), so drive visibility via inline style.display instead —
+           the one thing guaranteed to win. */
+        document.getElementById("obCardView").style.display = v === "cards" ? "" : "none";
+        document.getElementById("obRegionView").style.display = v === "region" ? "flex" : "none";
+        document.getElementById("obCats").style.display = v === "region" ? "none" : "";
+        document.getElementById("obSearchWrap").style.display = v === "region" ? "none" : "";
+        document.querySelector(".ob-filterbar").style.display = v === "region" ? "none" : "";
+        document.querySelector(".ob-pagination").style.display = v === "region" ? "none" : "";
+        if (v === "region") obRenderRegionTable(); else obRenderAll();
+      }
+
+      var OB_HEADLINE_CARDS = [
+        { id: "ai-use-individuals", title: "AI use", label: "Individuals aged 15+" },
+        { id: "enterprise-adoption", title: "Enterprise AI adoption", label: "Surveyed enterprises" },
+        { id: "training-reach", title: "AI training reach", label: "Current or formal training" },
+        { id: "enterprise-governance", title: "AI governance", label: "Enterprises with formal governance" },
+        { id: "advanced-capability", title: "Advanced AI capability", label: "Individuals aged 15+" }
+      ];
+
+      function obRenderHeadline() {
+        var html = OB_HEADLINE_CARDS.map(function (card) {
+          var item = OBS_INDICATORS.find(function (i) { return i.id === card.id; });
+          var d = DOMAIN_META[item.domain];
+          return '<div class="aiobs-card ob-headline-card" onclick="obOpenDrawer(\'' + item.id + '\')">' +
+            '<span class="ob-headline-ic" style="background:' + d.color + '1a;color:' + d.color + '"><i class="ti ' + d.icon + '"></i></span>' +
+            '<div class="ob-headline-val">' + item.value + '</div>' +
+            '<div class="ob-headline-name">' + card.title + '</div>' +
+            '<div class="ob-headline-label">' + card.label + '</div>' +
+            '</div>';
+        }).join("");
+        document.getElementById("obHeadlineGrid").innerHTML = html;
+      }
+
+      function obRenderCards(list) {
+        var start = (obState.page - 1) * obState.rpp, end = start + obState.rpp;
+        var page = list.slice(start, end);
+        var html = page.map(function (item) {
+          var d = DOMAIN_META[item.domain];
+          var qv = obQuickValue(item);
+          var val = item.unavailable ? '<span style="font-style:italic;color:var(--text-tertiary);font-size:15px;font-weight:600">Not yet published</span>' : (qv ? qv.value : item.value);
+          return '<div class="aiobs-card ob-icard" onclick="obOpenDrawer(\'' + item.id + '\')">' +
+            '<div class="ob-icard-top">' + obDomainIcon(item.domain, 26) + '<span class="ob-headline-badge">' + (item.unavailable ? "Unavailable" : (qv ? qv.tag : "First cycle")) + '</span></div>' +
+            '<div class="ob-icard-val">' + val + '</div>' +
+            '<div class="ob-icard-name">' + item.name + (item.isGlobal ? '<span class="ob-tag-global">UAE · external</span>' : '') + '</div>' +
+            '<div class="ob-icard-meta"><span>' + d.label + '</span><span>' + item.refPeriod + '</span></div>' +
+          '</div>';
+        }).join("");
+        document.getElementById("obCardView").innerHTML = html;
+      }
+
+      /* ── By Region table (region→district drill-down, dummy data) ── */
+      function obRegionMetricCells(metrics) {
+        return OB_METRIC_COLS.map(function (id) { return "<td>" + metrics[id] + "</td>"; }).join("");
+      }
+      function obRegionActionsCell() {
+        return '<td class="ob-actions-cell"><button class="ob-actions-btn" onclick="AIObs.toast(\'Row actions — coming soon in this preview\')"><i class="ti ti-dots-vertical"></i></button></td>';
+      }
+      function obRegionRowHtml(r, idx) {
+        var hasDistricts = r.districtRows && r.districtRows.length > 0;
+        var toggle = hasDistricts
+          ? '<button type="button" class="ob-regtbl-toggle" onclick="obToggleRegionRow(' + idx + ')"><i class="ti ti-chevron-right"></i>' + r.name + '</button>'
+          : '<span class="ob-regtbl-toggle" style="cursor:default"><i class="ti ti-chevron-right" style="visibility:hidden"></i>' + r.name + '</span>';
+        return '<tr data-obregion="' + idx + '"><td>' + toggle + '</td>' + obRegionMetricCells(r.metrics) + obRegionActionsCell() + '</tr>';
+      }
+      function obDistrictRowHtml(d, regionIdx) {
+        return '<tr class="ob-regtbl-row--district" data-obregion="' + regionIdx + '"><td>' + d.name + '</td>' + obRegionMetricCells(d.metrics) + obRegionActionsCell() + '</tr>';
+      }
+      function obViewAllRowHtml(r, idx) {
+        if (!r.moreCount) return "";
+        var total = r.districtRows.length + r.moreCount;
+        return '<tr class="ob-regtbl-row--viewall" data-obregion="' + idx + '"><td colspan="' + (OB_METRIC_COLS.length + 2) + '">' +
+          '<a class="ob-regtbl-viewall" href="#" onclick="AIObs.toast(\'Full district list — coming soon in this preview\'); return false;">View all ' + total + ' districts in ' + r.name + ' <i class="ti ti-arrow-right"></i></a></td></tr>';
+      }
+      /* Column headers explain their methodology on hover, sourced straight
+         from the same indicator definitions shown elsewhere on this page —
+         one place to edit, no risk of the tooltip text drifting from the
+         real definition. */
+      function obRenderRegionTableHead() {
+        document.querySelectorAll("#screen-cpi-obs .ob-regtbl thead th[data-metric]").forEach(function (th) {
+          var item = OBS_INDICATORS.find(function (i) { return i.id === th.getAttribute("data-metric"); });
+          if (item) th.title = item.definition + " (" + item.sourceShort + " — region/district figures here are illustrative estimates, not yet measured at that geography.)";
+        });
+      }
+      function obRenderRegionTable() {
+        var body = document.getElementById("obRegionBody");
+        if (!body) return;
+        obRenderRegionTableHead();
+        var html = "";
+        OB_REGIONS.forEach(function (r, idx) {
+          html += obRegionRowHtml(r, idx);
+          r.districtRows.forEach(function (d) { html += obDistrictRowHtml(d, idx); });
+          html += obViewAllRowHtml(r, idx);
+        });
+        body.innerHTML = html;
+        /* Al Ain Region ships expanded by default, matching Census Observe's
+           reference layout — every other region starts collapsed. */
+        obToggleRegionRow(1, true);
+      }
+      function obToggleRegionRow(idx, forceOpen) {
+        var headRow = document.querySelector('tr[data-obregion="' + idx + '"]:not(.ob-regtbl-row--district):not(.ob-regtbl-row--viewall)');
+        if (!headRow) return;
+        var isOpen = headRow.classList.contains("is-expanded");
+        var open = forceOpen !== undefined ? forceOpen : !isOpen;
+        headRow.classList.toggle("is-expanded", open);
+        document.querySelectorAll('tr[data-obregion="' + idx + '"]').forEach(function (row) {
+          if (row.classList.contains("ob-regtbl-row--district") || row.classList.contains("ob-regtbl-row--viewall")) {
+            row.style.display = open ? "table-row" : "none";
+          }
+        });
+      }
+
+      function obRenderPagination(list) {
+        var total = list.length;
+        var totalPages = Math.max(1, Math.ceil(total / obState.rpp));
+        if (obState.page > totalPages) obState.page = totalPages;
+        var start = total === 0 ? 0 : (obState.page - 1) * obState.rpp + 1;
+        var end = Math.min(total, obState.page * obState.rpp);
+        document.getElementById("obPgCount").textContent = "Showing " + start + "–" + end + " of " + total + " indicators";
+        var btns = '<button class="ob-pg-btn" ' + (obState.page <= 1 ? "disabled" : "") + ' onclick="obGoPage(' + (obState.page - 1) + ')"><i class="ti ti-chevron-left"></i></button>';
+        for (var p = 1; p <= totalPages; p++) {
+          btns += '<button class="ob-pg-btn' + (p === obState.page ? " active" : "") + '" onclick="obGoPage(' + p + ')">' + p + '</button>';
+        }
+        btns += '<button class="ob-pg-btn" ' + (obState.page >= totalPages ? "disabled" : "") + ' onclick="obGoPage(' + (obState.page + 1) + ')"><i class="ti ti-chevron-right"></i></button>';
+        document.getElementById("obPgBtns").innerHTML = btns;
+      }
+
+      function obGoPage(p) { obState.page = p; obRenderAll(); }
+
+      function obRenderAll() {
+        var list = obFilteredList();
+        obRenderCards(list);
+        obRenderPagination(list);
+        obRenderMoreFiltersBadge();
+      }
+
+      function obRenderMoreFiltersBadge() {
+        var n = (obState.size !== "all" ? 1 : 0) + (obState.age !== "all" ? 1 : 0);
+        var badge = document.getElementById("obMoreFiltersBadge");
+        badge.hidden = n === 0;
+        badge.textContent = n;
+      }
+
+      function obToggleExport(e) { e.stopPropagation(); document.getElementById("obExport").classList.toggle("is-open"); }
+      function obToggleMoreFilters(e) { e.stopPropagation(); document.getElementById("obMoreFilters").classList.toggle("is-open"); }
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".ob-export")) document.getElementById("obExport") && document.getElementById("obExport").classList.remove("is-open");
+        if (!e.target.closest(".ob-morefilters")) document.getElementById("obMoreFilters") && document.getElementById("obMoreFilters").classList.remove("is-open");
+      });
+
+      function obClearAll() {
+        obState = { domain: "all", pop: "all", size: "all", age: "all", search: "", page: 1, rpp: obState.rpp, view: obState.view };
+        document.getElementById("obPopFilter").value = "all";
+        document.getElementById("obSizeFilter").value = "all";
+        document.getElementById("obAgeFilter").value = "all";
+        document.getElementById("obSearch").value = "";
+        obRenderCats();
+        obRenderAll();
+        AIObs.toast("Filters cleared");
+      }
+
+      /* ── Drawer ── */
+      function obRenderDimBars(dims) {
+        var max = Math.max.apply(null, dims.rows.map(function (r) { return Math.abs(r.value); }));
+        return dims.rows.map(function (r) {
+          var w = max === 0 ? 0 : (Math.abs(r.value) / max) * 100;
+          return '<div class="ob-dimbar-row"><span class="ob-dimbar-name">' + r.name + '</span>' +
+            '<div class="ob-dimbar-track"><div class="ob-dimbar-fill" style="width:' + w + '%"></div></div>' +
+            '<span class="ob-dimbar-val">' + r.valueLabel + '</span></div>';
+        }).join("");
+      }
+
+      function obOpenDrawer(id) {
+        var item = OBS_INDICATORS.find(function (i) { return i.id === id; });
+        if (!item) return;
+        var d = DOMAIN_META[item.domain];
+        document.getElementById("obDrawerDomain").innerHTML = obDomainIcon(item.domain, 18) + " " + d.label + (item.isGlobal ? '<span class="ob-tag-global">UAE · external benchmark</span>' : "");
+        document.getElementById("obDrawerName").textContent = item.name;
+
+        var body = "";
+        if (item.unavailable) {
+          body += '<div class="ob-unavail-note"><i class="ti ti-info-circle"></i><p>' + item.definition + '</p></div>';
+        } else {
+          body += '<div class="ob-drawer-val">' + item.value + '</div>';
+          body += '<p class="ob-drawer-p">' + item.definition + '</p>';
+        }
+        body += '<div class="ob-drawer-meta-grid">' +
+          '<div class="ob-drawer-meta-item"><dt>Reference period</dt><dd>' + item.refPeriod + '</dd></div>' +
+          '<div class="ob-drawer-meta-item"><dt>Change</dt><dd title="No prior-period value — first published survey cycle">' + item.changeText + '</dd></div>' +
+          '<div class="ob-drawer-meta-item" style="grid-column:1/-1"><dt>Source</dt><dd>' + item.sourceFull + '</dd></div>' +
+          (item.population ? '<div class="ob-drawer-meta-item" style="grid-column:1/-1"><dt>Population</dt><dd>' + item.population + '</dd></div>' : "") +
+        '</div>';
+        if (item.dims) {
+          body += '<div class="ob-drawer-section"><h4>Explore by — ' + item.dims.label + '</h4>' + obRenderDimBars(item.dims) + '</div>';
+        }
+        if (item.related && item.related.length) {
+          body += '<div class="ob-drawer-section"><h4>Related measures</h4>' + item.related.map(function (r) {
+            return '<div class="ob-related-row"><span>' + r.label + '</span><span>' + r.value + '</span></div>';
+          }).join("") + '</div>';
+        }
+        if (item.notes) {
+          body += '<div class="ob-drawer-section"><h4>Note</h4><p class="ob-drawer-p">' + item.notes + '</p></div>';
+        }
+        document.getElementById("obDrawerBody").innerHTML = body;
+        document.getElementById("obDrawerExploreBtn").disabled = !item.dims;
+        var compareBtn = document.getElementById("obDrawerCompareBtn");
+        compareBtn.style.display = item.compareId ? "" : "none";
+        if (item.compareId) compareBtn.setAttribute("onclick", "obOpenCompare('" + item.id + "')");
+        document.getElementById("obDrawerAskBtn").setAttribute("onclick", "AIObs.askAI('Explain the indicator: " + item.name.replace(/'/g, "") + "')");
+
+        document.getElementById("obOverlay").classList.add("is-open");
+        document.getElementById("obDrawer").classList.add("is-open");
+      }
+      function obCloseDrawer() { document.getElementById("obDrawer").classList.remove("is-open"); document.getElementById("obOverlay").classList.remove("is-open"); }
+
+      /* ── Compare modal ── */
+      function obOpenCompare(id) {
+        var item = OBS_INDICATORS.find(function (i) { return i.id === id; });
+        if (!item || !item.compareId) return;
+        var set = COMPARE_SETS[item.compareId];
+        document.getElementById("obCompareTitle").textContent = set.title;
+        document.getElementById("obCompareNote").textContent = set.note;
+        var max = Math.max.apply(null, set.rows.map(function (r) { return r.value; }));
+        document.getElementById("obCompareBody").innerHTML = set.rows.map(function (r) {
+          var w = (r.value / max) * 100;
+          return '<div class="ob-dimbar-row" style="grid-template-columns:140px 1fr 70px">' +
+            '<span class="ob-dimbar-name" style="' + (r.highlight ? "font-weight:800;color:var(--text-primary)" : "") + '">' + r.name + '</span>' +
+            '<div class="ob-dimbar-track"><div class="ob-dimbar-fill" style="width:' + w + '%;background:' + (r.highlight ? "var(--accent)" : "var(--gray-300)") + '"></div></div>' +
+            '<span class="ob-dimbar-val">' + r.value + (r.value < 100 ? "%" : "") + '</span></div>' +
+            '<div style="font-size:10px;color:var(--text-tertiary);margin:-5px 0 8px 0">' + r.tag + '</div>';
+        }).join("");
+        document.getElementById("obOverlay").classList.add("is-open");
+        document.getElementById("obCompareModal").classList.add("is-open");
+      }
+
+      function obOpenReport() {
+        document.getElementById("obOverlay").classList.add("is-open");
+        document.getElementById("obReportModal").classList.add("is-open");
+      }
+      function obCloseModal() {
+        document.getElementById("obCompareModal").classList.remove("is-open");
+        document.getElementById("obReportModal").classList.remove("is-open");
+        if (!document.getElementById("obDrawer").classList.contains("is-open")) document.getElementById("obOverlay").classList.remove("is-open");
+      }
+      function obGenerateReport() {
+        obCloseModal();
+        AIObs.toast("Generating report from the current view — coming soon in this preview");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        if (window.initBayaanFooter) initBayaanFooter();
+
+        /* Deep-link from Themes/Data Stories: ?domain=<key> preselects a
+           category pill, ?q=<text> preloads the search box — lets a theme
+           card open Observe already scoped to its topic. */
+        var obParams = new URLSearchParams(window.location.search);
+        var obDomainParam = obParams.get("domain");
+        if (obDomainParam && DOMAIN_META[obDomainParam]) { obState.domain = obDomainParam; obState.view = "cards"; }
+        var obQParam = obParams.get("q");
+        if (obQParam) { obState.search = obQParam; document.getElementById("obSearch").value = obQParam; obState.view = "cards"; }
+
+        obRenderHeadline();
+        obRenderCats();
+        obSetView(obState.view);
+
+        document.getElementById("obPopFilter").addEventListener("change", function (e) { obState.pop = e.target.value; obState.page = 1; obRenderAll(); });
+        document.getElementById("obSizeFilter").addEventListener("change", function (e) { obState.size = e.target.value; obRenderAll(); });
+        document.getElementById("obAgeFilter").addEventListener("change", function (e) { obState.age = e.target.value; obRenderAll(); });
+        document.getElementById("obRpp").addEventListener("change", function (e) { obState.rpp = parseInt(e.target.value, 10); obState.page = 1; obRenderAll(); });
+        document.getElementById("obSearch").addEventListener("input", function (e) { obState.search = e.target.value; obState.page = 1; obRenderAll(); });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,2336 @@
+/* ====================================================================
+   AI OBSERVATORY — shared primitives
+   Scoped to #screen-cpi-obs (same screen id/shell Census Observatory
+   uses — see css/pages/obs-sidebar.css for the sidebar/page-wrap rules
+   this inherits for free). Each of the six review concepts (Overview
+   A/B/C, Interpret A/B/C) layers its own <style> block on top of this
+   file for whatever is genuinely specific to that concept; anything
+   reusable across concepts (page header, stat tiles, bar/donut charts,
+   evidence drawers, the option switcher) lives here once. ==================================================================== */
+
+#screen-cpi-obs .aiobs-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--page-gutter) 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ====================================================================
+   VISUAL IDENTITY — deep-navy/cyan hero system + per-domain accents
+   (2026-09-12 "distinctive, authoritative, premium government
+   intelligence product" rework of Overview + Interpret). Additive on top
+   of the existing --accent (#0066FF light / #3B82F6 dark) system — most
+   of the app still reads through --accent/--surface exactly as before;
+   these tokens exist for the one signature dark-surface component (the
+   Executive Brief hero, shared by both pages) and for Interpret's three
+   domain accents. Scoped entirely to this file — css/variables.css and
+   css/theme.css are never touched, per the AI-Observatory-only scope
+   boundary this workstream follows.
+
+   --aiobs-domain/-light/-dark default to the plain accent everywhere
+   (Overview, Observe, Benchmark, Themes see no change at all), and are
+   overridden only inside Interpret's three [data-domain-panel] domain
+   containers below — so any existing rule that switches from
+   var(--accent) to var(--aiobs-domain) picks up domain tinting for free
+   inside Interpret, with zero effect anywhere else. ==================================================================== */
+#screen-cpi-obs {
+  --aiobs-navy-900: #071B3D;
+  --aiobs-navy-800: #0B2A5C;
+  --aiobs-navy-700: #123A73;
+  --aiobs-cyan: #14B8C4;
+  --aiobs-cyan-light: rgba(20, 184, 196, 0.16);
+  --aiobs-hero-3: var(--aiobs-navy-700);
+  --aiobs-domain: var(--accent);
+  --aiobs-domain-light: var(--accent-light);
+  --aiobs-domain-dark: var(--accent-dark);
+}
+#screen-cpi-obs [data-domain-panel="economic"] {
+  --aiobs-domain: #0B4F9E;
+  --aiobs-domain-light: #E5F0FC;
+  --aiobs-domain-dark: #073E82;
+  --aiobs-hero-3: #0B4F9E;
+}
+#screen-cpi-obs [data-domain-panel="people"] {
+  --aiobs-domain: #7C3AED;
+  --aiobs-domain-light: #F1E9FE;
+  --aiobs-domain-dark: #5B21B6;
+  --aiobs-hero-3: #3B2E7A;
+}
+#screen-cpi-obs [data-domain-panel="infra"] {
+  --aiobs-domain: var(--aiobs-cyan);
+  --aiobs-domain-light: var(--aiobs-cyan-light);
+  --aiobs-domain-dark: #0B7480;
+  --aiobs-hero-3: #0E5C6B;
+}
+html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="economic"] { --aiobs-domain-light: rgba(59, 130, 246, 0.2); }
+html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="people"] { --aiobs-domain-light: rgba(124, 58, 237, 0.22); }
+html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="infra"] { --aiobs-domain-light: rgba(20, 184, 196, 0.2); }
+
+/* ── Option switcher — lets the reviewer hop between the three variants
+   of the page they're on without going back through the sidebar. ── */
+#screen-cpi-obs .aiobs-switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 18px 0 4px;
+}
+#screen-cpi-obs .aiobs-switcher-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-inline-end: 4px;
+}
+#screen-cpi-obs .aiobs-switch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-solid);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+#screen-cpi-obs .aiobs-switch-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+#screen-cpi-obs .aiobs-switch-pill.active {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: #fff;
+}
+#screen-cpi-obs .aiobs-switch-pill .ti {
+  font-size: 14px;
+}
+#screen-cpi-obs .aiobs-switch-pill--back {
+  margin-inline-start: auto;
+  background: var(--accent-light);
+  border-color: transparent;
+  color: var(--accent);
+}
+#screen-cpi-obs .aiobs-switch-pill--back:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Page header ── */
+#screen-cpi-obs .aiobs-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 6px;
+  flex-wrap: wrap;
+}
+#screen-cpi-obs .aiobs-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+#screen-cpi-obs .aiobs-eyebrow .ti { font-size: 14px; }
+#screen-cpi-obs .aiobs-title {
+  font-size: var(--fs-4xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+}
+#screen-cpi-obs .aiobs-subtitle {
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  margin: 6px 0 0;
+  max-width: 62ch;
+  line-height: 1.5;
+}
+#screen-cpi-obs .aiobs-hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#screen-cpi-obs .aiobs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-solid);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+#screen-cpi-obs .aiobs-btn:hover { border-color: var(--accent); color: var(--accent); }
+#screen-cpi-obs .aiobs-btn--primary {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: #fff;
+}
+#screen-cpi-obs .aiobs-btn--primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+#screen-cpi-obs .aiobs-btn--ai {
+  background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+  border-color: transparent;
+  color: #fff;
+}
+#screen-cpi-obs .aiobs-btn--ai:hover { color: #fff; opacity: 0.92; }
+
+/* ── Section header ── */
+#screen-cpi-obs .aiobs-section-hd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+#screen-cpi-obs .aiobs-section-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+#screen-cpi-obs .aiobs-section-title .ti {
+  font-size: 19px;
+  color: var(--aiobs-domain);
+}
+#screen-cpi-obs .aiobs-section-note {
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+  max-width: 46ch;
+}
+
+/* ── Ask Bayaan AI contextual chip ── */
+#screen-cpi-obs .aiobs-ask {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--aiobs-domain-light);
+  color: var(--aiobs-domain-dark);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+#screen-cpi-obs .aiobs-ask:hover { background: var(--aiobs-domain); color: #fff; }
+#screen-cpi-obs .aiobs-ask .ti { font-size: 13px; }
+
+/* Icon-only sparkle — matches Executive Brief / home-module-sparkle pattern */
+#screen-cpi-obs .aiobs-ask--icon {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  gap: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent);
+  white-space: nowrap;
+}
+#screen-cpi-obs .aiobs-ask--icon .ti {
+  font-size: var(--fs-lg);
+  animation: sparkleGlow 2.4s ease-in-out infinite;
+}
+#screen-cpi-obs .aiobs-ask--icon:hover {
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--accent);
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-ask--icon:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+#screen-cpi-obs .aiobs-ask--icon:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ── Evidence / metadata affordance ── */
+#screen-cpi-obs .aiobs-info {
+  position: relative;
+  display: inline-flex;
+}
+#screen-cpi-obs .aiobs-info-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface2);
+  color: var(--text-tertiary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-info-btn:hover { background: var(--accent-light); color: var(--accent); }
+#screen-cpi-obs .aiobs-info-btn .ti { font-size: 12px; }
+#screen-cpi-obs .aiobs-info-pop {
+  position: absolute;
+  z-index: 40;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: 240px;
+  max-width: 90vw;
+  background: var(--text-primary);
+  color: #fff;
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  font-size: var(--fs-2xs);
+  line-height: 1.55;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s, transform 0.14s;
+  margin-left: max(-120px, -50vw + 8px);
+}
+#screen-cpi-obs .aiobs-info-pop dt {
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  margin-top: 7px;
+}
+#screen-cpi-obs .aiobs-info-pop dt:first-child { margin-top: 0; }
+#screen-cpi-obs .aiobs-info-pop dd { margin: 1px 0 0; }
+#screen-cpi-obs .aiobs-info.is-open .aiobs-info-pop {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+@media (hover: hover) {
+  #screen-cpi-obs .aiobs-info:hover .aiobs-info-pop {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ── Cards ── */
+#screen-cpi-obs .aiobs-card {
+  background: var(--surface);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Stat tile ── */
+#screen-cpi-obs .aiobs-stat-value {
+  font-size: var(--fs-4xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+#screen-cpi-obs .aiobs-stat-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+#screen-cpi-obs .aiobs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+}
+#screen-cpi-obs .aiobs-badge--up { background: var(--success-bg); color: var(--success-dark); }
+#screen-cpi-obs .aiobs-badge--down { background: var(--danger-bg); color: var(--danger); }
+#screen-cpi-obs .aiobs-badge--neutral { background: var(--surface2); color: var(--text-secondary); }
+#screen-cpi-obs .aiobs-badge--accent { background: var(--accent-light); color: var(--accent-dark); }
+
+/* ── Bar rows (labelled horizontal bars, the workhorse chart) ── */
+#screen-cpi-obs .aiobs-bars { display: flex; flex-direction: column; gap: 12px; }
+#screen-cpi-obs .aiobs-bar-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; align-items: center; }
+#screen-cpi-obs .aiobs-bar-top { display: flex; justify-content: space-between; gap: 10px; font-size: var(--fs-xs); margin-bottom: 5px; }
+#screen-cpi-obs .aiobs-bar-name { color: var(--text-secondary); font-weight: 500; }
+#screen-cpi-obs .aiobs-bar-val { color: var(--text-primary); font-weight: 700; font-variant-numeric: tabular-nums; }
+#screen-cpi-obs .aiobs-bar-track {
+  height: 9px;
+  border-radius: 999px;
+  background: var(--surface2);
+  overflow: hidden;
+}
+#screen-cpi-obs .aiobs-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--aiobs-domain);
+}
+#screen-cpi-obs .aiobs-bar-fill--muted { background: var(--gray-300); }
+#screen-cpi-obs .aiobs-bar-fill--gap { background: var(--warning); }
+#screen-cpi-obs .aiobs-bar-item { display: flex; flex-direction: column; gap: 0; }
+
+/* ── Gap / pp bars centred on a zero axis ── */
+#screen-cpi-obs .aiobs-gapbars { display: flex; flex-direction: column; gap: 10px; }
+#screen-cpi-obs .aiobs-gap-row { display: grid; grid-template-columns: 42% 1fr; align-items: center; gap: 12px; font-size: var(--fs-xs); }
+#screen-cpi-obs .aiobs-gap-name { color: var(--text-secondary); font-weight: 500; text-align: right; }
+#screen-cpi-obs .aiobs-gap-track { position: relative; height: 18px; background: var(--surface2); border-radius: 5px; }
+#screen-cpi-obs .aiobs-gap-axis { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--border-md); }
+#screen-cpi-obs .aiobs-gap-fill { position: absolute; top: 2px; bottom: 2px; border-radius: 4px; background: var(--accent); }
+#screen-cpi-obs .aiobs-gap-fill--neg { background: var(--gray-400); }
+#screen-cpi-obs .aiobs-gap-val { position: absolute; top: 50%; transform: translateY(-50%); font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+
+/* ── Donut ── */
+#screen-cpi-obs .aiobs-donut-wrap { position: relative; width: 108px; height: 108px; flex-shrink: 0; }
+#screen-cpi-obs .aiobs-donut-wrap svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+#screen-cpi-obs .aiobs-donut-center {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+}
+#screen-cpi-obs .aiobs-donut-center b { font-size: var(--fs-xl); color: var(--text-primary); line-height: 1; }
+#screen-cpi-obs .aiobs-donut-center span { font-size: 9.5px; color: var(--text-tertiary); margin-top: 2px; }
+#screen-cpi-obs .aiobs-legend { display: flex; flex-direction: column; gap: 7px; }
+#screen-cpi-obs .aiobs-legend-item { display: flex; align-items: center; gap: 8px; font-size: var(--fs-xs); color: var(--text-secondary); }
+#screen-cpi-obs .aiobs-legend-item b { color: var(--text-primary); margin-inline-start: auto; font-variant-numeric: tabular-nums; }
+#screen-cpi-obs .aiobs-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+
+/* ── Divider gap-story row (two numbers + arrow) ── */
+#screen-cpi-obs .aiobs-gapstat {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+#screen-cpi-obs .aiobs-gapstat-num { font-size: var(--fs-3xl); font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+#screen-cpi-obs .aiobs-gapstat-num--faded { color: var(--text-tertiary); }
+#screen-cpi-obs .aiobs-gapstat-arrow { color: var(--gray-300); font-size: 20px; }
+
+/* ── Responsive ── */
+@media (max-width: 1180px) {
+  #screen-cpi-obs .aiobs-content { padding: 0 20px 80px; }
+}
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-title { font-size: 26px; }
+  #screen-cpi-obs .aiobs-page-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* Dark mode */
+html[data-theme="dark"] #screen-cpi-obs .aiobs-card,
+html[data-theme="dark"] #screen-cpi-obs .aiobs-btn {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+/* ── Toast (Ask Bayaan AI feedback) ── */
+.aiobs-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(12px);
+  background: #0f172a;
+  color: #fff;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  padding: 11px 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 999;
+  max-width: 420px;
+  text-align: center;
+}
+.aiobs-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Scroll reveal (Overview C / Interpret A) ── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: var(--rv-delay, 0s);
+}
+[data-reveal].is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Restrained variants for Overview's "alive, not animated" pass
+   (2026-09-11) — shorter duration + smaller lift than the shared
+   [data-reveal] default above (which other prototype pages still use at
+   18px/0.6s), scoped so it never touches those pages. Same trigger-once
+   IntersectionObserver, same .is-in end state, same reduced-motion gate. ── */
+[data-reveal].aiobs-section-reveal {
+  transform: translateY(10px);
+  transition-duration: 0.4s;
+}
+[data-reveal].aiobs-insight-reveal {
+  transform: translateY(8px);
+  transition-duration: 0.4s;
+}
+[data-reveal].aiobs-glancecard {
+  transform: translateY(10px);
+  transition-duration: 0.4s;
+}
+[data-reveal].aiobs-glancecard.is-in {
+  transform: none;
+}
+
+/* ====================================================================
+   OVERVIEW (2026 REWORK) — shared containerisation primitives
+   One level up from .aiobs-card: a large bordered "panel" that holds a
+   header plus several lighter-weight sub-components, so a page reads as
+   PAGE → SECTION CONTAINER → small cards, not a flat stack of same-weight
+   cards. Built for ai-overview.html; safe to reuse from any AI Observatory
+   page that wants the same section rhythm. ==================================================================== */
+
+/* ── Panel: the section container. Matches the 28px gradient "module
+   card" convention shared by Census/CPI/Crisis Observatory (radial accent
+   wash + off-white linear, 1px border, soft shadow) so AI Observatory
+   sections read as the same product, not a flatter variant. ── */
+#screen-cpi-obs .aiobs-panel {
+  position: relative;
+  background:
+    radial-gradient(480px 260px at 96% -12%, var(--aiobs-domain-light), transparent 70%),
+    linear-gradient(180deg, var(--surface) 0%, var(--surface) 100%);
+  border: 1px solid var(--border-solid);
+  border-radius: 28px;
+  box-shadow: var(--shadow-sm), 0 12px 32px rgba(15, 23, 42, 0.07);
+  padding: 28px 30px 30px;
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-panel {
+  background: var(--surface);
+  box-shadow: none;
+}
+
+/* ── Open variant: the section container with all card chrome stripped
+   (no background/border/shadow), just a top rule + generous
+   whitespace — an "editorial flow" section for narrative chapters that
+   sit back-to-back (e.g. Overview's State-of-AI chapters), so four
+   connected chapters don't read as four identical boxes. Charts/figures
+   inside keep their own .aiobs-subcard framing, so the page still shows
+   real structure — just not one more card wrapping the whole section. ── */
+#screen-cpi-obs .aiobs-panel--open {
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 26px 0 4px;
+  border-top: 1px solid var(--border-solid);
+}
+#screen-cpi-obs .aiobs-panel--open:first-child { border-top: none; padding-top: 4px; }
+#screen-cpi-obs .aiobs-panel-hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+#screen-cpi-obs .aiobs-panel-hd h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+#screen-cpi-obs .aiobs-panel-hd h2 .ti { font-size: 19px; color: var(--aiobs-domain); }
+#screen-cpi-obs .aiobs-panel-hd p {
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+  margin: 5px 0 0;
+  max-width: 56ch;
+  line-height: 1.55;
+}
+#screen-cpi-obs .aiobs-panel-headline {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: -8px 0 20px;
+}
+
+/* ── Lightweight sub-card: separated by tone, not by a repeated shadow ── */
+#screen-cpi-obs .aiobs-subcard {
+  background: var(--surface2);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+}
+#screen-cpi-obs .aiobs-subgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+#screen-cpi-obs .aiobs-subcard-kicker {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+#screen-cpi-obs .aiobs-subcard-title {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 3px 0 14px;
+}
+
+/* ── AI Insight — the ONE reusable treatment for every "what this means"
+   note across the AI Observatory (replaces the page-local .dg-insight
+   duplicate and the inline-styled note on Observe — 2026-09-11 consistency
+   pass). Subtle blue→violet gradient, matching the "AI Summary" callout
+   language used on Diagnose/Benchmark panels elsewhere in Bayaan. ── */
+#screen-cpi-obs .aiobs-insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.07) 0%, rgba(124, 58, 237, 0.045) 100%);
+  border: 1px solid rgba(0, 102, 255, 0.12);
+  margin-top: 20px;
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-insight {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.14) 0%, rgba(124, 58, 237, 0.09) 100%);
+  border-color: rgba(59, 130, 246, 0.22);
+}
+#screen-cpi-obs .aiobs-insight-ic {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+/* Subtle activity indicator — a slow "breathing" ring, not a shimmer or
+   typing effect. Low-amplitude, multi-second cycle. */
+@media (prefers-reduced-motion: no-preference) {
+  #screen-cpi-obs .aiobs-insight-ic {
+    animation: aiobsInsightPulse 3.2s ease-in-out infinite;
+  }
+}
+@keyframes aiobsInsightPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.32); }
+  50% { box-shadow: 0 0 0 5px rgba(0, 102, 255, 0); }
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-insight-ic {
+  animation-name: aiobsInsightPulseDark;
+}
+@keyframes aiobsInsightPulseDark {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(59, 130, 246, 0); }
+}
+#screen-cpi-obs .aiobs-insight-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-dark);
+  margin-bottom: 3px;
+}
+#screen-cpi-obs .aiobs-insight-body p {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+#screen-cpi-obs .aiobs-insight-body b { color: var(--text-primary); font-weight: 700; }
+#screen-cpi-obs .aiobs-insight-body .aiobs-ask { margin-top: 10px; }
+#screen-cpi-obs .aiobs-insight-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-top: 10px;
+}
+#screen-cpi-obs .aiobs-insight-tag .ti { color: var(--accent); font-size: 12px; }
+
+/* ── Executive Brief ── */
+#screen-cpi-obs .aiobs-brief {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 34px 26px;
+}
+#screen-cpi-obs .aiobs-brief-orn {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+#screen-cpi-obs .aiobs-brief-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 32px;
+}
+#screen-cpi-obs .aiobs-brief-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+#screen-cpi-obs .aiobs-brief-eyebrow .aiobs-brief-ic {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+}
+#screen-cpi-obs .aiobs-brief-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  line-height: 1.18;
+  margin: 12px 0 10px;
+}
+#screen-cpi-obs .aiobs-brief-copy {
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 62ch;
+}
+#screen-cpi-obs .aiobs-brief-coverage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-solid);
+}
+#screen-cpi-obs .aiobs-coverage-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin-inline-end: 2px;
+}
+#screen-cpi-obs .aiobs-coverage-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+#screen-cpi-obs .aiobs-coverage-pill--done { background: var(--success-bg); color: var(--success-dark); }
+#screen-cpi-obs .aiobs-coverage-pill--pending { background: var(--surface2); color: var(--text-tertiary); }
+#screen-cpi-obs .aiobs-coverage-pill .ti { font-size: 12px; }
+
+#screen-cpi-obs .aiobs-brief-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#screen-cpi-obs .aiobs-fact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface2);
+  border-radius: var(--r-md);
+}
+#screen-cpi-obs .aiobs-fact-ic {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border-solid);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+#screen-cpi-obs .aiobs-fact-val { font-size: var(--fs-lg); font-weight: 800; color: var(--text-primary); line-height: 1; }
+#screen-cpi-obs .aiobs-fact-label { font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; }
+#screen-cpi-obs .aiobs-brief-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── AI at a Glance — metric grid with column dividers, not repeated card chrome ── */
+#screen-cpi-obs .aiobs-glance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+#screen-cpi-obs .aiobs-glance-item {
+  padding: 4px 22px;
+  border-left: 1px solid var(--border-solid);
+}
+#screen-cpi-obs .aiobs-glance-item:first-child { border-left: none; padding-left: 4px; }
+#screen-cpi-obs .aiobs-glance-ic {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+#screen-cpi-obs .aiobs-glance-val {
+  font-size: var(--fs-4xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+#screen-cpi-obs .aiobs-glance-label {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 8px 0 5px;
+}
+#screen-cpi-obs .aiobs-glance-desc {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+
+/* ── Stat panel — a single centred headline figure inside a .aiobs-subcard,
+   for when one number (not a chart) is the right-hand half of a subgrid
+   pair (e.g. Overview's enterprise-governance figure beside the
+   purposes-of-use chart). Reuses .aiobs-stat-value/.aiobs-stat-label. ── */
+#screen-cpi-obs .aiobs-statpanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 2px;
+}
+#screen-cpi-obs .aiobs-statpanel-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-xl);
+  margin-bottom: 12px;
+}
+#screen-cpi-obs .aiobs-statpanel .aiobs-stat-value { font-size: var(--fs-4xl); }
+#screen-cpi-obs .aiobs-statpanel .aiobs-stat-label { margin-top: 4px; }
+#screen-cpi-obs .aiobs-statpanel .aiobs-chap-note { margin-top: 12px; }
+
+/* ── Gap story cards (Governance & Gaps section) ── */
+#screen-cpi-obs .aiobs-gap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+#screen-cpi-obs .aiobs-gapcard {
+  padding: 18px 20px;
+}
+#screen-cpi-obs .aiobs-gapcard-label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+#screen-cpi-obs .aiobs-gapcard-desc {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+/* ── Benchmark rank rows (Abu Dhabi vs. the World) ── */
+#screen-cpi-obs .aiobs-rank-rows { display: flex; flex-direction: column; gap: 3px; }
+#screen-cpi-obs .aiobs-rank-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 64px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-solid);
+}
+#screen-cpi-obs .aiobs-rank-row:first-child { border-top: none; }
+#screen-cpi-obs .aiobs-rank-name { font-size: var(--fs-xs); font-weight: 600; color: var(--text-secondary); }
+#screen-cpi-obs .aiobs-rank-name b { color: var(--text-primary); }
+#screen-cpi-obs .aiobs-rank-track { position: relative; height: 6px; border-radius: 999px; background: var(--surface2); margin-top: 6px; }
+#screen-cpi-obs .aiobs-rank-fill { position: absolute; inset: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent-light), var(--accent)); }
+#screen-cpi-obs .aiobs-rank-val { text-align: right; font-size: var(--fs-sm); font-weight: 800; color: var(--text-primary); }
+#screen-cpi-obs .aiobs-rank-val span { display: block; font-size: 9.5px; font-weight: 600; color: var(--text-tertiary); }
+
+/* ── Next Wave gauge ── */
+#screen-cpi-obs .aiobs-gauge-wrap { position: relative; width: 168px; height: 168px; margin: 0 auto; flex-shrink: 0; }
+#screen-cpi-obs .aiobs-gauge-wrap svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+#screen-cpi-obs .aiobs-gauge-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+#screen-cpi-obs .aiobs-gauge-center b { font-size: 34px; font-weight: 800; color: var(--text-primary); line-height: 1; letter-spacing: -0.02em; }
+#screen-cpi-obs .aiobs-gauge-center span { font-size: 10.5px; font-weight: 600; color: var(--text-tertiary); margin-top: 4px; max-width: 92px; line-height: 1.3; }
+
+/* ── Key Insights — ported verbatim from CensusObservatory.html's page-local
+   Key Insights treatment (.aiobs-keyins-section + .impacts-list/.impact-item):
+   one soft-gradient section card, vertical icon+text rows with tinted icon
+   squares and inline .impact-val highlights, plus the shared .ai-footnote /
+   .ai-pill attribution row. Content stays AI-specific; chrome matches Census. ── */
+#screen-cpi-obs .aiobs-keyins-section {
+  background:
+    radial-gradient(ellipse 90% 70% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%),
+    linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 28px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 10px 28px rgba(42, 61, 76, 0.07);
+  padding: 24px 28px 28px;
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section {
+  background: var(--surface, #141a26);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+#screen-cpi-obs .aiobs-keyins-section .section-hdr h2.cpi-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+#screen-cpi-obs .aiobs-keyins-section .section-hdr h2.cpi-section-title i {
+  font-size: var(--fs-2xl);
+  line-height: 1;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-keyins-section .section-hdr-sub {
+  margin: 2px 0 16px;
+  font-size: var(--fs-sm);
+  color: var(--text2);
+}
+#screen-cpi-obs .aiobs-keyins-section .impacts-list {
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  background-color: transparent;
+}
+#screen-cpi-obs .aiobs-keyins-section .impacts-list,
+#screen-cpi-obs .aiobs-keyins-section .impacts-list:hover {
+  box-shadow: none;
+}
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-item {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 11px;
+  align-items: start;
+  padding: 10px 0;
+  border-bottom: 1px solid #eaecf0;
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  color: #536277;
+  transition: transform 0.22s ease;
+}
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-item:last-child {
+  border-bottom: 0;
+}
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-item:hover {
+  background: none;
+  transform: translateX(3px);
+}
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 9%, white);
+}
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon i {
+  font-size: var(--fs-xl);
+  line-height: 1;
+}
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon--up { --tone: #e5484d; }
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon--down { --tone: #0c9b70; }
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon--neutral { --tone: #246bfd; }
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon--purple { --tone: #7c3aed; }
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon--warning { --tone: #d97706; }
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon--pink { --tone: #c2255c; }
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon--brand { --tone: #0b4f9e; }
+#screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-val {
+  color: #172033;
+  font-weight: 700;
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-item {
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-val {
+  color: var(--text-primary);
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .impact-icon {
+  background: color-mix(in srgb, var(--tone) 18%, transparent);
+}
+#screen-cpi-obs .aiobs-keyins-section .ai-footnote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: var(--fs-xs);
+  color: var(--text2);
+}
+#screen-cpi-obs .aiobs-keyins-section .ai-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--accent-light);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-keyins-section .ai-pill i {
+  font-size: var(--fs-2xs);
+}
+
+/* ── Key Insights, numbered-badge grid variant — used by Interpret's
+   closing "What this means" (2 x 2 cards with a numbered circle instead
+   of the .aiobs-keyins-list's icon+sentence vertical list Overview
+   uses). Scoped under .aiobs-keyins-grid so it never touches Overview's
+   .aiobs-keyins-list rules above. ── */
+#screen-cpi-obs .aiobs-keyins-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 28px; }
+/* 4-across variant — Overview's "Key signals for action" (one row of 4,
+   not Interpret's 2x2), stepping down before Interpret's own 2-col
+   breakpoint so it doesn't get squeezed at mid widths. */
+#screen-cpi-obs .aiobs-keyins-grid--4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 980px) {
+  #screen-cpi-obs .aiobs-keyins-grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  #screen-cpi-obs .aiobs-keyins-grid--4 { grid-template-columns: 1fr; }
+}
+/* 3-across variant — Interpret's per-domain "What this means" closings
+   (3 implications per domain, rather than the page-level 2x2/4-across
+   sets above). */
+#screen-cpi-obs .aiobs-keyins-grid--3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-keyins-grid--3 { grid-template-columns: 1fr; }
+}
+#screen-cpi-obs .aiobs-keyins-grid .aiobs-keyins-item { grid-template-columns: 30px 1fr; border-bottom: none; padding: 0; }
+#screen-cpi-obs .aiobs-keyins-grid .aiobs-keyins-ic {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: var(--fs-xs);
+  font-style: normal;
+}
+#screen-cpi-obs .aiobs-keyins-body { display: flex; flex-direction: column; gap: 4px; padding-top: 3px; }
+#screen-cpi-obs .aiobs-keyins-body b { font-size: var(--fs-sm); font-weight: 700; color: var(--text-primary); line-height: 1.4; }
+#screen-cpi-obs .aiobs-keyins-body span { font-size: var(--fs-xs); color: var(--text-tertiary); line-height: 1.5; }
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-keyins-grid { grid-template-columns: 1fr; }
+}
+
+/* ── News cards ── */
+#screen-cpi-obs .aiobs-news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+#screen-cpi-obs .aiobs-news-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+#screen-cpi-obs .aiobs-news-thumb {
+  height: 118px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: rgba(255,255,255,0.9);
+  position: relative;
+}
+#screen-cpi-obs .aiobs-news-cat {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+#screen-cpi-obs .aiobs-news-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+#screen-cpi-obs .aiobs-news-date { font-size: 10.5px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; }
+#screen-cpi-obs .aiobs-news-title { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); line-height: 1.35; margin: 0; }
+#screen-cpi-obs .aiobs-news-desc { font-size: var(--fs-xs); color: var(--text-tertiary); line-height: 1.55; margin: 0; flex: 1; }
+#screen-cpi-obs .aiobs-news-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+#screen-cpi-obs .aiobs-news-read { font-size: var(--fs-xs); font-weight: 700; color: var(--accent); display: inline-flex; align-items: center; gap: 4px; }
+#screen-cpi-obs .aiobs-news-ai { font-size: 11px; font-weight: 600; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; }
+#screen-cpi-obs .aiobs-news-ai:hover { color: var(--accent); }
+
+/* ── Responsive: 3 → 2 → 1 col ── */
+@media (max-width: 1180px) {
+  #screen-cpi-obs .aiobs-brief-grid { grid-template-columns: 1fr; }
+  #screen-cpi-obs .aiobs-glance-grid { grid-template-columns: repeat(2, 1fr); row-gap: 22px; }
+  #screen-cpi-obs .aiobs-glance-item:nth-child(3) { border-left: none; padding-left: 4px; }
+  #screen-cpi-obs .aiobs-news-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 860px) {
+  #screen-cpi-obs .aiobs-subgrid,
+  #screen-cpi-obs .aiobs-gap-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-glance-grid { grid-template-columns: 1fr; }
+  #screen-cpi-obs .aiobs-glance-item { border-left: none; padding-left: 4px; border-top: 1px solid var(--border-solid); padding-top: 18px; }
+  #screen-cpi-obs .aiobs-glance-item:first-child { border-top: none; padding-top: 4px; }
+  #screen-cpi-obs .aiobs-news-grid { grid-template-columns: 1fr; }
+  #screen-cpi-obs .aiobs-panel { padding: 22px 20px 24px; }
+  #screen-cpi-obs .aiobs-brief { padding: 24px 20px 22px; }
+}
+
+/* ====================================================================
+   OPENING SECTION — Executive Brief (2026-09-12 rework: a genuine deep
+   navy → domain-tinted hero, not a pale tinted-white card — the single
+   biggest lever for "confident, authoritative government intelligence
+   product" rather than "soft muted dashboard". Shared by Overview (plain
+   navy, no domain scope above it) and each of Interpret's three domain
+   Executive Summaries (navy → that domain's accent, via --aiobs-hero-3
+   set per [data-domain-panel] above). Structure unchanged from the prior
+   pale version — icon+title topline, sources/info control at top-right,
+   one flowing paragraph, optional actions, low-opacity illustration
+   pinned bottom-right — only the surface treatment and text colors
+   (now fixed light-on-dark, independent of the site's own light/dark
+   toggle, same reasoning as the .aiobs-toast dark chip elsewhere). ==================================================================== */
+#screen-cpi-obs .aiobs-execbrief {
+  position: relative;
+  overflow: hidden;
+  min-height: 150px;
+  border-radius: 20px;
+  padding: 30px 34px 32px;
+  background: linear-gradient(135deg, var(--aiobs-navy-900) 0%, var(--aiobs-navy-800) 52%, var(--aiobs-hero-3) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 56px -24px rgba(4, 15, 38, 0.55), 0 2px 8px rgba(4, 15, 38, 0.3);
+}
+#screen-cpi-obs .aiobs-execbrief-topline {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+#screen-cpi-obs .aiobs-execbrief-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+#screen-cpi-obs .aiobs-execbrief-ico {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--aiobs-cyan), #3B82F6);
+  color: #fff;
+  font-size: var(--fs-2xl);
+  box-shadow: 0 4px 18px rgba(20, 184, 196, 0.4);
+}
+#screen-cpi-obs .aiobs-execbrief-title {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+/* ── Audio brief control — same .brief-* pattern as Census Observatory
+   (CensusObservatory.html / census-interpret.html), icon-only on the dark
+   hero. Driven by js/census-exec-brief.js via initCensusExecBrief(). ── */
+#screen-cpi-obs .aiobs-execbrief {
+  --brief-blue: #246bfd;
+  --brief-red: #e5484d;
+}
+#screen-cpi-obs .aiobs-execbrief-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-speech {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 30px;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-speech[hidden] { display: none; }
+#screen-cpi-obs .aiobs-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  transition: 0.22s ease;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen:hover .brief-listen__icon {
+  transform: scale(1.06);
+  box-shadow: 0 5px 12px rgba(36, 107, 253, 0.32);
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen:focus-visible,
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-audio-action:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 2px;
+  border-radius: 16px;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(145deg, #1f5ef0, #5b97f8);
+  box-shadow: 0 3px 8px rgba(36, 107, 253, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__icon::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 1px solid rgba(36, 107, 253, 0.22);
+  border-radius: 50%;
+  transform: scale(0.84);
+  opacity: 0;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__speaker,
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__play,
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__pause {
+  grid-area: 1 / 1;
+  display: block;
+  font-size: var(--fs-xs);
+  line-height: 1;
+  transition: opacity 0.15s, transform 0.15s;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__play {
+  margin-left: 1px;
+  opacity: 0;
+  transform: scale(0.85);
+  pointer-events: none;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__pause {
+  opacity: 0;
+  transform: scale(0.85);
+  pointer-events: none;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__speaker {
+  opacity: 1;
+  transform: scale(1);
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen[data-state="speaking"] .brief-listen__speaker,
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen[data-state="paused"] .brief-listen__speaker {
+  opacity: 0;
+  transform: scale(0.85);
+  pointer-events: none;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen[data-state="speaking"] .brief-listen__pause {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen[data-state="paused"] .brief-listen__play {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen[data-state="paused"] .brief-listen__icon {
+  background: linear-gradient(145deg, #3b7af5, #7aafff);
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen[data-state="speaking"] .brief-listen__icon::after {
+  animation: aiobs-brief-voice-ring 1.8s ease-out infinite;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-listen__copy {
+  display: none;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-speech__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(-6px);
+  transition: max-width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s, transform 0.3s;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-speech.is-active .brief-speech__actions {
+  max-width: 56px;
+  opacity: 1;
+  transform: none;
+}
+#screen-cpi-obs .aiobs-execbrief .brief-speech__actions::before {
+  content: "";
+  width: 1px;
+  height: 14px;
+  margin: 0 4px 0 2px;
+  background: rgba(255, 255, 255, 0.22);
+}
+#screen-cpi-obs .aiobs-panel-actions .brief-speech__actions::before {
+  background: var(--border-solid);
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-audio-action {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+#screen-cpi-obs .aiobs-execbrief .brief-audio-action:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+  transform: scale(1.06);
+}
+#screen-cpi-obs .aiobs-panel-actions .brief-audio-action {
+  color: var(--text-tertiary);
+}
+#screen-cpi-obs .aiobs-panel-actions .brief-audio-action:hover {
+  color: var(--text-primary);
+  background: rgba(15, 23, 42, 0.06);
+}
+#screen-cpi-obs .aiobs-execbrief .brief-audio-action--stop:hover {
+  color: #fca5a5;
+  background: rgba(229, 72, 77, 0.16);
+}
+#screen-cpi-obs .aiobs-panel-actions .brief-audio-action--stop:hover {
+  color: #e5484d;
+  background: rgba(229, 72, 77, 0.1);
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .brief-stop-box {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: currentColor;
+}
+#screen-cpi-obs :is(.aiobs-execbrief, .aiobs-panel-actions) .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@keyframes aiobs-brief-voice-ring {
+  0% { transform: scale(0.82); opacity: 0.8; }
+  80%, 100% { transform: scale(1.5); opacity: 0; }
+}
+#screen-cpi-obs .aiobs-execbrief-sub {
+  position: relative;
+  z-index: 1;
+  margin: 20px 0 0;
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  color: rgba(234, 241, 251, 0.88);
+  width: 100%;
+  box-sizing: border-box;
+}
+#screen-cpi-obs .aiobs-execbrief-actions {
+  position: relative;
+  z-index: 1;
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn--primary {
+  background: #fff;
+  border-color: #fff;
+  color: var(--aiobs-navy-900);
+}
+#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn--primary:hover { background: var(--aiobs-cyan); border-color: var(--aiobs-cyan); color: #fff; }
+#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn:not(.aiobs-btn--primary) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn:not(.aiobs-btn--primary):hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.4); color: #fff; }
+
+/* ── Signature animation: a minimal abstract connected-data network,
+   pinned bottom-right, now cyan-on-navy so it reads as a real accent
+   against the dark hero rather than a near-invisible pale wash. Still
+   deliberately just nodes + thin links, no skyline/city silhouette (the
+   2026-09-11 animation brief explicitly excluded that; the new deep-navy
+   surface makes the restraint read as intentional rather than timid).
+   Nodes/links pulse slowly and calmly, gated behind prefers-reduced-
+   motion. ── */
+#screen-cpi-obs .aiobs-execbrief-bg {
+  position: absolute;
+  right: 18px;
+  bottom: 0;
+  width: 280px;
+  height: 120px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+#screen-cpi-obs .aiobs-execbrief-bg .aiobs-art-link {
+  stroke: var(--aiobs-cyan);
+  stroke-width: 1.2;
+  stroke-opacity: 0.6;
+}
+#screen-cpi-obs .aiobs-execbrief-bg .aiobs-art-node {
+  fill: var(--aiobs-cyan);
+  stroke: none;
+}
+@media (max-width: 900px) {
+  #screen-cpi-obs .aiobs-execbrief-bg { display: none; }
+}
+/* Slow, calm pulse — a "heartbeat", not an effect. Multi-second cycles,
+   low-amplitude, gated behind prefers-reduced-motion with a fully static
+   (still legible) fallback below. */
+@media (prefers-reduced-motion: no-preference) {
+  #screen-cpi-obs .aiobs-execbrief-bg .aiobs-art-node {
+    animation: aiobsMeshPulse 4.5s ease-in-out infinite;
+    animation-delay: var(--nd, 0s);
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  #screen-cpi-obs .aiobs-execbrief-bg .aiobs-art-link {
+    animation: aiobsMeshLinkPulse 5.5s ease-in-out infinite;
+    animation-delay: var(--ld, 0s);
+  }
+}
+@keyframes aiobsMeshPulse {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.16); }
+}
+@keyframes aiobsMeshLinkPulse {
+  0%, 100% { stroke-opacity: 0.4; }
+  50% { stroke-opacity: 0.85; }
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-execbrief {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 56px -24px rgba(0, 0, 0, 0.7);
+}
+
+/* ── AI at a Glance — one card per headline figure. Styled to match
+   Census Observatory's "at a glance" cards (.obs-card/.glance-card in
+   CensusObservatory.html, read-only reference — not edited): a plain
+   white bordered card with an icon+label header, one big number, one
+   quiet caption below. No comparison badge or breakdown chart per card
+   — the source PDF carries no prior-year AI figure to badge against, and
+   unlike Census's population/labour domains these five measures have no
+   citizenship/gender split to chart. Population/survey-year context is
+   kept, just demoted to the small caption + the info popover rather than
+   a bold tag competing with the label for attention (2026-09-11, "too
+   much information" feedback on the first pass). ── */
+#screen-cpi-obs .aiobs-glancecards {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  align-items: stretch;
+  overflow: visible;
+}
+#screen-cpi-obs .aiobs-glancecard {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 18px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  overflow: visible;
+}
+#screen-cpi-obs .aiobs-glancecard:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-lg);
+}
+#screen-cpi-obs .aiobs-glancecard-hd {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  min-height: 2.6em;
+  overflow: visible;
+}
+#screen-cpi-obs .aiobs-glancecard-ic {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-lg);
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-glancecard-label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  flex: 1;
+}
+#screen-cpi-obs .aiobs-glancecard-info { margin-inline-start: auto; flex-shrink: 0; }
+#screen-cpi-obs .aiobs-glancecard-val {
+  font-size: var(--fs-4xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+#screen-cpi-obs .aiobs-glancecard-bar {
+  height: 4px;
+  background: var(--border-solid);
+  border-radius: 2px;
+  margin: 10px 0 8px;
+  overflow: hidden;
+}
+#screen-cpi-obs .aiobs-glancecard-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.6s ease-out;
+}
+#screen-cpi-obs .aiobs-glancecard-sub {
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+  margin-top: auto;
+  padding-top: 4px;
+}
+#screen-cpi-obs .aiobs-glancecard-sub + .aiobs-glancecard-sub {
+  margin-top: 2px;
+}
+/* Gap cards (percentage-point values) hide the progress bar so a 16 pp
+   value is not misread as 16% adoption; spacing is preserved. */
+#screen-cpi-obs .aiobs-glancecard-bar--gap {
+  visibility: hidden;
+}
+/* Glance-card tooltips are portaled to <body> and positioned with
+   position:fixed via js/ai-observatory.js so they are never clipped by
+   card overflow or the data-reveal transform containing block. */
+#screen-cpi-obs .aiobs-panel.aiobs-glance { overflow: visible; }
+#screen-cpi-obs .aiobs-glancecard .aiobs-info-pop {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+@media (hover: hover) {
+  #screen-cpi-obs .aiobs-glancecard .aiobs-info:hover .aiobs-info-pop,
+  #screen-cpi-obs .aiobs-glancecard .aiobs-info.is-open .aiobs-info-pop {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+.aiobs-info-pop.aiobs-info-pop--floating {
+  position: fixed;
+  z-index: 700;
+  width: 240px;
+  max-width: calc(100vw - 24px);
+  margin: 0;
+  left: auto;
+  right: auto;
+  top: auto;
+  bottom: auto;
+  transform: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s;
+  background: var(--text-primary, #0f172a);
+  color: #fff;
+  border-radius: var(--r-md, 10px);
+  padding: 12px 14px;
+  font-size: var(--fs-2xs, 11px);
+  line-height: 1.55;
+  box-shadow: var(--shadow-lg, 0 12px 32px rgba(15, 23, 42, 0.18));
+}
+.aiobs-info-pop.aiobs-info-pop--floating dt {
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  margin-top: 7px;
+}
+.aiobs-info-pop.aiobs-info-pop--floating dt:first-child { margin-top: 0; }
+.aiobs-info-pop.aiobs-info-pop--floating dd { margin: 1px 0 0; }
+.aiobs-info-pop.aiobs-info-pop--floating.aiobs-info-pop--wide {
+  width: 320px;
+}
+.aiobs-info-pop.aiobs-info-pop--floating.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Glance label — top-right contextual note on the section header */
+#screen-cpi-obs .aiobs-glance-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+#screen-cpi-obs .aiobs-panel.aiobs-glance .aiobs-panel-hd > div > p {
+  font-size: var(--fs-xs);
+  max-width: 70ch;
+  margin: 6px 0 0;
+}
+
+/* 4-across variant — used by Interpret's per-domain AI at a Glance
+   panels, which carry 4 figures rather than Overview's 5. */
+#screen-cpi-obs .aiobs-glancecards--4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-glancecards--4 { grid-template-columns: repeat(2, 1fr); }
+}
+/* Stat variant — label → value → subtitle, no icon or progress bar
+   (e.g. Higher-education section's three headline figures). */
+#screen-cpi-obs .aiobs-glancecard--stat .aiobs-glancecard-hd { margin-bottom: 14px; }
+#screen-cpi-obs .aiobs-glancecard--stat .aiobs-glancecard-val { margin-bottom: 10px; }
+/* Pending variant — a glancecard for a measure with no approved figure
+   yet (e.g. Interpret's Infrastructure domain), styled to sit in the same
+   grid/row as real glancecards rather than a visually different empty
+   state, so a not-yet-published theme still reads as part of the same
+   system instead of looking broken next to measured ones. */
+#screen-cpi-obs .aiobs-glancecard--pending { background: var(--surface2); border-style: dashed; box-shadow: none; }
+#screen-cpi-obs .aiobs-glancecard--pending:hover { box-shadow: none; border-color: var(--border-solid); }
+#screen-cpi-obs .aiobs-glancecard--pending .aiobs-glancecard-val { color: var(--text-tertiary); }
+
+/* Featured variant — one glance card per row (the domain/page's single
+   headline figure) reads as the lead measure rather than an equal-weight
+   tile among five identical cards, per the "review whether every card
+   deserves equal prominence" brief. Tinted top wash + accent border in
+   the ambient/domain color; every other card in the row stays plain. */
+#screen-cpi-obs .aiobs-glancecard--featured {
+  background: linear-gradient(180deg, var(--aiobs-domain-light) 0%, var(--surface) 65%);
+  border-color: var(--aiobs-domain);
+  box-shadow: 0 0 0 1px var(--aiobs-domain) inset, var(--shadow-md);
+}
+#screen-cpi-obs .aiobs-glancecard--featured:hover { box-shadow: 0 0 0 1px var(--aiobs-domain) inset, var(--shadow-lg); }
+#screen-cpi-obs .aiobs-glancecard--featured .aiobs-glancecard-val { color: var(--aiobs-domain-dark); }
+
+/* ── Synthesis line, closing AI at a Glance ── */
+#screen-cpi-obs .aiobs-glance-synthesis {
+  position: relative;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 92ch;
+  margin: 20px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-solid);
+}
+#screen-cpi-obs .aiobs-glance-synthesis a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+#screen-cpi-obs .aiobs-glance-synthesis a:hover { text-decoration: underline; }
+#screen-cpi-obs .aiobs-info-pop--wide { width: 320px; }
+
+/* ── Responsive: 5 → 3 → 2 → 1 col glance cards; brief padding tightens,
+   decorative skyline already hides <900px (see .aiobs-execbrief-bg). ── */
+@media (max-width: 1180px) {
+  #screen-cpi-obs .aiobs-glancecards { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-execbrief { padding: 20px 20px 22px; }
+  #screen-cpi-obs .aiobs-glancecards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  #screen-cpi-obs .aiobs-glancecards { grid-template-columns: 1fr; }
+}
+
+/* ── Domain exploration shortcut — three equal cards linking to
+   Interpret's People & Skills, Economic and Infrastructure tabs. ── */
+#screen-cpi-obs .aiobs-domain-explore-hd {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+#screen-cpi-obs .aiobs-domain-explore-ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-domain-explore-hd h2 {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+}
+#screen-cpi-obs .aiobs-domain-explore-hd p {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin: 6px 0 0;
+  line-height: 1.55;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  #screen-cpi-obs .aiobs-domain-explore-hd p { white-space: normal; }
+}
+#screen-cpi-obs .aiobs-domain-explore-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+#screen-cpi-obs .aiobs-domain-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 20px 18px;
+  min-width: 0;
+}
+#screen-cpi-obs .aiobs-domain-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-solid);
+  margin-bottom: 16px;
+}
+#screen-cpi-obs .aiobs-domain-card-ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--domain-light);
+  color: var(--domain);
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-domain-card-titles { flex: 1; min-width: 0; }
+#screen-cpi-obs .aiobs-domain-card-titles h3 {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+#screen-cpi-obs .aiobs-domain-card-titles p {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin: 5px 0 0;
+  line-height: 1.5;
+}
+#screen-cpi-obs .aiobs-domain-card-arrow {
+  color: var(--text-tertiary);
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+#screen-cpi-obs .aiobs-domain-card-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  flex: 1;
+  align-items: stretch;
+}
+#screen-cpi-obs .aiobs-domain-metric {
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px;
+  min-width: 0;
+}
+#screen-cpi-obs .aiobs-domain-metric:first-child { padding-left: 0; }
+#screen-cpi-obs .aiobs-domain-metric:last-child { padding-right: 0; }
+#screen-cpi-obs .aiobs-domain-metric:not(:first-child) {
+  border-left: 1px solid var(--border-solid);
+}
+#screen-cpi-obs .aiobs-domain-metric-val {
+  font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+#screen-cpi-obs .aiobs-domain-metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin-top: 6px;
+  min-height: 2.7em;
+}
+
+#screen-cpi-obs .aiobs-domain-card-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 11px 16px;
+  border-radius: var(--r-md);
+  background: var(--domain-light);
+  color: var(--domain-dark);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+#screen-cpi-obs .aiobs-domain-card-cta:hover {
+  background: var(--domain);
+  color: #fff;
+}
+#screen-cpi-obs .aiobs-domain-card-cta .ti { font-size: 14px; transition: transform 0.15s; }
+#screen-cpi-obs .aiobs-domain-card-cta:hover .ti { transform: translateX(2px); }
+
+@media (max-width: 980px) {
+  #screen-cpi-obs .aiobs-domain-explore-grid { grid-template-columns: repeat(2, 1fr); }
+  #screen-cpi-obs .aiobs-domain-explore-grid .aiobs-domain-card:last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-domain-explore-grid { grid-template-columns: 1fr; }
+  #screen-cpi-obs .aiobs-domain-explore-grid .aiobs-domain-card:last-child { grid-column: auto; }
+}
+@media (max-width: 480px) {
+  #screen-cpi-obs .aiobs-domain-card-metrics {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  #screen-cpi-obs .aiobs-domain-metric {
+    padding: 0 0 12px !important;
+    border-left: none !important;
+    border-bottom: 1px solid var(--border-solid);
+  }
+  #screen-cpi-obs .aiobs-domain-metric-label { min-height: 0; }
+  #screen-cpi-obs .aiobs-domain-metric:last-child {
+    padding-bottom: 0 !important;
+    border-bottom: none;
+  }
+}
+
+/* ====================================================================
+   OVERVIEW — IA-workbook rework (2026-09-11)
+   Four new blocks driven by the "00 Executive IA" / "02 Section Data Map"
+   sheets: a progression visual (readiness journey), a positioned spectrum
+   (trust & future outlook), a min–max range (sector variation), and
+   lightweight pathway teasers that replace what used to be full Benchmark
+   and Next-Wave sections directly on Overview — those now live on their
+   own dedicated pages per the workbook's page allocation.
+   ==================================================================== */
+
+/* ── Readiness journey: a 4-step progression, not a KPI wall ── */
+#screen-cpi-obs .aiobs-journey {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+#screen-cpi-obs .aiobs-journey-step {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 18px;
+}
+#screen-cpi-obs .aiobs-journey-step--accent .aiobs-journey-val { color: var(--accent); }
+#screen-cpi-obs .aiobs-journey-val {
+  font-size: var(--fs-3xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+#screen-cpi-obs .aiobs-journey-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 7px 0 12px;
+  line-height: 1.4;
+  min-height: 2.8em;
+}
+#screen-cpi-obs .aiobs-journey-track { height: 6px; border-radius: 999px; background: var(--surface2); overflow: hidden; }
+#screen-cpi-obs .aiobs-journey-fill { height: 100%; border-radius: 999px; background: var(--gray-300); }
+#screen-cpi-obs .aiobs-journey-step--accent .aiobs-journey-fill { background: var(--accent); }
+#screen-cpi-obs .aiobs-journey-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-300);
+  font-size: 18px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+/* ── Trust & future outlook spectrum: dots positioned by their actual
+   value along a shared 0–100 track, so distance reads as real distance.
+   Each point carries its own population tag — individuals and
+   enterprises are shown together for the story but never implied to
+   share a denominator. ── */
+#screen-cpi-obs .aiobs-spectrum { padding: 34px 6px 44px; }
+#screen-cpi-obs .aiobs-spectrum-track {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--surface2);
+  margin: 0 8px;
+}
+#screen-cpi-obs .aiobs-spectrum-point {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+#screen-cpi-obs .aiobs-spectrum-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--border-solid);
+  display: block;
+}
+#screen-cpi-obs .aiobs-spectrum-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 150px;
+  text-align: center;
+}
+#screen-cpi-obs .aiobs-spectrum-point--below .aiobs-spectrum-label { top: 22px; }
+#screen-cpi-obs .aiobs-spectrum-point--above .aiobs-spectrum-label { bottom: 22px; }
+#screen-cpi-obs .aiobs-spectrum-label b { display: block; font-size: var(--fs-lg); font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+#screen-cpi-obs .aiobs-spectrum-label .aiobs-spectrum-name { display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-top: 2px; }
+#screen-cpi-obs .aiobs-spectrum-label .aiobs-spectrum-pop { display: block; font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); margin-top: 1px; }
+
+/* ── Min–max range: sector adoption spread ── */
+#screen-cpi-obs .aiobs-range { padding: 30px 6px 40px; }
+#screen-cpi-obs .aiobs-range-track { position: relative; height: 6px; border-radius: 999px; background: var(--surface2); margin: 0 8px; }
+#screen-cpi-obs .aiobs-range-fill { position: absolute; top: 0; bottom: 0; border-radius: 999px; background: linear-gradient(90deg, var(--gray-300), var(--accent)); }
+#screen-cpi-obs .aiobs-range-tick { position: absolute; top: 50%; width: 2px; height: 16px; background: var(--text-tertiary); transform: translate(-50%, -50%); }
+#screen-cpi-obs .aiobs-range-tick-label { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); font-size: 9.5px; font-weight: 700; color: var(--text-tertiary); white-space: nowrap; }
+#screen-cpi-obs .aiobs-range-marker { position: absolute; top: -34px; width: max-content; max-width: 130px; }
+#screen-cpi-obs .aiobs-range-marker b { display: block; font-size: var(--fs-xl); font-weight: 800; color: var(--text-primary); }
+#screen-cpi-obs .aiobs-range-marker span { display: block; font-size: 10px; font-weight: 600; color: var(--text-tertiary); margin-top: 1px; }
+/* Anchored outward (away from each other) rather than centered, so two
+   markers close together on the 0–100 scale (e.g. 66% and 86%) never
+   overlap — low grows left from its point, high grows right from its. */
+#screen-cpi-obs .aiobs-range-marker--low { transform: translateX(-100%); text-align: right; padding-inline-end: 10px; }
+#screen-cpi-obs .aiobs-range-marker--low b { color: var(--text-secondary); }
+#screen-cpi-obs .aiobs-range-marker--high { transform: translateX(0); text-align: left; padding-inline-start: 10px; }
+#screen-cpi-obs .aiobs-range-marker--high b { color: var(--accent); }
+
+/* ── Pathway teasers: lightweight forward links, not restated content ── */
+#screen-cpi-obs .aiobs-pathway-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+/* 4-across variant — Overview's "Continue the analysis" (4 destinations,
+   not Interpret's 3), with its own 2-col step before the shared 1-col
+   collapse below. */
+#screen-cpi-obs .aiobs-pathway-grid--4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 980px) {
+  #screen-cpi-obs .aiobs-pathway-grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+#screen-cpi-obs .aiobs-pathway-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+#screen-cpi-obs .aiobs-pathway-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+#screen-cpi-obs .aiobs-pathway-ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-pathway-body { flex: 1; min-width: 0; }
+#screen-cpi-obs .aiobs-pathway-body b { display: block; font-size: var(--fs-sm); font-weight: 700; color: var(--text-primary); }
+#screen-cpi-obs .aiobs-pathway-body p { font-size: var(--fs-xs); color: var(--text-tertiary); line-height: 1.5; margin: 4px 0 0; }
+#screen-cpi-obs .aiobs-pathway-card > .ti-arrow-right { color: var(--gray-300); font-size: 15px; margin-top: 3px; flex-shrink: 0; }
+
+@media (max-width: 860px) {
+  #screen-cpi-obs .aiobs-journey { flex-direction: column; gap: 16px; }
+  #screen-cpi-obs .aiobs-journey-arrow { transform: rotate(90deg); padding: 0; }
+  #screen-cpi-obs .aiobs-pathway-grid { grid-template-columns: 1fr; }
+}
+/* Below ~640px there usually isn't room between close values (e.g. 29%
+   and 43.3% can be under 40px apart) for the position-encoded dot-plot
+   to hold readable labels — fall back to a plain stacked list in the
+   same DOM order rather than fighting for space along one axis. */
+@media (max-width: 640px) {
+  #screen-cpi-obs .aiobs-spectrum { padding: 6px 4px; }
+  #screen-cpi-obs .aiobs-spectrum-track { height: auto; background: none; margin: 0; display: flex; flex-direction: column; gap: 16px; }
+  #screen-cpi-obs .aiobs-spectrum-point { position: static; transform: none; display: flex; align-items: center; gap: 12px; }
+  #screen-cpi-obs .aiobs-spectrum-dot { flex-shrink: 0; }
+  #screen-cpi-obs .aiobs-spectrum-label { position: static; transform: none; text-align: left; max-width: none; width: auto; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+  #screen-cpi-obs .aiobs-spectrum-label b { font-size: var(--fs-lg); }
+  #screen-cpi-obs .aiobs-spectrum-label .aiobs-spectrum-name,
+  #screen-cpi-obs .aiobs-spectrum-label .aiobs-spectrum-pop { margin-top: 0; }
+}
+
+/* ====================================================================
+   INTERPRET — chapter shell (2026-09-11 narrative rework)
+   A guided sequence of numbered chapters replacing the old accordion +
+   bespoke li-* system. Reuses .aiobs-panel/.aiobs-execbrief/.aiobs-bars/
+   .aiobs-gapbars/.aiobs-donut-wrap/.aiobs-insight as-is; adds only what
+   a chaptered narrative genuinely needs on top of those: a sticky chapter
+   rail, a numbered chapter header, and a two-donut "from X to Y" duo.
+   ==================================================================== */
+
+/* ── Sticky chapter rail — jump links, not a filter ── */
+#screen-cpi-obs .aiobs-chapnav {
+  position: sticky;
+  top: 12px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border-solid);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  scrollbar-width: none;
+}
+#screen-cpi-obs .aiobs-chapnav::-webkit-scrollbar { display: none; }
+#screen-cpi-obs .aiobs-chapnav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+#screen-cpi-obs .aiobs-chapnav a b { font-weight: 800; opacity: 0.55; }
+#screen-cpi-obs .aiobs-chapnav a:hover { background: var(--surface2); color: var(--text-secondary); }
+#screen-cpi-obs .aiobs-chapnav a.active { background: var(--accent-light); color: var(--accent-dark); }
+#screen-cpi-obs .aiobs-chapnav a.active b { opacity: 1; }
+
+/* ── Donut duo: "from X to Y" in one glance, reusing .aiobs-donut-wrap ── */
+#screen-cpi-obs .aiobs-duo { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 10px 0 4px; }
+#screen-cpi-obs .aiobs-duo-col { display: flex; flex-direction: column; align-items: center; }
+#screen-cpi-obs .aiobs-duo-label { text-align: center; font-size: var(--fs-xs); font-weight: 600; color: var(--text-secondary); margin-top: 12px; max-width: 120px; line-height: 1.35; }
+#screen-cpi-obs .aiobs-duo-arrow { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); color: var(--text-tertiary); font-size: 15px; flex-shrink: 0; }
+
+/* ── Chapter footnote — small provenance line under a chart, matching
+   the inline style already used for chart sources elsewhere ── */
+#screen-cpi-obs .aiobs-chap-note { font-size: 11px; color: var(--text-tertiary); margin: 14px 0 0; line-height: 1.5; }
+
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-chapnav { border-radius: var(--r-lg); justify-content: flex-start; }
+}
+
+/* ====================================================================
+   CHART/CONTENT CARDS — Overview State of AI + Interpret domains
+   White chart/content panels with subtle borders; neutral bar tracks
+   only. Shared by ai-overview.html (.aiobs-state-of-ai) and
+   ai-interpret.html (.itp-domain). Executive Brief / dark hero panels
+   are never .aiobs-panel and are excluded. Content-specific bar
+   layouts remain page-local. ==================================================================== */
+#screen-cpi-obs {
+  --aiobs-chart-panel-bg: var(--surface);
+  --aiobs-chart-panel-border: #E2E8F0;
+  --aiobs-chart-track-bg: #E8EDF3;
+}
+
+/* ── Overview: chapter stack ── */
+#screen-cpi-obs .aiobs-state-of-ai {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Clean white outer analysis panels — no gradient wash */
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-panel,
+#screen-cpi-obs .itp-domain .aiobs-panel {
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Overview-only: chapter header icon chip + title */
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-chapter-hd-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-chapter-hd-ic {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--accent-light);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-panel-hd h2 {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--aiobs-navy-900);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-panel-hd p {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  max-width: 96ch;
+  margin: 6px 0 0;
+  line-height: 1.55;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-panel-hd {
+  margin-bottom: 24px;
+  align-items: flex-start;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-ask {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Chart/content sub-panels: white surface, subtle border only */
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-subcard,
+#screen-cpi-obs .itp-domain .aiobs-subcard {
+  background: var(--aiobs-chart-panel-bg);
+  border: 1px solid var(--aiobs-chart-panel-border);
+  box-shadow: none;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-subcard-kicker,
+#screen-cpi-obs .itp-domain .aiobs-subcard-kicker {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-subcard-title,
+#screen-cpi-obs .itp-domain .aiobs-subcard-title {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--aiobs-navy-900);
+  margin: 3px 0 16px;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-subcard-hd,
+#screen-cpi-obs .itp-domain .aiobs-subcard-hd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-subcard-ic,
+#screen-cpi-obs .itp-domain .aiobs-subcard-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-subgrid,
+#screen-cpi-obs .itp-domain .aiobs-subgrid {
+  gap: 16px;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-bars,
+#screen-cpi-obs .itp-domain .aiobs-bars {
+  gap: 14px;
+  flex: 1;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-bar-track,
+#screen-cpi-obs .itp-domain .aiobs-bar-track {
+  height: 10px;
+  background: var(--aiobs-chart-track-bg);
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-bar-name,
+#screen-cpi-obs .itp-domain .aiobs-bar-name {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-bar-val,
+#screen-cpi-obs .itp-domain .aiobs-bar-val {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-chap-note,
+#screen-cpi-obs .itp-domain .aiobs-chap-note {
+  margin-top: auto;
+  padding-top: 14px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* Donut duo inside white chart panels */
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-duo,
+#screen-cpi-obs .itp-domain .aiobs-duo {
+  flex: 1;
+  align-items: center;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-duo-arrow,
+#screen-cpi-obs .itp-domain .aiobs-duo-arrow {
+  background: var(--surface);
+  border: 1px solid var(--aiobs-chart-panel-border);
+  box-shadow: none;
+}
+
+/* Stat panel inside subgrid */
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-statpanel,
+#screen-cpi-obs .itp-domain .aiobs-statpanel {
+  background: var(--aiobs-chart-panel-bg);
+  border: 1px solid var(--aiobs-chart-panel-border);
+  border-radius: var(--r-md);
+  box-shadow: none;
+  padding: 24px 22px;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-statpanel .aiobs-stat-value,
+#screen-cpi-obs .itp-domain .aiobs-statpanel .aiobs-stat-value {
+  font-size: clamp(2.5rem, 5vw, 3.25rem);
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-statpanel .aiobs-chap-note,
+#screen-cpi-obs .itp-domain .aiobs-statpanel .aiobs-chap-note {
+  max-width: 36ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* AI Insight callout — consistent sizing */
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-insight,
+#screen-cpi-obs .itp-domain .aiobs-insight {
+  padding: 18px 22px;
+  margin-top: 20px;
+}
+#screen-cpi-obs .aiobs-state-of-ai .aiobs-insight-ic,
+#screen-cpi-obs .itp-domain .aiobs-insight-ic {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+/* Dark mode: chart panels use surface token, tracks stay neutral */
+html[data-theme="dark"] #screen-cpi-obs .aiobs-state-of-ai .aiobs-subcard,
+html[data-theme="dark"] #screen-cpi-obs .itp-domain .aiobs-subcard,
+html[data-theme="dark"] #screen-cpi-obs .aiobs-state-of-ai .aiobs-statpanel,
+html[data-theme="dark"] #screen-cpi-obs .itp-domain .aiobs-statpanel {
+  background: var(--surface);
+  border-color: var(--border-solid);
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-state-of-ai .aiobs-bar-track,
+html[data-theme="dark"] #screen-cpi-obs .itp-domain .aiobs-bar-track {
+  background: var(--surface2);
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-state-of-ai .aiobs-panel-hd h2,
+html[data-theme="dark"] #screen-cpi-obs .itp-domain .aiobs-panel-hd h2,
+html[data-theme="dark"] #screen-cpi-obs .aiobs-state-of-ai .aiobs-subcard-title,
+html[data-theme="dark"] #screen-cpi-obs .itp-domain .aiobs-subcard-title {
+  color: var(--text-primary);
+}
+
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-state-of-ai .aiobs-panel-hd {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  #screen-cpi-obs .aiobs-state-of-ai .aiobs-ask {
+    align-self: flex-start;
+  }
+}

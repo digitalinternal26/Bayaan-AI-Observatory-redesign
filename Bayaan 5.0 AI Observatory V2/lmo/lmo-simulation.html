@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labour Market Observatory — Simulations · Bayaan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-common.css">
+<link rel="stylesheet" href="../style.css" />
+<link rel="stylesheet" href="../css/theme.css" />
+<script>
+  (function () {
+    var t = localStorage.getItem("bayaan-theme") || "light";
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  })();
+</script>
+<script src="../js/theme.js"></script>
+<script src="../js/header.js"></script>
+<script src="../js/lmo-chrome.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-simulation.css">
+<script src="lmo-sidenav.js"></script>
+<script src="lmo-shared.js"></script>
+</head>
+<body class="lmo lmo--simulation" data-lmo-active="simulation" data-lmo-ai-onclick="openChat('What are the highest-impact simulations to run now?','Simulation AI')">
+
+<div id="screen-lmo-obs" class="ws-screen header-flush">
+<div data-bayaan-header></div>
+
+<div id="lmo-sidenav-mount"></div>
+
+<div class="app-shell">
+<div class="wrap">
+<div class="page">
+
+  <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+    <a href="#" data-lmo-bc="home">Home</a>
+    <span class="ind-bc-sep">›</span>
+    <a href="#" data-lmo-bc="observatory">Observatory</a>
+    <span class="ind-bc-sep">›</span>
+    <a href="lmo-simulation.html">Simulations</a>
+    <span class="ind-bc-sep">›</span>
+    <span class="ind-bc-current" id="bc-sim">What-If Analysis</span>
+  </nav>
+
+  <div class="ph">
+    <div class="ph-l">
+      <h1 class="ph-title">Labour Market Observatory (LMO) - Simulation Hub</h1>
+    </div>
+  </div>
+
+  <div class="stage-layout">
+    <div class="stage-card">
+      <div class="stage-hd">
+        <div>
+          <h2 class="ph-title stage-scenario-title"><span id="stage-title">Employment Across Leading Sectors</span> <button type="button" class="ai-sparkle-action ai-sparkle-action--ph" onclick="openChat('What are the highest-impact What-If scenarios to run now?','Simulation AI')"><i class="ti ti-sparkles" aria-hidden="true"></i></button></h2>
+          <p class="stage-hd-sub">Assess how changes in Emiratization may influence Emirati employment across Abu Dhabi's largest sectors.</p>
+        </div>
+      </div>
+      <div class="stage-kpi-row" id="kpi-row"></div>
+
+      <div class="stage-chart-area">
+        <div class="stage-chart-wrap"><canvas id="main-chart"></canvas></div>
+      </div>
+      <div class="stage-legend">
+        <div class="leg"><div class="leg-line actual"></div>Historical</div>
+        <div class="leg"><div class="leg-line sim"></div>What-If Forecast</div>
+        <div class="leg"><div class="leg-line base"></div>Baseline Forecast</div>
+        <button type="button" class="stage-meta-pill" title="Download metadata and methodology" aria-label="Download metadata and methodology">
+          <i class="ti ti-file-spreadsheet" aria-hidden="true"></i>
+          <span>Metadata and methodology</span>
+          <i class="ti ti-download" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="driver-panel">
+      <div class="dp-hd">
+        <div class="dp-hd-title">
+          <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
+          Scenario Drivers
+        </div>
+        <button type="button" class="dp-reset" onclick="resetSliders()">Reset</button>
+      </div>
+      <p class="dp-hint">Modify any drivers below to view changes in the projection.</p>
+      <div class="dp-slider-section" id="driver-sliders"></div>
+    </div>
+  </div>
+
+  <div class="ai-insights-card">
+    <div class="ai-insights-hd">
+      <div class="ai-insights-title ai-insights-title--md">
+        AI-Generated Insights
+        <button type="button" class="ai-sparkle-action" onclick="openChat(currentScenario,'What-If Analysis')" title="Deep-dive with AI" aria-label="Deep-dive with AI"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+      </div>
+    </div>
+    <div class="ai-insight-list" id="insight-list"></div>
+  </div>
+
+  <div class="rel-sec">
+    <div class="rel-sec-hd">
+      <div class="rel-sec-title">Related Indicators</div>
+      <button type="button" class="rel-all">View All <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+    <div class="rel-grid" id="rel-grid"></div>
+  </div>
+
+</div>
+</div>
+
+<aside class="cpanel ai-panel" id="cpanel" role="complementary" aria-label="Bayaan AI Panel">
+  <div class="bai-header">
+    <div class="bai-header-left">
+      <img class="bai-icon-wrap" src="../assets/ai-chat-thumb.svg" alt="Bayaan AI" width="38" height="38">
+      <div><div class="bai-header-title">Bayaan AI</div></div>
+    </div>
+    <div class="bai-header-right">
+      <button class="bai-close-btn" type="button" onclick="closeChat()" title="Close AI Panel"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+  <div class="bai-context-strip">
+    <span class="bai-ctx-label">Analysing</span>
+    <span class="bai-ctx-pill" id="ctx-val">Simulation Intelligence</span>
+    <span class="bai-ctx-dot"></span>
+    <span class="bai-ctx-dot-label">Generating</span>
+  </div>
+  <div class="bai-messages msgs" id="msgs"></div>
+  <div class="suggs" id="suggs"></div>
+  <div class="bai-input-area">
+    <div class="bai-input-row">
+      <textarea class="bai-input" id="cin" placeholder="Ask about this simulation…" rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendC()}"></textarea>
+      <button class="bai-send-btn" type="button" onclick="sendC()" title="Send"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</aside>
+</div>
+</div>
+
+<script>
+const CHART_AC = '#0066FF';
+const CHART_SIM = '#EA580C';
+const YEARS = ['2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026','2027','2028'];
+const SCENARIO_ORDER = ['emp_leading','emp_public_admin','emp_manufacturing','emp_education','emp_finance','emp_mining'];
+
+const SCENARIOS = {
+  emp_leading: {
+    name: 'Employment Across Leading Sectors',
+    sub: 'What-If Scenario Analysis · Total employment · 2014 – 2028',
+    yAxis: 'Employed Persons', yMin: 900000, yMax: 1600000,
+    yFmt: v => (v >= 1000000 ? (v / 1000000).toFixed(2) + 'M' : (v / 1000).toFixed(0) + 'K'),
+    labels: YEARS, histEnd: 10,
+    actual: [980000,1020000,1065000,1110000,1155000,1200000,1185000,1240000,1295000,1350000,1410000,null,null,null,null],
+    base:   [null,null,null,null,null,null,null,null,null,null,1410000,1465000,1510000,1550000,1595000],
+    drivers: [
+      { id:'nogdp', name:'Non Oil GDP Growth', min:-8, max:8, step:1, value:0, neutral:0, impact:0.028 },
+      { id:'pmi', name:'PMI Employment Index', min:-4, max:4, step:1, value:0, neutral:0, impact:0.035 },
+      { id:'sector_demand', name:'Leading Sector Demand', min:-6, max:6, step:1, value:0, neutral:0, impact:0.03 }
+    ],
+    kpis: [
+      { lbl:'Indicator as of 2023', val:'1.41M', sub:'Total leading-sector employment' },
+      { lbl:'% Change 2024–2025', val:'+3.9%', chip:'▲ +3.9%', chipCls:'up', sub:'vs prior year forecast' },
+      { lbl:'Indicator as of 2028', val:'1.60M', sub:'Projected employment' },
+      { lbl:'% Change 2023–2028', val:'+13.1%', chip:'▲ +13.1%', chipCls:'up', sub:'Long-run trajectory' }
+    ],
+    insights: [
+      '<strong>Employment across leading sectors</strong> is projected to reach <strong>1.60M by 2028</strong>, up 13.1% from 1.41M in 2023, led by public administration, manufacturing, and financial services.',
+      'A <strong>–8% Non-Oil GDP shock</strong> would trim the 2028 headcount to roughly <strong>1.48M</strong>, with manufacturing absorbing the largest absolute reduction.',
+      '<strong>PMI Employment</strong> and <strong>Leading Sector Demand</strong> are the most sensitive drivers — a combined +4 uplift raises 2028 employment to approximately <strong>1.68M</strong>.'
+    ],
+    impacts: [
+      { lbl:'Public Admin. (2028)', val:'348K', chg:'▲ +12.3% vs 2023', cls:'up' },
+      { lbl:'Manufacturing (2028)', val:'198K', chg:'▲ +11.2% vs 2023', cls:'up' },
+      { lbl:'Financial Services (2028)', val:'72K', chg:'▲ +18.0% vs 2023', cls:'up' },
+      { lbl:'Model Confidence', val:'82%', chg:'Sector demand + ARIMA', cls:'nt' }
+    ],
+    rel: { desc:'Aggregates employment across priority economic sectors and stress-tests sensitivity to Non-Oil GDP, PMI, and sector demand shocks.', metric:'1.60M', metricLbl:'Leading-sector employment (2028)' }
+  },
+  emp_public_admin: {
+    name: 'Sectoral Employment in Public Administration & Defence',
+    sub: 'What-If Scenario Analysis · Public administration & defence · 2014 – 2028',
+    yAxis: 'Employed Persons', yMin: 220000, yMax: 380000,
+    yFmt: v => (v / 1000).toFixed(0) + 'K',
+    labels: YEARS, histEnd: 10,
+    actual: [248000,255000,262000,270000,278000,285000,282000,290000,298000,305000,310000,null,null,null,null],
+    base:   [null,null,null,null,null,null,null,null,null,null,310000,318000,328000,338000,348000],
+    drivers: [
+      { id:'public_hire', name:'Public Sector Hiring Rate', min:-5, max:5, step:1, value:0, neutral:0, impact:0.032 },
+      { id:'emirat_rate', name:'Emiratisation Rate', min:-5, max:5, step:1, value:0, neutral:0, impact:0.022 }
+    ],
+    kpis: [
+      { lbl:'Indicator as of 2023', val:'310K', sub:'Public admin. & defence employment' },
+      { lbl:'% Change 2024–2025', val:'+2.6%', chip:'▲ +2.6%', chipCls:'up', sub:'vs prior year forecast' },
+      { lbl:'Indicator as of 2028', val:'348K', sub:'Projected employment' },
+      { lbl:'% Change 2023–2028', val:'+12.3%', chip:'▲ +12.3%', chipCls:'up', sub:'Long-run trajectory' }
+    ],
+    insights: [
+      '<strong>Public administration & defence</strong> remains the largest employer among leading sectors, rising from <strong>310K in 2023 to 348K by 2028</strong> (+12.3%).',
+      'Emiratisation in this sector is already high (<strong>~67%</strong>); further gains depend mainly on public hiring pace rather than localisation quotas.',
+      'A <strong>+5% public hiring uplift</strong> lifts 2028 employment to about <strong>360K</strong>, while a −5% freeze holds the outlook near <strong>336K</strong>.'
+    ],
+    impacts: [
+      { lbl:'Emiratisation Share (2028)', val:'68.4%', chg:'▲ +1.3pp vs 2023', cls:'up' },
+      { lbl:'Emirati Headcount (2028)', val:'238K', chg:'▲ +13.1% vs 2023', cls:'up' },
+      { lbl:'Non-Emirati Headcount (2028)', val:'110K', chg:'▲ +10.4% vs 2023', cls:'up' },
+      { lbl:'Model Confidence', val:'85%', chg:'Public payroll + ARIMA', cls:'nt' }
+    ],
+    rel: { desc:'Projects public administration & defence employment under adjustable hiring and emiratisation drivers.', metric:'348K', metricLbl:'Public admin. employment (2028)' }
+  },
+  emp_manufacturing: {
+    name: 'Sectoral Employment in Manufacturing',
+    sub: 'What-If Scenario Analysis · Manufacturing · 2014 – 2028',
+    yAxis: 'Employed Persons', yMin: 120000, yMax: 230000,
+    yFmt: v => (v / 1000).toFixed(0) + 'K',
+    labels: YEARS, histEnd: 10,
+    actual: [142000,148000,155000,160000,166000,172000,165000,170000,175000,178000,178000,null,null,null,null],
+    base:   [null,null,null,null,null,null,null,null,null,null,178000,182000,187000,192000,198000],
+    drivers: [
+      { id:'ipi', name:'Industrial Production Index', min:-10, max:10, step:1, value:0, neutral:0, impact:0.026 },
+      { id:'nogdp_mfg', name:'Non Oil GDP Growth', min:-8, max:8, step:1, value:0, neutral:0, impact:0.024 }
+    ],
+    kpis: [
+      { lbl:'Indicator as of 2023', val:'178K', sub:'Manufacturing employment' },
+      { lbl:'% Change 2024–2025', val:'+2.2%', chip:'▲ +2.2%', chipCls:'up', sub:'vs prior year forecast' },
+      { lbl:'Indicator as of 2028', val:'198K', sub:'Projected employment' },
+      { lbl:'% Change 2023–2028', val:'+11.2%', chip:'▲ +11.2%', chipCls:'up', sub:'Long-run trajectory' }
+    ],
+    insights: [
+      '<strong>Manufacturing employment</strong> recovers from the 2020 dip and is forecast to reach <strong>198K by 2028</strong> (+11.2% from 2023).',
+      '<strong>Industrial Production</strong> is the primary driver — a −10 IPI shock would leave 2028 employment near <strong>185K</strong>.',
+      'Non-Emirati workers dominate manufacturing headcount; localisation gains remain modest versus public administration and education.'
+    ],
+    impacts: [
+      { lbl:'Emiratisation Share (2028)', val:'22.9%', chg:'▼ –1.2pp vs 2023', cls:'dn' },
+      { lbl:'IPI Sensitivity (2028)', val:'±13K', chg:'±10 IPI shock band', cls:'nt' },
+      { lbl:'YoY Growth (2027–28)', val:'+3.1%', chg:'Steady expansion', cls:'up' },
+      { lbl:'Model Confidence', val:'79%', chg:'IPI bridge + ARIMA', cls:'nt' }
+    ],
+    rel: { desc:'Models manufacturing employment against Industrial Production and Non-Oil GDP shocks through 2028.', metric:'198K', metricLbl:'Manufacturing employment (2028)' }
+  },
+  emp_education: {
+    name: 'Sectoral Employment in Education',
+    sub: 'What-If Scenario Analysis · Education · 2014 – 2028',
+    yAxis: 'Employed Persons', yMin: 60000, yMax: 140000,
+    yFmt: v => (v / 1000).toFixed(0) + 'K',
+    labels: YEARS, histEnd: 10,
+    actual: [72000,76000,80000,84000,88000,92000,90000,95000,100000,105000,108000,null,null,null,null],
+    base:   [null,null,null,null,null,null,null,null,null,null,108000,112000,116000,121000,126000],
+    drivers: [
+      { id:'edu_spend', name:'Education Sector Investment', min:-6, max:6, step:1, value:0, neutral:0, impact:0.03 },
+      { id:'emirat_edu', name:'Emiratisation Rate (Education)', min:-5, max:5, step:1, value:0, neutral:0, impact:0.02 }
+    ],
+    kpis: [
+      { lbl:'Indicator as of 2023', val:'108K', sub:'Education sector employment' },
+      { lbl:'% Change 2024–2025', val:'+3.7%', chip:'▲ +3.7%', chipCls:'up', sub:'vs prior year forecast' },
+      { lbl:'Indicator as of 2028', val:'126K', sub:'Projected employment' },
+      { lbl:'% Change 2023–2028', val:'+16.7%', chip:'▲ +16.7%', chipCls:'up', sub:'Long-run trajectory' }
+    ],
+    insights: [
+      '<strong>Education employment</strong> is one of the faster-growing leading sectors, rising from <strong>108K in 2023 to 126K by 2028</strong> (+16.7%).',
+      'Emiratisation share in education is projected near <strong>46.6% by 2028</strong>, among the highest across non-government domains.',
+      'A <strong>+6% education investment</strong> uplift pushes 2028 headcount to about <strong>133K</strong>, concentrating new roles in teaching and academic support.'
+    ],
+    impacts: [
+      { lbl:'Emiratisation Share (2028)', val:'46.6%', chg:'▲ +4.2pp vs 2023', cls:'up' },
+      { lbl:'Emirati Teachers (2028)', val:'59K', chg:'▲ +22.1% vs 2023', cls:'up' },
+      { lbl:'Investment Sensitivity', val:'±7K', chg:'±6% spend shock band', cls:'nt' },
+      { lbl:'Model Confidence', val:'80%', chg:'Education payroll model', cls:'nt' }
+    ],
+    rel: { desc:'Projects education-sector employment and emiratisation under investment and localisation drivers.', metric:'126K', metricLbl:'Education employment (2028)' }
+  },
+  emp_finance: {
+    name: 'Sectoral Employment in Financial and Insurance Activities',
+    sub: 'What-If Scenario Analysis · Financial & insurance · 2014 – 2028',
+    yAxis: 'Employed Persons', yMin: 30000, yMax: 90000,
+    yFmt: v => (v / 1000).toFixed(0) + 'K',
+    labels: YEARS, histEnd: 10,
+    actual: [38000,41000,44000,47000,50000,53000,51000,55000,58000,60000,61000,null,null,null,null],
+    base:   [null,null,null,null,null,null,null,null,null,null,61000,64000,67000,70000,72000],
+    drivers: [
+      { id:'bfsi_growth', name:'BFSI Sector Growth', min:-6, max:6, step:1, value:0, neutral:0, impact:0.034 },
+      { id:'adgm', name:'ADGM / Finance Hub Expansion', min:-5, max:5, step:1, value:0, neutral:0, impact:0.028 }
+    ],
+    kpis: [
+      { lbl:'Indicator as of 2023', val:'61K', sub:'Financial & insurance employment' },
+      { lbl:'% Change 2024–2025', val:'+4.9%', chip:'▲ +4.9%', chipCls:'up', sub:'vs prior year forecast' },
+      { lbl:'Indicator as of 2028', val:'72K', sub:'Projected employment' },
+      { lbl:'% Change 2023–2028', val:'+18.0%', chip:'▲ +18.0%', chipCls:'up', sub:'Long-run trajectory' }
+    ],
+    insights: [
+      '<strong>Financial and insurance activities</strong> show the strongest percentage growth among leading sectors — <strong>61K in 2023 to 72K by 2028</strong> (+18.0%).',
+      'Professional and managerial roles absorb most incremental hiring; emiratisation share is projected near <strong>54.1% by 2028</strong>.',
+      'ADGM expansion of <strong>+5%</strong> lifts 2028 employment to about <strong>76K</strong>, with the largest gains in compliance, risk, and digital banking roles.'
+    ],
+    impacts: [
+      { lbl:'Emiratisation Share (2028)', val:'54.1%', chg:'▲ +5.8pp vs 2023', cls:'up' },
+      { lbl:'Professionals (2028)', val:'38K', chg:'Dominant occupation group', cls:'up' },
+      { lbl:'ADGM Sensitivity', val:'±4K', chg:'±5% hub expansion band', cls:'nt' },
+      { lbl:'Model Confidence', val:'83%', chg:'BFSI demand model', cls:'nt' }
+    ],
+    rel: { desc:'Forecasts financial and insurance employment under BFSI growth and finance-hub expansion shocks.', metric:'72K', metricLbl:'Financial sector employment (2028)' }
+  },
+  emp_mining: {
+    name: 'Sectoral Employment in Mining and Quarrying',
+    sub: 'What-If Scenario Analysis · Mining and quarrying · 2014 – 2028',
+    yAxis: 'Employed Persons', yMin: 40000, yMax: 100000,
+    yFmt: v => (v / 1000).toFixed(0) + 'K',
+    labels: YEARS, histEnd: 10,
+    actual: [52000,54000,56000,58000,60000,62000,58000,60000,63000,65000,68000,null,null,null,null],
+    base:   [null,null,null,null,null,null,null,null,null,null,68000,71000,74000,77000,80000],
+    drivers: [
+      { id:'oil_prod', name:'Oil & Gas Production Index', min:-8, max:8, step:1, value:0, neutral:0, impact:0.03 },
+      { id:'mining_capex', name:'Mining Capex / Investment', min:-6, max:6, step:1, value:0, neutral:0, impact:0.025 }
+    ],
+    kpis: [
+      { lbl:'Indicator as of 2023', val:'68K', sub:'Mining & quarrying employment' },
+      { lbl:'% Change 2024–2025', val:'+4.4%', chip:'▲ +4.4%', chipCls:'up', sub:'vs prior year forecast' },
+      { lbl:'Indicator as of 2028', val:'80K', sub:'Projected employment' },
+      { lbl:'% Change 2023–2028', val:'+17.6%', chip:'▲ +17.6%', chipCls:'up', sub:'Long-run trajectory' }
+    ],
+    insights: [
+      '<strong>Mining and quarrying employment</strong> is projected to rise from <strong>68K in 2023 to 80K by 2028</strong> (+17.6%), supported by energy investment and localisation programmes.',
+      'Emiratization in mining reached <strong>25.45%</strong> in 2025 with a strong YoY gain; further gains depend on technical skills pipelines.',
+      'An <strong>–8% oil production shock</strong> would hold 2028 employment near <strong>74K</strong>, while +8% production lifts the outlook toward <strong>86K</strong>.'
+    ],
+    impacts: [
+      { lbl:'Emiratisation Share (2028)', val:'28.1%', chg:'▲ +2.7pp vs 2023', cls:'up' },
+      { lbl:'Production Sensitivity', val:'±6K', chg:'±8 oil-index shock band', cls:'nt' },
+      { lbl:'Capex Sensitivity', val:'±5K', chg:'±6% investment band', cls:'nt' },
+      { lbl:'Model Confidence', val:'77%', chg:'Energy employment model', cls:'nt' }
+    ],
+    rel: { desc:'Projects mining and quarrying employment against oil production and mining investment shocks.', metric:'80K', metricLbl:'Mining employment (2028)' }
+  }
+};
+
+let chart = null;
+let currentScenario = 'emp_leading';
+let driverValues = {};
+let chatHistory = [];
+let currentCtx = 'default';
+
+function simName(key){ return SCENARIOS[key]?.name || 'What-If Scenario'; }
+function pct(v, mn, mx){ return ((v - mn) / (mx - mn) * 100).toFixed(1) + '%'; }
+function fmtDriverVal(d, v){
+  const n = Number(v);
+  const suffix = d.suffix || '%';
+  const decimals = d.step < 1 ? 1 : 0;
+  const text = decimals ? n.toFixed(decimals) : String(n);
+  return (n > 0 ? '+' : '') + text + suffix;
+}
+
+function initDriverValues(key){
+  driverValues[key] = {};
+  (SCENARIOS[key].drivers || []).forEach(d => { driverValues[key][d.id] = d.value; });
+}
+
+function computeSimSeries(key){
+  const s = SCENARIOS[key];
+  const sim = s.base.slice();
+  let delta = 0;
+  (s.drivers || []).forEach(d => {
+    delta += ((driverValues[key]?.[d.id] ?? d.value) - d.neutral) * d.impact;
+  });
+  for (let i = s.histEnd; i < sim.length; i++) {
+    if (sim[i] != null) {
+      const scaled = s.yMax > 100 ? sim[i] * (1 + delta) : sim[i] * (1 + delta);
+      sim[i] = s.yMax > 100 ? Math.round(scaled) : parseFloat(scaled.toFixed(2));
+    }
+  }
+  return sim;
+}
+
+function bridgeSeries(actual, forecast, histEnd){
+  const bridged = forecast.slice();
+  if (actual[histEnd] != null && bridged[histEnd] == null) bridged[histEnd] = actual[histEnd];
+  return bridged;
+}
+
+function renderKpis(key){
+  const row = document.getElementById('kpi-row');
+  const s = SCENARIOS[key];
+  if (!row || !s) return;
+  row.innerHTML = s.kpis.map(k => `
+    <div class="skpi">
+      <div class="skpi-lbl">${k.lbl}</div>
+      <div class="skpi-val">${k.val}</div>
+      <div class="skpi-chg ${k.chipCls || 'nt'}">${k.chip ? `<span class="skpi-chip ${k.chipCls || 'nt'}">${k.chip}</span>` : ''}${k.sub ? ` ${k.sub}` : ''}</div>
+    </div>`).join('');
+}
+
+function renderDrivers(key){
+  const wrap = document.getElementById('driver-sliders');
+  const s = SCENARIOS[key];
+  if (!wrap || !s) return;
+  if (!driverValues[key]) initDriverValues(key);
+  wrap.innerHTML = s.drivers.map(d => {
+    const v = driverValues[key][d.id];
+    return `<div class="slider-row">
+      <div class="slider-meta">
+        <span class="slider-name">${d.name}</span>
+        <span class="slider-val" id="sv-${key}-${d.id}">${fmtDriverVal(d, v)}</span>
+      </div>
+      <input type="range" class="sim-range" id="sl-${key}-${d.id}" min="${d.min}" max="${d.max}" step="${d.step}" value="${v}" oninput="onDriverInput('${key}','${d.id}',this)" style="--pct:${pct(v, d.min, d.max)}" aria-valuemin="${d.min}" aria-valuemax="${d.max}" aria-valuenow="${v}" aria-label="${d.name}">
+      <div class="slider-range-labels" aria-hidden="true">
+        <span>${fmtDriverVal(d, d.min)}</span>
+        <span>${fmtDriverVal(d, d.max)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderInsights(key){
+  const list = document.getElementById('insight-list');
+  const s = SCENARIOS[key];
+  if (!list || !s) return;
+  list.innerHTML = s.insights.map(t => `
+    <div class="ai-insight-item">
+      <span class="ai-insight-sparkle" aria-hidden="true"><i class="ti ti-sparkles"></i></span>
+      <div class="ai-insight-text">${t}</div>
+    </div>`).join('');
+}
+
+function updateSimNav(key){
+  const s = SCENARIOS[key];
+  if (!s) return;
+  const name = simName(key);
+  const bc = document.getElementById('bc-sim');
+  if (bc) bc.textContent = 'What-If Analysis';
+  document.title = `${name} — LMO Simulations · Bayaan`;
+  const titleEl = document.getElementById('stage-title');
+  if (titleEl) titleEl.textContent = name;
+}
+
+function lmoAx() {
+  return (window.LMO && typeof LMO.chartAxes === 'function')
+    ? LMO.chartAxes()
+    : { tick: '#94A3B8', grid: 'rgba(148,163,184,.12)', pointBorder: '#fff', tooltipBg: 'rgba(15,23,42,.92)', tooltipTitle: '#fff', tooltipBody: '#CBD5E1', tooltipBorder: 'rgba(255,255,255,.1)' };
+}
+
+function buildChart(key){
+  const s = SCENARIOS[key];
+  const canvas = document.getElementById('main-chart');
+  if (!canvas || typeof Chart === 'undefined' || !s) return;
+  const ctx = canvas.getContext('2d');
+  if (chart) chart.destroy();
+  const sg = ctx.createLinearGradient(0, 0, 0, 280);
+  sg.addColorStop(0, 'rgba(234,88,12,.13)');
+  sg.addColorStop(1, 'rgba(234,88,12,.02)');
+  const ag = ctx.createLinearGradient(0, 0, 0, 280);
+  ag.addColorStop(0, 'rgba(0,102,255,.10)');
+  ag.addColorStop(1, 'rgba(0,102,255,.02)');
+  const simSeries = bridgeSeries(s.actual, computeSimSeries(key), s.histEnd);
+  const baseSeries = bridgeSeries(s.actual, s.base, s.histEnd);
+  const ax = lmoAx();
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: s.labels,
+      datasets: [
+        { label: 'Historical', data: s.actual, borderColor: CHART_AC, borderWidth: 2.5, fill: true, backgroundColor: ag, pointRadius: 4, pointBackgroundColor: CHART_AC, pointBorderColor: ax.pointBorder, pointBorderWidth: 2, tension: .35, spanGaps: false },
+        { label: 'Baseline Forecast', data: baseSeries, borderColor: (LMO.isDarkTheme && LMO.isDarkTheme()) ? '#697693' : '#CBD5E1', borderWidth: 1.5, borderDash: [5, 4], fill: false, pointRadius: 3, pointBackgroundColor: (LMO.isDarkTheme && LMO.isDarkTheme()) ? '#697693' : '#CBD5E1', tension: .35, spanGaps: false },
+        { label: 'What-If Forecast', data: simSeries, borderColor: CHART_SIM, borderWidth: 2.5, fill: true, backgroundColor: sg, pointRadius: 4, pointBackgroundColor: CHART_SIM, pointBorderColor: ax.pointBorder, pointBorderWidth: 2, tension: .35, spanGaps: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index', intersect: false,
+          backgroundColor: ax.tooltipBg, titleColor: ax.tooltipTitle, bodyColor: ax.tooltipBody,
+          borderColor: ax.tooltipBorder, borderWidth: 1, padding: 12, cornerRadius: 8,
+          callbacks: { label: c => c.parsed.y == null ? null : `${c.dataset.label}: ${s.yFmt(c.parsed.y)}` }
+        }
+      },
+      scales: {
+        x: { grid: { color: ax.grid }, ticks: { color: ax.tick, font: { size: 11 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
+        y: { grid: { color: ax.grid }, min: s.yMin, max: s.yMax, ticks: { color: ax.tick, font: { size: 11 }, callback: v => s.yFmt(v) }, title: { display: true, text: s.yAxis, color: ax.tick, font: { size: 10 } } }
+      },
+      interaction: { mode: 'index', intersect: false }
+    }
+  });
+}
+
+function applyScenario(key){
+  currentScenario = key;
+  if (!driverValues[key]) initDriverValues(key);
+  renderKpis(key);
+  renderDrivers(key);
+  renderInsights(key);
+  buildChart(key);
+}
+
+function onDriverInput(key, id, el){
+  const d = SCENARIOS[key].drivers.find(x => x.id === id);
+  if (!d) return;
+  const v = parseFloat(el.value);
+  driverValues[key][id] = v;
+  const sv = document.getElementById(`sv-${key}-${id}`);
+  if (sv) sv.textContent = fmtDriverVal(d, v);
+  el.style.setProperty('--pct', pct(v, d.min, d.max));
+  el.setAttribute('aria-valuenow', v);
+  buildChart(key);
+}
+
+function resetSliders(){
+  const s = SCENARIOS[currentScenario];
+  if (!s) return;
+  s.drivers.forEach(d => {
+    driverValues[currentScenario][d.id] = d.neutral;
+    const el = document.getElementById(`sl-${currentScenario}-${d.id}`);
+    const sv = document.getElementById(`sv-${currentScenario}-${d.id}`);
+    if (el) { el.value = d.neutral; el.style.setProperty('--pct', pct(d.neutral, d.min, d.max)); }
+    if (sv) sv.textContent = fmtDriverVal(d, d.neutral);
+  });
+  buildChart(currentScenario);
+}
+
+function selectSim(key){
+  if (!SCENARIOS[key] || key === currentScenario) return;
+  applyScenario(key);
+  updateSimNav(key);
+  currentCtx = key;
+  const url = new URL(window.location.href);
+  url.searchParams.set('sim', key);
+  if (LMO.isEmbed()) url.searchParams.set('embed', '1');
+  history.replaceState(null, '', url.toString());
+  renderRelatedSims();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(LMO.reportEmbedHeight, 200);
+}
+
+function renderRelatedSims(){
+  const grid = document.getElementById('rel-grid');
+  if (!grid) return;
+  grid.innerHTML = SCENARIO_ORDER.filter(k => k !== currentScenario).map(key => {
+    const s = SCENARIOS[key];
+    const r = s.rel;
+    return `
+    <article class="rel-card">
+      <div class="rel-top-row">
+        <div class="rel-ico"><i class="ti ti-chart-line" aria-hidden="true"></i></div>
+        <div class="rel-card-head">
+          <div class="rel-name">${s.name}</div>
+        </div>
+      </div>
+      <p class="rel-desc">${r.desc}</p>
+      <div class="rel-bottom-row">
+        <div><div class="rel-outcome-val">${r.metric}</div><div class="rel-outcome-lbl">${r.metricLbl}</div></div>
+        <button type="button" class="rel-view" onclick="selectSim('${key}')">
+          View<i class="ti ti-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function initSimFromUrl(){
+  const param = new URLSearchParams(location.search).get('sim');
+  const sim = param && SCENARIOS[param] ? param : 'emp_leading';
+  SCENARIO_ORDER.forEach(initDriverValues);
+  applyScenario(sim);
+  updateSimNav(sim);
+  renderRelatedSims();
+  currentCtx = sim;
+}
+
+const AI_RESP = {
+  emp_leading: 'The <strong>Employment Across Leading Sectors</strong> model projects total leading-sector employment at <strong>1.60M by 2028</strong> (+13.1% vs 2023). Public administration, manufacturing, and financial services drive the bulk of growth. Non-Oil GDP and PMI Employment are the highest-sensitivity drivers.',
+  emp_public_admin: 'The <strong>Sectoral Employment in Public Administration &amp; Defence</strong> scenario forecasts <strong>348K employed by 2028</strong> (+12.3% vs 2023). Emiratisation remains high (~68%), with public hiring rate the primary controllable driver.',
+  emp_manufacturing: 'The <strong>Sectoral Employment in Manufacturing</strong> model recovers from the 2020 dip and reaches <strong>198K by 2028</strong> (+11.2% vs 2023). Industrial Production is the dominant shock channel.',
+  emp_education: 'The <strong>Sectoral Employment in Education</strong> outlook rises to <strong>126K by 2028</strong> (+16.7% vs 2023), with emiratisation share near <strong>46.6%</strong> — among the strongest localisation trajectories.',
+  emp_finance: 'The <strong>Sectoral Employment in Financial and Insurance Activities</strong> model shows the fastest percentage growth to <strong>72K by 2028</strong> (+18.0%). ADGM expansion and BFSI growth are the key upside drivers.',
+  emp_mining: 'The <strong>Sectoral Employment in Mining and Quarrying</strong> scenario projects <strong>80K by 2028</strong> (+17.6% vs 2023). Oil production and mining capex shocks define the forecast band.',
+  default: 'The <strong>LMO What-If Analysis Hub</strong> has 6 employment simulations focused on leading sectors. Current: <strong>Employment Across Leading Sectors</strong> — 1.60M projected by 2028. Select a related sector scenario to explore.'
+};
+const SUGGS = {
+  emp_leading: ['Which sector grows fastest?', 'What if Non-Oil GDP drops 8%?', 'Show public admin vs manufacturing'],
+  emp_public_admin: ['Impact of +5% public hiring?', 'Emiratisation trajectory?', 'Compare vs education sector'],
+  emp_manufacturing: ['What if IPI drops 10%?', 'Emiratisation outlook?', 'Compare vs mining'],
+  emp_education: ['Investment uplift impact?', 'Emiratisation share by 2028?', 'Compare vs finance'],
+  emp_finance: ['ADGM expansion +5%?', 'Professional roles share?', 'Compare vs public admin'],
+  emp_mining: ['Oil production shock −8%?', 'Capex uplift impact?', 'Emiratisation gains?'],
+  default: ['Which sector has highest growth?', 'Compare all 2028 projections', 'Most sensitive driver?']
+};
+
+function openChat(ctx, title){
+  if (document.body.classList.contains('embed') && window.parent !== window) {
+    window.parent.postMessage({ type: 'lmo-chat', ctx, title: title || 'Simulation Intelligence' }, '*');
+    return;
+  }
+  document.getElementById('ctx-val').textContent = title || 'What-If Analysis';
+  currentCtx = SCENARIOS[ctx] ? ctx : (currentScenario || 'default');
+  const ms = document.getElementById('msgs');
+  if (chatHistory.length === 0) {
+    const r = AI_RESP[currentCtx] || AI_RESP.default;
+    addMsg('ai', r);
+    chatHistory.push({ role: 'ai', text: r });
+  } else {
+    const n = document.createElement('div');
+    n.className = 'msg ai';
+    n.innerHTML = `<div class="bubble ai" style="font-size:11.5px;background:var(--acbg);border-color:var(--acbr);color:var(--ac)">📍 ${title || 'Simulation'}</div>`;
+    ms.appendChild(n);
+    ms.scrollTop = ms.scrollHeight;
+  }
+  const sug = SUGGS[currentCtx] || SUGGS.default;
+  document.getElementById('suggs').innerHTML = sug.map(x => `<button type="button" class="sugg" onclick="sendCT('${escAttr(x)}')">${x}</button>`).join('');
+  document.getElementById('cpanel').classList.add('open');
+  setTimeout(() => document.getElementById('cin').focus(), 300);
+}
+function closeChat(){ document.getElementById('cpanel').classList.remove('open'); }
+function addMsg(role, text){
+  const ms = document.getElementById('msgs');
+  const d = document.createElement('div'); d.className = 'msg ' + role;
+  const b = document.createElement('div'); b.className = 'bubble ' + role; b.innerHTML = text;
+  d.appendChild(b); ms.appendChild(d); ms.scrollTop = ms.scrollHeight;
+}
+function sendC(){ const i = document.getElementById('cin'); const t = i.value.trim(); if (!t) return; sendCT(t); i.value = ''; }
+function sendCT(text){
+  addMsg('user', text); chatHistory.push({ role: 'user', text });
+  document.getElementById('suggs').innerHTML = '';
+  const ms = document.getElementById('msgs');
+  const td = document.createElement('div'); td.className = 'msg ai'; td.id = 'typi';
+  td.innerHTML = '<div class="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
+  ms.appendChild(td); ms.scrollTop = ms.scrollHeight;
+  setTimeout(() => {
+    document.getElementById('typi')?.remove();
+    const key = Object.keys(AI_RESP).find(k => text.toLowerCase().includes(k.replace(/_/g, ' '))) || currentCtx;
+    const r = AI_RESP[key] || AI_RESP.default;
+    addMsg('ai', r); chatHistory.push({ role: 'ai', text: r });
+    const sug = SUGGS[key] || SUGGS.default;
+    document.getElementById('suggs').innerHTML = sug.map(x => `<button type="button" class="sugg" onclick="sendCT('${escAttr(x)}')">${x}</button>`).join('');
+    ms.scrollTop = ms.scrollHeight;
+  }, 1400);
+}
+
+window.addEventListener('load', () => {
+  LMO.initLmoEmbed();
+  initSimFromUrl();
+  setTimeout(LMO.reportEmbedHeight, 300);
+  if (LMO.onThemeChange) {
+    LMO.onThemeChange(() => buildChart(currentScenario));
+  }
+});
+window.addEventListener('resize', () => setTimeout(LMO.reportEmbedHeight, 200));
+</script>
+</body>
+</html>

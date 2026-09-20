@@ -1,0 +1,32 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".claude/static-server.js"],
+      "port": 5599,
+      "autoPort": true
+    },
+    {
+      "name": "static-alt",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".claude/static-server.js"],
+      "port": 5601,
+      "autoPort": true
+    },
+    {
+      "name": "ps-static",
+      "runtimeExecutable": "powershell.exe",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".claude/ps-static-server.ps1"
+      ],
+      "port": 8090,
+      "autoPort": true
+    }
+  ]
+}

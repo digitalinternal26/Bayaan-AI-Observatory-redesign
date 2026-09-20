@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="66" height="61" viewBox="0 0 66 61">
+  <defs>
+    <clipPath id="clip-total_population">
+      <rect width="66" height="61"/>
+    </clipPath>
+  </defs>
+  <g id="total_population" data-name="total population" clip-path="url(#clip-total_population)">
+    <g id="Group_156697" data-name="Group 156697" transform="translate(-238.606 -260.887)">
+      <circle id="Ellipse_5720" data-name="Ellipse 5720" cx="8.132" cy="8.132" r="8.132" transform="translate(263.368 262.887)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5"/>
+      <path id="Path_100620" data-name="Path 100620" d="M61.847,97.758V79.2A9.748,9.748,0,0,1,71.6,69.45h6.023A9.748,9.748,0,0,1,87.366,79.2V97.758" transform="translate(196.894 213.819)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5"/>
+      <circle id="Ellipse_5721" data-name="Ellipse 5721" cx="5.249" cy="5.249" r="5.249" transform="translate(266.251 293.008)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5"/>
+      <path id="Path_100621" data-name="Path 100621" d="M77.151,160.737v-7.545a6.292,6.292,0,0,1,6.292-6.292h3.887a6.292,6.292,0,0,1,6.292,6.292v7.545" transform="translate(186.113 159.263)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5"/>
+      <circle id="Ellipse_5722" data-name="Ellipse 5722" cx="6.145" cy="6.145" r="6.145" transform="translate(286.607 274.591)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5"/>
+      <path id="Path_100622" data-name="Path 100622" d="M148.178,95.609a7.361,7.361,0,0,1,6.217-3.414h4.551a7.366,7.366,0,0,1,7.366,7.366v14.024" transform="translate(136.082 197.797)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5"/>
+      <circle id="Ellipse_5723" data-name="Ellipse 5723" cx="6.145" cy="6.145" r="6.145" transform="translate(244.103 274.591)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5"/>
+      <path id="Path_100623" data-name="Path 100623" d="M18.634,95.609a7.361,7.361,0,0,0-6.217-3.414H7.866A7.366,7.366,0,0,0,.5,99.561v14.024" transform="translate(240.106 197.797)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5"/>
+    </g>
+  </g>
+</svg>

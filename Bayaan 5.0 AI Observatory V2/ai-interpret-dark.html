@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Observatory — Interpret (dark/cinematic direction) · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <link rel="stylesheet" href="css/pages/ai-observatory-dark.css" />
+    <script src="js/ai-observatory-dark.js" defer></script>
+    <style>
+      html, body { margin: 0; height: 100%; background: #0a0e17; }
+    </style>
+  </head>
+  <body>
+    <div class="gd-shell">
+
+      <!-- ══════════════ TOP BAR ══════════════ -->
+      <header class="gd-topbar">
+        <a class="gd-brand" href="index.html">
+          <img src="assets/bayaan-logo-white.svg" alt="Bayaan" />
+          <span>BAYAAN 5.0</span>
+        </a>
+        <div class="gd-topbar-right">
+          <button class="gd-topbar-btn" type="button" onclick="GDObs.toast('Search — coming soon in this preview')"><i class="ti ti-search"></i></button>
+          <button class="gd-lang" type="button">EN <i class="ti ti-chevron-down" style="font-size:12px"></i></button>
+          <div class="gd-avatar">AV</div>
+        </div>
+      </header>
+
+      <div class="gd-body">
+        <!-- ══════════════ SIDEBAR ══════════════ -->
+        <aside class="gd-sidebar">
+          <div class="gd-crumb">
+            <a href="index.html"><i class="ti ti-apps" style="font-size:13px"></i> <span class="gd-crumb-text">Products</span></a>
+            <a href="#" onclick="return false;"><i class="ti ti-telescope" style="font-size:13px"></i> <span class="gd-crumb-text">Observatory</span></a>
+            <div class="gd-crumb-current"><i class="ti ti-sparkles"></i><span class="gd-crumb-text">AI Observatory</span></div>
+          </div>
+
+          <button class="gd-nav-ai" type="button" onclick="GDObs.toast('AI Observatory assistant — coming soon in this preview')">
+            <i class="ti ti-sparkles"></i><span class="gd-nav-label">Ask Bayaan AI</span>
+          </button>
+
+          <nav class="gd-nav-section">
+            <a class="gd-nav-item" href="ai-overview.html" data-note="dark-cinematic-overview"><i class="ti ti-layout-dashboard"></i><span class="gd-nav-label">Overview</span></a>
+            <a class="gd-nav-item active" href="ai-interpret.html"><i class="ti ti-bulb"></i><span class="gd-nav-label">Interpret</span></a>
+            <a class="gd-nav-item is-disabled" href="#" onclick="GDObs.comingSoon('Diagnose');return false;"><i class="ti ti-stethoscope"></i><span class="gd-nav-label">Diagnose</span><span class="gd-nav-soon gd-nav-label">Soon</span></a>
+            <a class="gd-nav-item is-disabled" href="#" onclick="GDObs.comingSoon('Observe');return false;"><i class="ti ti-eye"></i><span class="gd-nav-label">Observe</span><span class="gd-nav-soon gd-nav-label">Soon</span></a>
+            <a class="gd-nav-item is-disabled" href="#" onclick="GDObs.comingSoon('Benchmark');return false;"><i class="ti ti-chart-bar"></i><span class="gd-nav-label">Benchmark</span><span class="gd-nav-soon gd-nav-label">Soon</span></a>
+            <a class="gd-nav-item is-disabled" href="#" onclick="GDObs.comingSoon('Explore');return false;"><i class="ti ti-compass"></i><span class="gd-nav-label">Explore</span><span class="gd-nav-soon gd-nav-label">Soon</span></a>
+            <a class="gd-nav-item is-disabled" href="#" onclick="GDObs.comingSoon('Evidence');return false;"><i class="ti ti-file-certificate"></i><span class="gd-nav-label">Evidence</span><span class="gd-nav-soon gd-nav-label">Soon</span></a>
+          </nav>
+
+          <div class="gd-sidebar-foot">
+            <a class="gd-nav-item" href="ai-observatory-directions.html"><i class="ti ti-layout-grid"></i><span class="gd-nav-label">Phase 1 directions</span></a>
+            <a class="gd-nav-item" href="#" onclick="return false;"><i class="ti ti-help-circle"></i><span class="gd-nav-label">Help &amp; Support</span></a>
+            <button class="gd-collapse-btn" type="button" data-gd-collapse><i class="ti ti-chevron-left"></i><span>Collapse</span></button>
+          </div>
+        </aside>
+
+        <!-- ══════════════ STORY RAIL ══════════════ -->
+        <nav class="gd-story-rail" aria-label="Chapters">
+          <button class="gd-story-dot active" data-story-dot="s1"><span class="lbl">01 · Adoption</span></button>
+          <button class="gd-story-dot" data-story-dot="s2"><span class="lbl">02 · Capability</span></button>
+          <button class="gd-story-dot" data-story-dot="s3"><span class="lbl">03 · Skills</span></button>
+          <button class="gd-story-dot" data-story-dot="s4"><span class="lbl">04 · Enterprise use</span></button>
+          <button class="gd-story-dot" data-story-dot="s5"><span class="lbl">05 · Governance</span></button>
+          <button class="gd-story-dot" data-story-dot="s6"><span class="lbl">06 · Trust</span></button>
+        </nav>
+
+        <!-- ══════════════ MAIN ══════════════ -->
+        <main class="gd-main">
+          <div class="gd-page">
+
+            <section style="padding:56px 0 10px" data-reveal>
+              <span class="gd-eyebrow">Interpret</span>
+              <h1 style="font-family:var(--gd-font-display);font-weight:500;font-size:44px;line-height:1.12;margin:14px 0 16px;max-width:18ch">What the data tells us</h1>
+              <p style="font-size:15.5px;line-height:1.7;color:var(--gd-text-dim);max-width:66ch;margin:0">Six findings, in the order a policymaker should read them — from the adoption headline, down through capability, skills, enterprise use, governance and trust. Scroll to move through the story, or jump ahead using the rail on the left.</p>
+            </section>
+
+            <!-- 01 · ADOPTION -->
+            <section class="gd-chapter" id="s1" data-chapter="s1" data-reveal>
+              <div class="gd-chapter-grid">
+                <div>
+                  <div class="gd-chapter-num">01<span></span></div>
+                  <div class="gd-chapter-kicker">Adoption &amp; use</div>
+                  <h2>AI adoption is now mainstream, not early-stage</h2>
+                  <p>73% of enterprises and 86% of individuals have used AI. Adoption is highest among large enterprises (88%) and the youngest age band (93%, ages 15–24) — but even the slowest-moving groups, small enterprises (72%) and residents 45+ (73%), are past the halfway mark.</p>
+                  <button class="gd-ask" onclick="GDObs.askAI('Why is small-enterprise adoption still 16pp behind large enterprises?')"><i class="ti ti-sparkles"></i>Ask Bayaan AI: why the size gap?</button>
+                </div>
+                <div class="gd-panel gd-chapter-visual">
+                  <div class="gd-bars">
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Enterprises · Large</span><span class="gd-bar-val">88%</span></div><div class="gd-bar-track"><div class="gd-bar-fill" style="width:88%"></div></div></div>
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Enterprises · Small</span><span class="gd-bar-val">72%</span></div><div class="gd-bar-track"><div class="gd-bar-fill gd-bar-fill--blue" style="width:72%"></div></div></div>
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Individuals · 15–24</span><span class="gd-bar-val">93%</span></div><div class="gd-bar-track"><div class="gd-bar-fill" style="width:93%"></div></div></div>
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Individuals · 45+</span><span class="gd-bar-val">73%</span></div><div class="gd-bar-track"><div class="gd-bar-fill gd-bar-fill--blue" style="width:73%"></div></div></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 02 · CAPABILITY -->
+            <section class="gd-chapter" id="s2" data-chapter="s2" data-reveal>
+              <div class="gd-chapter-grid gd-flip">
+                <div>
+                  <div class="gd-chapter-num">02<span></span></div>
+                  <div class="gd-chapter-kicker">Awareness &amp; knowledge</div>
+                  <h2>Advanced capability remains rare</h2>
+                  <p>Only 12.4% of individuals reach the advanced knowledge band, and 42.5% report no knowledge of core AI concepts at all. Adoption without depth is the pattern across every age group — including the youngest, most-adopted one.</p>
+                  <button class="gd-ask" onclick="GDObs.askAI('What would close the capability gap fastest?')"><i class="ti ti-sparkles"></i>Ask Bayaan AI: what closes this fastest?</button>
+                </div>
+                <div class="gd-panel gd-chapter-visual" style="display:flex;gap:26px;align-items:center;flex-wrap:wrap">
+                  <div class="gd-donut-wrap">
+                    <svg viewBox="0 0 42 42">
+                      <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#4a3a12" stroke-width="5" stroke-dasharray="13.3 86.7" />
+                      <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#cca34d" stroke-width="5" stroke-dasharray="32.1 67.9" stroke-dashoffset="-13.3" />
+                      <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#8a7135" stroke-width="5" stroke-dasharray="12.1 87.9" stroke-dashoffset="-45.4" />
+                      <circle cx="21" cy="21" r="15.9155" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="5" stroke-dasharray="42.5 57.5" stroke-dashoffset="-57.5" />
+                    </svg>
+                    <div class="gd-donut-center"><b>42.5%</b><span>no knowledge</span></div>
+                  </div>
+                  <div class="gd-legend">
+                    <div class="gd-legend-item"><span class="gd-dot" style="background:#cca34d"></span>Good<b>32.1%</b></div>
+                    <div class="gd-legend-item"><span class="gd-dot" style="background:#4a3a12;border:1px solid #cca34d"></span>Advanced<b>13.3%</b></div>
+                    <div class="gd-legend-item"><span class="gd-dot" style="background:#8a7135"></span>Basic<b>12.1%</b></div>
+                    <div class="gd-legend-item"><span class="gd-dot" style="background:rgba(255,255,255,0.1);border:1px solid var(--gd-border-strong)"></span>None<b>42.5%</b></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 03 · SKILLS -->
+            <section class="gd-chapter" id="s3" data-chapter="s3" data-reveal>
+              <div class="gd-chapter-grid">
+                <div>
+                  <div class="gd-chapter-num">03<span></span></div>
+                  <div class="gd-chapter-kicker">Skills, training &amp; certification</div>
+                  <h2>Skills demand is outrunning training</h2>
+                  <p>Programming and developing AI apps shows the widest want-minus-have gap, +26.2pp — ahead of data analysis (+18.9pp) and AI ethics (+10.8pp). The only oversupplied skill is basic AI understanding (−27.6pp). Meanwhile 32.9% intend to enrol in certification within six months, but only 2.3% hold one today.</p>
+                  <button class="gd-ask" onclick="GDObs.askAI('Why is the programming skills gap the widest?')"><i class="ti ti-sparkles"></i>Ask Bayaan AI: why programming?</button>
+                </div>
+                <div class="gd-panel gd-chapter-visual">
+                  <div style="display:flex;flex-direction:column;gap:14px">
+                    <div>
+                      <div class="gd-bar-top"><span class="gd-bar-name">Programming / developing AI apps</span><span class="gd-bar-val" style="color:var(--gd-gold-bright)">+26.2pp</span></div>
+                      <div class="gd-bar-track" style="position:relative"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.25)"></div><div class="gd-bar-fill" style="position:absolute;left:50%;width:39%;height:100%"></div></div>
+                    </div>
+                    <div>
+                      <div class="gd-bar-top"><span class="gd-bar-name">Data analysis</span><span class="gd-bar-val" style="color:var(--gd-gold-bright)">+18.9pp</span></div>
+                      <div class="gd-bar-track" style="position:relative"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.25)"></div><div class="gd-bar-fill" style="position:absolute;left:50%;width:28%;height:100%"></div></div>
+                    </div>
+                    <div>
+                      <div class="gd-bar-top"><span class="gd-bar-name">AI ethics &amp; responsible use</span><span class="gd-bar-val" style="color:var(--gd-gold-bright)">+10.8pp</span></div>
+                      <div class="gd-bar-track" style="position:relative"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.25)"></div><div class="gd-bar-fill" style="position:absolute;left:50%;width:16%;height:100%"></div></div>
+                    </div>
+                    <div>
+                      <div class="gd-bar-top"><span class="gd-bar-name">Basic understanding of AI</span><span class="gd-bar-val" style="color:var(--gd-text-faint)">−27.6pp (oversupplied)</span></div>
+                      <div class="gd-bar-track" style="position:relative"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.25)"></div><div class="gd-bar-fill gd-bar-fill--muted" style="position:absolute;right:50%;width:41%;height:100%"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 04 · ENTERPRISE USE -->
+            <section class="gd-chapter" id="s4" data-chapter="s4" data-reveal>
+              <div class="gd-chapter-grid gd-flip">
+                <div>
+                  <div class="gd-chapter-num">04<span></span></div>
+                  <div class="gd-chapter-kicker">AI in work</div>
+                  <h2>Enterprise use is operational, not transformative yet</h2>
+                  <p>Administration, production and marketing account for 71% of enterprise AI use between them. Only 2% goes to R&amp;D or innovation — and even that is concentrated in Information &amp; Communication (41.1%) and Professional activities (24.6%).</p>
+                  <button class="gd-ask" onclick="GDObs.askAI('How could enterprises shift AI use toward R&D?')"><i class="ti ti-sparkles"></i>Ask Bayaan AI: how to shift toward R&amp;D?</button>
+                </div>
+                <div class="gd-panel gd-chapter-visual">
+                  <div class="gd-bars">
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Administration</span><span class="gd-bar-val">26%</span></div><div class="gd-bar-track"><div class="gd-bar-fill" style="width:26%"></div></div></div>
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Production / service processes</span><span class="gd-bar-val">23%</span></div><div class="gd-bar-track"><div class="gd-bar-fill" style="width:23%"></div></div></div>
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Marketing or sales</span><span class="gd-bar-val">22%</span></div><div class="gd-bar-track"><div class="gd-bar-fill" style="width:22%"></div></div></div>
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Finance management</span><span class="gd-bar-val">13%</span></div><div class="gd-bar-track"><div class="gd-bar-fill gd-bar-fill--blue" style="width:13%"></div></div></div>
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">R&amp;D or innovation</span><span class="gd-bar-val">2%</span></div><div class="gd-bar-track"><div class="gd-bar-fill gd-bar-fill--muted" style="width:2%"></div></div></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 05 · GOVERNANCE -->
+            <section class="gd-chapter" id="s5" data-chapter="s5" data-reveal>
+              <div class="gd-chapter-grid">
+                <div>
+                  <div class="gd-chapter-num">05<span></span></div>
+                  <div class="gd-chapter-kicker">Governance</div>
+                  <h2>Governance is the adoption story's weak link</h2>
+                  <p>38% of adopting enterprises have no AI strategy or policy in place. 33% have internal policies or guidelines; only 29% have a formal AI strategy. For the 47% of non-adopters planning to adopt within 3–5 years, the top barrier is now expertise (16.7%), not interest.</p>
+                  <button class="gd-ask" onclick="GDObs.askAI('What would move enterprises from no policy to formal strategy?')"><i class="ti ti-sparkles"></i>Ask Bayaan AI: closing the policy gap</button>
+                </div>
+                <div class="gd-panel gd-chapter-visual" style="display:flex;gap:26px;align-items:center;flex-wrap:wrap">
+                  <div class="gd-donut-wrap">
+                    <svg viewBox="0 0 42 42">
+                      <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#6b3a2c" stroke-width="5" stroke-dasharray="38 62" />
+                      <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#8a7135" stroke-width="5" stroke-dasharray="33 67" stroke-dashoffset="-38" />
+                      <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#cca34d" stroke-width="5" stroke-dasharray="29 71" stroke-dashoffset="-71" />
+                    </svg>
+                    <div class="gd-donut-center"><b>29%</b><span>formal strategy</span></div>
+                  </div>
+                  <div class="gd-legend">
+                    <div class="gd-legend-item"><span class="gd-dot" style="background:#6b3a2c"></span>No policy at all<b>38%</b></div>
+                    <div class="gd-legend-item"><span class="gd-dot" style="background:#8a7135"></span>Internal guidelines<b>33%</b></div>
+                    <div class="gd-legend-item"><span class="gd-dot" style="background:#cca34d"></span>Formal strategy<b>29%</b></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 06 · TRUST -->
+            <section class="gd-chapter" id="s6" data-chapter="s6" data-reveal style="border-bottom:none">
+              <div class="gd-chapter-grid gd-flip">
+                <div>
+                  <div class="gd-chapter-num">06<span></span></div>
+                  <div class="gd-chapter-kicker">Perceptions, sentiment &amp; concerns</div>
+                  <h2>Sentiment is positive; trust is conditional</h2>
+                  <p>70.1% of individuals hold a positive view of AI overall, but only 43.3% trust it in decision-making — a 26.8pp gap. Privacy leads concerns at 56.0%. Even so, 88.3% support clear AI regulation, and 88.6% are positive about the UAE's AI future specifically.</p>
+                  <button class="gd-ask" onclick="GDObs.askAI('Why is trust lower than sentiment, and what closes that gap?')"><i class="ti ti-sparkles"></i>Ask Bayaan AI: closing the trust gap</button>
+                </div>
+                <div class="gd-panel gd-chapter-visual">
+                  <div class="gd-compare-nums" style="margin-bottom:22px">
+                    <div class="gd-compare-num" style="text-align:left"><b style="font-size:42px">70.1%</b><span>positive</span></div>
+                    <span class="gd-compare-arrow"><i class="ti ti-arrow-right"></i></span>
+                    <div class="gd-compare-num dim" style="text-align:left"><b style="font-size:42px">43.3%</b><span>trust</span></div>
+                  </div>
+                  <div class="gd-bars">
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Privacy — leading concern</span><span class="gd-bar-val">56.0%</span></div><div class="gd-bar-track"><div class="gd-bar-fill gd-bar-fill--blue" style="width:56%"></div></div></div>
+                    <div><div class="gd-bar-top"><span class="gd-bar-name">Support clear AI regulation</span><span class="gd-bar-val">88.3%</span></div><div class="gd-bar-track"><div class="gd-bar-fill" style="width:88.3%"></div></div></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- CLOSE -->
+            <section style="padding:50px 0 20px;border-top:1px solid var(--gd-border)" data-reveal>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+                <div>
+                  <span class="gd-eyebrow">Where next</span>
+                  <h3 style="font-family:var(--gd-font-display);font-weight:500;font-size:24px;margin:12px 0 8px;max-width:26ch">The next chapter isn't whether Abu Dhabi uses AI — it's what that AI is worth.</h3>
+                  <p style="font-size:13.5px;color:var(--gd-text-dim);max-width:60ch;margin:0">The 2027 roadmap adds an AI Satellite Account measuring GDP contribution, productivity and ROI — the first of its kind published by any statistical office.</p>
+                </div>
+                <a class="gd-btn gd-btn--gold" href="ai-overview.html" data-note="dark-cinematic-overview"><i class="ti ti-arrow-left"></i> Back to Overview</a>
+              </div>
+            </section>
+
+          </div>
+
+          <!-- ══════════════ FOOTER ══════════════ -->
+          <footer class="gd-footer">
+            <div class="gd-footer-left">
+              <img src="assets/bayaan-logo-white.svg" alt="" />
+              <div><b>Statistics Centre — Abu Dhabi</b>Enterprise &amp; Individual AI Adoption Surveys, 2026</div>
+            </div>
+            <div class="gd-footer-right"><i class="ti ti-circle-check"></i>Last updated September 2026 · Source: SCAD — AI Statistics</div>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

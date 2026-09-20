@@ -1,0 +1,762 @@
+/* Labor Supply–Demand Analysis — shared styles for LMO Diagnose page */
+
+body.lmo .lmo-lsd {
+  --lsd-accent: var(--ac, #0066ff);
+  --lsd-text: var(--t1, #0f172a);
+  --lsd-text2: var(--t2, #475569);
+  --lsd-border: var(--bd, #e5e7eb);
+  --lsd-demand: var(--dn, #dc2626);
+  --lsd-gap: var(--or, #ea580c);
+  --lsd-muted: var(--t3, #94a3b8);
+  margin-bottom: 28px;
+}
+
+body.lmo .lmo-lsd .section-hdr {
+  margin-bottom: 20px;
+}
+
+body.lmo .lmo-lsd .cpi-section-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--lsd-text);
+  margin: 0;
+}
+
+body.lmo .lmo-lsd .cpi-section-title i {
+  font-size: 20px;
+  color: var(--lsd-accent);
+}
+
+body.lmo .lmo-lsd .obs-card {
+  border-radius: 16px;
+  background: var(--sf, #fff);
+  border: 1px solid var(--lsd-border);
+  box-shadow: var(--sh, 0 1px 3px rgba(15, 23, 42, 0.06));
+  padding: 20px;
+  overflow: visible;
+}
+
+body.lmo .lmo-lsd-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+body.lmo .lmo-lsd-hdr .cpi-section-title {
+  margin: 0;
+}
+
+body.lmo .lmo-lsd-hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+body.lmo .lmo-lsd-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+body.lmo .lmo-lsd-toolbar .lmo-lsd-tabs {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding-bottom: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+body.lmo .lmo-lsd-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+body.lmo .lmo-lsd-year-select {
+  appearance: none;
+  height: 32px;
+  padding: 0 32px 0 12px;
+  border: 1px solid var(--lsd-border);
+  border-radius: 8px;
+  background: var(--sf, #fff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lsd-text);
+  cursor: pointer;
+  min-width: 88px;
+}
+
+body.lmo .lmo-lsd-year-select:hover {
+  border-color: var(--acbr);
+}
+
+body.lmo .lmo-lsd-year-select:focus {
+  outline: none;
+  border-color: var(--lsd-accent);
+  box-shadow: 0 0 0 3px var(--acbg);
+}
+
+body.lmo .lmo-lsd-tabs {
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid var(--lsd-border);
+  margin-bottom: 16px;
+}
+
+body.lmo .lmo-lsd-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 10px 2px;
+  margin-bottom: -1px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--lsd-text2);
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+body.lmo .lmo-lsd-tab:hover {
+  color: var(--lsd-text);
+}
+
+body.lmo .lmo-lsd-tab.active {
+  color: var(--lsd-accent);
+  border-bottom-color: var(--lsd-accent);
+}
+
+body.lmo .lmo-lsd-card {
+  position: relative;
+  overflow: visible;
+}
+
+body.lmo .dg-view-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.05);
+}
+
+body.lmo .dg-view-toggle button {
+  width: 30px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--lsd-text2);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+}
+
+body.lmo .dg-view-toggle button.active {
+  background: var(--sf, #fff);
+  color: var(--lsd-accent);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
+
+body.lmo .dg-view-toggle.lmo-lsd-viztoggle {
+  flex-direction: row;
+  margin: 0;
+}
+
+body.lmo .lmo-lsd-body {
+  display: block;
+}
+
+body.lmo .lmo-lsd-viz {
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+body.lmo .lmo-lsd-sankey {
+  overflow: visible;
+  min-height: 320px;
+}
+
+body.lmo .lmo-lsd-sankey svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+body.lmo .lsd-node {
+  cursor: pointer;
+}
+
+body.lmo .lsd-gnode {
+  cursor: pointer;
+}
+
+body.lmo .lsd-node--supply {
+  fill: #8b9db5;
+}
+
+body.lmo .lsd-node--emirati {
+  fill: #7d8c9f;
+}
+
+body.lmo .lsd-node--nonemirati {
+  fill: #2fa6a0;
+}
+
+body.lmo .lsd-node--demand {
+  fill: #2dc4a3;
+}
+
+body.lmo .lsd-node--gap {
+  fill: #d4847a;
+}
+
+body.lmo .lsd-gnode--0 { fill: #0d3a6e; }
+body.lmo .lsd-gnode--1 { fill: #2fa6a0; }
+body.lmo .lsd-gnode--2 { fill: #4d95e0; }
+body.lmo .lsd-gnode--3 { fill: #3f51b7; }
+body.lmo .lsd-gnode--4 { fill: #5dbe89; }
+body.lmo .lsd-gnode--5 { fill: #9675cc; }
+body.lmo .lsd-gnode--6 { fill: #66afe2; }
+body.lmo .lsd-gnode--7 { fill: #2a3f7a; }
+
+body.lmo .lsd-link {
+  transition: opacity 0.15s;
+  cursor: pointer;
+}
+
+body.lmo .lsd-link--emirati {
+  fill: #7d8c9f;
+  opacity: 0.32;
+}
+
+body.lmo .lsd-link--nonemirati {
+  fill: #2fa6a0;
+  opacity: 0.22;
+}
+
+body.lmo .lsd-link--group-0 { fill: #0d3a6e; opacity: 0.22; }
+body.lmo .lsd-link--group-1 { fill: #2fa6a0; opacity: 0.22; }
+body.lmo .lsd-link--group-2 { fill: #4d95e0; opacity: 0.22; }
+body.lmo .lsd-link--group-3 { fill: #3f51b7; opacity: 0.22; }
+body.lmo .lsd-link--group-4 { fill: #5dbe89; opacity: 0.22; }
+body.lmo .lsd-link--group-5 { fill: #9675cc; opacity: 0.22; }
+body.lmo .lsd-link--group-6 { fill: #66afe2; opacity: 0.22; }
+body.lmo .lsd-link--group-7 { fill: #2a3f7a; opacity: 0.22; }
+
+body.lmo .lsd-link--gap {
+  fill: #d4847a;
+  opacity: 0.16;
+}
+
+body.lmo .lmo-lsd-sankey.is-hi .lsd-link {
+  opacity: 0.06;
+}
+
+body.lmo .lmo-lsd-sankey.is-hi .lsd-link.lsd-on {
+  opacity: 0.55;
+}
+
+body.lmo .lsd-label {
+  font-size: 10px;
+  fill: var(--lsd-text2);
+  font-weight: 600;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body.lmo .lsd-label--strong {
+  fill: var(--lsd-text);
+  font-weight: 700;
+  font-size: 10px;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body.lmo .lsd-sankey-text {
+  font-size: 8px;
+  font-weight: 600;
+  font-family: Inter, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
+
+body.lmo .lsd-sankey-text--on-dark {
+  fill: #fff;
+}
+
+body.lmo .lsd-sankey-text--muted {
+  fill: var(--lsd-text2);
+}
+
+body.lmo .lsd-sankey-text--strong {
+  fill: var(--lsd-text);
+  font-weight: 700;
+}
+
+body.lmo .lsd-glabel {
+  font-size: 8px;
+  fill: #fff;
+  font-weight: 600;
+  font-family: Inter, system-ui, sans-serif;
+  pointer-events: none;
+}
+
+body.lmo .lmo-lsd-tip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.12s;
+  background: #0f2744;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  padding: 6px 9px;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.25);
+  white-space: nowrap;
+}
+
+body.lmo .lmo-lsd-tip.on {
+  opacity: 1;
+}
+
+body.lmo .lmo-lsd-tip b {
+  font-weight: 700;
+}
+
+body.lmo .lmo-lsd-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 11.5px;
+  color: var(--lsd-muted);
+}
+
+body.lmo .lmo-lsd-note i {
+  color: var(--lsd-accent);
+}
+
+body.lmo .lmo-neg {
+  color: var(--lsd-gap);
+  font-weight: 600;
+}
+
+body.lmo .lmo-qa {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--lsd-muted);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+body.lmo .lmo-qa:hover {
+  background: var(--acbg);
+  color: var(--lsd-accent);
+  border-color: var(--acbr);
+}
+
+body.lmo .lmo-qa i {
+  font-size: 15px;
+}
+
+body.lmo .home-module-sparkle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #0073f0;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+body.lmo .home-module-sparkle i {
+  font-size: 20px;
+}
+
+body.lmo .home-module-sparkle:hover {
+  opacity: 0.8;
+}
+
+body.lmo .dg-table-wrap {
+  overflow-x: auto;
+}
+
+body.lmo .dg-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+body.lmo .dg-table th {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lsd-text2);
+  text-align: right;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid var(--lsd-border);
+  white-space: nowrap;
+}
+
+body.lmo .dg-table th:first-child,
+body.lmo .dg-table td:first-child {
+  text-align: left;
+  padding-left: 4px;
+}
+
+body.lmo .dg-table td {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lsd-text);
+  text-align: right;
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+  white-space: nowrap;
+}
+
+body.lmo .dg-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+body.lmo .dg-table tbody tr:hover {
+  background: var(--acbg);
+}
+
+body.lmo .dg-cat-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+body.lmo .dg-cat-cell i {
+  font-size: 17px;
+  color: var(--lsd-text2);
+}
+
+@media (max-width: 760px) {
+  body.lmo .lmo-lsd-hdr {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  body.lmo .lmo-lsd-hdr-actions {
+    align-self: flex-end;
+  }
+
+  body.lmo .lmo-lsd-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body.lmo .lmo-lsd-controls {
+    justify-content: flex-end;
+  }
+}
+
+/* ── News — editorial image cards in a 3-up carousel, sitting under the
+   Labor Supply–Demand Analysis. Cards are full-bleed image + navy gradient
+   overlay + overlaid content. Moved here from the Briefing Desk. ── */
+body.lmo .lmo-news {
+  --lsd-accent: var(--ac, #0066ff);
+  --lsd-text: var(--t1, #0f172a);
+  --lsd-text2: var(--t2, #475569);
+  --lsd-muted: var(--t3, #94a3b8);
+  margin-bottom: 28px;
+}
+
+body.lmo .lmo-news .section-hdr { margin-bottom: 0; }
+
+body.lmo .lmo-news .cpi-section-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--lsd-text);
+  margin: 0;
+}
+
+body.lmo .lmo-news .cpi-section-title i {
+  font-size: 20px;
+  color: var(--lsd-accent);
+}
+
+body.lmo .lmo-news-hdr {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+body.lmo .lmo-news-sub {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--lsd-text2);
+}
+
+/* Carousel shell — the track scrolls horizontally, paging via arrows/dots. */
+body.lmo .lmo-news .dg-carousel,
+body.lmo .lmo-news.dg-carousel { position: relative; }
+
+body.lmo .lmo-news .dg-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding: 2px 2px 4px;
+}
+
+body.lmo .lmo-news .dg-track::-webkit-scrollbar { display: none; }
+
+body.lmo .lmo-news-track .dg-slide {
+  flex: 0 0 calc((100% - 28px) / 3);
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+body.lmo .lmo-news .dg-carousel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+body.lmo .lmo-news .dg-carousel-nav.is-single { display: none; }
+
+body.lmo .lmo-news .home-carousel-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--lsd-text2);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+body.lmo .lmo-news .home-carousel-arrow:hover:not(:disabled) {
+  color: var(--lsd-accent);
+  background: var(--acbg, #eef4ff);
+}
+
+body.lmo .lmo-news .home-carousel-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+body.lmo .lmo-news .home-carousel-arrow i { font-size: 16px; }
+
+body.lmo .lmo-news .home-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+body.lmo .lmo-news .home-carousel-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 3px;
+  background: #d3dfec;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  transition: width 0.2s, background 0.2s;
+}
+
+body.lmo .lmo-news .home-carousel-dot.active {
+  width: 16px;
+  background: var(--lsd-accent);
+}
+
+/* Card */
+body.lmo .lmo-news-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  min-height: 340px;
+  padding: 0;
+  display: flex;
+  color: #fff;
+  isolation: isolate;
+  border: none;
+  background: #0b172c;
+}
+
+body.lmo .lmo-news-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #0b172c;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: transform 0.5s ease;
+}
+
+body.lmo .lmo-news-card--bw .lmo-news-media {
+  filter: grayscale(1);
+}
+
+body.lmo .lmo-news-card:hover .lmo-news-media { transform: scale(1.05); }
+
+body.lmo .lmo-news-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(11, 23, 44, 0.1) 0%, rgba(11, 23, 44, 0.32) 42%, rgba(11, 23, 44, 0.9) 100%);
+}
+
+body.lmo .lmo-news-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px;
+}
+
+body.lmo .lmo-news-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+body.lmo .lmo-news-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(4px);
+}
+
+body.lmo .lmo-news-date {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+body.lmo .lmo-news-foot { display: flex; flex-direction: column; gap: 8px; }
+
+body.lmo .lmo-news-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+body.lmo .lmo-news-sum {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.86);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+body.lmo .lmo-news-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+body.lmo .lmo-news-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  padding: 5px 9px;
+  transition: background 0.15s;
+}
+
+body.lmo .lmo-news-act:hover { background: rgba(255, 255, 255, 0.26); }
+body.lmo .lmo-news-act i { font-size: 14px; }
+
+body.lmo .lmo-news-more {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+}
+
+body.lmo .lmo-news-more:hover { text-decoration: underline; }
+body.lmo .lmo-news-more i { font-size: 14px; }
+
+@media (max-width: 1080px) {
+  body.lmo .lmo-news-track .dg-slide { flex: 0 0 calc((100% - 14px) / 2); }
+}
+
+@media (max-width: 620px) {
+  body.lmo .lmo-news-track .dg-slide { flex: 0 0 100%; }
+  body.lmo .lmo-news-hdr { flex-direction: column; }
+}
+
+/* ── Dark theme ── */
+[data-theme="dark"] body.lmo .dg-view-toggle {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] body.lmo .dg-view-toggle button.active {
+  background: var(--sf2);
+  box-shadow: var(--sh);
+}

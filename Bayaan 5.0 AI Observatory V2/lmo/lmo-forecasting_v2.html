@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labour Market Observatory — Forecasting · Bayaan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-common.css">
+<link rel="stylesheet" href="../style.css" />
+<link rel="stylesheet" href="../css/theme.css" />
+<script>
+  (function () {
+    var t = localStorage.getItem("bayaan-theme") || "light";
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  })();
+</script>
+<script src="../js/theme.js"></script>
+<script src="../js/header.js"></script>
+<script src="../js/lmo-chrome.js"></script>
+<link rel="stylesheet" href="../css/pages/lmo-observe.css">
+<link rel="stylesheet" href="../css/pages/lmo-forecast-v2.css">
+<script src="lmo-sidenav.js"></script>
+<script src="lmo-shared.js"></script>
+</head>
+<body class="lmo" data-lmo-active="forecasting" data-lmo-ai-onclick="openChat('Give me a summary of all active labour market forecasts and key signals for Q3 2026','Forecast Intelligence')">
+
+<div id="screen-lmo-obs" class="ws-screen header-flush">
+<div data-bayaan-header></div>
+
+<div id="lmo-sidenav-mount"></div>
+
+<!-- ██ MAIN + AI SPLIT ██ -->
+<div class="app-shell">
+<div class="wrap">
+<div class="page">
+
+  <!-- Breadcrumb -->
+  <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+    <a href="#" data-lmo-bc="home">Home</a>
+    <span class="ind-bc-sep">›</span>
+    <a href="#" data-lmo-bc="observatory">Observatory</a>
+    <span class="ind-bc-sep">›</span>
+    <span class="ind-bc-current">Labour Market Observatory</span>
+  </nav>
+
+  <!-- Page Head -->
+  <div class="ph">
+    <div class="ph-l">
+      <h1 class="ph-title">Labour Market Observatory (LMO)— Forecasting Hub</h1>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="fc-toolbar">
+    <div class="fc-toolbar-l">
+      <span class="fc-period" id="fc-period">2024–2028</span>
+      <div class="fc-select-wrap">
+        <select id="fc-select" class="fc-select" aria-label="Select forecast" onchange="selectForecast(this.value)"></select>
+      </div>
+    </div>
+    <div class="fc-toolbar-r">
+      <div class="fc-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="fc-search" placeholder="Search forecasts…" oninput="filterForecastOptions(this.value)">
+      </div>
+      <button type="button" class="btn btn-ghost" onclick="exportDetail()"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+    </div>
+  </div>
+
+  <!-- Summary KPIs -->
+  <div class="fc-summary" id="fc-summary"></div>
+
+  <!-- Chart + side panels -->
+  <div class="fc-main">
+    <div class="fc-chart-card">
+      <div class="fc-chart-hd">
+        <div class="fc-chart-hd-text">
+          <div class="fc-chart-hd-title" id="fc-chart-title">Forecast trajectory</div>
+          <p class="fc-chart-hd-desc" id="fc-chart-desc"></p>
+        </div>
+      </div>
+      <div class="legend-row" style="margin-bottom:12px">
+        <div class="legend-item"><div class="legend-line actual"></div><span>Actual</span></div>
+        <div class="legend-item"><div class="legend-line forecast"></div><span>Forecast</span></div>
+        <div class="legend-item"><div class="legend-line ci"></div><span>90% CI</span></div>
+      </div>
+      <div class="fc-chart-canvas"><canvas id="fc-landing-chart"></canvas></div>
+    </div>
+    <div class="fc-side">
+      <div class="fc-side-card">
+        <div class="fc-side-title">
+          <i class="ti ti-book-2 fc-side-title-ico fc-side-title-ico--interp" aria-hidden="true"></i>
+          Interpretation
+        </div>
+        <ul class="fc-side-list" id="fc-interpretation"></ul>
+      </div>
+      <div class="fc-side-card">
+        <div class="fc-side-title">
+          <i class="ti ti-target fc-side-title-ico fc-side-title-ico--impact" aria-hidden="true"></i>
+          Key Impact
+        </div>
+        <ul class="fc-side-list" id="fc-impacts"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model note -->
+  <div class="fc-model-banner" id="fc-model-banner"></div>
+
+  <!-- Related forecasts -->
+  <section class="fc-related" id="fc-related" aria-label="Related forecasts">
+    <div class="fc-related-box">
+      <div class="fc-related-title">Related Forecasts</div>
+      <p class="fc-related-sub">Explore linked labour market forecasts — select a card to open its detail view.</p>
+      <div class="dg-carousel fc-related-carousel">
+        <div class="dg-track fc-related-track products-grid" id="fc-related-grid"></div>
+        <div class="dg-carousel-nav home-carousel-nav" aria-label="Related forecasts carousel">
+          <button type="button" class="home-carousel-arrow" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+          <div class="home-carousel-dots"></div>
+          <button type="button" class="home-carousel-arrow" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+</div><!-- /page -->
+</div><!-- /wrap -->
+
+<aside class="cpanel ai-panel" id="cpanel" role="complementary" aria-label="Bayaan AI Panel">
+  <div class="bai-header">
+    <div class="bai-header-left">
+      <img class="bai-icon-wrap" src="../assets/ai-chat-thumb.svg" alt="Bayaan AI" width="38" height="38">
+      <div><div class="bai-header-title">Bayaan AI</div></div>
+    </div>
+    <div class="bai-header-right">
+      <button class="bai-close-btn" type="button" onclick="closeChat()" title="Close AI Panel"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+  <div class="bai-context-strip">
+    <span class="bai-ctx-label">Analysing</span>
+    <span class="bai-ctx-pill" id="ctx-val">Forecast Intelligence</span>
+    <span class="bai-ctx-dot"></span>
+    <span class="bai-ctx-dot-label">Generating</span>
+  </div>
+  <div class="bai-messages msgs" id="msgs"></div>
+  <div class="suggs" id="suggs"></div>
+  <div class="bai-input-area">
+    <div class="bai-input-row">
+      <textarea class="bai-input" id="cin" placeholder="Ask about any forecast…" rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendC()}"></textarea>
+      <button class="bai-send-btn" type="button" onclick="sendC()" title="Send"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</aside>
+</div><!-- /app-shell -->
+</div>
+
+<script>
+/* =========================================================
+   CHART HELPERS
+   ========================================================= */
+const AC='#2563EB', AC2='rgba(37,99,235,.12)';
+const UP='#16A34A', DN='#DC2626', WN='#B45309', TL='#0D9488', PU='#7C3AED';
+
+function sparkLine(id,data,color){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(el._chart){el._chart.destroy();el._chart=null;}
+  const ctx=el.getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,48);
+  grad.addColorStop(0,color+'35');
+  grad.addColorStop(1,color+'00');
+  el._chart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:data.map((_,i)=>i),
+      datasets:[{
+        data,borderColor:color,borderWidth:2,fill:true,backgroundColor:grad,
+        pointRadius:0,tension:.45
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},
+      scales:{x:{display:false},y:{display:false}},elements:{point:{radius:0}}}
+  });
+}
+
+function miniLine(id,actual,forecast,color){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(el._chart){el._chart.destroy();el._chart=null;}
+  const ctx=el.getContext('2d');
+  const allLabels=['Q4\'24','Q1\'25','Q2\'25','Q3\'25','Q4\'25','Q1\'26','Q2\'26','Q3\'26','Q4\'26'];
+  const grad=ctx.createLinearGradient(0,0,0,48);
+  grad.addColorStop(0,color+'30');
+  grad.addColorStop(1,color+'00');
+  el._chart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:allLabels,
+      datasets:[
+        {data:actual,borderColor:color,borderWidth:2,fill:true,backgroundColor:grad,
+         pointRadius:0,tension:.4,borderDash:[]},
+        {data:forecast,borderColor:color,borderWidth:1.5,fill:false,backgroundColor:'transparent',
+         pointRadius:0,tension:.4,borderDash:[4,3]}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},
+      scales:{x:{display:false},y:{display:false}}}
+  });
+}
+
+function relatedForecastChart(id,d,color){
+  const el=document.getElementById(id);
+  if(!el||!d)return;
+  if(el._chart){el._chart.destroy();el._chart=null;}
+  let{actual,forecast,ciHigh,ciLow}=bridgeActualForecast(d.actual,d.forecast,d.ciHigh,d.ciLow);
+  const ctx=el.getContext('2d');
+  const h=el.parentElement?.clientHeight||48;
+  const ciGrad=ctx.createLinearGradient(0,0,0,h);
+  ciGrad.addColorStop(0,'rgba(37,99,235,.10)');
+  ciGrad.addColorStop(1,'rgba(37,99,235,.02)');
+  el._chart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:d.labels||FC_YEARS,
+      datasets:[
+        {label:'90% CI High',data:ciHigh,borderColor:'transparent',fill:'+1',backgroundColor:ciGrad,pointRadius:0,tension:.4},
+        {label:'90% CI Low',data:ciLow,borderColor:'transparent',fill:false,pointRadius:0,tension:.4},
+        {label:'Actual',data:actual,borderColor:color,borderWidth:2,fill:false,pointRadius:0,tension:.4},
+        {label:'Forecast',data:forecast,borderColor:color,borderWidth:1.75,borderDash:[5,3],fill:false,pointRadius:0,tension:.4}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{enabled:false}},
+      scales:{x:{display:false},y:{display:false}},
+      elements:{point:{radius:0}}
+    }
+  });
+}
+
+function formatAxisTick(v,unit){
+  const n=Number(v);
+  if(!Number.isFinite(n))return '';
+  const u=unit||'';
+  if(u==='%'||u==='k'||u==='M')return parseFloat(n.toFixed(1))+u;
+  if(Math.abs(n)>=10000)return n.toLocaleString('en-US',{maximumFractionDigits:0});
+  if(Math.abs(n-Math.round(n))<0.05)return Math.round(n)+u;
+  return parseFloat(n.toFixed(1))+u;
+}
+
+function bridgeActualForecast(actual,forecast,ciHigh,ciLow){
+  const a=actual.slice(),f=forecast.slice(),hi=ciHigh?ciHigh.slice():null,lo=ciLow?ciLow.slice():null;
+  let lastIdx=-1,lastVal=null;
+  for(let i=0;i<a.length;i++){if(a[i]!=null){lastIdx=i;lastVal=a[i];}}
+  if(lastIdx<0)return{actual:a,forecast:f,ciHigh:hi,ciLow:lo};
+  let firstFc=-1;
+  for(let i=0;i<f.length;i++){if(f[i]!=null){firstFc=i;break;}}
+  if(firstFc>lastIdx&&f[lastIdx]==null){
+    f[lastIdx]=lastVal;
+    if(hi&&hi[firstFc]!=null&&hi[lastIdx]==null)hi[lastIdx]=lastVal;
+    if(lo&&lo[firstFc]!=null&&lo[lastIdx]==null)lo[lastIdx]=lastVal;
+  }
+  return{actual:a,forecast:f,ciHigh:hi,ciLow:lo};
+}
+
+function lmoAx(){
+  return (window.LMO && typeof LMO.chartAxes === 'function')
+    ? LMO.chartAxes()
+    : { tick:'#94A3B8', grid:'rgba(148,163,184,.15)', pointBorder:'#fff', tooltipBg:'rgba(15,23,42,.9)', tooltipTitle:'#fff', tooltipBody:'#CBD5E1', tooltipBorder:'rgba(255,255,255,.1)' };
+}
+
+function mainChart(id,labels,actual,forecast,ciHigh,ciLow,color,label){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(el._chart)el._chart.destroy();
+  ({actual,forecast,ciHigh,ciLow}=bridgeActualForecast(actual,forecast,ciHigh,ciLow));
+  const ctx=el.getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,200);
+  grad.addColorStop(0,color+'20');
+  grad.addColorStop(1,color+'00');
+  const ciGrad=ctx.createLinearGradient(0,0,0,200);
+  ciGrad.addColorStop(0,'rgba(37,99,235,.08)');
+  ciGrad.addColorStop(1,'rgba(37,99,235,.02)');
+  const ax = lmoAx();
+  const chart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'90% CI High',data:ciHigh,borderColor:'transparent',fill:'+1',backgroundColor:ciGrad,pointRadius:0,tension:.4},
+        {label:'90% CI Low',data:ciLow,borderColor:'transparent',fill:false,pointRadius:0,tension:.4},
+        {label:'Actual',data:actual,borderColor:color,borderWidth:2.5,fill:true,backgroundColor:grad,
+         pointRadius:3,pointBackgroundColor:color,tension:.4},
+        {label:'Forecast',data:forecast,borderColor:color,borderWidth:2,borderDash:[6,4],fill:false,
+         pointRadius:3,pointBackgroundColor:color,pointBorderColor:ax.pointBorder,pointBorderWidth:1.5,tension:.4}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          mode:'index',intersect:false,
+          backgroundColor:ax.tooltipBg,titleColor:ax.tooltipTitle,bodyColor:ax.tooltipBody,
+          borderColor:ax.tooltipBorder,borderWidth:1,padding:10,
+          callbacks:{
+            label:function(c){
+              if(c.dataset.label.includes('CI'))return null;
+              if(c.dataset.label==='Forecast'){
+                const i=c.dataIndex;
+                const ds=c.chart.data.datasets.find(d=>d.label==='Actual');
+                if(ds&&ds.data[i]!=null&&c.parsed.y===ds.data[i])return null;
+              }
+              const val=c.parsed.y!=null?formatAxisTick(c.parsed.y,label):c.formattedValue;
+              return c.dataset.label+': '+val;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:ax.grid},ticks:{color:ax.tick,font:{size:11}}},
+        y:{
+          grid:{color:ax.grid},
+          ticks:{color:ax.tick,font:{size:11},precision:1,callback:function(v){return formatAxisTick(v,label)}},
+          title:{display:true,text:label||'',color:ax.tick,font:{size:10}}
+        }
+      },
+      interaction:{mode:'index',intersect:false}
+    }
+  });
+  el._chart=chart;
+}
+
+/* =========================================================
+   DATA — employment forecasts (reference scenario)
+   ========================================================= */
+const FC_NOTE='The forecast results are for the reference scenario and are subject to change based on various economic factors. The data is based on the latest available information and assumes no major policy changes or external shocks during the forecast period.';
+const FC_YEARS=['2019','2020','2021','2022','2023','2024','2025','2026','2027','2028'];
+const FC_METHOD='<strong>Model:</strong> Reference scenario econometric forecast using annual LFS microdata (2019–2023 actuals) with ARIMA trend extrapolation and disaggregated bridge models. Forecast horizon 2024–2028.';
+const FC_META='Reference Scenario · Annual · Last run: Jun 2026 · Confidence: 82%';
+const FC_ICON=[['var(--acbg)','var(--ac)'],['var(--tlbg)','var(--tl)'],['var(--pubg)','var(--pu)'],['var(--wnbg)','var(--wn)'],['var(--dnbg)','var(--dn)'],['var(--upbg)','var(--up)']];
+
+function fcBands(hist,proj,b=.04){
+  const actual=[...hist,...Array(5).fill(null)];
+  const forecast=[...Array(5).fill(null),...proj];
+  const val=i=>actual[i]??forecast[i];
+  const band=(v,m)=>v!=null?parseFloat((v*(1+m)).toFixed(1)):null;
+  const base=FC_YEARS.map((_,i)=>val(i));
+  return{labels:FC_YEARS,actual,forecast,
+    ciHigh:base.map(v=>band(v,b)),
+    ciLow:base.map(v=>band(v,-b)),
+    optimisticForecast:base.map(v=>band(v,b*1.5)),
+    pessimisticForecast:base.map(v=>band(v,-b*1.5))
+  };
+}
+
+function computeSummaryChanges(m){
+  const cur=m.hist[4],prev=m.hist[3],next=m.proj[0];
+  if(cur==null||prev==null||next==null)return{
+    sumQoQ:{val:'—',unit:'',sub:'vs Q1 2026',valDir:'nt'},
+    sumYoY:{val:'—',unit:'',sub:'vs Q2 2025',valDir:'nt'}
+  };
+  if(m.unit==='%'){
+    const yoy=cur-prev,qoq=next-cur;
+    const fmt=n=>(n>0?'+':'')+n.toFixed(1);
+    return{
+      sumQoQ:{val:fmt(qoq),unit:'pp',sub:'vs Q1 2026',valDir:qoq>=0?'up':'dn'},
+      sumYoY:{val:fmt(yoy),unit:'pp',sub:'vs Q2 2025',valDir:yoy>=0?'up':'dn'}
+    };
+  }
+  const yoyPct=(cur-prev)/prev*100,qoqPct=(next-cur)/cur*100;
+  const fmtPct=n=>(n>0?'+':'')+n.toFixed(1);
+  return{
+    sumQoQ:{val:fmtPct(qoqPct),unit:'%',sub:'vs Q1 2026',valDir:qoqPct>=0?'up':'dn'},
+    sumYoY:{val:fmtPct(yoyPct),unit:'%',sub:'vs Q2 2025',valDir:yoyPct>=0?'up':'dn'}
+  };
+}
+
+function buildForecast(m,i){
+  const [iconColor,iconStroke]=FC_ICON[i%FC_ICON.length];
+  return{
+    label:m.label,title:m.title,subtitle:m.subtitle,modelMeta:FC_META,iconColor,iconStroke,
+    kpis:m.kpis,chartTitle:m.chartTitle,...fcBands(m.hist,m.proj),
+    ...computeSummaryChanges(m),
+    unit:m.unit,method:FC_METHOD,confidence:82,drivers:m.drivers,note:FC_NOTE,
+    aiContext:m.aiContext,horizon:'me',signal:false
+  };
+}
+
+const EMP_FORECAST_DEFS=[
+  {key:'emp-citizenship',label:'Employment Forecast by Citizenship',
+    title:'Employment Forecast by Citizenship',subtitle:'Annual · Total employed · By citizenship',
+    chartTitle:'Total Employed Persons — Actual vs Forecast (Thousands)',
+    hist:[2100,2150,2200,2250,2300],proj:[2380,2450,2550,2620,2700],unit:'k',
+    kpis:[{lbl:'2023 Actual',val:'2.3',unit:'M',chg:'Base year total employed',dir:'nt'},{lbl:'2028 Forecast',val:'2.7',unit:'M',chg:'↑ +14.5% vs 2023',dir:'up'},{lbl:'Non-Emirati Growth',val:'15.2',unit:'%',chg:'2023–2028 segment growth',dir:'up'}],
+    drivers:['By 2028, the total number of employed persons is expected to reach 2.7M, an increase of 14.5% from 2.3M in 2023.','Growth is primarily driven by the Non-Emirati segment, which is expected to grow by 15.2% over the same period.','Emirati employment continues to expand steadily alongside public sector hiring and NAFIS placement programmes.'],
+    aiContext:'employment forecast citizenship Emirati Non-Emirati 2028'},
+  {key:'emp-activity',label:'Employment Forecast by Economic Activity',
+    title:'Employment Forecast by Economic Activity',subtitle:'Annual · By ISIC economic activity',
+    chartTitle:'Construction Employment — Actual vs Forecast (Thousands)',
+    hist:[275,285,295,303,311],proj:[318,325,332,340,350],unit:'k',
+    kpis:[{lbl:'Construction 2028',val:'350',unit:'k',chg:'↑ +12.5% from 311K in 2023',dir:'up'},{lbl:'Wholesale & Retail 2028',val:'420',unit:'k',chg:'Significant sector growth',dir:'up'},{lbl:'Reference Year',val:'2023',unit:'',chg:'311K construction baseline',dir:'nt'}],
+    drivers:['By 2028, employed persons in Construction are expected to reach 350K, a growth of 12.5% from 311K in 2023.','The Wholesale and Retail Trade sector is also expected to see significant growth, reaching 420K by 2028.','Services and trade activities remain key contributors to overall employment expansion.'],
+    aiContext:'employment forecast economic activity construction wholesale retail 2028'},
+  {key:'emp-activity-emirati',label:'Employment Forecast by Economic Activity for Emirati',
+    title:'Employment Forecast by Economic Activity for Emirati',subtitle:'Annual · Emirati nationals · By sector',
+    chartTitle:'Public Administration & Defense Employment — Emirati (Thousands)',
+    hist:[105,108,110,112,113],proj:[115,116,117,118,120],unit:'k',
+    kpis:[{lbl:'Public Admin. 2028',val:'120',unit:'k',chg:'↑ +5.8% from 2023 levels',dir:'up'},{lbl:'Largest Sector',val:'Public Admin.',unit:'',chg:'Remains top Emirati employer',dir:'nt'},{lbl:'2023 Baseline',val:'113',unit:'k',chg:'Public administration & defense',dir:'nt'}],
+    drivers:['For the Emirati population, Public Administration and Defense is expected to remain the largest employer.','The number of employed Emiratis in this sector is projected to reach 120K by 2028, a 5.8% increase from 2023 levels.','Government and quasi-government roles continue to anchor Emirati labour market participation.'],
+    aiContext:'Emirati employment forecast economic activity public administration 2028'},
+  {key:'emp-activity-nonemirati',label:'Employment Forecast by Economic Activity for Non-Emirati',
+    title:'Employment Forecast by Economic Activity for Non-Emirati',subtitle:'Annual · Non-Emirati · By sector',
+    chartTitle:'Non-Emirati Construction Employment — Actual vs Forecast (Thousands)',
+    hist:[245,252,258,265,272],proj:[278,285,292,300,308],unit:'k',
+    kpis:[{lbl:'Construction Growth',val:'13.1',unit:'%',chg:'2023–2028 Non-Emirati sector',dir:'up'},{lbl:'Manufacturing Growth',val:'11.4',unit:'%',chg:'2023–2028 Non-Emirati sector',dir:'up'},{lbl:'Main Drivers',val:'2',unit:'sectors',chg:'Construction & Manufacturing',dir:'nt'}],
+    drivers:['Among Non-Emiratis, Construction and Manufacturing are projected as the main drivers of employment growth.','Construction employment is expected to increase by 13.1% by 2028.','Manufacturing employment is expected to increase by 11.4% over the same forecast period.'],
+    aiContext:'Non-Emirati employment forecast construction manufacturing 2028'},
+  {key:'emp-education',label:'Employment Forecast by Education Level',
+    title:'Employment Forecast by Education Level',subtitle:'Annual · By highest qualification',
+    chartTitle:'Employed with Bachelor\'s Degree or Higher — Actual vs Forecast (Thousands)',
+    hist:[680,720,760,785,804],proj:[830,860,890,920,950],unit:'k',
+    kpis:[{lbl:'Bachelor+ 2028',val:'950',unit:'k',chg:'↑ +18.2% by 2028',dir:'up'},{lbl:'Skilled Labour Demand',val:'High',unit:'',chg:'Highly skilled roles expanding',dir:'up'},{lbl:'2023 Baseline',val:'804',unit:'k',chg:'Bachelor\'s degree or higher',dir:'nt'}],
+    drivers:['Demand for highly skilled labour is expected to grow across the forecast period.','Employed persons with a Bachelor\'s degree or higher are projected to increase by 18.2% by 2028.','Total highly educated employment is expected to reach 950K by 2028.'],
+    aiContext:'employment forecast education level bachelor degree skilled labour 2028'},
+  {key:'emp-occupation',label:'Employment Forecast by Occupation',
+    title:'Employment Forecast by Occupation',subtitle:'Annual · By ISCO occupation group',
+    chartTitle:'Professional Occupations Employment — Actual vs Forecast (Thousands)',
+    hist:[420,445,465,485,498],proj:[515,535,555,570,580],unit:'k',
+    kpis:[{lbl:'Professionals 2028',val:'580',unit:'k',chg:'↑ +16.5% growth',dir:'up'},{lbl:'Technicians Growth',val:'14.2',unit:'%',chg:'↑ Over forecast period',dir:'up'},{lbl:'2023 Baseline',val:'498',unit:'k',chg:'Professional occupations',dir:'nt'}],
+    drivers:['By 2028, employment in Professional occupations is expected to grow by 16.5%, reaching 580K.','Technicians and Associate Professionals are also expected to see a steady increase of 14.2% over the forecast period.','Occupational upgrading reflects continued economic diversification and skills demand.'],
+    aiContext:'employment forecast occupation professionals technicians 2028'},
+  {key:'emp-sector-citizenship',label:'Employment Forecast by Sector & Citizenship',
+    title:'Employment Forecast by Economic Sector and Citizenship',subtitle:'Annual · Sector × citizenship growth rates',
+    chartTitle:'Sector Employment Growth Index — Actual vs Forecast (Index, 2023=100)',
+    hist:[92,94,96,98,100],proj:[103,106,109,112,115],unit:'',
+    kpis:[{lbl:'Real Estate (Emirati)',val:'9.5',unit:'%',chg:'Highest Emirati sector CAGR',dir:'up'},{lbl:'ICT (Non-Emirati)',val:'8.2',unit:'%',chg:'Fastest Non-Emirati sector CAGR',dir:'up'},{lbl:'Reference',val:'2023',unit:'',chg:'Index base year = 100',dir:'nt'}],
+    drivers:['Real Estate Activities is expected to show the highest growth rate for Emiratis at 9.5% CAGR.','For Non-Emiratis, Information and Communication is projected to grow the fastest at 8.2% CAGR.','Citizenship-specific sector dynamics highlight differentiated employment pathways across the economy.'],
+    aiContext:'employment forecast sector citizenship real estate ICT CAGR 2028'},
+  {key:'emp-activity-occupation',label:'Employment by Activity & Occupation',
+    title:'Employment Forecasts by Economic Activities and Occupation',subtitle:'Annual · Sector × occupation cross-cut',
+    chartTitle:'Financial Sector Professionals — Actual vs Forecast (Thousands)',
+    hist:[85,88,90,92,94],proj:[96,98,100,102,106],unit:'k',
+    kpis:[{lbl:'Financial Professionals',val:'106',unit:'k',chg:'↑ +12.8% by 2028',dir:'up'},{lbl:'Dominant Group',val:'Professionals',unit:'',chg:'Financial & insurance activities',dir:'nt'},{lbl:'2023 Baseline',val:'94',unit:'k',chg:'Financial sector professionals',dir:'nt'}],
+    drivers:['In Financial and Insurance Activities, Professionals are expected to remain the dominant occupation group.','Their numbers are projected to grow by 12.8% by 2028 to meet increasing industry demands.','BFSI expansion and digitisation continue to drive professional hiring in the sector.'],
+    aiContext:'employment forecast financial insurance professionals occupation 2028'},
+  {key:'emp-occupation-education',label:'Employment by Occupation & Education',
+    title:'Employment Forecasts by Occupation and Education Level',subtitle:'Annual · Managerial roles · Education mix',
+    chartTitle:'Highly Educated Managers — Actual vs Forecast (Thousands)',
+    hist:[180,185,190,195,200],proj:[205,210,215,220,223],unit:'k',
+    kpis:[{lbl:'Managerial Bachelor+',val:'223',unit:'k',chg:'↑ +11.5% by 2028',dir:'up'},{lbl:'Education Mix',val:'Majority',unit:'',chg:'Bachelor\'s degree or higher',dir:'nt'},{lbl:'2023 Baseline',val:'200',unit:'k',chg:'Highly educated managers',dir:'nt'}],
+    drivers:['For Managerial positions, the majority of the workforce is expected to hold a Bachelor\'s degree or higher.','This trend is projected to continue, with an 11.5% increase in highly educated managers by 2028.','Upskilling in leadership roles supports productivity and governance standards across sectors.'],
+    aiContext:'employment forecast managerial education bachelor degree 2028'},
+  {key:'emp-rate-citizenship',label:'Employment Rate Forecast by Citizenship',
+    title:'Employment Rate Forecast by Citizenship',subtitle:'Annual · Employment rate · By citizenship',
+    chartTitle:'Emirati Employment Rate — Actual vs Forecast (%)',
+    hist:[49.8,50.2,50.8,51.2,51.6],proj:[51.8,52.0,52.1,52.3,52.4],unit:'%',
+    kpis:[{lbl:'Emirati Rate 2028',val:'52.4',unit:'%',chg:'Slight upward trend',dir:'up'},{lbl:'Non-Emirati Rate 2028',val:'81.2',unit:'%',chg:'Stable high participation',dir:'nt'},{lbl:'Overall Outlook',val:'Stable',unit:'',chg:'Marginal improvement projected',dir:'up'}],
+    drivers:['The overall employment rate is projected to remain stable, with a slight upward trend.','The Emirati employment rate is expected to reach 52.4% by 2028.','The Non-Emirati employment rate is projected at 81.2% by 2028.'],
+    aiContext:'employment rate forecast citizenship Emirati Non-Emirati 2028'}
+];
+
+const FORECASTS=Object.fromEntries(EMP_FORECAST_DEFS.map((m,i)=>[m.key,buildForecast(m,i)]));
+const FC_KEYS=EMP_FORECAST_DEFS.map(m=>m.key);
+
+/* =========================================================
+   FORECAST LANDING (dropdown view)
+   ========================================================= */
+const FORECAST_OPTIONS=EMP_FORECAST_DEFS.map(({key,label})=>({key,label}));
+const FC_COLORS=Object.fromEntries(FC_KEYS.map((k,i)=>[k,[AC,TL,PU,WN,DN,UP][i%6]]));
+const RELATED_SKIP=new Set(['emp-activity-emirati','emp-education','emp-activity-occupation','emp-occupation-education']);
+const RELATED_FORECASTS=Object.fromEntries(FC_KEYS.map(k=>[k,FC_KEYS.filter(x=>x!==k&&!RELATED_SKIP.has(x)).slice(0,6)]));
+
+let landingKey='emp-citizenship';
+let landingScenario='base';
+let landingChartInstance=null;
+
+function horizonLabel(h){
+  return h==='sh'?'Short-Term':h==='me'?'Medium-Term':'Long-Term';
+}
+
+function populateForecastSelect(filter=''){
+  const sel=document.getElementById('fc-select');
+  if(!sel)return;
+  const q=filter.trim().toLowerCase();
+  const opts=FORECAST_OPTIONS.filter(o=>!q||o.label.toLowerCase().includes(q));
+  sel.innerHTML=opts.map(o=>`<option value="${o.key}">${o.label}</option>`).join('');
+  if(!opts.find(o=>o.key===landingKey)&&opts.length)landingKey=opts[0].key;
+  sel.value=landingKey;
+}
+
+function filterForecastOptions(q){
+  populateForecastSelect(q);
+}
+
+function setForecastHash(key){
+  const base=window.location.href.split('#')[0];
+  try{
+    history.replaceState(null,'',key?base+'#forecast-'+key:base);
+  }catch(e){
+    window.location.hash=key?'forecast-'+key:'';
+  }
+}
+
+function selectForecast(key){
+  if(!FORECASTS[key])return;
+  landingKey=key;
+  landingScenario='base';
+  const sel=document.getElementById('fc-select');
+  if(sel)sel.value=key;
+  document.querySelectorAll('#fc-scenario-pills .dp-pill').forEach((p,i)=>p.classList.toggle('sel',i===0));
+  renderLandingForecast();
+  setForecastHash(key);
+  setTimeout(LMO.notifyEmbedHeight, 450);
+}
+
+function renderLandingForecast(){
+  const d=FORECASTS[landingKey];
+  if(!d)return;
+
+  const sum=document.getElementById('fc-summary');
+  if(sum){
+    const cards=[
+      {lbl:d.kpis[0].lbl,val:d.kpis[0].val,unit:d.kpis[0].unit,sub:d.kpis[0].chg,dir:d.kpis[0].dir},
+      {lbl:d.kpis[1].lbl,val:d.kpis[1].val,unit:d.kpis[1].unit,sub:d.kpis[1].chg,dir:d.kpis[1].dir},
+      {lbl:'QoQ Change',val:d.sumQoQ.val,unit:d.sumQoQ.unit,sub:d.sumQoQ.sub,valDir:d.sumQoQ.valDir},
+      {lbl:'YoY Change',val:d.sumYoY.val,unit:d.sumYoY.unit,sub:d.sumYoY.sub,valDir:d.sumYoY.valDir}
+    ];
+    sum.innerHTML=cards.map(c=>`
+      <div class="fc-sum-card">
+        <div class="fc-sum-lbl">${c.lbl}</div>
+        <div class="fc-sum-val ${c.valDir||''}">${c.val}${c.unit?`<span class="fc-sum-unit">${c.unit==='%'||c.unit==='pp'||c.unit==='k'||c.unit==='M'?c.unit:(' '+c.unit)}</span>`:''}</div>
+        <div class="fc-sum-sub ${c.dir||''}">${c.sub}</div>
+      </div>`).join('');
+  }
+
+  const chartTitle=document.getElementById('fc-chart-title');
+  if(chartTitle)chartTitle.textContent=d.label;
+  const chartDesc=document.getElementById('fc-chart-desc');
+  if(chartDesc)chartDesc.textContent=d.subtitle||'';
+
+  const interp=document.getElementById('fc-interpretation');
+  if(interp)interp.innerHTML=d.drivers.slice(0,3).map(x=>`<li>${x}</li>`).join('');
+
+  const impacts=document.getElementById('fc-impacts');
+  if(impacts)impacts.innerHTML=d.drivers.slice(2).map(x=>`<li>${x}</li>`).join('');
+
+  const banner=document.getElementById('fc-model-banner');
+  if(banner){
+    const methodText=d.method.replace(/<[^>]+>/g,'').trim();
+    const note=d.note?` <strong>Note:</strong> ${d.note}`:'';
+    banner.innerHTML=`<strong>Model-based forecasts.</strong> ${methodText} ${d.modelMeta}${note}`;
+  }
+
+  renderLandingChart(landingKey,landingScenario);
+  renderRelatedForecasts();
+}
+
+function getSparkData(d){
+  const out=[];
+  const len=Math.max(d.actual.length,d.forecast.length);
+  for(let i=0;i<len;i++){
+    const v=d.actual[i]!=null?d.actual[i]:d.forecast[i];
+    if(v!=null)out.push(v);
+  }
+  return out.length?out.slice(-8):[1,2,3,4];
+}
+
+const FC_REL_AXIS=FC_YEARS.map(y=>`<span>${y}</span>`).join('');
+
+function renderRelatedForecasts(){
+  const track=document.getElementById('fc-related-grid');
+  if(!track)return;
+  const keys=(RELATED_FORECASTS[landingKey]||FC_KEYS.filter(k=>k!==landingKey)).slice(0,6);
+  track.innerHTML=keys.map(key=>{
+    const d=FORECASTS[key];
+    if(!d)return '';
+    const kpi=d.kpis[1]||d.kpis[0];
+    const dir=kpi.dir||'nt';
+    const chgCls=dir==='up'?'val-green':dir==='dn'?'val-red':'val-amber';
+    const arrow=dir==='up'?'ti-arrow-up':dir==='dn'?'ti-arrow-down':'ti-minus';
+    const unit=['%','pp','k','M'].includes(kpi.unit)?kpi.unit:(kpi.unit?' '+kpi.unit:'');
+    return `<article class="card product-card card-hover dg-slide" data-fc-key="${key}" role="button" tabindex="0">
+      <div class="product-card-toprow">
+        <span class="product-cat-tag"><i class="ti ti-chart-line"></i> <span class="product-cat-text">Forecast</span></span>
+        <div class="product-actions"><i class="ti ti-arrow-up-right" title="Open"></i></div>
+      </div>
+      <div class="product-name-row"><div class="product-name">${d.label}</div></div>
+      <div class="product-val">${kpi.val}${unit?`<span class="product-unit">${unit}</span>`:''}</div>
+      <div class="product-change ${chgCls}"><i class="ti ${arrow}"></i>${kpi.chg}</div>
+      <div class="product-viz"><canvas id="rel-spark-${key}" aria-hidden="true"></canvas></div>
+      <div class="product-axis">${FC_REL_AXIS}</div>
+      <div class="product-ai-row"><i class="ti ti-bulb"></i><span><span class="product-ai-lbl">AI Summary</span> <span class="product-ai-text">${d.drivers[0]||''}</span></span></div>
+      <div class="product-card-tags"><span class="product-usecase-tag" data-tag-type="stable">${horizonLabel(d.horizon)}</span></div>
+    </article>`;
+  }).join('');
+  requestAnimationFrame(()=>{
+    keys.forEach(key=>{const d=FORECASTS[key];if(d)relatedForecastChart('rel-spark-'+key,d,FC_COLORS[key]||AC);});
+    document.querySelector('.fc-related-carousel')?._sync?.();
+    setTimeout(LMO.notifyEmbedHeight,350);
+  });
+}
+
+function navigateToForecast(key){
+  if(!FORECASTS[key])return;
+  selectForecast(key);
+  const target=document.querySelector('.fc-toolbar')||document.querySelector('.ph');
+  if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+  else window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderLandingChart(key,scenario){
+  const d=FORECASTS[key];
+  if(!d)return;
+  let forecastData=d.forecast;
+  if(scenario==='optimistic'&&d.optimisticForecast)forecastData=d.optimisticForecast;
+  if(scenario==='pessimistic'&&d.pessimisticForecast)forecastData=d.pessimisticForecast;
+
+  const canvas=document.getElementById('fc-landing-chart');
+  if(!canvas)return;
+  if(landingChartInstance){landingChartInstance.destroy();landingChartInstance=null;}
+  if(canvas._chart){canvas._chart.destroy();canvas._chart=null;}
+
+  if(key==='sector'){
+    const ctx=canvas.getContext('2d');
+    const ax=lmoAx();
+    let fc=forecastData;
+    if(scenario==='optimistic')fc=d.optimisticForecast||d.forecast;
+    if(scenario==='pessimistic')fc=d.pessimisticForecast||d.forecast;
+    landingChartInstance=new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels:d.labels,
+        datasets:[
+          {label:'2025 Actual',data:d.actual,backgroundColor:'rgba(37,99,235,.3)',borderColor:AC,borderWidth:1.5,borderRadius:4},
+          {label:'2026 '+scenario.charAt(0).toUpperCase()+scenario.slice(1),data:fc,backgroundColor:'rgba(13,148,136,.3)',borderColor:TL,borderWidth:1.5,borderRadius:4}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true,position:'top',labels:{font:{size:11},color:ax.tick}},
+          tooltip:{backgroundColor:ax.tooltipBg,titleColor:ax.tooltipTitle,bodyColor:ax.tooltipBody,padding:10}
+        },
+        scales:{
+          x:{grid:{display:false},ticks:{color:ax.tick,font:{size:11}}},
+          y:{grid:{color:ax.grid},ticks:{color:ax.tick,font:{size:11},precision:1,callback:v=>formatAxisTick(v,'%')},title:{display:true,text:'Growth %',color:ax.tick,font:{size:10}}}
+        }
+      }
+    });
+  }else{
+    mainChart('fc-landing-chart',d.labels,d.actual,forecastData,d.ciHigh,d.ciLow,FC_COLORS[key]||AC,d.unit);
+    landingChartInstance=canvas._chart;
+  }
+}
+
+function switchLandingScenario(scenario,btn){
+  landingScenario=scenario;
+  document.querySelectorAll('#fc-scenario-pills .dp-pill').forEach(p=>p.classList.remove('sel'));
+  if(btn)btn.classList.add('sel');
+  renderLandingChart(landingKey,scenario);
+  setTimeout(LMO.notifyEmbedHeight, 450);
+}
+
+function exportDetail(){
+  if(!landingKey)return;
+  const d=FORECASTS[landingKey];
+  const msg=`Forecast Export — ${d.title}\n\nKPIs:\n${d.kpis.map(k=>`${k.lbl}: ${k.val}${k.unit} (${k.chg})`).join('\n')}\n\nKey Drivers:\n${d.drivers.join('\n')}\n\nModel: ${d.modelMeta}\n\nGenerated: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}`;
+  const blob=new Blob([msg],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`LMO-Forecast-${landingKey}-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+
+window.addEventListener('load',()=>{
+  LMO.initLmoEmbed();
+  populateForecastSelect();
+  const hashKey=window.location.hash?window.location.hash.replace('#forecast-',''):'';
+  selectForecast(FORECASTS[hashKey]?hashKey:'emp-citizenship');
+  const relTrack=document.getElementById('fc-related-grid');
+  const relCarousel=document.querySelector('.fc-related-carousel');
+  if(relTrack){
+    relTrack.addEventListener('click',e=>{
+      const card=e.target.closest('[data-fc-key]');
+      if(card)navigateToForecast(card.dataset.fcKey);
+    });
+    relTrack.addEventListener('keydown',e=>{
+      if(e.key!=='Enter'&&e.key!==' ')return;
+      const card=e.target.closest('[data-fc-key]');
+      if(card){e.preventDefault();navigateToForecast(card.dataset.fcKey);}
+    });
+  }
+  if(relCarousel)LMO.initDgCarousel(relCarousel);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape')closeChat();
+  });
+  LMO.notifyEmbedHeight();
+  if (LMO.onThemeChange) {
+    LMO.onThemeChange(() => {
+      if (landingKey) renderLandingChart(landingKey, landingScenario);
+    });
+  }
+  window.addEventListener('resize',()=>{
+    LMO.reportEmbedHeight();
+    relCarousel?._sync?.();
+  });
+});
+
+
+/* =========================================================
+   AI CHAT — with session memory
+   ========================================================= */
+const AI_RESPONSES=Object.fromEntries(EMP_FORECAST_DEFS.map(m=>[m.key,
+  `<strong>${m.title}</strong> — ${m.drivers[0]} ${m.drivers[1]||''}`
+]));
+AI_RESPONSES.default='The LMO Forecasting Hub has <strong>10 employment forecast models</strong> for the reference scenario (2024–2028). Headline outlook: total employment reaching <strong>2.7M by 2028</strong> (+14.5% from 2023), Construction at <strong>350K</strong>, and Emirati employment rate at <strong>52.4%</strong>. Select a forecast from the dropdown or Related Forecasts cards to explore sector, occupation, education, and citizenship breakdowns.';
+
+// Contextual follow-up suggestions per topic
+const FOLLOW_UP_SUGGESTIONS=Object.fromEntries(FC_KEYS.map(k=>[k,['What drives the 2028 outlook?','Break down by citizenship','Compare vs 2023 baseline']]));
+FOLLOW_UP_SUGGESTIONS.default=['Which sector grows fastest?','Emirati vs Non-Emirati outlook','What is the reference scenario assumption?','Show employment rate forecast'];
+
+// Session chat memory
+let chatHistory=[];
+let currentChatCtx='default';
+
+function getTopicKey(text){
+  const lc=text.toLowerCase();
+  if(lc.includes('employment rate')||lc.includes('rate forecast'))return 'emp-rate-citizenship';
+  if(lc.includes('education')||lc.includes('bachelor'))return 'emp-education';
+  if(lc.includes('occupation')&&lc.includes('education'))return 'emp-occupation-education';
+  if(lc.includes('occupation'))return 'emp-occupation';
+  if(lc.includes('non-emirati')||lc.includes('non emirati'))return 'emp-activity-nonemirati';
+  if(lc.includes('emirati'))return 'emp-activity-emirati';
+  if(lc.includes('citizenship'))return 'emp-citizenship';
+  if(lc.includes('construction')||lc.includes('economic activity')||lc.includes('sector'))return 'emp-activity';
+  if(FORECASTS[landingKey])return landingKey;
+  return null;
+}
+
+function getAIResponse(text){
+  const lc=text.toLowerCase();
+  if(lc.includes('risk')||lc.includes('highest'))return "Under the reference scenario, the strongest growth signals are in <strong>highly skilled employment</strong> (Bachelor's degree or higher projected at <strong>950K by 2028</strong>, +18.2%) and <strong>Professional occupations</strong> (580K, +16.5%). Sector growth is uneven — Real Estate leads Emirati employment at <strong>9.5% CAGR</strong>, while ICT leads Non-Emirati growth at <strong>8.2% CAGR</strong>.";
+  if(lc.includes('policy')||lc.includes('action'))return "Key policy levers from the employment forecasts: sustaining <strong>Emirati employment rate growth to 52.4%</strong> by 2028, supporting <strong>Construction (+12.5%)</strong> and <strong>Manufacturing (+11.4%)</strong> hiring among Non-Emiratis, and aligning education pipelines with demand for <strong>highly educated managers (+11.5%)</strong>.";
+  if(lc.includes('short vs long')||lc.includes('horizon'))return "<strong>Reference scenario (2024–2028):</strong> Total employment rises from <strong>2.3M to 2.7M</strong> (+14.5%). Employment rates remain stable with a slight upward trend — Emirati <strong>52.4%</strong> and Non-Emirati <strong>81.2%</strong> by 2028. Sector and occupation forecasts point to continued diversification into services, finance, and skilled roles.";
+  if(lc.includes('vision')||lc.includes('2031'))return "The 2028 employment forecasts indicate continued labour market expansion under the reference scenario: <strong>2.7M employed persons</strong>, Construction at <strong>350K</strong>, and Wholesale & Retail at <strong>420K</strong>. Highly skilled and professional employment remain the fastest-growing segments through 2028.";
+  const topicKey=getTopicKey(text);
+  if(topicKey&&AI_RESPONSES[topicKey])return AI_RESPONSES[topicKey];
+  if(lc.includes('citizenship')||lc.includes('emirati')||lc.includes('non-emirati'))return AI_RESPONSES['emp-citizenship']||AI_RESPONSES.default;
+  if(lc.includes('construction')||lc.includes('sector')||lc.includes('economic activity'))return AI_RESPONSES['emp-activity']||AI_RESPONSES.default;
+  return AI_RESPONSES.default;
+}
+
+function openChat(ctx,title){
+  if(document.body.classList.contains('embed')&&window.parent!==window){
+    window.parent.postMessage({type:'lmo-chat',ctx,title:title||'Forecast Intelligence'},'*');
+    return;
+  }
+  document.getElementById('ctx-val').textContent=title||'Forecast Intelligence';
+  currentChatCtx=getTopicKey(ctx+' '+title)||'default';
+
+  // If chat already has history, inject context switch note rather than wiping
+  const ms=document.getElementById('msgs');
+  if(chatHistory.length>0){
+    const note=document.createElement('div');
+    note.className='msg ai';
+    note.innerHTML=`<div class="bubble ai" style="background:var(--acbg);border-color:var(--acbr);color:var(--ac);font-size:11.5px">📍 Switched context to: <strong>${title}</strong></div>`;
+    ms.appendChild(note);
+    ms.scrollTop=ms.scrollHeight;
+  } else {
+    // Fresh session — inject opening AI response
+    const resp=AI_RESPONSES[currentChatCtx]||AI_RESPONSES.default;
+    addMsg('ai',resp);
+    chatHistory.push({role:'ai',text:resp});
+  }
+
+  // Contextual suggestions
+  const suggs=FOLLOW_UP_SUGGESTIONS[currentChatCtx]||FOLLOW_UP_SUGGESTIONS.default;
+  document.getElementById('suggs').innerHTML=suggs.map(s=>`<button class="sugg" onclick="sendCT('${s}')">${s}</button>`).join('');
+
+  document.getElementById('cpanel').classList.add('open');
+  setTimeout(()=>{const inp=document.getElementById('cin');if(inp)inp.focus();},300);
+}
+
+function closeChat(){
+  document.getElementById('cpanel').classList.remove('open');
+}
+
+function addMsg(role,text){
+  const ms=document.getElementById('msgs');
+  const d=document.createElement('div');d.className='msg '+role;
+  const b=document.createElement('div');b.className='bubble '+role;b.innerHTML=text;
+  d.appendChild(b);ms.appendChild(d);ms.scrollTop=ms.scrollHeight;
+}
+
+function sendC(){
+  const inp=document.getElementById('cin');
+  const t=inp.value.trim();if(!t)return;
+  sendCT(t);inp.value='';
+}
+
+function sendCT(text){
+  addMsg('user',text);
+  chatHistory.push({role:'user',text});
+  document.getElementById('suggs').innerHTML='';
+  const ms=document.getElementById('msgs');
+  const td=document.createElement('div');td.className='msg ai';td.id='typi';
+  td.innerHTML='<div class="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
+  ms.appendChild(td);ms.scrollTop=ms.scrollHeight;
+  setTimeout(()=>{
+    document.getElementById('typi')?.remove();
+    const resp=getAIResponse(text);
+    addMsg('ai',resp);
+    chatHistory.push({role:'ai',text:resp});
+    // Inject contextual follow-up suggestions after each AI response
+    const newCtx=getTopicKey(text)||currentChatCtx;
+    const suggs=FOLLOW_UP_SUGGESTIONS[newCtx]||FOLLOW_UP_SUGGESTIONS.default;
+    document.getElementById('suggs').innerHTML=suggs.map(s=>`<button class="sugg" onclick="sendCT('${s}')">${s}</button>`).join('');
+    ms.scrollTop=ms.scrollHeight;
+  },1400);
+}
+</script>
+</body>
+</html>

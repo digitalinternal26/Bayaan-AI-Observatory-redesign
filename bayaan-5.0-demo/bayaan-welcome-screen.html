@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Bayaan</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap');
+
+    :root {
+      --navy: #1E3A5F;
+      --blue: #0066FF;
+      --cyan: #378ADD;
+      --ice: #EBF5FF;
+      --line: #E2E8F0;
+      --muted: #64748B;
+      --white: #fff;
+      --shadow: 0 24px 70px rgba(15, 23, 42, .12);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--navy);
+      font-family: "DM Sans", sans-serif; overflow-x: hidden;
+      background: radial-gradient(circle at 80% 10%, rgba(55,138,221,.13), transparent 24%),
+                  radial-gradient(circle at 8% 88%, rgba(0,102,255,.1), transparent 26%), #EFF4F7;
+    }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid rgba(37, 99, 235, .25); outline-offset: 3px; }
+
+    .ambient { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(2px); animation: drift 12s ease-in-out infinite; }
+    .orb.one { width: 330px; height: 330px; right: -130px; top: 18%; border: 1px solid rgba(0,102,255,.15); }
+    .orb.two { width: 160px; height: 160px; left: 3%; bottom: 5%; background: rgba(55,138,221,.06); animation-delay: -5s; }
+    @keyframes drift { 50% { transform: translate(0,-25px) rotate(8deg); } }
+
+    .app { position: relative; min-height: 100vh; padding: 26px clamp(22px, 4vw, 64px) 34px; }
+    header { height: 52px; display: flex; align-items: center; justify-content: space-between; animation: revealDown .65s .05s cubic-bezier(.2,.8,.2,1) both; }
+    .logo { width: 116px; height: auto; display: block; }
+    .secure { display: flex; align-items: center; gap: 8px; color: #718399; font-size: 12px; font-weight: 600; letter-spacing: .03em; }
+    .secure::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #45b98e; box-shadow: 0 0 0 5px rgba(69,185,142,.1); }
+
+    main { display: grid; grid-template-columns: minmax(270px, .72fr) minmax(560px, 1.55fr); gap: clamp(28px, 5vw, 78px); max-width: 1440px; margin: 24px auto 0; align-items: center; min-height: calc(100vh - 136px); }
+    .story { padding: 20px 0 40px; align-self: center; }
+    .eyebrow { margin: 0 0 16px; color: var(--blue); text-transform: uppercase; font-weight: 700; font-size: 11px; letter-spacing: .17em; animation: revealUp .65s .18s cubic-bezier(.2,.8,.2,1) both; }
+    h1 { font-family: Manrope, sans-serif; font-size: clamp(34px, 3.6vw, 54px); line-height: 1.2; letter-spacing: -.05em; margin: 0 0 22px; max-width: 620px; animation: revealUp .75s .28s cubic-bezier(.2,.8,.2,1) both; }
+    h1 span { color: var(--blue); }
+    .intro { max-width: 500px; color: var(--muted); font-size: 16px; line-height: 1.75; margin: 0; animation: revealUp .7s .4s cubic-bezier(.2,.8,.2,1) both; }
+    .signal { position: relative; height: 150px; margin: 38px 0 20px; max-width: 460px; animation: signalReveal .9s .52s cubic-bezier(.2,.8,.2,1) both; }
+    .signal-core { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 66px; height: 66px; border-radius: 22px; background: linear-gradient(145deg, var(--blue), #0052CC); display: grid; place-items: center; color: white; box-shadow: 0 18px 38px rgba(0,102,255,.25); z-index: 2; animation: breathe 2.8s ease-in-out infinite; }
+    .signal-core svg { width: 34px; }
+    .ring { position: absolute; left: 50%; top: 50%; border: 1px solid rgba(0,102,255,.18); border-radius: 50%; transform: translate(-50%,-50%); animation: pulse 3.4s ease-out infinite; }
+    .ring.r1 { width: 112px; height: 112px; } .ring.r2 { width: 190px; height: 112px; animation-delay: .7s; } .ring.r3 { width: 310px; height: 138px; animation-delay: 1.4s; }
+    .dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 5px rgba(55,138,221,.12); animation: float 4s ease-in-out infinite; }
+    .d1 { left: 14%; top: 30%; } .d2 { right: 10%; top: 62%; animation-delay: -2s; } .d3 { left: 29%; bottom: 3%; animation-delay: -1s; }
+    @keyframes pulse { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.75); } 35% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%,-50%) scale(1.12); } }
+    @keyframes breathe { 50% { transform: translate(-50%,-54%) scale(1.035); } }
+    @keyframes float { 50% { transform: translateY(-10px); } }
+
+    .agent-note { display: flex; align-items: center; gap: 12px; color: #526b80; font-size: 13px; animation: revealUp .7s .7s cubic-bezier(.2,.8,.2,1) both; }
+    .agent-note strong { color: var(--navy); }
+    .agent-avatar { flex: 0 0 auto; width: 34px; height: 34px; }
+    .agent-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .panel { position: relative; min-height: 735px; border: 1px solid rgba(255,255,255,.92); border-radius: 30px; background: linear-gradient(145deg, rgba(255,255,255,.9), rgba(235,245,255,.82)); box-shadow: 0 30px 90px rgba(15,23,42,.15), inset 0 1px 0 white; backdrop-filter: blur(22px); overflow: hidden; animation: panelPop .9s .25s cubic-bezier(.2,1.28,.32,1) both; }
+    @keyframes revealUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    @keyframes revealDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+    @keyframes panelPop { 0% { opacity: 0; transform: translateY(34px) scale(.86); filter: blur(8px); } 62% { opacity: 1; transform: translateY(-5px) scale(1.012); filter: none; } 100% { opacity: 1; transform: none; filter: none; } }
+    @keyframes signalReveal { from { opacity: 0; transform: scale(.78); } to { opacity: 1; transform: scale(1); } }
+    .panel::after { content: ""; position: absolute; right: -80px; top: -90px; width: 270px; height: 270px; border-radius: 50%; background: radial-gradient(circle, rgba(55,138,221,.13), transparent 68%); pointer-events: none; }
+    .panel-top { height: 75px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eaf0f4; }
+    .agent-id { display: flex; align-items: center; gap: 12px; }
+    .agent-face { width: 38px; height: 38px; flex-shrink: 0; display: block; }
+    .agent-id strong { font-size: 14px; display: block; } .agent-id small { color: #8192a3; }
+    .online { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border-radius: 99px; background: #effaf6; color: #20835e; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    .online i { width: 6px; height: 6px; background: #35b985; border-radius: 50%; }
+
+    .progress { display: none; }
+    .progress span { height: 4px; flex: 1; background: #e6edf1; border-radius: 99px; transition: .5s ease; }
+    .progress span.active { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+    .stage { padding: 34px; max-height: 660px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #BFDBFE transparent; scroll-behavior: smooth; animation: enter .42s cubic-bezier(.2,.8,.2,1); }
+    @keyframes enter { from { opacity: 0; transform: translateY(12px); } }
+    .step-label { color: var(--blue); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .15em; margin-bottom: 10px; }
+    h2 { font-family: Manrope, sans-serif; font-size: clamp(22px, 1.9vw, 30px); letter-spacing: -.03em; margin: 0 0 10px; line-height: 1.4; }
+    .description { color: var(--muted); line-height: 1.6; max-width: 660px; margin: 0 0 26px; font-size: 14px; }
+    .typing::after { content: ""; display: inline-block; width: 2px; height: 1em; margin-left: 4px; vertical-align: -.12em; background: var(--blue); animation: blink .8s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .conversation { display: flex; flex-direction: column; min-height: 500px; }
+    .context-trail { display: none; }
+    .context-pill { flex: 0 0 auto; max-width: 155px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 6px 9px; border: 1px solid #e5edf2; border-radius: 99px; background: rgba(235,245,255,.8); color: #73879a; font-size: 9px; }
+    .message-row { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 20px; }
+    .message-avatar { flex: 0 0 auto; width: 31px; height: 31px;}
+    .message-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .agent-bubble { position: relative; max-width: 620px; padding: 16px 18px; border: 1px solid #e4edf2; border-radius: 5px 19px 19px 19px; background: linear-gradient(145deg, #fff, #f9fcfd); box-shadow: 0 9px 24px rgba(15,23,42,.06); }
+    .agent-bubble::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(120deg, rgba(55,138,221,.08), transparent 35%); }
+    .agent-bubble .step-label { margin-bottom: 7px; }
+    .agent-bubble h2 { font-size: clamp(18px, 1.6vw, 23px); margin-bottom: 7px; }
+    .agent-bubble .description { margin: 0; font-size: 13px; }
+    .agent-status { display: flex; align-items: center; gap: 7px; margin: -9px 0 17px 43px; color: #8ca0b1; font-size: 12px; }
+    .agent-status span { display: flex; gap: 3px; }
+    .agent-status i { width: 4px; height: 4px; border-radius: 50%; background: var(--cyan); animation: thinking 1.2s ease-in-out infinite; }
+    .agent-status i:nth-child(2) { animation-delay: .15s; } .agent-status i:nth-child(3) { animation-delay: .3s; }
+    @keyframes thinking { 50% { transform: translateY(-4px); opacity: .45; } }
+    .history { display: flex; flex-direction: column; }
+    .user-row { justify-content: flex-end; margin: -9px 0 21px; }
+    .user-bubble { max-width: 76%; padding: 11px 15px; border-radius: 17px 5px 17px 17px; color: white; background: linear-gradient(135deg, #2563EB, #0052CC); box-shadow: 0 10px 22px rgba(0,102,255,.17); font-size: 14px; line-height: 1.5; }
+    .user-bubble strong { display: block; margin-bottom: 2px; color: #BFDBFE; font-size: 8px; text-transform: uppercase; letter-spacing: .12em; }
+    .response-area { position: relative; margin-left: 42px; padding: 17px; border: 1px solid rgba(0,102,255,.18); border-radius: 5px 21px 21px 21px; background: linear-gradient(145deg, rgba(235,245,255,.88), rgba(250,254,255,.92)); box-shadow: 0 10px 30px rgba(0,102,255,.07), inset 0 1px 0 white; }
+    .response-area::before { content: "Choose your response"; display: block; margin-bottom: 11px; color: #8195a8; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+    .response-area .option { background: rgba(255,255,255,.9); }
+    .response-area .subdomain-wrap { max-height: 265px; }
+    .module-grid { grid-template-columns: repeat(2, 1fr); }
+    .module-grid .option { min-height: 90px; }
+    .module-grid .icon { width: 42px; height: 42px; font-size: 20px; }
+    .module-grid .icon i { font-size: 20px; }
+    .smart-note { margin-top: 13px; padding: 10px 12px; border-radius: 11px; color: #5e7387; background: rgba(0,102,255,.06); font-size: 10px; line-height: 1.5; }
+    .smart-note strong { color: var(--blue); }
+    .conversation-meta { display: flex; align-items: center; gap: 8px; color: #7d91a4; font-size: 10px; }
+    .conversation-meta::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 5px rgba(55,138,221,.12); animation: statusPulse 2s ease-in-out infinite; }
+    @keyframes statusPulse { 50% { box-shadow: 0 0 0 8px rgba(55,138,221,0); } }
+
+    /* Conversation entrance choreography */
+    .conversation .history .message-row {
+      animation: chatAgentIn .48s cubic-bezier(.2,.85,.25,1) both;
+    }
+    .conversation .history .message-row:nth-child(1) { animation-delay: .04s; }
+    .conversation .history .message-row:nth-child(2) { animation-delay: .1s; }
+    .conversation .history .message-row:nth-child(3) { animation-delay: .16s; }
+    .conversation .history .message-row:nth-child(4) { animation-delay: .22s; }
+    .conversation .history .message-row:nth-child(5) { animation-delay: .28s; }
+    .conversation .history .message-row:nth-child(6) { animation-delay: .34s; }
+    .conversation .history .user-row {
+      animation-name: chatUserIn;
+    }
+    .conversation .current-exchange {
+      animation: chatExchangeIn .55s .18s cubic-bezier(.2,.85,.25,1) both;
+    }
+    .conversation .current-exchange .message-avatar {
+      animation: chatAvatarIn .5s .28s cubic-bezier(.2,1.3,.3,1) both;
+    }
+    .conversation .current-exchange .agent-bubble {
+      animation: chatBubbleIn .62s .34s cubic-bezier(.2,1.05,.3,1) both;
+    }
+    .conversation .current-exchange .agent-bubble .step-label {
+      animation: chatTextIn .45s .48s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .conversation .current-exchange .agent-bubble h2 {
+      animation: chatTextIn .5s .56s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .conversation .current-exchange .agent-bubble .description {
+      animation: chatTextIn .55s .66s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .conversation .agent-status {
+      animation: chatStatusIn .45s .78s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .conversation .response-area {
+      animation: chatResponseIn .65s .72s cubic-bezier(.2,.85,.25,1) both;
+    }
+    .conversation .response-area::before {
+      animation: chatTextIn .4s .9s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .conversation .response-area .option {
+      animation: optionRise .48s cubic-bezier(.2,.85,.25,1) both;
+    }
+    .conversation .response-area .option:nth-child(1) { animation-delay: .95s; }
+    .conversation .response-area .option:nth-child(2) { animation-delay: 1.02s; }
+    .conversation .response-area .option:nth-child(3) { animation-delay: 1.09s; }
+    .conversation .response-area .option:nth-child(4) { animation-delay: 1.16s; }
+    .conversation .response-area .option:nth-child(5) { animation-delay: 1.23s; }
+    .conversation .response-area .option:nth-child(6) { animation-delay: 1.3s; }
+    .conversation .domain-section {
+      animation: chatTextIn .5s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .conversation .domain-section:nth-child(1) { animation-delay: .95s; }
+    .conversation .domain-section:nth-child(2) { animation-delay: 1.05s; }
+    .conversation .domain-section:nth-child(3) { animation-delay: 1.15s; }
+    .conversation .domain-section:nth-child(4) { animation-delay: 1.25s; }
+    .conversation .domain-section:nth-child(5) { animation-delay: 1.35s; }
+    .conversation .domain-section:nth-child(6) { animation-delay: 1.45s; }
+    .conversation .chip {
+      animation: chipPop .4s cubic-bezier(.2,1.2,.3,1) both;
+    }
+    .conversation .domain-section:nth-child(1) .chip:nth-child(1) { animation-delay: 1.05s; }
+    .conversation .domain-section:nth-child(1) .chip:nth-child(2) { animation-delay: 1.1s; }
+    .conversation .domain-section:nth-child(1) .chip:nth-child(3) { animation-delay: 1.15s; }
+    .conversation .domain-section:nth-child(1) .chip:nth-child(4) { animation-delay: 1.2s; }
+    .conversation .domain-section:nth-child(1) .chip:nth-child(5) { animation-delay: 1.25s; }
+    .conversation .domain-section:nth-child(1) .chip:nth-child(6) { animation-delay: 1.3s; }
+    .conversation .summary {
+      animation: chatResponseIn .6s .7s cubic-bezier(.2,.85,.25,1) both;
+    }
+    .conversation .summary-row {
+      animation: timelineIn .5s cubic-bezier(.2,.85,.25,1) both;
+    }
+    .conversation .summary-row:nth-child(1) { animation-delay: .85s; }
+    .conversation .summary-row:nth-child(2) { animation-delay: .98s; }
+    .conversation .summary-row:nth-child(3) { animation-delay: 1.11s; }
+    .conversation .summary-check {
+      animation: summaryCheckPop .45s cubic-bezier(.2,1.4,.3,1) both;
+    }
+    .conversation .summary-row:nth-child(1) .summary-check { animation-delay: .95s; }
+    .conversation .summary-row:nth-child(2) .summary-check { animation-delay: 1.08s; }
+    .conversation .summary-row:nth-child(3) .summary-check { animation-delay: 1.21s; }
+    .conversation .smart-note {
+      animation: chatTextIn .5s .9s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .conversation .actions {
+      animation: chatActionsIn .55s 1.15s cubic-bezier(.2,.85,.25,1) both;
+    }
+
+    @keyframes chatAgentIn {
+      0% { opacity: 0; transform: translateX(-16px) translateY(8px); filter: blur(3px); }
+      100% { opacity: 1; transform: none; filter: none; }
+    }
+    @keyframes chatUserIn {
+      0% { opacity: 0; transform: translateX(18px) scale(.96); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes chatExchangeIn {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes chatAvatarIn {
+      0% { opacity: 0; transform: scale(.45) rotate(-12deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes chatBubbleIn {
+      0% { opacity: 0; transform: translateX(-18px) scale(.96); filter: blur(5px); }
+      100% { opacity: 1; transform: none; filter: none; }
+    }
+    @keyframes chatTextIn {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes chatStatusIn {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes chatResponseIn {
+      0% { opacity: 0; transform: translateY(20px) scale(.985); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes optionRise {
+      0% { opacity: 0; transform: translateY(12px) scale(.97); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes chipPop {
+      0% { opacity: 0; transform: translateY(8px) scale(.9); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes chatActionsIn {
+      0% { opacity: 0; transform: translateY(14px); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes summaryCheckPop {
+      0% { opacity: 0; transform: scale(.3); }
+      70% { transform: scale(1.15); }
+      100% { opacity: 1; transform: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .conversation .history .message-row,
+      .conversation .current-exchange,
+      .conversation .current-exchange .message-avatar,
+      .conversation .current-exchange .agent-bubble,
+      .conversation .current-exchange .agent-bubble .step-label,
+      .conversation .current-exchange .agent-bubble h2,
+      .conversation .current-exchange .agent-bubble .description,
+      .conversation .agent-status,
+      .conversation .response-area,
+      .conversation .response-area::before,
+      .conversation .response-area .option,
+      .conversation .domain-section,
+      .conversation .chip,
+      .conversation .summary,
+      .conversation .summary-row,
+      .conversation .summary-check,
+      .conversation .smart-note,
+      .conversation .actions {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+      }
+    }
+
+
+    .welcome-card { min-height: 420px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 24px; }
+    .welcome-card h2 { font-size: clamp(18px, 1.6vw, 26px); max-width: 600px; }
+    .welcome-card .description { font-size: 16px; max-width: 580px; }
+    .hello-row { display: flex; align-items: center; gap: 32px; margin: 0 0 18px; }
+    .hello-row h2 {
+      margin: 0;
+      font-family: Manrope, sans-serif;
+      font-size: clamp(36px, 4.2vw, 42px);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1.1;
+      max-width: none;
+      background: linear-gradient(115deg, var(--navy) 8%, var(--blue) 38%, var(--cyan) 52%, var(--blue) 68%, var(--navy) 92%);
+      background-size: 220% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hello-badge { position: relative; isolation: isolate; flex: 0 0 auto; width: 78px; height: 78px; border-radius: 25px; display: grid; place-items: center; margin: 0; color: var(--blue); background: linear-gradient(145deg, #fff, #EBF5FF); border: 1px solid rgba(153,194,255,.4); box-shadow: 0 18px 42px rgba(0,102,255,.22), inset 0 1px 0 white; font-size: 31px; }
+    .hello-badge::before { content: ""; position: absolute; z-index: -1; inset: -10px; border: 1px solid rgba(0,102,255,.26); border-radius: 31px; animation: badgeOrbit 4.5s linear infinite; }
+    .hello-badge::after { content: ""; position: absolute; z-index: -2; inset: -18px; border-radius: 37px; background: radial-gradient(circle, rgba(55,138,221,.2), transparent 66%); animation: badgePulse 2.4s ease-out infinite; }
+    .hello-badge i { font-size: 31px; line-height: 1; }
+
+    /* Welcome card entrance choreography */
+    .welcome-card .hello-badge {
+      animation:
+        badgeEntrance 1s .12s cubic-bezier(.16,1.45,.3,1) both,
+        badgeFloat 3.2s 1.35s ease-in-out infinite;
+    }
+    .welcome-card .hello-badge i {
+      animation: badgeIconSpin .9s .28s cubic-bezier(.2,1.3,.3,1) both;
+    }
+    .welcome-card .hello-row h2 {
+      animation:
+        welcomeHelloIn .85s .42s cubic-bezier(.2,.85,.2,1) both,
+        welcomeShimmer 2.4s 1.15s ease-in-out both;
+    }
+    .welcome-card .message-row {
+      animation: welcomeRise .7s .72s cubic-bezier(.2,.85,.25,1) both;
+    }
+    .welcome-card .message-avatar {
+      animation: welcomeAvatarIn .55s .78s cubic-bezier(.2,1.25,.3,1) both;
+    }
+    .welcome-card .agent-bubble {
+      animation: welcomeBubble .75s .82s cubic-bezier(.2,1.1,.3,1) both;
+    }
+    .welcome-card .agent-bubble .step-label {
+      animation: welcomeFadeUp .5s .95s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .welcome-card .agent-bubble h2 {
+      animation: welcomeFadeUp .55s 1.05s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .welcome-card .agent-bubble .description {
+      animation: welcomeFadeUp .6s 1.16s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .welcome-card .actions {
+      animation: welcomeRise .65s 1.28s cubic-bezier(.2,.85,.25,1) both;
+    }
+    .welcome-card .actions .btn-primary {
+      animation: welcomeCtaPulse 2.4s 2s ease-in-out infinite;
+    }
+
+    @keyframes badgeEntrance {
+      0% { opacity: 0; transform: translateY(28px) scale(.2) rotate(-28deg); filter: blur(8px); }
+      55% { opacity: 1; transform: translateY(-10px) scale(1.18) rotate(8deg); filter: none; }
+      78% { transform: translateY(3px) scale(.95) rotate(-3deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes badgeIconSpin {
+      0% { opacity: 0; transform: scale(.4) rotate(-90deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes badgeFloat {
+      0%,100% { transform: translateY(0) rotate(0); box-shadow: 0 18px 42px rgba(0,102,255,.22), inset 0 1px 0 white; }
+      50% { transform: translateY(-8px) rotate(3deg); box-shadow: 0 25px 50px rgba(0,102,255,.3), 0 0 24px rgba(55,138,221,.16), inset 0 1px 0 white; }
+    }
+    @keyframes badgeOrbit { to { transform: rotate(360deg); border-radius: 45% 55% 48% 52%; } }
+    @keyframes badgePulse { 0% { opacity: 0; transform: scale(.72); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(1.32); } }
+    @keyframes welcomeHelloIn {
+      0% { opacity: 0; transform: translateX(-20px) scale(.94); filter: blur(10px); letter-spacing: .06em; }
+      100% { opacity: 1; transform: none; filter: none; letter-spacing: -.04em; }
+    }
+    @keyframes welcomeShimmer {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    @keyframes welcomeRise {
+      0% { opacity: 0; transform: translateY(22px); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes welcomeAvatarIn {
+      0% { opacity: 0; transform: scale(.55) translateY(10px); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes welcomeBubble {
+      0% { opacity: 0; transform: translateX(-14px) scale(.97); filter: blur(4px); }
+      100% { opacity: 1; transform: none; filter: none; }
+    }
+    @keyframes welcomeFadeUp {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes welcomeCtaPulse {
+      0%,100% { box-shadow: 0 11px 23px rgba(0,102,255,.23); }
+      50% { box-shadow: 0 14px 32px rgba(0,102,255,.38), 0 0 0 6px rgba(0,102,255,.08); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .welcome-card .hello-badge,
+      .welcome-card .hello-badge i,
+      .welcome-card .hello-row h2,
+      .welcome-card .message-row,
+      .welcome-card .message-avatar,
+      .welcome-card .agent-bubble,
+      .welcome-card .agent-bubble .step-label,
+      .welcome-card .agent-bubble h2,
+      .welcome-card .agent-bubble .description,
+      .welcome-card .actions,
+      .welcome-card .actions .btn-primary {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+      }
+    }
+
+
+    .option-grid { display: grid; gap: 12px; }
+    .locations { grid-template-columns: repeat(3, 1fr); }
+    .domains { grid-template-columns: repeat(2, 1fr); }
+    .option { border: 1px solid var(--line); background: rgba(255,255,255,.8); min-height: 82px; border-radius: 18px; padding: 15px 16px; text-align: left; color: var(--navy); cursor: pointer; display: flex; align-items: center; gap: 13px; transition: transform .2s ease, border .2s, box-shadow .2s, background .2s; }
+    .option:hover { transform: translateY(-3px); border-color: #99C2FF; box-shadow: 0 12px 24px rgba(15,23,42,.08); }
+    .option.selected { background: linear-gradient(135deg, #EBF5FF, #fff); border-color: var(--blue); box-shadow: inset 0 0 0 1px rgba(0,102,255,.1), 0 11px 24px rgba(0,102,255,.1); }
+    .icon { flex: 0 0 auto; width: 38px; height: 38px; border-radius: 12px; background: #f0f6f8; display: grid; place-items: center; color: var(--blue); font-size: 18px; transition: .2s; }
+    .icon i { font-size: 18px; line-height: 1; }
+    .selected .icon { color: white; background: var(--blue); }
+    .option strong { display: block; font-size: 13px; line-height: 1.3; } .option small { display: block; color: #8493a3; margin-top: 3px; font-size: 10px; }
+    .check { margin-left: auto; width: 20px; height: 20px; border: 1px solid #d7e1e7; border-radius: 50%; display: grid; place-items: center; color: transparent; font-size: 12px; }
+    .check i { font-size: 12px; line-height: 1; }
+    .selected .check { color: white; border-color: var(--blue); background: var(--blue); }
+
+    .subdomain-wrap { max-height: 330px; overflow: auto; padding: 2px 8px 2px 2px; scrollbar-width: thin; scrollbar-color: #BFDBFE transparent; }
+    .domain-section { margin: 0 0 20px; }
+    .domain-title { display: flex; align-items: center; gap: 9px; margin: 0 0 10px; color: #6d82a0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .13em; }
+    .domain-title::after { content: ""; height: 1px; flex: 1; background: #edf1f4; }
+    .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+    .chip { border: 1px solid #d8e1e7; border-radius: 99px; background: white; color: var(--navy); padding: 10px 14px; cursor: pointer; transition: .18s ease; font-size: 12px; box-shadow: 0 3px 7px rgba(15,23,42,.05); }
+    .chip:hover { transform: translateY(-2px); border-color: #99C2FF; }
+    .chip.selected { color: #0052CC; background: #EBF5FF; border-color: var(--blue); box-shadow: none; }
+    .chip-check { display: inline-grid; place-items: center; width: 17px; height: 17px; margin-right: 7px; border-radius: 50%; color: white; background: var(--blue); font-size: 10px; vertical-align: middle; }
+    .chip-check i { font-size: 10px; line-height: 1; }
+
+    .summary { position: relative; display: grid; gap: 0; margin-left: 43px; padding: 7px 0 4px 27px; }
+    .summary::before { content: ""; position: absolute; left: 7px; top: 13px; bottom: 14px; width: 2px; border-radius: 9px; background: linear-gradient(var(--cyan), var(--blue), #DBEAFE); }
+    .summary-row { position: relative; padding: 10px 15px 17px; border: 0; border-bottom: 1px solid #e9f0f4; border-radius: 0; background: transparent; }
+    .summary-row:last-child { border-bottom: 0; }
+    .summary-check { position: absolute; left: -29px; top: 10px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; color: white; background: linear-gradient(145deg, var(--blue), var(--cyan)); box-shadow: 0 0 0 5px #EBF5FF; font-size: 10px; }
+    .summary-check i { font-size: 10px; line-height: 1; }
+    @keyframes timelineIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+    .summary-row header { height: auto; margin-bottom: 8px; }
+    .summary-row label { color: #7c8ea1; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+    .summary-row button { border: 0; background: none; color: var(--blue); cursor: pointer; font-size: 11px; font-weight: 700; }
+    .summary-row p { margin: 0; font-size: 13px; line-height: 1.55; }
+    .success-mark { width: 58px; height: 58px; border-radius: 50%; margin-bottom: 18px; display: grid; place-items: center; background: #eaf9f4; color: #21a16e; font-size: 24px; animation: pop .5s cubic-bezier(.2,1.6,.4,1); }
+    @keyframes pop { from { transform: scale(.2); opacity: 0; } }
+
+    .actions { display: flex; align-items: center; justify-content: space-between; margin-top: 28px; }
+    .actions-left:empty { display: none; }
+    .actions-right { display: flex; align-items: center; gap: 10px; }
+    .btn { border: 0; border-radius: 13px; padding: 12px 18px; font-size: 14px; cursor: pointer; transition: .2s ease; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { min-width: 130px; color: white; background: linear-gradient(135deg, var(--blue), #0052CC); box-shadow: 0 11px 23px rgba(0,102,255,.23); }
+    .btn-primary:hover { box-shadow: 0 15px 30px rgba(0,102,255,.3); }
+    .btn-ghost { color: #708397; background: transparent; }
+    .counter { color: #8a9baa; font-size: 11px; }
+    .toast { position: fixed; z-index: 10; left: 50%; bottom: 26px; transform: translate(-50%, 20px); padding: 12px 17px; border-radius: 12px; background: var(--navy); color: white; box-shadow: 0 15px 40px rgba(15,23,42,.25); font-size: 12px; opacity: 0; pointer-events: none; transition: .3s ease; }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+
+    @media (max-width: 1000px) {
+      main { grid-template-columns: 1fr; max-width: 760px; margin-top: 8px; }
+      .story { display: none; } .panel { min-height: 735px; }
+    }
+    @media (max-width: 650px) {
+      .app { padding: 18px 14px 24px; } header { padding: 0 6px; }
+      .panel { border-radius: 22px; min-height: calc(100vh - 98px); }
+      .panel-top { padding: 0 20px; } .progress { padding: 18px 20px 0; }
+      .stage { padding: 24px 20px; max-height: calc(100vh - 145px); } .locations, .domains, .module-grid { grid-template-columns: 1fr; }
+      .option { min-height: 69px; } .secure { display: none; }
+      .actions { align-items: flex-end; } .btn { padding: 11px 14px; } .btn-primary { min-width: 110px; }
+      .context-trail { display: none; } .response-area { margin-left: 0; padding: 13px; } .conversation { min-height: 0; } .summary { margin-left: 15px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"><span class="orb one"></span><span class="orb two"></span></div>
+  <div class="app">
+    <header>
+      <img class="logo" src="assets/bayaan-logo.svg" alt="Bayaan">
+      <div class="secure">Your preferences stay private</div>
+    </header>
+
+    <main>
+      <section class="story" aria-label="Welcome to Bayaan">
+        <p class="eyebrow">Your intelligence, personalised</p>
+        <h1>Welcome to<br><span>Bayaan.</span></h1>
+        <p class="intro">A few thoughtful choices help Bayaan understand your world—so every signal, story and insight arrives with purpose.</p>
+        <div class="signal" aria-hidden="true">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span>
+          <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+          <div class="signal-core"><svg viewBox="0 0 36 36" fill="none"><path d="M7 18h5l3-9 6 18 3-9h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="agent-note"><div class="agent-avatar"><img src="assets/bayaan-chat-logo-2.svg" alt="Bayaan AI" width="34" height="34"></div><div><strong>Meet Bayaan AI, your decision intelligence.</strong><br>An agentic partner built around Abu Dhabi.</div></div>
+      </section>
+
+      <section class="panel" aria-live="polite">
+        <div class="panel-top">
+          <div class="agent-id"><img class="agent-face" src="assets/bayaan-chat-logo-2.svg" alt="Bayaan AI" width="38" height="38"><div><strong>Bayaan AI</strong><small>Decision intelligence agent</small></div></div>
+          <span class="conversation-meta">UAE decision intelligence online</span>
+        </div>
+        <div class="progress" id="progress" aria-label="Setup progress"></div>
+        <div id="stage" class="stage"></div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+
+  <script>
+    const AI_AVATAR = "assets/bayaan-chat-logo-2.svg";
+    const PROD_DOMAIN_CATALOG = {
+      "Economy": ["GDP", "Consumer Price Index", "Inflation", "Foreign Trade & FDI", "Consumer Spending", "E-commerce"],
+      "Industry & Business": ["PMI", "Business Confidence", "Construction", "Energy", "Transport", "Tourism"],
+      "Labour Force": ["Employment", "Unemployment", "Labour Force Dynamics"],
+      "Population & Demographic": ["Population Estimates", "Births & Deaths", "Marriages & Divorces"],
+      "Social": ["Education", "Health", "Culture & Heritage", "Crime & Justice"],
+      "Agriculture & Environment": ["Agriculture", "Environment", "Water Resources", "Fisheries"]
+    };
+
+    const locations = [
+      { name: "Abu Dhabi", note: "Capital region", icon: "ti-map-pin" },
+      { name: "Al Ain", note: "Eastern region", icon: "ti-map-pin" },
+      { name: "Al Dhafra", note: "Western region", icon: "ti-map-pin" }
+    ];
+    const domainIcons = {"Economy":"ti-chart-line","Industry & Business":"ti-building","Labour Force":"ti-briefcase","Population & Demographic":"ti-globe","Social":"ti-users","Agriculture & Environment":"ti-plant"};
+    function bayaanAvatar(size = 31) {
+      return `<div class="message-avatar"><img src="${AI_AVATAR}" alt="Bayaan AI" width="${size}" height="${size}"></div>`;
+    }
+    function iconHtml(name) { return `<i class="ti ${name}"></i>`; }
+    function updateSelectionCounter(text) {
+      const counter = stage.querySelector(".actions .counter");
+      if (counter) counter.textContent = text;
+    }
+    function setOptionSelected(button, selected) {
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    }
+    function setChipSelected(button, selected) {
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+      const check = button.querySelector(".chip-check");
+      if (selected && !check) button.insertAdjacentHTML("afterbegin", `<span class="chip-check">${iconHtml("ti-check")}</span>`);
+      else if (!selected && check) check.remove();
+    }
+    const state = { step: 0, locations: new Set(), domains: new Set(), subdomains: {} };
+    const stage = document.getElementById("stage");
+    const progress = document.getElementById("progress");
+    const totalSteps = 5;
+
+    function renderProgress() {
+      progress.innerHTML = Array.from({length: totalSteps}, (_, i) => `<span class="${i <= state.step ? "active" : ""}"></span>`).join("");
+    }
+    function selectedCount() { return Object.values(state.subdomains).reduce((n, set) => n + set.size, 0); }
+    function toast(message) {
+      const el = document.getElementById("toast"); el.textContent = message; el.classList.add("show");
+      clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
+    }
+    function contextTrail() {
+      const items = [];
+      if (state.locations.size) items.push(`Watching · ${[...state.locations].join(", ")}`);
+      if (state.domains.size) items.push(`Domains · ${[...state.domains].join(", ")}`);
+      if (selectedCount()) items.push(`${selectedCount()} topics tuned`);
+      return `<div class="context-trail">${items.map(x => `<span class="context-pill">${iconHtml("ti-check")} ${x}</span>`).join("")}</div>`;
+    }
+    function completedExchange(question, label, answer) {
+      return `<div class="message-row">${bayaanAvatar()}<div class="agent-bubble"><div class="step-label">Bayaan</div><h2>${question}</h2></div></div><div class="message-row user-row"><div class="user-bubble"><strong>${label}</strong>${answer}</div></div>`;
+    }
+    function historyHTML() {
+      let html = "";
+      if (state.step > 1) html += completedExchange("Where should I keep watch?", "My locations", [...state.locations].join(", ") || "All UAE regions");
+      if (state.step > 2) html += completedExchange("Which domains shape your decisions?", "My decision domains", [...state.domains].join(", ") || "General intelligence");
+      if (state.step > 3) html += completedExchange("Let’s sharpen the signal.", "Track these topics", `${selectedCount()} selected · ${Object.values(state.subdomains).flatMap(x => [...x]).join(", ")}`);
+      return `<div class="history">${html}</div>`;
+    }
+    function agentQuestion(step, title, description) {
+      return `${historyHTML()}<div class="current-exchange"><div class="message-row">${bayaanAvatar()}<div class="agent-bubble"><div class="step-label">Bayaan · ${step}</div><h2>${title}</h2><p class="description">${description}</p></div></div><div class="agent-status"><span><i></i><i></i><i></i></span>Bayaan is ready for your choice</div></div>`;
+    }
+    function actionBar({next="Continue", back=true, skip=false, count="", explore=false}={}) {
+      const nextBtn = explore
+        ? `<button class="btn btn-primary" data-action="explore">${next} ${iconHtml("ti-arrow-right")}</button>`
+        : `<button class="btn btn-primary" data-action="next">${next} ${iconHtml("ti-arrow-right")}</button>`;
+      return `<div class="actions"><div class="actions-left">${back ? `<button class="btn btn-ghost" data-action="back">${iconHtml("ti-arrow-left")} Back</button>` : ''}</div><div class="actions-right">${count ? `<span class="counter">${count}</span>` : ''}${skip ? '<button class="btn btn-ghost" data-action="skip">Skip for now</button>' : ''}${nextBtn}</div></div>`;
+    }
+    function renderWelcome() {
+      stage.innerHTML = `<div class="welcome-card"><div class="hello-row"><div class="hello-badge" aria-hidden="true">${iconHtml("ti-sparkles")}</div><h2>Hello, Mohammed.</h2></div><div class="message-row">${bayaanAvatar()}<div class="agent-bubble"><div class="step-label">Bayaan · UAE decision intelligence</div><h2>I’m ready to learn how you decide.</h2><p class="description">I'll ask few quick questions, then tailor policy intelligence, community signals and decision-support tools around your work as a <strong>Policy Analyst</strong> at the <strong>Department of Community Development</strong>. No forms—just choose the responses that feel right.</p></div></div>${actionBar({next:"Start conversation",back:false,skip:true})}</div>`;
+    }
+    function renderLocations() {
+      stage.innerHTML = `<div class="conversation">${agentQuestion("01 · Location intelligence","Where should I keep watch?","Which parts of the Emirate do you want me watching? Pick as many as you like — I'll only surface what's relevant to these.")}<div class="response-area"><div class="option-grid locations">${locations.map(x => `<button class="option ${state.locations.has(x.name)?"selected":""}" data-location="${x.name}" aria-pressed="${state.locations.has(x.name)}"><span class="icon">${iconHtml(x.icon)}</span><span><strong>${x.name}</strong><small>${x.note}</small></span><span class="check">${iconHtml("ti-check")}</span></button>`).join("")}</div></div>${actionBar({count:`${state.locations.size} selected`})}</div>`;
+    }
+    function renderDomains() {
+      stage.innerHTML = `<div class="conversation">${agentQuestion("02 · Decision domains","Which domains shape your decisions?","Choose the areas you work with most. I’ll prioritise their indicators, dashboards and evidence across Bayaan.")}<div class="response-area"><div class="option-grid domains">${Object.keys(PROD_DOMAIN_CATALOG).map(name => `<button class="option ${state.domains.has(name)?"selected":""}" data-domain="${name}" aria-pressed="${state.domains.has(name)}"><span class="icon">${iconHtml(domainIcons[name])}</span><span><strong>${name}</strong><small>${PROD_DOMAIN_CATALOG[name].length} topics</small></span><span class="check">${iconHtml("ti-check")}</span></button>`).join("")}</div></div>${actionBar({count:`${state.domains.size} selected`})}</div>`;
+    }
+    function renderSubdomains() {
+      const sections = [...state.domains].map(domain => `<section class="domain-section"><h3 class="domain-title">${domain}</h3><div class="chips">${PROD_DOMAIN_CATALOG[domain].map(item => { const selected = state.subdomains[domain]?.has(item); return `<button class="chip ${selected?"selected":""}" data-parent="${domain}" data-subdomain="${item}" aria-pressed="${selected}">${selected ? `<span class="chip-check">${iconHtml("ti-check")}</span>` : ""}${item}</button>`; }).join("")}</div></section>`).join("");
+      stage.innerHTML = `<div class="conversation">${agentQuestion("03 · Signal precision","Let’s sharpen the signal.","Choose the subdomains you want me to track inside your selected areas. This helps me separate useful intelligence from noise.")}<div class="response-area"><div class="subdomain-wrap">${sections}</div></div>${actionBar({count:`${selectedCount()} selected`})}</div>`;
+    }
+    function renderSummary() {
+      const subs = [...state.domains].map(d => `${d}: ${state.subdomains[d]?.size ? [...state.subdomains[d]].join(", ") : "All relevant signals"}`).join(" · ");
+      stage.innerHTML = `<div class="conversation">${agentQuestion("Configuration ready","Your decision profile is ready.","Each preference below becomes an active layer in your Bayaan experience. Review the intelligence timeline, then activate your workspace.")}<div class="summary"><div class="summary-row"><span class="summary-check">${iconHtml("ti-check")}</span><header><label>01 · Geographic lens</label><button data-edit="1">Edit</button></header><p>${[...state.locations].join(", ") || "All locations"}</p></div><div class="summary-row"><span class="summary-check">${iconHtml("ti-check")}</span><header><label>02 · Decision domains</label><button data-edit="2">Edit</button></header><p>${[...state.domains].join(", ") || "General intelligence"}</p></div><div class="summary-row"><span class="summary-check">${iconHtml("ti-check")}</span><header><label>03 · Signal topics</label><button data-edit="3">Edit</button></header><p>${subs || "All relevant signals"}</p></div></div>${actionBar({next:"Explore Bayaan", explore:true})}</div>`;
+    }
+    function renderComplete() {
+      stage.innerHTML = `<div class="conversation">${historyHTML()}<div class="current-exchange"><div class="message-row">${bayaanAvatar()}<div class="agent-bubble"><div class="step-label">Bayaan · Configuration active</div><h2>Your decision intelligence is ready.</h2><p class="description">I’ve configured your UAE intelligence lens. I’ll keep learning from your choices—and explain every recommendation I make.</p></div></div><div class="smart-note"><strong>Decision profile activated:</strong> ${state.locations.size} regions · ${state.domains.size} domains · ${selectedCount()} topics</div><div class="actions"><span class="counter">Preferences saved for this prototype</span><button class="btn btn-primary" data-action="restart">Preview again</button></div></div></div>`;
+    }
+    function render() {
+      stage.classList.remove("stage"); void stage.offsetWidth; stage.classList.add("stage");
+      renderProgress(); [renderWelcome, renderLocations, renderDomains, renderSubdomains, renderSummary, renderComplete][state.step]();
+      requestAnimationFrame(() => { stage.scrollTop = stage.scrollHeight; });
+    }
+    function validate() {
+      if (state.step === 1 && !state.locations.size) { toast("Choose at least one location to continue."); return false; }
+      if (state.step === 2 && !state.domains.size) { toast("Choose at least one domain to continue."); return false; }
+      if (state.step === 3 && !selectedCount()) { toast("Choose at least one topic to continue."); return false; }
+      return true;
+    }
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("button"); if (!button) return;
+      if (button.dataset.location) {
+        const x = button.dataset.location;
+        state.locations.has(x) ? state.locations.delete(x) : state.locations.add(x);
+        setOptionSelected(button, state.locations.has(x));
+        updateSelectionCounter(`${state.locations.size} selected`);
+        return;
+      }
+      if (button.dataset.domain) {
+        const x = button.dataset.domain;
+        if (state.domains.has(x)) { state.domains.delete(x); delete state.subdomains[x]; }
+        else { state.domains.add(x); state.subdomains[x] = new Set(); }
+        setOptionSelected(button, state.domains.has(x));
+        updateSelectionCounter(`${state.domains.size} selected`);
+        return;
+      }
+      if (button.dataset.subdomain) {
+        const d = button.dataset.parent, s = button.dataset.subdomain;
+        state.subdomains[d] ||= new Set();
+        state.subdomains[d].has(s) ? state.subdomains[d].delete(s) : state.subdomains[d].add(s);
+        setChipSelected(button, state.subdomains[d].has(s));
+        updateSelectionCounter(`${selectedCount()} selected`);
+        return;
+      }
+      if (button.dataset.edit) { state.step=Number(button.dataset.edit); render(); }
+      if (button.dataset.action === "next" && validate()) { state.step=Math.min(5,state.step+1); render(); }
+      if (button.dataset.action === "explore") { window.location.href = "index.html"; }
+      if (button.dataset.action === "back") { state.step=Math.max(0,state.step-1); render(); }
+      if (button.dataset.action === "skip") { window.location.href = "index.html"; }
+      if (button.dataset.action === "restart") { state.step=0; state.locations.clear(); state.domains.clear(); state.subdomains={}; render(); }
+    });
+    render();
+  </script>
+</body>
+</html>

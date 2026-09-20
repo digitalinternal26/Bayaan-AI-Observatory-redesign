@@ -1,0 +1,290 @@
+/* Bayaan app footer — LP/FooterLight + LP/FooterDark */
+.bayaan-products-footer {
+  --bpf-bg: #e7e8ea;
+  --bpf-text: #001a33;
+  --bpf-text-secondary: #4a5d75;
+  --bpf-heading: #001a33;
+  --bpf-divider: #c5d9eb;
+  --bpf-partner-filter: none;
+
+  background: var(--bpf-bg);
+  color: var(--bpf-text);
+  font-family: Inter, var(--font, system-ui, -apple-system, sans-serif);
+  flex-shrink: 0;
+  position: static;
+  width: 100%;
+}
+
+[data-theme="dark"] .bayaan-products-footer {
+  --bpf-bg: #001a35;
+  --bpf-text: #ffffff;
+  --bpf-text-secondary: rgba(255, 255, 255, 0.72);
+  --bpf-heading: #ffffff;
+  --bpf-divider: rgba(255, 255, 255, 0.14);
+  --bpf-partner-filter: brightness(0) invert(1);
+}
+
+.bayaan-products-footer__inner {
+  padding: 48px var(--prod-gutter, var(--obs-gutter, 35px)) 0;
+}
+
+.bayaan-products-footer__grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px 40px;
+  align-items: start;
+}
+
+.bayaan-products-footer__brand-logo {
+  display: block;
+  height: 56px;
+  width: auto;
+  margin-bottom: 18px;
+}
+
+.bayaan-products-footer__brand-logo--dark {
+  display: none;
+}
+
+[data-theme="dark"] .bayaan-products-footer__brand-logo--light {
+  display: none;
+}
+
+[data-theme="dark"] .bayaan-products-footer__brand-logo--dark {
+  display: block;
+}
+
+.bayaan-products-footer__store-label {
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--bpf-text-secondary);
+}
+
+.bayaan-products-footer__store-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bayaan-products-footer__store-btn {
+  display: inline-flex;
+  line-height: 0;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.bayaan-products-footer__store-btn:hover {
+  opacity: 0.88;
+}
+
+.bayaan-products-footer__store-btn img {
+  display: block;
+  height: 48px;
+  width: auto;
+}
+
+.bayaan-products-footer__col-title {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--bpf-heading);
+}
+
+.bayaan-products-footer__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bayaan-products-footer__links a {
+  color: var(--bpf-text);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.bayaan-products-footer__links a:hover {
+  opacity: 0.78;
+}
+
+.bayaan-products-footer__location {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  color: var(--bpf-text);
+}
+
+.bayaan-products-footer__location > p {
+  margin: 0 0 12px;
+}
+
+.bayaan-products-footer__location-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.bayaan-products-footer__location-item:last-child {
+  margin-bottom: 0;
+}
+
+.bayaan-products-footer__location-icon {
+  flex-shrink: 0;
+  width: 17px;
+  height: 10px;
+  margin-top: 6px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+[data-theme="dark"] .bayaan-products-footer__location-icon {
+  filter: brightness(0) invert(1);
+}
+
+.bayaan-products-footer__location a {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.bayaan-products-footer__location a:hover {
+  opacity: 0.78;
+}
+
+.bayaan-products-footer__partners {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  align-self: center;
+  gap: 0;
+  min-height: 100%;
+}
+
+.bayaan-products-footer__partner-divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 56px;
+  margin: 0 24px;
+  background: var(--bpf-divider);
+}
+
+.bayaan-products-footer__partner-logo {
+  display: block;
+  width: auto;
+  object-fit: contain;
+  filter: var(--bpf-partner-filter);
+}
+
+.bayaan-products-footer__partner-logo--emirates {
+  height: 68px;
+  max-width: 203px;
+}
+
+.bayaan-products-footer__partner-logo--scad {
+  height: 65px;
+  max-width: 150px;
+}
+
+.bayaan-products-footer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+  padding: 16px 0 20px;
+  border-top: 1px solid var(--bpf-divider);
+}
+
+.bayaan-products-footer__copy {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--bpf-text-secondary);
+}
+
+.bayaan-products-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bayaan-products-footer__legal a {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--bpf-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.bayaan-products-footer__legal a:hover {
+  opacity: 0.78;
+}
+
+@media (max-width: 1180px) {
+  .bayaan-products-footer__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px 32px;
+  }
+
+  .bayaan-products-footer__brand {
+    grid-column: 1 / -1;
+  }
+
+  .bayaan-products-footer__partners {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    align-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .bayaan-products-footer__inner {
+    padding-top: 36px;
+  }
+
+  .bayaan-products-footer__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 20px;
+  }
+
+  .bayaan-products-footer__bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .bayaan-products-footer__legal {
+    justify-content: flex-start;
+    gap: 16px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bayaan-products-footer__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bayaan-products-footer__partners {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+}

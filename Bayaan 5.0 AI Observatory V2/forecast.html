@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consumer Price Index — Forecast · Bayaan</title>
+    <link rel="icon" type="image/png" href="assets/bayaan-logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <!-- Shared design system (same order as CPI.html / the main application) -->
+    <link rel="stylesheet" href="css/pages/ai.css" />
+    <link rel="stylesheet" href="css/pages/cpi-obs.css" />
+    <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
+    <link rel="stylesheet" href="css/pages/exec-home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
+    <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("bayaan-theme") || "light";
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "dark" ? "dark" : "light"
+        );
+      })();
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/header.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+      /* ====================================================================
+         FORECAST VIEW — layout-only additions on top of the CPI Observatory
+         design system. Every surface, colour, radius and type ramp below is
+         taken from an existing component:
+           • panels  → the home-page section module (see CPI.html .dg-panel)
+           • cards   → the home "subcard" recipe (.obs-card + --figma-subcard-*)
+           • labels  → .kpi-label / .dg-eyebrow
+           • pills   → .kpi-badge / .dg-month
+           • banner  → .cpi-notice
+           • search  → .dg-search (Diagnose view)
+         No new colour language is introduced; tone lives on values only.
+         ==================================================================== */
+
+      /* Subcard tokens — redeclared here because the originals are scoped to
+         .screen-home (same as CPI.html). */
+      #screen-cpi-obs {
+        --figma-subcard-bg: rgba(255, 255, 255, 0.6);
+        --figma-subcard-shadow: 0 24px 30px 0 rgba(42, 61, 76, 0.03);
+      }
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card {
+        background: var(--figma-subcard-bg);
+        border: 1px solid #eaecf0;
+        box-shadow: var(--figma-subcard-shadow);
+      }
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card:hover {
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-md);
+      }
+      /* Pre-existing: the light border shorthand in cpi-obs.css outranks the
+         dark `border-color` in theme.css, leaving pale edges on dark cards. */
+      html[data-theme="dark"] #screen-cpi-obs .obs-card {
+        border-color: var(--border);
+      }
+
+      /* No rule under the page title/subtitle — zero width rather than a colour
+         override, so the dark-theme border-bottom-color can't bring it back. */
+      #screen-cpi-obs .cpi-page-header-inner {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      /* Breadcrumb sits outside .page-wrap, so it clears neither the 120px rail
+         nor the page gutter. Realign it with the content column. */
+      #screen-cpi-obs .crisis-scroll > .container {
+        --obs-rail-w: 120px;
+        padding-inline: calc(var(--obs-rail-w) + var(--page-gutter))
+          var(--page-gutter);
+      }
+
+      /* Sidebar on brand primary (--accent / #0066FF), mirroring #screen-topic
+         in css/pages/obs-sidebar.css. Dark theme already resolves to --accent. */
+      html:not([data-theme="dark"]) #screen-cpi-obs .sidebar-icon {
+        background: #ebf3ff;
+        color: var(--accent);
+      }
+      html:not([data-theme="dark"])
+        #screen-cpi-obs
+        .sidebar-item:hover:not(.active):not(.sidebar-item--ai)
+        .sidebar-icon {
+        background: #dbe9ff;
+      }
+      html:not([data-theme="dark"])
+        #screen-cpi-obs
+        .sidebar-item.active:not(.sidebar-item--ai)
+        .sidebar-icon {
+        background: var(--accent);
+        color: #fff;
+      }
+      /* AI entry point on the app's AI gradient — same fill as .ai-mode-btn. */
+      html #screen-cpi-obs .sidebar .sidebar-item--ai .sidebar-icon {
+        background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+        color: #fff;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        transition: transform 0.15s, box-shadow 0.2s;
+      }
+      html #screen-cpi-obs .sidebar .sidebar-item--ai:hover .sidebar-icon {
+        background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+        transform: scale(1.04);
+      }
+      /* Compact floating sidebar — fits all items below the top nav. */
+      #screen-cpi-obs .sidebar {
+        top: calc(50% + 34px);
+        padding: 14px 10px;
+        gap: 9px;
+      }
+      #screen-cpi-obs .sidebar-item {
+        padding: 4px 0;
+        gap: 5px;
+        font-size: 10.5px;
+      }
+      /* Sidebar items that navigate are anchors — strip the link underline so
+         they render identically to the button items. */
+      #screen-cpi-obs a.sidebar-item {
+        text-decoration: none;
+      }
+      #screen-cpi-obs .sidebar-icon {
+        width: 38px;
+        height: 38px;
+      }
+      #screen-cpi-obs .sidebar-icon i {
+        font-size: 17px;
+      }
+
+      /* === Standard expanding icon rail (shared across observatory views) ===
+         Icons only by default; hovering the pill reveals every label at once,
+         to the right of its icon. Price AI sits on top, split from the view
+         switcher by a divider that grows with the rail. */
+      #screen-cpi-obs .sidebar {
+        max-width: none;
+        border-radius: 999px;
+        align-items: stretch;
+        padding: 8px 10px;
+        transition: none;
+      }
+      #screen-cpi-obs .sidebar:hover {
+        border-radius: 28px;
+      }
+      #screen-cpi-obs .sidebar-item {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        padding: 4px 4px;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-item {
+        justify-content: flex-start;
+        gap: 10px;
+      }
+      #screen-cpi-obs .sidebar-label {
+        max-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        opacity: 0;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text2);
+        transition: max-width 0.22s ease, opacity 0.18s ease;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-label {
+        max-width: 120px;
+        opacity: 1;
+      }
+      #screen-cpi-obs .sidebar-item.active:not(.sidebar-item--ai) .sidebar-label {
+        color: #272829;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .sidebar-label {
+        color: #cdd6e0;
+      }
+      #screen-cpi-obs .sidebar-item--ai .sidebar-label {
+        color: #0066ff;
+      }
+      #screen-cpi-obs .sidebar-divider {
+        width: 16px;
+        height: 2px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        margin: 1px 0 1px 15px;
+        align-self: flex-start;
+        transition: width 0.22s ease, margin-left 0.22s ease;
+      }
+      #screen-cpi-obs .sidebar:hover .sidebar-divider {
+        width: calc(100% - 12px);
+        margin-left: 6px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .sidebar-divider {
+        background: #3a4453;
+      }
+
+      /* ── Content stack ── */
+      #screen-cpi-obs #cpi-forecast-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      /* ── Header toolbar (search only, on the title row) and the filter row
+         (Measure · Period) below the heading ──
+         The two filters use the application's standard filter control
+         (.prod-filter-bar / .prod-filter-field / .prod-filter-dd from the
+         Products screen). Its rules in style.css are scoped to
+         #screen-products, so the spec is mirrored here verbatim under this
+         screen — same approach CPI.html takes for the home-page subcard
+         tokens. Values are copied, not re-invented; keep in sync with
+         `#screen-products .prod-filter-*` in style.css. */
+      #screen-cpi-obs .fx-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+      }
+      /* Filters sit below the heading, left-aligned above the KPI strip. */
+      #screen-cpi-obs .fx-filter-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      #screen-cpi-obs .prod-filter-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+      #screen-cpi-obs .prod-filter-field-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        letter-spacing: 0.02em;
+      }
+      #screen-cpi-obs .prod-filter-dd {
+        position: relative;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 168px;
+        max-width: 220px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        color: #0f2744;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger span {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger i {
+        font-size: 15px;
+        color: #9ca3af;
+        flex-shrink: 0;
+        transition: transform 0.15s;
+      }
+      /* Leading icon (calendar / chart) on the brand accent, like the sibling
+         pages' header pills. Only the trailing chevron rotates when open. */
+      #screen-cpi-obs .prod-filter-dd-trigger .fx-dd-lead {
+        font-size: 16px;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger.is-open .ti-chevron-down {
+        transform: rotate(180deg);
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger:hover:not(:disabled),
+      #screen-cpi-obs .prod-filter-dd-trigger.is-open {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .prod-filter-dd-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        z-index: 9000;
+        min-width: 100%;
+        width: max-content;
+        max-width: min(320px, calc(100vw - 32px));
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 12px 40px rgba(11, 28, 61, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+        padding: 6px;
+        animation: govEntityDropIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      #screen-cpi-obs .prod-filter-dd-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 9px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 500;
+        color: #0f2744;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.12s, color 0.12s;
+      }
+      #screen-cpi-obs .prod-filter-dd-option .ti-check {
+        margin-left: auto;
+        color: var(--accent);
+        font-size: 15px;
+        opacity: 0;
+      }
+      #screen-cpi-obs .prod-filter-dd-option.is-active .ti-check {
+        opacity: 1;
+      }
+      #screen-cpi-obs .prod-filter-dd-option:hover {
+        background: #f8fbff;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .prod-filter-dd-option.is-active {
+        background: #eff6ff;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      /* Dark theme — mirrors [data-theme="dark"] #screen-products
+         .prod-filter-* in css/theme.css. */
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger {
+        background: var(--surface);
+        border-color: var(--border-md);
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger:hover:not(:disabled),
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger.is-open {
+        border-color: var(--accent);
+        color: var(--accent-mid);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-field-label {
+        color: var(--text-tertiary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-menu {
+        background: var(--surface);
+        border-color: var(--border-md);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option {
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option:hover,
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option.is-active {
+        background: var(--accent-light);
+        color: var(--accent-mid);
+      }
+
+      /* Search — the Diagnose view's .dg-search, sized to the control row. */
+      #screen-cpi-obs .fx-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 240px;
+        height: 40px;
+        padding: 0 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border, #eaecf0);
+        background: var(--white, #fff);
+        color: var(--text2);
+        font-size: 13px;
+      }
+      #screen-cpi-obs .fx-search > i {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .fx-search input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        outline: none;
+        background: none;
+        font-family: inherit;
+        font-size: 13px;
+        color: var(--text);
+      }
+      #screen-cpi-obs .fx-search input::placeholder {
+        color: var(--muted);
+      }
+      #screen-cpi-obs .fx-search:focus-within {
+        border-color: var(--accent);
+      }
+      #screen-cpi-obs .fx-kbd {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--accent-light);
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+
+      /* ── KPI strip — four subcards: icon chip · label + value · period pill ── */
+      #screen-cpi-obs .fx-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+      #screen-cpi-obs .fx-kpi {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        border-radius: 16px;
+        padding: 14px 16px;
+        min-width: 0;
+        transition: box-shadow 0.22s ease, border-color 0.22s ease,
+          transform 0.22s ease, background 0.22s ease;
+      }
+      #screen-cpi-obs .fx-kpi:hover {
+        transform: translateY(-1px);
+      }
+      #screen-cpi-obs .fx-kpi-ic {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        color: var(--tone, var(--accent));
+        background: color-mix(in srgb, var(--tone, #0066ff) 9%, white);
+      }
+      #screen-cpi-obs .fx-kpi-ic i {
+        font-size: 17px;
+        line-height: 1;
+      }
+      #screen-cpi-obs .fx-kpi--up {
+        --tone: #e5484d;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .fx-kpi-ic {
+        background: color-mix(in srgb, var(--tone, #0066ff) 18%, transparent);
+      }
+      #screen-cpi-obs .fx-kpi-body {
+        min-width: 0;
+        flex: 1;
+      }
+      #screen-cpi-obs .fx-kpi-val {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        margin-top: 8px; /* title → number */
+      }
+      #screen-cpi-obs .fx-kpi-val.up {
+        color: var(--up);
+      }
+      #screen-cpi-obs .fx-kpi-val.down {
+        color: var(--down);
+      }
+      /* Reference period sits under the figure as supporting text, using the
+         page's own .cpiby-col-sub (css/pages/cpi-obs.css) — the same treatment
+         the "CPI by" card uses for "Top High +0.27%". */
+      #screen-cpi-obs .fx-kpi .cpiby-col-sub {
+        margin-top: 3px;
+      }
+
+      /* ── Main row: chart + side insight panels ── */
+      #screen-cpi-obs .fx-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 16px;
+        align-items: start;
+      }
+      /* Expanded: the chart takes the full content width. */
+      #screen-cpi-obs .fx-main.is-expanded {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      #screen-cpi-obs .fx-main.is-expanded .fx-side {
+        display: none;
+      }
+
+      /* Panel shell — the home-page section module (identical recipe to
+         .dg-panel in the Diagnose view), at the card radius used for
+         content panels rather than full-width sections. */
+      #screen-cpi-obs .fx-panel {
+        background: linear-gradient(-76deg, #f3fbff 1.2%, rgba(255, 255, 255, 0) 40%),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
+        border-radius: 24px;
+        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.03);
+        padding: 20px 22px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .fx-panel {
+        background: var(--surface, #141a26);
+        border: 1px solid var(--border);
+      }
+
+      #screen-cpi-obs .fx-chart-card {
+        position: relative;
+        min-width: 0;
+      }
+      /* Expand control — secondary button standard (.home-widget-sidebar-create
+         in css/pages/home-widgets.css): white fill, #CED4DA border, 10px
+         radius, ink icon, blue-tinted hover. Icon-only, so the 9px/14px
+         padding becomes a square box at the same radius. */
+      #screen-cpi-obs .fx-expand {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: var(--font);
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .fx-expand i {
+        font-size: 15px;
+        line-height: 1;
+      }
+      #screen-cpi-obs .fx-expand:hover {
+        background: var(--accent-light);
+        border-color: var(--accent);
+        color: var(--accent-dark);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .fx-expand {
+        background: var(--surface2, #1a2740);
+        border-color: var(--border-md);
+        color: var(--accent-mid);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .fx-expand:hover {
+        background: var(--surface);
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .fx-chart-canvas {
+        position: relative;
+        height: 320px;
+      }
+      #screen-cpi-obs .fx-main.is-expanded .fx-chart-canvas {
+        height: 420px;
+      }
+      /* Legend — dot + label, centred under the plot (matches the mock). */
+      #screen-cpi-obs .fx-legend {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 22px;
+        margin-top: 14px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+      }
+      #screen-cpi-obs .fx-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      #screen-cpi-obs .fx-legend-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      /* ── Side insight panels — the app's AI-insight header treatment
+         (.dg-aisummary-hd) over .brief-point-style copy rows. ── */
+      #screen-cpi-obs .fx-side {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+      }
+      /* Interpretation & Key Impacts are AI-generated, so each takes the app's
+         AI-insight card treatment (blue→violet gradient tint + blue border),
+         same as the Diagnose view's .dg-aisummary. The chart card stays neutral. */
+      #screen-cpi-obs .fx-side .fx-panel {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.06), rgba(124, 58, 237, 0.04));
+        border: 1px solid rgba(0, 102, 255, 0.12);
+        border-radius: 16px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .fx-side .fx-panel {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.12), rgba(124, 58, 237, 0.10));
+        border-color: rgba(0, 102, 255, 0.25);
+      }
+      #screen-cpi-obs .fx-side-hd {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      #screen-cpi-obs .fx-side-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .fx-side-title i {
+        font-size: 15px;
+      }
+      /* Ask-AI affordance — the app's module-header sparkle
+         (.home-module-sparkle in style.css): plain glowing sparkle, no box.
+         --figma-navy-400 is scoped to .screen-home there, so it is redeclared
+         here, dark value included. */
+      #screen-cpi-obs {
+        --figma-navy-400: #0073f0;
+      }
+      html[data-theme="dark"] #screen-cpi-obs {
+        --figma-navy-400: #5c9cff;
+      }
+      #screen-cpi-obs .fx-ask {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        color: var(--figma-navy-400);
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+      }
+      #screen-cpi-obs .fx-ask i {
+        font-size: 20px;
+        animation: sparkleGlow 2.4s ease-in-out infinite;
+      }
+      #screen-cpi-obs .fx-ask:hover {
+        opacity: 0.8;
+      }
+      #screen-cpi-obs .fx-point {
+        font-size: 12.5px;
+        line-height: 1.65;
+        color: #536277;
+      }
+      #screen-cpi-obs .fx-point p {
+        margin: 0;
+      }
+      #screen-cpi-obs .fx-point + .fx-point {
+        margin-top: 12px;
+      }
+      #screen-cpi-obs .fx-point b {
+        color: #172033;
+        font-weight: 700;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .fx-point {
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .fx-point b {
+        color: var(--text-primary);
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 1200px) {
+        #screen-cpi-obs .fx-main {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        #screen-cpi-obs .fx-kpis {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 700px) {
+        #screen-cpi-obs .fx-kpis {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        #screen-cpi-obs .fx-search {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==================== SCREEN: CPI OBSERVATORY — FORECAST (standalone) ==================== -->
+    <div id="screen-cpi-obs" class="screen ws-screen active">
+      <div data-bayaan-header></div>
+      <div class="crisis-scroll">
+        <div class="container">
+          <nav class="ind-page-breadcrumb" aria-label="Breadcrumb">
+            <a href="#" onclick="goTo('screen-home'); return false;">Home</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="#" onclick="openObservatories(event); return false;">Observatory</a>
+            <span class="ind-bc-sep">›</span>
+            <a href="CPI.html">Consumer Price Index</a>
+            <span class="ind-bc-sep">›</span>
+            <span class="ind-bc-current">Forecast</span>
+          </nav>
+        </div>
+        <div class="page-wrap">
+          <div class="sidebar-rail">
+            <aside class="sidebar" aria-label="CPI views">
+              <button
+                type="button"
+                class="sidebar-item sidebar-item--ai"
+                onclick="openObsSidebarAI(this, 'bayaan-ai', 'Price AI', 'ti-sparkles')"
+              >
+                <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
+                <span class="sidebar-label">Price AI</span>
+              </button>
+              <span class="sidebar-divider" aria-hidden="true"></span>
+              <!-- Interpret and Diagnose are panes on CPI.html — real links,
+                   so they work without JS and support open-in-new-tab. -->
+              <a class="sidebar-item" href="CPI.html">
+                <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
+                <span class="sidebar-label">Interpret</span>
+              </a>
+              <a class="sidebar-item" href="CPI.html#diagnose">
+                <div class="sidebar-icon"><i class="ti ti-search"></i></div>
+                <span class="sidebar-label">Diagnose</span>
+              </a>
+              <button type="button" class="sidebar-item active" onclick="activateSidebar(this)">
+                <div class="sidebar-icon"><i class="ti ti-chart-line"></i></div>
+                <span class="sidebar-label">Forecast</span>
+              </button>
+              <a class="sidebar-item" href="benchmark.html">
+                <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
+                <span class="sidebar-label">Benchmark</span>
+              </a>
+              <a class="sidebar-item" href="observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
+              <a class="sidebar-item" href="trade.html">
+                <div class="sidebar-icon"><i class="ti ti-arrows-exchange"></i></div>
+                <span class="sidebar-label">Trade</span>
+              </a>
+            </aside>
+          </div>
+          <div class="obs-ai-split">
+            <main class="main">
+              <div class="cpi-page-header">
+                <div class="cpi-page-header-inner">
+                  <div>
+                    <h1 class="topic-title">Forecast</h1>
+                    <p class="topic-title-sub">Abu Dhabi · Q2 2026 projection</p>
+                  </div>
+                  <!-- ── Filters — search + Period/Measure, on the title row and
+                       aligned right (mirrors the Interpret/Diagnose header
+                       actions). Search leads the group. ── -->
+                  <div class="fx-toolbar">
+                    <div class="fx-search">
+                      <i class="ti ti-search"></i>
+                      <input type="search" placeholder="Search…" aria-label="Search forecasts" />
+                      <span class="fx-kbd">Ctrl+K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="cpi-forecast-content" class="cpi-obs-content">
+
+                <!-- ── Filter row below the heading: Measure · Period.
+                     Search stays on the title row above. ── -->
+                <div class="fx-filter-row">
+                  <div class="prod-filter-field">
+                    <div class="prod-filter-dd" id="fxMeasureDd">
+                      <button
+                        type="button"
+                        class="prod-filter-dd-trigger"
+                        id="fxMeasureTrigger"
+                        aria-expanded="false"
+                        aria-controls="fxMeasureMenu"
+                        aria-label="Measure"
+                        onclick="toggleFxFilterDropdown('measure')"
+                      >
+                        <i class="ti ti-chart-line fx-dd-lead" aria-hidden="true"></i>
+                        <span id="fxMeasureLabel">Overall CPI</span>
+                        <i class="ti ti-chevron-down" aria-hidden="true"></i>
+                      </button>
+                      <div
+                        class="prod-filter-dd-menu"
+                        id="fxMeasureMenu"
+                        role="listbox"
+                        aria-label="Measure"
+                        hidden
+                      >
+                        <button type="button" class="prod-filter-dd-option is-active" role="option">
+                          Overall CPI <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="prod-filter-dd-option" role="option">
+                          Essentials CPI <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="prod-filter-dd-option" role="option">
+                          CPI by Income <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="prod-filter-dd-option" role="option">
+                          CPI by Household <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="prod-filter-field">
+                    <div class="prod-filter-dd" id="fxPeriodDd">
+                      <button
+                        type="button"
+                        class="prod-filter-dd-trigger"
+                        id="fxPeriodTrigger"
+                        aria-expanded="false"
+                        aria-controls="fxPeriodMenu"
+                        aria-label="Period"
+                        onclick="toggleFxFilterDropdown('period')"
+                      >
+                        <i class="ti ti-calendar-event fx-dd-lead" aria-hidden="true"></i>
+                        <span id="fxPeriodLabel">Q2 - 2026</span>
+                        <i class="ti ti-chevron-down" aria-hidden="true"></i>
+                      </button>
+                      <div
+                        class="prod-filter-dd-menu"
+                        id="fxPeriodMenu"
+                        role="listbox"
+                        aria-label="Period"
+                        hidden
+                      >
+                        <button type="button" class="prod-filter-dd-option is-active" role="option">
+                          Q2 - 2026 <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="prod-filter-dd-option" role="option">
+                          Q1 - 2026 <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="prod-filter-dd-option" role="option">
+                          Q4 - 2025 <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="prod-filter-dd-option" role="option">
+                          Q3 - 2025 <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── KPI strip ── -->
+                <div class="fx-kpis">
+                  <div class="obs-card fx-kpi">
+                    <div class="fx-kpi-ic"><i class="ti ti-shopping-cart"></i></div>
+                    <div class="fx-kpi-body">
+                      <div class="kpi-label">Latest</div>
+                      <div class="fx-kpi-val">108.31</div>
+                      <div class="cpiby-col-sub">Q1 2026</div>
+                    </div>
+                  </div>
+
+                  <div class="obs-card fx-kpi fx-kpi--up">
+                    <div class="fx-kpi-ic"><i class="ti ti-arrows-exchange"></i></div>
+                    <div class="fx-kpi-body">
+                      <div class="kpi-label">QoQ Change</div>
+                      <div class="fx-kpi-val up">+0.86%</div>
+                      <div class="cpiby-col-sub">vs Q4 2025</div>
+                    </div>
+                  </div>
+
+                  <div class="obs-card fx-kpi fx-kpi--up">
+                    <div class="fx-kpi-ic"><i class="ti ti-calendar-stats"></i></div>
+                    <div class="fx-kpi-body">
+                      <div class="kpi-label">YoY Change</div>
+                      <div class="fx-kpi-val up">+2.14%</div>
+                      <div class="cpiby-col-sub">vs Q1 2025</div>
+                    </div>
+                  </div>
+
+                  <div class="obs-card fx-kpi">
+                    <div class="fx-kpi-ic"><i class="ti ti-chart-bar"></i></div>
+                    <div class="fx-kpi-body">
+                      <div class="kpi-label">Average</div>
+                      <div class="fx-kpi-val">106.99</div>
+                      <div class="cpiby-col-sub">Q2 2025 – Q1 2026</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── Chart + side insight panels ── -->
+                <div class="fx-main" id="fx-main">
+                  <div class="fx-panel fx-chart-card">
+                    <button
+                      type="button"
+                      class="fx-expand"
+                      id="fx-expand"
+                      aria-label="Expand chart"
+                      aria-pressed="false"
+                      onclick="toggleForecastExpand(this)"
+                    >
+                      <i class="ti ti-arrows-diagonal-minimize-2"></i>
+                    </button>
+                    <div class="fx-chart-canvas">
+                      <canvas id="fx-chart"></canvas>
+                    </div>
+                    <div class="fx-legend">
+                      <span class="fx-legend-item">
+                        <span class="fx-legend-dot" data-legend="actual"></span> Actual
+                      </span>
+                      <span class="fx-legend-item">
+                        <span class="fx-legend-dot" data-legend="forecast"></span> Forecast
+                      </span>
+                    </div>
+                  </div>
+
+                  <aside class="fx-side">
+                    <section class="fx-panel">
+                      <div class="fx-side-hd">
+                        <div class="fx-side-title">
+                          <i class="ti ti-book"></i> Interpretation
+                        </div>
+                        <button
+                          type="button"
+                          class="fx-ask"
+                          title="Ask Price AI"
+                          aria-label="Ask Price AI about this interpretation"
+                        >
+                          <i class="ti ti-sparkles" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                      <div class="fx-point">
+                        <p>
+                          Overall CPI is forecast to rise from <b>108.31</b> to
+                          <b>112.49</b> (<b>+3.86%</b> QoQ) in Q2 2026, driven by
+                          anticipated housing and rent increases linked to continued
+                          population growth and constrained new housing supply.
+                        </p>
+                      </div>
+                    </section>
+
+                    <section class="fx-panel">
+                      <div class="fx-side-hd">
+                        <div class="fx-side-title">
+                          <i class="ti ti-target"></i> Key Impacts
+                        </div>
+                        <button
+                          type="button"
+                          class="fx-ask"
+                          title="Ask Price AI"
+                          aria-label="Ask Price AI about these impacts"
+                        >
+                          <i class="ti ti-sparkles" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                      <div class="fx-point">
+                        <p>
+                          Overall CPI projected to rise sharply (<b>+3.86%</b> QoQ),
+                          with Emirati households most affected (<b>+1.21%</b>),
+                          likely reflecting higher local service costs and renewed
+                          housing demand pressures.
+                        </p>
+                      </div>
+                    </section>
+                  </aside>
+                </div>
+
+                <!-- ── Model disclosure banner ── -->
+                <div class="cpi-notice" style="margin: 0">
+                  <i class="ti ti-alert-circle"></i>
+                  <div class="cpi-notice-text">
+                    Model-based forecasts — not official statistics. Expand for details.
+                  </div>
+                  <button
+                    type="button"
+                    class="cpi-notice-dismiss"
+                    aria-label="Expand forecast methodology details"
+                  >
+                    <i class="ti ti-chevron-down"></i>
+                  </button>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ============================================================
+         Standalone stubs — this page is isolated and does NOT link
+         back into the main application. The shared top navigation and
+         breadcrumb are kept for visual parity; their cross-screen
+         actions are no-ops here (same contract as CPI.html).
+         ============================================================ */
+      function goTo() {}
+      function openGeoView(e) { if (e) e.preventDefault(); }
+      function openBayaanSpace(e) { if (e) e.preventDefault(); }
+      function openProducts(e) { if (e) e.preventDefault(); }
+      function openObservatories(e) { if (e) e.preventDefault(); }
+      function openWsDrp() {}
+      function onHeaderSearchClick() {}
+      function openObsSidebarAI(el) { activateSidebar(el); }
+      function toast() {}
+
+      function activateSidebar(el) {
+        const sidebar = el.closest(".sidebar");
+        (sidebar || document)
+          .querySelectorAll(".sidebar-item")
+          .forEach((s) => s.classList.remove("active"));
+        el.classList.add("active");
+        /* Interpret and Diagnose are links to CPI.html and never reach this
+           handler; the remaining views have no content yet, so selecting one
+           only moves the highlight. */
+      }
+
+      /* ============================================================
+         FILTERS — the standard filter dropdown behaviour, mirroring
+         toggleProdFilterDropdown() on the Products screen: one menu open
+         at a time, aria-expanded + .is-open on the trigger (which rotates
+         the chevron), and a check mark on the active option.
+         ============================================================ */
+      const FX_DROPDOWNS = {
+        period: ["fxPeriodMenu", "fxPeriodTrigger", "fxPeriodLabel"],
+        measure: ["fxMeasureMenu", "fxMeasureTrigger", "fxMeasureLabel"],
+      };
+
+      function toggleFxFilterDropdown(which, force) {
+        const [menuId, triggerId] = FX_DROPDOWNS[which] || [];
+        const menu = document.getElementById(menuId);
+        const trigger = document.getElementById(triggerId);
+        if (!menu || !trigger) return;
+        const open =
+          typeof force === "boolean" ? force : menu.hasAttribute("hidden");
+        if (open) {
+          Object.keys(FX_DROPDOWNS).forEach((key) => {
+            if (key !== which) toggleFxFilterDropdown(key, false);
+          });
+        }
+        menu.hidden = !open;
+        trigger.setAttribute("aria-expanded", open ? "true" : "false");
+        trigger.classList.toggle("is-open", open);
+      }
+
+      function initFxFilters() {
+        Object.entries(FX_DROPDOWNS).forEach(([which, [menuId, , labelId]]) => {
+          const menu = document.getElementById(menuId);
+          const label = document.getElementById(labelId);
+          if (!menu || !label) return;
+          menu.querySelectorAll(".prod-filter-dd-option").forEach((opt) => {
+            opt.addEventListener("click", () => {
+              menu
+                .querySelectorAll(".prod-filter-dd-option")
+                .forEach((o) => o.classList.remove("is-active"));
+              opt.classList.add("is-active");
+              /* Only the label moves — this page carries a single published
+                 series, so no other option re-hydrates the view. */
+              label.textContent = opt.textContent.trim();
+              toggleFxFilterDropdown(which, false);
+            });
+          });
+        });
+
+        /* Click-away and Escape close, as on the Products filter bar. */
+        document.addEventListener("click", (e) => {
+          if (e.target.closest(".prod-filter-dd")) return;
+          Object.keys(FX_DROPDOWNS).forEach((k) => toggleFxFilterDropdown(k, false));
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape")
+            Object.keys(FX_DROPDOWNS).forEach((k) => toggleFxFilterDropdown(k, false));
+        });
+      }
+
+      /* ============================================================
+         FORECAST CHART
+         Quarterly Overall CPI, Q2 2023 – Q2 2026. The last observed
+         quarter (Q1 2026) is repeated at the head of the forecast
+         series so the dashed projection joins the actual line.
+         ============================================================ */
+      const FX_LABELS = [
+        "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024", "Q2 2024", "Q3 2024",
+        "Q4 2024", "Q1 2025", "Q2 2025", "Q3 2025", "Q4 2025", "Q1 2026",
+        "Q2 2026",
+      ];
+      /* Actuals — Q1 2026 = 108.31 (Latest KPI); Q4 2025 = 107.39 (+0.86% QoQ);
+         Q1 2025 = 106.04 (+2.14% YoY); Q2 2025–Q1 2026 mean = 106.99. */
+      const FX_ACTUAL = [
+        104.62, 106.18, 106.29, 105.72, 106.21, 106.47, 105.94, 106.04,
+        105.9, 106.36, 107.39, 108.31, null,
+      ];
+      /* Forecast — 108.31 → 112.49 (+3.86% QoQ), 90% interval ±~4%. */
+      const FX_FORECAST = [
+        null, null, null, null, null, null, null, null, null, null, null,
+        108.31, 112.49,
+      ];
+      const FX_CI_HIGH = [
+        null, null, null, null, null, null, null, null, null, null, null,
+        108.31, 116.99,
+      ];
+      const FX_CI_LOW = [
+        null, null, null, null, null, null, null, null, null, null, null,
+        108.31, 107.63,
+      ];
+
+      let fxChart = null;
+
+      function fxToken(name, fallback) {
+        const v = getComputedStyle(document.getElementById("screen-cpi-obs"))
+          .getPropertyValue(name)
+          .trim();
+        return v || fallback;
+      }
+
+      function renderForecastChart() {
+        const canvas = document.getElementById("fx-chart");
+        if (!canvas || typeof Chart === "undefined") return;
+        if (fxChart) fxChart.destroy();
+
+        const dark = document.documentElement.getAttribute("data-theme") === "dark";
+        /* Series colours come from the page's own tokens: --accent for observed
+           data, --down (the semantic positive/green) for the projection. */
+        const actualColor = fxToken("--accent", "#0066ff");
+        const fcColor = fxToken("--down", "#16a34a");
+        const grid = dark ? "rgba(148,163,184,.14)" : "rgba(148,163,184,.22)";
+        const tick = fxToken("--muted", "#94a3b8");
+
+        const ctx = canvas.getContext("2d");
+        const band = ctx.createLinearGradient(0, 0, 0, 300);
+        band.addColorStop(0, dark ? "rgba(52,211,153,.20)" : "rgba(22,163,74,.16)");
+        band.addColorStop(1, dark ? "rgba(52,211,153,.04)" : "rgba(22,163,74,.03)");
+
+        /* Paint the legend swatches from the same values. */
+        document.querySelectorAll(".fx-legend-dot").forEach((dot) => {
+          dot.style.background =
+            dot.dataset.legend === "forecast" ? fcColor : actualColor;
+        });
+
+        fxChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: FX_LABELS,
+            datasets: [
+              {
+                label: "90% CI High",
+                data: FX_CI_HIGH,
+                borderColor: "transparent",
+                backgroundColor: band,
+                fill: "+1",
+                pointRadius: 0,
+                spanGaps: false,
+                tension: 0,
+              },
+              {
+                label: "90% CI Low",
+                data: FX_CI_LOW,
+                borderColor: "transparent",
+                fill: false,
+                pointRadius: 0,
+                spanGaps: false,
+                tension: 0,
+              },
+              {
+                label: "Actual",
+                data: FX_ACTUAL,
+                borderColor: actualColor,
+                borderWidth: 2.5,
+                fill: false,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                pointBackgroundColor: actualColor,
+                pointBorderColor: dark ? "#141e32" : "#fff",
+                pointBorderWidth: 1.5,
+                tension: 0.35,
+              },
+              {
+                label: "Forecast",
+                data: FX_FORECAST,
+                borderColor: fcColor,
+                borderWidth: 2,
+                borderDash: [6, 5],
+                fill: false,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: fcColor,
+                pointBorderColor: dark ? "#141e32" : "#fff",
+                pointBorderWidth: 1.5,
+                tension: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "rgba(15,23,42,.92)",
+                titleColor: "#fff",
+                bodyColor: "#cbd5e1",
+                borderColor: "rgba(255,255,255,.1)",
+                borderWidth: 1,
+                padding: 10,
+                displayColors: false,
+                callbacks: {
+                  label(c) {
+                    if (c.parsed.y == null) return null;
+                    if (c.dataset.label.indexOf("CI") === 0)
+                      return c.dataset.label + ": " + c.parsed.y.toFixed(2);
+                    /* The bridging point is shared by both series — show it once. */
+                    if (c.dataset.label === "Forecast" && c.dataIndex === 11)
+                      return null;
+                    return c.dataset.label + ": " + c.parsed.y.toFixed(2);
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: { color: grid },
+                border: { display: false },
+                ticks: { color: tick, font: { size: 11 } },
+              },
+              y: {
+                suggestedMin: 104,
+                suggestedMax: 120,
+                grid: { color: grid },
+                border: { display: false },
+                ticks: { color: tick, font: { size: 11 }, stepSize: 2 },
+                title: {
+                  display: true,
+                  text: "CPI Base Year 2021 = 100",
+                  color: tick,
+                  font: { size: 10 },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      /* Expand / collapse — the chart claims the side panels' column. */
+      function toggleForecastExpand(btn) {
+        const main = document.getElementById("fx-main");
+        if (!main) return;
+        const expanded = main.classList.toggle("is-expanded");
+        btn.setAttribute("aria-pressed", String(expanded));
+        btn.setAttribute("aria-label", expanded ? "Collapse chart" : "Expand chart");
+        btn.querySelector("i").className = expanded
+          ? "ti ti-arrows-diagonal-2"
+          : "ti ti-arrows-diagonal-minimize-2";
+        if (fxChart) requestAnimationFrame(() => fxChart.resize());
+      }
+
+      /* ── Boot ── */
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
+          window.BayaanHeader.init();
+          window.BayaanHeader.syncActive("screen-cpi-obs");
+        }
+        initFxFilters();
+        renderForecastChart();
+      });
+
+      /* Re-paint the chart with the new palette when the theme is switched. */
+      window.addEventListener("bayaan-theme-change", renderForecastChart);
+    </script>
+  </body>
+</html>

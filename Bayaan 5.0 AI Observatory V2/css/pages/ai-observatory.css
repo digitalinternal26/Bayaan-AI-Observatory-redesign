@@ -8,13 +8,225 @@
    reusable across concepts (page header, stat tiles, bar/donut charts,
    evidence drawers, the option switcher) lives here once. ==================================================================== */
 
-#screen-cpi-obs .aiobs-content {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 var(--page-gutter) 96px;
+#screen-cpi-obs {
+  /* AI Observatory-owned clone of the CPI Observatory visual values. */
+  --aiobs-bg: #f8fafc;
+  --aiobs-surface: #ffffff;
+  --aiobs-surface-muted: #f1f5f9;
+  --aiobs-border: #e5e7eb;
+  --aiobs-border-soft: rgba(15, 23, 42, 0.06);
+  --aiobs-text: #0f172a;
+  --aiobs-text-secondary: #475569;
+  --aiobs-text-muted: #94a3b8;
+  --aiobs-accent: #0066ff;
+  --aiobs-accent-light: #ebf5ff;
+  --aiobs-accent-dark: #0052cc;
+  --aiobs-success: #16a34a;
+  --aiobs-danger: #dc2626;
+  --aiobs-page-gutter: clamp(16px, 2vw, 32px);
+  --aiobs-radius-sm: 8px;
+  --aiobs-radius-md: 12px;
+  --aiobs-shadow-sm: 0 1px 6px rgba(15, 23, 42, 0.04);
+
+  /* Local aliases let page-specific AI styles resolve against this clone. */
+  --surface: var(--aiobs-surface);
+  --surface2: var(--aiobs-surface-muted);
+  --border: var(--aiobs-border-soft);
+  --border-md: rgba(15, 23, 42, 0.10);
+  --border-solid: var(--aiobs-border);
+  --text: var(--aiobs-text);
+  --text-primary: var(--aiobs-text);
+  --text2: var(--aiobs-text-secondary);
+  --text-secondary: var(--aiobs-text-secondary);
+  --text-tertiary: var(--aiobs-text-muted);
+  --accent: var(--aiobs-accent);
+  --accent-light: var(--aiobs-accent-light);
+  --accent-dark: var(--aiobs-accent-dark);
+  --shadow-sm: var(--aiobs-shadow-sm);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.08);
+  --r-md: var(--aiobs-radius-md);
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --warning: #d97706;
+  --warning-bg: #fffbeb;
+  background: var(--aiobs-bg);
+}
+
+/* AI-owned navigation clone: same compact rail values as CPI, without
+   depending on CPI selectors or component styles. */
+#screen-cpi-obs .sidebar {
+  background: var(--aiobs-surface);
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(42, 61, 76, 0.1), 0 2px 8px rgba(42, 61, 76, 0.06);
+  padding: 8px 10px;
+  gap: 9px;
+}
+#screen-cpi-obs .sidebar-item {
+  gap: 0;
+  padding: 4px 4px;
+  color: var(--aiobs-text-secondary);
+}
+#screen-cpi-obs .sidebar:hover .sidebar-item { gap: 10px; }
+#screen-cpi-obs .sidebar-icon {
+  width: 38px;
+  height: 38px;
+  background: var(--aiobs-accent-light);
+  color: var(--aiobs-accent);
+}
+#screen-cpi-obs .sidebar-item:hover:not(.active):not(.sidebar-item--ai) .sidebar-icon {
+  background: #dbe9ff;
+}
+#screen-cpi-obs .sidebar-item.active:not(.sidebar-item--ai) .sidebar-icon {
+  background: var(--aiobs-accent);
+  color: #fff;
+}
+#screen-cpi-obs .sidebar-item--ai .sidebar-icon {
+  background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+#screen-cpi-obs .sidebar-item--ai:hover .sidebar-icon {
+  background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
+  transform: scale(1.04);
+}
+#screen-cpi-obs .sidebar-label { color: var(--aiobs-text-secondary); }
+#screen-cpi-obs .sidebar-item.active:not(.sidebar-item--ai) .sidebar-label { color: var(--aiobs-text); }
+#screen-cpi-obs .sidebar-item--ai .sidebar-label { color: var(--aiobs-accent); }
+#screen-cpi-obs .sidebar-divider { background: var(--aiobs-border); }
+
+html[data-theme="dark"] #screen-cpi-obs .sidebar {
+  background: var(--aiobs-surface);
+}
+html[data-theme="dark"] #screen-cpi-obs .sidebar-label { color: #cdd6e0; }
+html[data-theme="dark"] #screen-cpi-obs .sidebar-divider { background: #3a4453; }
+
+/* AI-owned clone of the small benchmark shell primitives previously supplied
+   by the CPI stylesheet. */
+#screen-cpi-obs .cpi-page-header {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 24px var(--aiobs-page-gutter) 0;
+  box-sizing: border-box;
+}
+#screen-cpi-obs .cpi-page-header-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+#screen-cpi-obs .topic-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--aiobs-text);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+#screen-cpi-obs .topic-title-sub {
+  margin: 4px 0 0;
+  font-size: var(--fs-sm);
+  color: var(--aiobs-text-secondary);
+}
+#screen-cpi-obs .cpi-obs-content {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 20px var(--aiobs-page-gutter) 48px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+}
+#screen-cpi-obs .cpi-obs-content > section { margin-bottom: 24px; }
+#screen-cpi-obs .obs-card {
+  background: var(--aiobs-surface);
+  border: 1px solid var(--aiobs-border);
+  border-radius: 16px;
+  box-shadow: var(--aiobs-shadow-sm);
+}
+
+#screen-cpi-obs .aiobs-content {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--aiobs-page-gutter) 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* AI Overview title row, matching the Census Observatory page header. */
+#screen-cpi-obs .aiobs-titlebar {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px var(--aiobs-page-gutter) 16px;
+}
+#screen-cpi-obs .aiobs-titlebar-copy {
+  min-width: 0;
+}
+#screen-cpi-obs .aiobs-titlebar-title {
+  margin: 0;
+  color: var(--aiobs-text);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+#screen-cpi-obs .aiobs-titlebar-subtitle {
+  margin: 4px 0 0;
+  color: var(--aiobs-text-secondary);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+#screen-cpi-obs .aiobs-titlebar-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-family: inherit;
+  border: 1px solid #e5e7eb;
+  background: var(--aiobs-surface);
+  color: var(--aiobs-text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+#screen-cpi-obs .aiobs-titlebar-download:hover {
+  border-color: var(--aiobs-accent);
+  background: var(--aiobs-bg);
+}
+#screen-cpi-obs .aiobs-titlebar-download i {
+  font-size: var(--fs-lg);
+  color: var(--aiobs-accent);
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-titlebar-download {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+@media (max-width: 640px) {
+  #screen-cpi-obs .aiobs-titlebar {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 20px 16px 14px;
+  }
+  #screen-cpi-obs .aiobs-titlebar-download {
+    align-self: flex-start;
+  }
 }
 
 /* ====================================================================
@@ -36,37 +248,39 @@
    var(--accent) to var(--aiobs-domain) picks up domain tinting for free
    inside Interpret, with zero effect anywhere else. ==================================================================== */
 #screen-cpi-obs {
-  --aiobs-navy-900: #071B3D;
-  --aiobs-navy-800: #0B2A5C;
-  --aiobs-navy-700: #123A73;
-  --aiobs-cyan: #14B8C4;
-  --aiobs-cyan-light: rgba(20, 184, 196, 0.16);
+  --aiobs-navy-900: #0d1b3e;
+  --aiobs-navy-800: #1a56db;
+  --aiobs-navy-700: #0066ff;
+  --aiobs-cyan: #0066ff;
+  --aiobs-cyan-light: #ebf5ff;
   --aiobs-hero-3: var(--aiobs-navy-700);
-  --aiobs-domain: var(--accent);
-  --aiobs-domain-light: var(--accent-light);
-  --aiobs-domain-dark: var(--accent-dark);
+  --aiobs-domain: var(--aiobs-accent);
+  --aiobs-domain-light: var(--aiobs-accent-light);
+  --aiobs-domain-dark: var(--aiobs-accent-dark);
 }
 #screen-cpi-obs [data-domain-panel="economic"] {
-  --aiobs-domain: #0B4F9E;
-  --aiobs-domain-light: #E5F0FC;
-  --aiobs-domain-dark: #073E82;
-  --aiobs-hero-3: #0B4F9E;
+  --aiobs-domain: var(--aiobs-accent);
+  --aiobs-domain-light: var(--aiobs-accent-light);
+  --aiobs-domain-dark: var(--aiobs-accent-dark);
+  --aiobs-hero-3: var(--aiobs-accent);
 }
 #screen-cpi-obs [data-domain-panel="people"] {
-  --aiobs-domain: #7C3AED;
-  --aiobs-domain-light: #F1E9FE;
-  --aiobs-domain-dark: #5B21B6;
-  --aiobs-hero-3: #3B2E7A;
+  --aiobs-domain: var(--aiobs-accent);
+  --aiobs-domain-light: var(--aiobs-accent-light);
+  --aiobs-domain-dark: var(--aiobs-accent-dark);
+  --aiobs-hero-3: var(--aiobs-accent);
 }
 #screen-cpi-obs [data-domain-panel="infra"] {
-  --aiobs-domain: var(--aiobs-cyan);
-  --aiobs-domain-light: var(--aiobs-cyan-light);
-  --aiobs-domain-dark: #0B7480;
-  --aiobs-hero-3: #0E5C6B;
+  --aiobs-domain: var(--aiobs-accent);
+  --aiobs-domain-light: var(--aiobs-accent-light);
+  --aiobs-domain-dark: var(--aiobs-accent-dark);
+  --aiobs-hero-3: var(--aiobs-accent);
 }
-html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="economic"] { --aiobs-domain-light: rgba(59, 130, 246, 0.2); }
-html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="people"] { --aiobs-domain-light: rgba(124, 58, 237, 0.22); }
-html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="infra"] { --aiobs-domain-light: rgba(20, 184, 196, 0.2); }
+html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="economic"],
+html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="people"],
+html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="infra"] {
+  --aiobs-domain-light: rgba(59, 130, 246, 0.2);
+}
 
 /* ── Option switcher — lets the reviewer hop between the three variants
    of the page they're on without going back through the sidebar. ── */
@@ -91,21 +305,21 @@ html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="infra"] { --aiobs-do
   gap: 7px;
   padding: 7px 14px;
   border-radius: 999px;
-  border: 1px solid var(--border-solid);
-  background: var(--surface);
-  color: var(--text-secondary);
+  border: 1px solid var(--aiobs-border);
+  background: var(--aiobs-surface);
+  color: var(--aiobs-text-secondary);
   font-size: var(--fs-xs);
   font-weight: 600;
   text-decoration: none;
   transition: all 0.15s;
 }
 #screen-cpi-obs .aiobs-switch-pill:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--aiobs-accent);
+  color: var(--aiobs-accent);
 }
 #screen-cpi-obs .aiobs-switch-pill.active {
-  background: var(--text-primary);
-  border-color: var(--text-primary);
+  background: var(--aiobs-text);
+  border-color: var(--aiobs-text);
   color: #fff;
 }
 #screen-cpi-obs .aiobs-switch-pill .ti {
@@ -113,12 +327,12 @@ html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="infra"] { --aiobs-do
 }
 #screen-cpi-obs .aiobs-switch-pill--back {
   margin-inline-start: auto;
-  background: var(--accent-light);
+  background: var(--aiobs-accent-light);
   border-color: transparent;
-  color: var(--accent);
+  color: var(--aiobs-accent);
 }
 #screen-cpi-obs .aiobs-switch-pill--back:hover {
-  background: var(--accent);
+  background: var(--aiobs-accent);
   color: #fff;
 }
 
@@ -167,28 +381,28 @@ html[data-theme="dark"] #screen-cpi-obs [data-domain-panel="infra"] { --aiobs-do
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 9px 16px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--border-solid);
-  background: var(--surface);
-  color: var(--text-secondary);
-  font-size: var(--fs-sm);
-  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--aiobs-radius-sm);
+  border: 1px solid var(--aiobs-border);
+  background: var(--aiobs-surface);
+  color: var(--aiobs-text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: 500;
   cursor: pointer;
   font-family: inherit;
   text-decoration: none;
   transition: all 0.15s;
 }
-#screen-cpi-obs .aiobs-btn:hover { border-color: var(--accent); color: var(--accent); }
+#screen-cpi-obs .aiobs-btn:hover { border-color: var(--aiobs-accent); color: var(--aiobs-accent); }
 #screen-cpi-obs .aiobs-btn--primary {
-  background: var(--text-primary);
-  border-color: var(--text-primary);
+  background: var(--aiobs-accent);
+  border-color: var(--aiobs-accent);
   color: #fff;
 }
-#screen-cpi-obs .aiobs-btn--primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+#screen-cpi-obs .aiobs-btn--primary:hover { background: var(--aiobs-accent-dark); border-color: var(--aiobs-accent-dark); color: #fff; }
 #screen-cpi-obs .aiobs-btn--ai {
-  background: linear-gradient(135deg, #9292ff 0%, #3295ff 100%);
-  border-color: transparent;
+  background: var(--aiobs-accent);
+  border-color: var(--aiobs-accent);
   color: #fff;
 }
 #screen-cpi-obs .aiobs-btn--ai:hover { color: #fff; opacity: 0.92; }
@@ -332,10 +546,10 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-ask--icon:hover {
 
 /* ── Cards ── */
 #screen-cpi-obs .aiobs-card {
-  background: var(--surface);
-  border: 1px solid var(--border-solid);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
+  background: var(--aiobs-surface);
+  border: 1px solid var(--aiobs-border);
+  border-radius: var(--aiobs-radius-md);
+  box-shadow: var(--aiobs-shadow-sm);
 }
 
 /* ── Stat tile ── */
@@ -512,16 +726,17 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-btn {
 #screen-cpi-obs .aiobs-panel {
   position: relative;
   background:
-    radial-gradient(480px 260px at 96% -12%, var(--aiobs-domain-light), transparent 70%),
-    linear-gradient(180deg, var(--surface) 0%, var(--surface) 100%);
-  border: 1px solid var(--border-solid);
+    radial-gradient(ellipse 90% 70% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%),
+    linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+  border: 1px solid #e2e8f0;
   border-radius: 28px;
-  box-shadow: var(--shadow-sm), 0 12px 32px rgba(15, 23, 42, 0.07);
-  padding: 28px 30px 30px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(42, 61, 76, 0.07);
+  padding: 24px 28px 28px;
 }
 html[data-theme="dark"] #screen-cpi-obs .aiobs-panel {
   background: var(--surface);
-  box-shadow: none;
+  border-color: var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
 }
 
 /* ── Open variant: the section container with all card chrome stripped
@@ -537,7 +752,7 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-panel {
   box-shadow: none;
   border-radius: 0;
   padding: 26px 0 4px;
-  border-top: 1px solid var(--border-solid);
+  border-top: 1px solid var(--aiobs-border);
 }
 #screen-cpi-obs .aiobs-panel--open:first-child { border-top: none; padding-top: 4px; }
 #screen-cpi-obs .aiobs-panel-hd {
@@ -575,9 +790,9 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-panel {
 
 /* ── Lightweight sub-card: separated by tone, not by a repeated shadow ── */
 #screen-cpi-obs .aiobs-subcard {
-  background: var(--surface2);
-  border: 1px solid var(--border-solid);
-  border-radius: var(--r-md);
+  background: var(--aiobs-surface-muted);
+  border: 1px solid var(--aiobs-border);
+  border-radius: var(--aiobs-radius-sm);
   padding: 18px 20px;
 }
 #screen-cpi-obs .aiobs-subgrid {
@@ -611,12 +826,12 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-panel {
   gap: 14px;
   padding: 16px 20px;
   border-radius: var(--r-lg);
-  background: linear-gradient(135deg, rgba(0, 102, 255, 0.07) 0%, rgba(124, 58, 237, 0.045) 100%);
-  border: 1px solid rgba(0, 102, 255, 0.12);
+  background: var(--aiobs-accent-light);
+  border: 1px solid rgba(0, 102, 255, 0.14);
   margin-top: 20px;
 }
 html[data-theme="dark"] #screen-cpi-obs .aiobs-insight {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.14) 0%, rgba(124, 58, 237, 0.09) 100%);
+  background: rgba(59, 130, 246, 0.14);
   border-color: rgba(59, 130, 246, 0.22);
 }
 #screen-cpi-obs .aiobs-insight-ic {
@@ -1159,11 +1374,22 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .imp
   position: relative;
   overflow: hidden;
   min-height: 150px;
-  border-radius: 20px;
-  padding: 30px 34px 32px;
-  background: linear-gradient(135deg, var(--aiobs-navy-900) 0%, var(--aiobs-navy-800) 52%, var(--aiobs-hero-3) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 56px -24px rgba(4, 15, 38, 0.55), 0 2px 8px rgba(4, 15, 38, 0.3);
+  border-radius: var(--aiobs-radius-md);
+  padding: 20px 22px 22px;
+  background:
+    radial-gradient(ellipse 70% 55% at 8% 15%, rgba(99, 179, 255, 0.22) 0%, transparent 55%),
+    linear-gradient(135deg, #f0f6ff 0%, #eef4fc 45%, #e8f0fa 100%);
+  border: 1px solid #bfdbfe;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(42, 61, 76, 0.07);
+}
+#screen-cpi-obs .aiobs-execbrief::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(37, 99, 235, 0.08) 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+  opacity: 0.72;
 }
 #screen-cpi-obs .aiobs-execbrief-topline {
   position: relative;
@@ -1189,15 +1415,15 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .imp
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--aiobs-cyan), #3B82F6);
+  background: var(--aiobs-accent);
   color: #fff;
   font-size: var(--fs-2xl);
-  box-shadow: 0 4px 18px rgba(20, 184, 196, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.22);
 }
 #screen-cpi-obs .aiobs-execbrief-title {
   font-size: var(--fs-xl);
   font-weight: 700;
-  color: #fff;
+  color: var(--aiobs-text);
   letter-spacing: -0.01em;
 }
 
@@ -1407,7 +1633,7 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .imp
   margin: 20px 0 0;
   font-size: var(--fs-md);
   line-height: 1.6;
-  color: rgba(234, 241, 251, 0.88);
+  color: var(--aiobs-text-secondary);
   width: 100%;
   box-sizing: border-box;
 }
@@ -1421,17 +1647,17 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .imp
   flex-wrap: wrap;
 }
 #screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn--primary {
-  background: #fff;
-  border-color: #fff;
-  color: var(--aiobs-navy-900);
-}
-#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn--primary:hover { background: var(--aiobs-cyan); border-color: var(--aiobs-cyan); color: #fff; }
-#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn:not(.aiobs-btn--primary) {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.28);
+  background: var(--aiobs-accent);
+  border-color: var(--aiobs-accent);
   color: #fff;
 }
-#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn:not(.aiobs-btn--primary):hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.4); color: #fff; }
+#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn--primary:hover { background: var(--aiobs-accent-dark); border-color: var(--aiobs-accent-dark); color: #fff; }
+#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn:not(.aiobs-btn--primary) {
+  background: var(--aiobs-surface);
+  border-color: var(--aiobs-border);
+  color: var(--aiobs-text-secondary);
+}
+#screen-cpi-obs .aiobs-execbrief-actions .aiobs-btn:not(.aiobs-btn--primary):hover { background: var(--aiobs-accent-light); border-color: var(--aiobs-accent); color: var(--aiobs-accent-dark); }
 
 /* ── Signature animation: a minimal abstract connected-data network,
    pinned bottom-right, now cyan-on-navy so it reads as a real accent
@@ -1477,6 +1703,189 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .imp
     animation-delay: var(--ld, 0s);
   }
 }
+
+/* ====================================================================
+   CONSISTENT AI OBSERVATORY MODULES
+   Every page uses the same CPI-style outer module surface. Inner cards stay
+   white and are used only for the individual KPI/chart units inside a module.
+   ==================================================================== */
+#screen-cpi-obs :is(
+  .aiobs-panel,
+  .aiobs-keyins-section,
+  .bm-panel,
+  .dg-filterbar,
+  .dg-alert,
+  .dg-priority-band,
+  .ob-filterbar,
+  .ob-table-wrap,
+  .ob-cardgrid,
+  .tm-cardgrid,
+  .tm-roadmap-grid,
+  .itp-impact-evidence,
+  .itp-impact-insight
+) {
+  background:
+    radial-gradient(ellipse 90% 70% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%),
+    linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 28px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(42, 61, 76, 0.07);
+}
+
+#screen-cpi-obs :is(
+  .aiobs-subcard,
+  .aiobs-statpanel,
+  .aiobs-glancecard,
+  .aiobs-domain-card,
+  .ob-headline-card,
+  .ob-icard,
+  .dg-priority-card,
+  .itp-infra-kpi-card,
+  .itp-infra-duo,
+  .itp-infra-bench-card,
+  .itp-infra-roadmap-card,
+  .itp-infra-evidence-card,
+  .tm-card,
+  .tm-roadmap-card
+) {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.04);
+}
+
+html[data-theme="dark"] #screen-cpi-obs :is(
+  .aiobs-panel,
+  .aiobs-keyins-section,
+  .bm-panel,
+  .dg-filterbar,
+  .dg-alert,
+  .dg-priority-band,
+  .ob-filterbar,
+  .ob-table-wrap,
+  .ob-cardgrid,
+  .tm-cardgrid,
+  .tm-roadmap-grid,
+  .itp-impact-evidence,
+  .itp-impact-insight,
+  .aiobs-subcard,
+  .aiobs-statpanel,
+  .aiobs-glancecard,
+  .aiobs-domain-card,
+  .ob-headline-card,
+  .ob-icard,
+  .dg-priority-card,
+  .itp-infra-kpi-card,
+  .itp-infra-duo,
+  .itp-infra-bench-card,
+  .itp-infra-roadmap-card,
+  .itp-infra-evidence-card,
+  .tm-card,
+  .tm-roadmap-card
+) {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+/* Keep warning/status content readable without creating a second visual
+   language for the surrounding module. */
+#screen-cpi-obs :is(.dg-alert, .dg-priority-band) .dg-alert-ic,
+#screen-cpi-obs :is(.dg-alert, .dg-priority-band) .dg-priority-icon {
+  background: var(--aiobs-accent-light) !important;
+  color: var(--aiobs-accent) !important;
+}
+#screen-cpi-obs .itp-impact-statcard--green {
+  background: var(--aiobs-accent-light) !important;
+}
+
+/* Final CPI-aligned spacing and type rhythm. */
+#screen-cpi-obs .aiobs-content {
+  gap: 24px !important;
+  padding-bottom: 48px !important;
+}
+#screen-cpi-obs :is(.aiobs-panel, .aiobs-execbrief) {
+  padding: 24px 28px 28px !important;
+}
+#screen-cpi-obs :is(.aiobs-panel-hd, .aiobs-execbrief-topline) {
+  gap: 16px !important;
+  margin-bottom: 16px !important;
+}
+#screen-cpi-obs :is(.aiobs-panel-hd h2, .aiobs-section-title) {
+  font-size: var(--fs-2xl) !important;
+  line-height: 1.2 !important;
+}
+#screen-cpi-obs :is(.aiobs-panel-hd p, .aiobs-section-note, .aiobs-execbrief-sub) {
+  font-size: var(--fs-sm) !important;
+  line-height: 1.55 !important;
+}
+#screen-cpi-obs :is(.aiobs-subcard, .aiobs-statpanel, .aiobs-glancecard, .aiobs-domain-card, .ob-headline-card, .ob-icard, .dg-priority-card, .tm-card) {
+  padding: 16px 18px !important;
+}
+#screen-cpi-obs :is(.aiobs-subgrid, .aiobs-domain-explore-grid, .aiobs-glancecards, .ob-headline-grid, .tm-cardgrid, .dg-ready-grid, .dg-priority-grid, .bm-kpis) {
+  gap: 16px !important;
+}
+#screen-cpi-obs :is(.aiobs-bar-top, .aiobs-bar-name, .aiobs-bar-val, .aiobs-legend-item, .aiobs-domain-card-titles p, .ob-headline-label, .tm-card-desc) {
+  font-size: var(--fs-xs) !important;
+  line-height: 1.5 !important;
+}
+#screen-cpi-obs :is(.aiobs-subcard-title, .aiobs-domain-card-titles h3, .tm-card-title, .dg-rail-hd h3, .bm-kpi-val) {
+  font-size: var(--fs-md) !important;
+  line-height: 1.35 !important;
+}
+#screen-cpi-obs :is(.aiobs-stat-value, .aiobs-glancecard-val, .ob-headline-val, .dg-ready-val) {
+  font-size: var(--fs-3xl) !important;
+  line-height: 1 !important;
+}
+#screen-cpi-obs :is(.aiobs-insight, .dg-note-card, .itp-impact-insight) {
+  padding: 12px 16px !important;
+  gap: 10px !important;
+  border-radius: var(--aiobs-radius-md) !important;
+}
+#screen-cpi-obs :is(.dg-head h1, .tm-head h1) {
+  font-size: 26px !important;
+  line-height: 1.2 !important;
+  margin: 4px 0 4px !important;
+}
+#screen-cpi-obs :is(.dg-head p, .tm-head p, .itp-page-head p) {
+  font-size: var(--fs-sm) !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+}
+#screen-cpi-obs :is(.dg-section-title, .itp-infra-duo-hd h3) {
+  font-size: var(--fs-xl) !important;
+  line-height: 1.25 !important;
+}
+#screen-cpi-obs :is(.dg-section, .itp-sections, .itp-domain, .ob-page-hero, .ob-explore) {
+  gap: 24px !important;
+}
+#screen-cpi-obs :is(.dg-filterbar, .ob-filterbar, .bm-filter-row) {
+  gap: 10px !important;
+  padding: 10px 14px !important;
+  margin-top: 16px !important;
+}
+#screen-cpi-obs :is(.dg-filter-pill, .dg-year-pill, .ob-filter-chip, .bm-seg-btn, .abm-select) {
+  font-size: var(--fs-xs) !important;
+}
+#screen-cpi-obs :is(.dg-alert, .dg-priority-band) {
+  padding: 20px 22px !important;
+}
+#screen-cpi-obs :is(.dg-alert-body p, .dg-section-desc, .dg-ready-desc, .itp-infra-kpi-desc) {
+  font-size: var(--fs-sm) !important;
+  line-height: 1.55 !important;
+}
+#screen-cpi-obs :is(.itp-trustcard, .itp-infra-kpi-card, .itp-infra-evidence-card, .tm-roadmap-card) {
+  padding: 16px 18px !important;
+}
+
+@media (max-width: 720px) {
+  #screen-cpi-obs :is(.aiobs-panel, .aiobs-execbrief) {
+    padding: 20px !important;
+  }
+  #screen-cpi-obs :is(.aiobs-content, .cpi-obs-content, .cpi-page-header) {
+    padding-inline: 16px !important;
+  }
+}
 @keyframes aiobsMeshPulse {
   0%, 100% { opacity: 0.65; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.16); }
@@ -1486,8 +1895,15 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-keyins-section .impacts-list .imp
   50% { stroke-opacity: 0.85; }
 }
 html[data-theme="dark"] #screen-cpi-obs .aiobs-execbrief {
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 24px 56px -24px rgba(0, 0, 0, 0.7);
+  background:
+    radial-gradient(ellipse 70% 55% at 8% 15%, rgba(59, 130, 246, 0.18) 0%, transparent 55%),
+    linear-gradient(135deg, var(--surface2) 0%, var(--surface) 45%, #151e32 100%);
+  border-color: var(--border-md);
+  box-shadow: var(--shadow-sm);
+}
+html[data-theme="dark"] #screen-cpi-obs .aiobs-execbrief::before {
+  background-image: radial-gradient(rgba(59, 130, 246, 0.12) 1.5px, transparent 1.5px);
+  opacity: 0.5;
 }
 
 /* ── AI at a Glance — one card per headline figure. Styled to match
@@ -1504,7 +1920,7 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-execbrief {
 #screen-cpi-obs .aiobs-glancecards {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(210px, 1fr));
   gap: 14px;
   align-items: stretch;
   overflow: visible;
@@ -1517,6 +1933,8 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-execbrief {
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
   padding: 16px 18px;
+  min-width: 0;
+  box-sizing: border-box;
   transition: box-shadow 0.15s, border-color 0.15s;
   overflow: visible;
 }
@@ -1657,7 +2075,7 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-execbrief {
 
 /* 4-across variant — used by Interpret's per-domain AI at a Glance
    panels, which carry 4 figures rather than Overview's 5. */
-#screen-cpi-obs .aiobs-glancecards--4 { grid-template-columns: repeat(4, 1fr); }
+#screen-cpi-obs .aiobs-glancecards--4 { grid-template-columns: repeat(4, minmax(210px, 1fr)); }
 @media (max-width: 720px) {
   #screen-cpi-obs .aiobs-glancecards--4 { grid-template-columns: repeat(2, 1fr); }
 }
@@ -1759,7 +2177,7 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-execbrief {
 }
 #screen-cpi-obs .aiobs-domain-explore-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
   gap: 16px;
   align-items: stretch;
 }
@@ -1772,6 +2190,7 @@ html[data-theme="dark"] #screen-cpi-obs .aiobs-execbrief {
   box-shadow: var(--shadow-sm);
   padding: 20px 20px 18px;
   min-width: 0;
+  box-sizing: border-box;
 }
 #screen-cpi-obs .aiobs-domain-card-top {
   display: flex;
@@ -2333,4 +2752,364 @@ html[data-theme="dark"] #screen-cpi-obs .itp-domain .aiobs-subcard-title {
   #screen-cpi-obs .aiobs-state-of-ai .aiobs-ask {
     align-self: flex-start;
   }
+}
+
+/* ====================================================================
+   AI OBSERVATORY RESPONSIVE FINISHING LAYER
+   The rail remains fixed like CPI's rail, while the content grid releases
+   its desktop 120px rail track below tablet width. Dense page-local grids
+   collapse here so labels and controls never force horizontal scrolling.
+   ==================================================================== */
+@media (max-width: 900px) {
+  #screen-cpi-obs .page-wrap {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+  #screen-cpi-obs .sidebar-rail {
+    min-width: 0;
+  }
+  #screen-cpi-obs .sidebar-rail .sidebar {
+    left: 16px;
+  }
+  #screen-cpi-obs .aiobs-content,
+  #screen-cpi-obs .cpi-obs-content,
+  #screen-cpi-obs .cpi-page-header {
+    max-width: none;
+    width: auto;
+  }
+  #screen-cpi-obs .aiobs-content {
+    padding-inline: 20px;
+  }
+  #screen-cpi-obs .aiobs-page-header,
+  #screen-cpi-obs .cpi-page-header-inner {
+    align-items: flex-start;
+  }
+  #screen-cpi-obs .aiobs-hdr-actions,
+  #screen-cpi-obs .cen-hdr-btns,
+  #screen-cpi-obs .cpi-hdr-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  #screen-cpi-obs .ob-page-hero .aiobs-subtitle {
+    white-space: normal;
+  }
+  #screen-cpi-obs .bm-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #screen-cpi-obs .bm-side {
+    width: 100%;
+  }
+  #screen-cpi-obs .itp-trustgrid,
+  #screen-cpi-obs .itp-infra-kpi-grid,
+  #screen-cpi-obs .itp-infra-roadmap-grid,
+  #screen-cpi-obs .tm-cardgrid,
+  #screen-cpi-obs .dg-ready-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  #screen-cpi-obs .sidebar-rail .sidebar {
+    left: 10px;
+  }
+  #screen-cpi-obs .aiobs-content,
+  #screen-cpi-obs .cpi-obs-content,
+  #screen-cpi-obs .cpi-page-header {
+    padding-inline: 16px;
+  }
+  #screen-cpi-obs .aiobs-title,
+  #screen-cpi-obs .topic-title {
+    font-size: 26px;
+  }
+  #screen-cpi-obs .aiobs-panel,
+  #screen-cpi-obs .aiobs-execbrief {
+    padding: 18px 16px 20px;
+  }
+  #screen-cpi-obs .aiobs-panel-hd,
+  #screen-cpi-obs .aiobs-execbrief-topline,
+  #screen-cpi-obs .cpi-page-header-inner {
+    gap: 12px;
+  }
+  #screen-cpi-obs .aiobs-execbrief-meta {
+    margin-inline-start: auto;
+  }
+  #screen-cpi-obs .bm-filter-row,
+  #screen-cpi-obs .fx-filter-row,
+  #screen-cpi-obs .ob-filterbar,
+  #screen-cpi-obs .dg-filterbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  #screen-cpi-obs .bm-region-seg,
+  #screen-cpi-obs .abm-select-wrap,
+  #screen-cpi-obs .abm-select,
+  #screen-cpi-obs .fx-search,
+  #screen-cpi-obs .ob-filter-chip,
+  #screen-cpi-obs .ob-search,
+  #screen-cpi-obs .ob-search input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  #screen-cpi-obs .bm-region-seg {
+    height: auto;
+    flex-wrap: wrap;
+  }
+  #screen-cpi-obs .bm-seg-btn {
+    min-height: 32px;
+    flex: 1 1 120px;
+  }
+  #screen-cpi-obs .abm-ref-pill {
+    margin-inline-start: 0;
+  }
+  #screen-cpi-obs .bm-kpis,
+  #screen-cpi-obs .itp-trustgrid,
+  #screen-cpi-obs .itp-infra-kpi-grid,
+  #screen-cpi-obs .itp-infra-roadmap-grid,
+  #screen-cpi-obs .tm-cardgrid,
+  #screen-cpi-obs .dg-ready-grid,
+  #screen-cpi-obs .dg-variation-grid,
+  #screen-cpi-obs .dg-constraint-grid,
+  #screen-cpi-obs .dg-trust-grid {
+    grid-template-columns: 1fr;
+  }
+  #screen-cpi-obs .abm-chart-canvas {
+    height: 280px;
+  }
+  #screen-cpi-obs .bm-main.is-expanded .abm-chart-canvas {
+    height: 340px;
+  }
+  #screen-cpi-obs .abm-lolli-row,
+  #screen-cpi-obs .abm-lolli-axis {
+    grid-template-columns: minmax(96px, 0.8fr) minmax(0, 1fr) 58px;
+    gap: 8px;
+  }
+  #screen-cpi-obs .aiobs-brief-grid,
+  #screen-cpi-obs .aiobs-subgrid,
+  #screen-cpi-obs .aiobs-gap-grid,
+  #screen-cpi-obs .itp-infra-duo,
+  #screen-cpi-obs .itp-infra-bench-grid,
+  #screen-cpi-obs .itp-infra-evidence-grid {
+    grid-template-columns: 1fr;
+  }
+  #screen-cpi-obs .itp-domtabs {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+}
+
+/* Section-specific hard-coded accents are reduced to the same AI blue. */
+#screen-cpi-obs .itp-domtab.active,
+#screen-cpi-obs .itp-domtab[data-domain-tab="economic"].active,
+#screen-cpi-obs .itp-domtab[data-domain-tab="people"].active,
+#screen-cpi-obs .itp-domtab[data-domain-tab="infra"].active {
+  background: var(--aiobs-accent) !important;
+}
+#screen-cpi-obs .aiobs-impact-metric--purple,
+#screen-cpi-obs .aiobs-impact-metric--blue {
+  background: var(--aiobs-accent-light) !important;
+}
+#screen-cpi-obs .aiobs-impact-metric--purple .aiobs-impact-metric-ic,
+#screen-cpi-obs .aiobs-impact-metric--blue .aiobs-impact-metric-ic {
+  color: var(--aiobs-accent) !important;
+}
+#screen-cpi-obs .tm-card-badge--live {
+  background: var(--aiobs-accent-light) !important;
+  color: var(--aiobs-accent-dark) !important;
+}
+#screen-cpi-obs .tm-card-ic[style],
+#screen-cpi-obs .aiobs-glancecard-ic[style] {
+  background: var(--aiobs-accent-light) !important;
+  color: var(--aiobs-accent) !important;
+}
+#screen-cpi-obs .aiobs-domain-card {
+  --domain: var(--aiobs-accent) !important;
+  --domain-light: var(--aiobs-accent-light) !important;
+  --domain-dark: var(--aiobs-accent-dark) !important;
+}
+#screen-cpi-obs .aiobs-subcard-ic[style],
+#screen-cpi-obs .aiobs-impact-bar-ic[style],
+#screen-cpi-obs .aiobs-pathway-ic[style],
+#screen-cpi-obs .itp-trustcard-ic[style],
+#screen-cpi-obs .tm-card-ic[style] {
+  background: var(--aiobs-accent-light) !important;
+  color: var(--aiobs-accent) !important;
+}
+#screen-cpi-obs .aiobs-bar-fill[style],
+#screen-cpi-obs .dg-rail-fill[style],
+#screen-cpi-obs .aiobs-glancecard-bar-fill[style] {
+  background: var(--aiobs-accent) !important;
+}
+#screen-cpi-obs .dg-ready-kicker[style],
+#screen-cpi-obs .ob-tag-global {
+  color: var(--aiobs-accent-dark) !important;
+}
+#screen-cpi-obs .ob-tag-global {
+  background: var(--aiobs-accent-light) !important;
+}
+#screen-cpi-obs circle[stroke="#7C3AED"] {
+  stroke: var(--aiobs-accent) !important;
+}
+
+/* Stable card tracks across browser zoom levels. Cards keep a usable minimum
+   width, then the grid drops a column at the same responsive thresholds used
+   by the CPI Observatory rather than continuously squeezing each card. */
+#screen-cpi-obs .aiobs-glancecards {
+  grid-template-columns: repeat(5, minmax(210px, 1fr));
+}
+#screen-cpi-obs .aiobs-glancecards--4 {
+  grid-template-columns: repeat(4, minmax(210px, 1fr));
+}
+#screen-cpi-obs .aiobs-domain-explore-grid {
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+}
+#screen-cpi-obs .ob-headline-grid {
+  grid-template-columns: repeat(5, minmax(210px, 1fr));
+}
+#screen-cpi-obs .ob-headline-card,
+#screen-cpi-obs .tm-cardgrid > *,
+#screen-cpi-obs .dg-ready-grid > *,
+#screen-cpi-obs .dg-priority-grid > *,
+#screen-cpi-obs .bm-kpis > * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+#screen-cpi-obs .tm-cardgrid {
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+}
+#screen-cpi-obs .dg-ready-grid,
+#screen-cpi-obs .dg-priority-grid {
+  grid-template-columns: repeat(4, minmax(210px, 1fr));
+}
+#screen-cpi-obs .bm-kpis {
+  grid-template-columns: repeat(4, minmax(210px, 1fr));
+}
+
+@media (max-width: 1180px) {
+  #screen-cpi-obs .aiobs-glancecards,
+  #screen-cpi-obs .ob-headline-grid {
+    grid-template-columns: repeat(3, minmax(210px, 1fr));
+  }
+  #screen-cpi-obs .tm-cardgrid,
+  #screen-cpi-obs .dg-ready-grid,
+  #screen-cpi-obs .dg-priority-grid,
+  #screen-cpi-obs .bm-kpis {
+    grid-template-columns: repeat(2, minmax(210px, 1fr));
+  }
+}
+@media (max-width: 980px) {
+  #screen-cpi-obs .aiobs-domain-explore-grid {
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  #screen-cpi-obs .aiobs-glancecards,
+  #screen-cpi-obs .aiobs-glancecards--4,
+  #screen-cpi-obs .ob-headline-grid,
+  #screen-cpi-obs .tm-cardgrid,
+  #screen-cpi-obs .dg-ready-grid,
+  #screen-cpi-obs .dg-priority-grid,
+  #screen-cpi-obs .bm-kpis {
+    grid-template-columns: repeat(2, minmax(210px, 1fr));
+  }
+  #screen-cpi-obs .aiobs-domain-explore-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 560px) {
+  #screen-cpi-obs .aiobs-glancecards,
+  #screen-cpi-obs .aiobs-glancecards--4,
+  #screen-cpi-obs .ob-headline-grid,
+  #screen-cpi-obs .tm-cardgrid,
+  #screen-cpi-obs .dg-ready-grid,
+  #screen-cpi-obs .dg-priority-grid,
+  #screen-cpi-obs .bm-kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Final cascade layer: keep every AI page on the CPI module recipe. */
+#screen-cpi-obs :is(
+  .aiobs-panel,
+  .aiobs-keyins-section,
+  .bm-panel,
+  .dg-filterbar,
+  .dg-alert,
+  .dg-priority-band,
+  .ob-filterbar,
+  .ob-table-wrap,
+  .ob-cardgrid,
+  .tm-cardgrid,
+  .tm-roadmap-grid,
+  .itp-impact-evidence,
+  .itp-impact-insight
+) {
+  background:
+    radial-gradient(ellipse 90% 70% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%),
+    linear-gradient(180deg, #ffffff 0%, #fafcff 100%) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 28px !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(42, 61, 76, 0.07) !important;
+}
+#screen-cpi-obs :is(
+  .aiobs-subcard,
+  .aiobs-statpanel,
+  .aiobs-glancecard,
+  .aiobs-domain-card,
+  .ob-headline-card,
+  .ob-icard,
+  .dg-priority-card,
+  .itp-infra-kpi-card,
+  .itp-infra-duo,
+  .itp-infra-bench-card,
+  .itp-infra-roadmap-card,
+  .itp-infra-evidence-card,
+  .tm-card,
+  .tm-roadmap-card
+) {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.04) !important;
+}
+html[data-theme="dark"] #screen-cpi-obs :is(
+  .aiobs-panel,
+  .aiobs-keyins-section,
+  .bm-panel,
+  .dg-filterbar,
+  .dg-alert,
+  .dg-priority-band,
+  .ob-filterbar,
+  .ob-table-wrap,
+  .ob-cardgrid,
+  .tm-cardgrid,
+  .tm-roadmap-grid,
+  .itp-impact-evidence,
+  .itp-impact-insight,
+  .aiobs-subcard,
+  .aiobs-statpanel,
+  .aiobs-glancecard,
+  .aiobs-domain-card,
+  .ob-headline-card,
+  .ob-icard,
+  .dg-priority-card,
+  .itp-infra-kpi-card,
+  .itp-infra-duo,
+  .itp-infra-bench-card,
+  .itp-infra-roadmap-card,
+  .itp-infra-evidence-card,
+  .tm-card,
+  .tm-roadmap-card
+) {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+#screen-cpi-obs :is(.dg-alert, .dg-priority-band) .dg-alert-ic,
+#screen-cpi-obs :is(.dg-alert, .dg-priority-band) .dg-priority-icon {
+  background: var(--aiobs-accent-light) !important;
+  color: var(--aiobs-accent) !important;
+}
+#screen-cpi-obs .itp-impact-statcard--green {
+  background: var(--aiobs-accent-light) !important;
 }

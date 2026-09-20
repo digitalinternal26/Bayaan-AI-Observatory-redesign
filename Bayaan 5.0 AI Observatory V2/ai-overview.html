@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="css/pages/obs-sidebar.css" />
     <link rel="stylesheet" href="css/components/bayaan-footer.css" />
+    <link rel="stylesheet" href="css/pages/home-widgets.css" />
     <link rel="stylesheet" href="css/pages/ai-observatory.css" />
     <script>
       (function () {
@@ -26,6 +27,7 @@
     <script src="js/footer.js"></script>
     <script src="js/voice-brief-dock.js" defer></script>
     <script src="js/census-exec-brief.js" defer></script>
+    <script src="js/section-scroll-spy.js"></script>
     <script src="js/ai-observatory.js" defer></script>
     <style>
       /* ============ OVERVIEW — page-local layout only ============
@@ -52,6 +54,53 @@
         #screen-cpi-obs #sec-adoption .aiobs-bar-item { flex-direction: column; align-items: stretch; gap: 5px; }
         #screen-cpi-obs #sec-adoption .aiobs-bar-name { min-width: 0; }
         #screen-cpi-obs #sec-adoption .aiobs-bar-val { min-width: 0; text-align: left; }
+      }
+
+      /* Download button cloned from Census Observatory. */
+      #screen-cpi-obs .cpi-hdr-download {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        height: 40px;
+        padding: 0 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        color: #0f172a;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .cpi-hdr-download:hover {
+        border-color: var(--accent);
+        background: #f8fafc;
+      }
+      #screen-cpi-obs .cpi-hdr-download i {
+        font-size: 16px;
+        color: var(--accent);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .cpi-hdr-download {
+        background: var(--surface, #141a26);
+        border-color: var(--border);
+      }
+
+      #screen-cpi-obs {
+        --home-rail-inset: 24px;
+        --home-rail-w: 28px;
+        --home-rail-gap: 12px;
+        --home-rail-lane: calc(var(--home-rail-inset) + var(--home-rail-w) + var(--home-rail-gap));
+      }
+      @media (min-width: 901px) {
+        #screen-cpi-obs .aiobs-titlebar,
+        #screen-cpi-obs .aiobs-content {
+          padding-right: calc(var(--aiobs-page-gutter) + var(--home-rail-lane));
+        }
+      }
+      #screen-cpi-obs .ai-overview-dots-rail[hidden] {
+        display: none !important;
       }
 
       /* Enterprise: grid bar layout with proportional axis scaling */
@@ -453,7 +502,6 @@
                 <div class="sidebar-icon"><i class="ti ti-sparkles"></i></div>
                 <span class="sidebar-label">Survey AI</span>
               </button>
-              <span class="sidebar-divider" aria-hidden="true"></span>
               <a class="sidebar-item active" href="ai-overview.html">
                 <div class="sidebar-icon"><i class="ti ti-layout-dashboard"></i></div>
                 <span class="sidebar-label">Overview</span>
@@ -462,18 +510,35 @@
                 <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
                 <span class="sidebar-label">Interpret</span>
               </a>
-              <a class="sidebar-item" href="ai-observe.html">
-                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
-                <span class="sidebar-label">Observe</span>
+              <a class="sidebar-item" href="ai-diagnose.html">
+                <div class="sidebar-icon"><i class="ti ti-stethoscope"></i></div>
+                <span class="sidebar-label">Diagnose</span>
+              </a>
+              <a class="sidebar-item" href="ai-themes.html">
+                <div class="sidebar-icon"><i class="ti ti-book-2"></i></div>
+                <span class="sidebar-label">Themes</span>
               </a>
               <a class="sidebar-item" href="ai-benchmark.html">
                 <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
                 <span class="sidebar-label">Benchmark</span>
               </a>
+              <a class="sidebar-item" href="ai-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
+              </a>
             </aside>
           </div>
 
           <main class="main">
+            <header class="aiobs-titlebar">
+              <div class="aiobs-titlebar-copy">
+                <h1 class="aiobs-titlebar-title">Overview</h1>
+                <p class="aiobs-titlebar-subtitle">Abu Dhabi · 2025 AI Observatory data</p>
+              </div>
+              <button type="button" class="cpi-hdr-download" onclick="AIObs.toast('Download — coming soon in this preview')">
+                <i class="ti ti-download" aria-hidden="true"></i> Download
+              </button>
+            </header>
             <div class="aiobs-content">
 
               <div class="ovw-sections">
@@ -1193,6 +1258,9 @@
         </div>
         <div data-bayaan-footer></div>
       </div>
+      <div class="home-module-rail ai-overview-dots-rail">
+        <nav id="aiOverviewDots" class="home-module-dots" aria-label="AI Overview sections" hidden></nav>
+      </div>
     </div>
     <script>
       function initDgCarousel(carousel) {
@@ -1262,6 +1330,40 @@
         sync();
       }
 
+      let aiOverviewDotsApi = null;
+
+      function initAiOverviewDots() {
+        const content = document.querySelector("#screen-cpi-obs .aiobs-content");
+        const rail = document.querySelector(".ai-overview-dots-rail");
+        if (!content || !window.BayaanSectionScrollSpy) return;
+
+        const sections = [
+          ["exec-brief", "Executive Brief"],
+          ["glance", "AI at a Glance"],
+          ["domain-explore", "Explore AI across three domains"],
+          ["sec-adoption", "AI adoption"],
+          ["sec-capability", "AI capability"],
+          ["sec-enterprise", "Enterprise AI"],
+          ["sec-impact", "Economic and workforce impact"],
+          ["sec-sentiment", "AI sentiment"],
+          ["key-insights", "Key Insights"],
+          ["ai-news", "News"],
+        ]
+          .map(([id, label]) => ({ id, label, el: document.getElementById(id) }))
+          .filter((item) => item.el);
+
+        if (aiOverviewDotsApi) aiOverviewDotsApi.destroy();
+        aiOverviewDotsApi = window.BayaanSectionScrollSpy.mountSectionDots({
+          navId: "aiOverviewDots",
+          root: document.querySelector("#screen-cpi-obs .crisis-scroll"),
+          sections,
+          scrollFnName: "scrollToAiOverviewSection",
+          config: { heroId: "exec-brief" },
+        });
+        if (rail) rail.hidden = sections.length < 2;
+        requestAnimationFrame(() => aiOverviewDotsApi?.sync());
+      }
+
       document.addEventListener("DOMContentLoaded", function () {
         if (window.BayaanHeader && typeof window.BayaanHeader.init === "function") {
           window.BayaanHeader.init();
@@ -1269,6 +1371,7 @@
         }
         if (window.initBayaanFooter) initBayaanFooter();
         document.querySelectorAll(".dg-carousel").forEach(initDgCarousel);
+        initAiOverviewDots();
       });
     </script>
   </body>

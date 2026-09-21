@@ -54,10 +54,18 @@
         border-color: var(--border);
       }
 
-      /* No rule under the page title — zero width rather than a colour
-         override, so the dark-theme border-bottom-color can't bring it back. */
+      /* Match the CPI Benchmark spacing rhythm: compact header row with a
+         ruled separator, then a 16px gap before the filter row and KPI stack. */
       #screen-cpi-obs .cpi-page-header-inner {
-        border-bottom: 0;
+        gap: 16px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+        flex-wrap: wrap;
+      }
+
+      #screen-cpi-obs .cpi-obs-content {
+        padding-top: 20px;
+        gap: 16px;
       }
 
       /* Search — the Forecast toolbar's .fx-search: leads the filter row,
@@ -126,12 +134,14 @@
       }
 
       /* ── Filter row below the heading: region · metric · year, left-aligned
-         above the KPI summary. ── */
+         above the KPI summary. Match the CPI Benchmark at all sizes. ── */
       #screen-cpi-obs .bm-filter-row {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 12px !important;
         flex-wrap: wrap;
+        margin: 0 !important;
+        padding: 0 !important;
       }
 
       /* Region segmented toggle — GCC ⇄ Global. The shell is the secondary
@@ -141,10 +151,10 @@
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        height: 42px;
-        padding: 4px;
+        height: 42px !important;
+        padding: 4px !important;
         border: 1px solid #ced4da;
-        border-radius: 12px;
+        border-radius: 12px !important;
         background: #fff;
       }
       #screen-cpi-obs .bm-seg-btn {
@@ -158,8 +168,8 @@
         background: transparent;
         color: var(--text-primary, #0f172a);
         font-family: inherit;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 13px !important;
+        font-weight: 600 !important;
         cursor: pointer;
         transition: background 0.15s, color 0.15s;
       }
@@ -198,14 +208,14 @@
         gap: 10px;
         min-width: 168px;
         max-width: 240px;
-        height: 42px;
-        padding: 0 12px;
+        height: 42px !important;
+        padding: 0 12px !important;
         border: 1px solid #e5e7eb;
-        border-radius: 10px;
+        border-radius: 10px !important;
         background: #fff;
         color: #0f2744;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 13px !important;
+        font-weight: 600 !important;
         font-family: inherit;
         cursor: pointer;
         box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
@@ -372,8 +382,8 @@
         align-items: flex-start;
         gap: 12px;
         min-width: 0;
-        border-radius: 16px;
-        padding: 14px 16px;
+        border-radius: 16px !important;
+        padding: 14px 16px !important;
         transition: box-shadow 0.22s ease, border-color 0.22s ease,
           transform 0.22s ease, background 0.22s ease;
       }
@@ -381,9 +391,9 @@
         transform: translateY(-1px);
       }
       #screen-cpi-obs .bm-kpi-ic {
-        width: 34px;
-        height: 34px;
-        border-radius: 11px;
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 11px !important;
         flex-shrink: 0;
         display: grid;
         place-items: center;
@@ -665,7 +675,7 @@
          .bm-kpi-val with !important, so restore the CPI Benchmark size here. */
       #screen-cpi-obs { --up: #dc2626; --down: #16a34a; --muted: #94a3b8; }
       html[data-theme="dark"] #screen-cpi-obs { --muted: #697693; }
-      #screen-cpi-obs .bm-kpi .bm-kpi-val { font-size: 24px !important; line-height: 1.15 !important; }
+      #screen-cpi-obs .bm-kpi .bm-kpi-val { font-size: 24px !important; line-height: 1.15 !important; letter-spacing: -0.01em !important; }
       #screen-cpi-obs .bm-kpi .bm-kpi-val--rank { font-size: 14px !important; }
       /* css/pages/ai-observatory.css also forces its own module surface onto
          .bm-panel with !important — restore the CPI Benchmark insight cards. */

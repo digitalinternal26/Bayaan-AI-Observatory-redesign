@@ -35,7 +35,7 @@
          live here; shared .bm-* shell is ported from Census Benchmark. */
 
       /* Filter row — same spacing as census-benchmark.html */
-      #screen-cpi-obs .bm-filter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px 0 20px; }
+      #screen-cpi-obs .bm-filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0 20px; }
 
       /* Export */
       #screen-cpi-obs .abm-export { position: relative; }
@@ -58,15 +58,15 @@
       #screen-cpi-obs .bm-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
       #screen-cpi-obs .bm-main.is-expanded { grid-template-columns: minmax(0, 1fr); }
       #screen-cpi-obs .bm-main.is-expanded .bm-side { display: none; }
-      #screen-cpi-obs .bm-panel { border-radius: 16px; padding: 18px 20px; }
-      html:not([data-theme="dark"]) #screen-cpi-obs .bm-panel { background: #fff; border: 1px solid #eaecf0; box-shadow: 0 1px 6px rgba(15,23,42,0.04); }
+      #screen-cpi-obs .bm-panel { border-radius: 24px; padding: 20px 22px; }
+      html:not([data-theme="dark"]) #screen-cpi-obs .bm-panel { background: rgba(255,255,255,0.6); border: 1px solid #eaecf0; box-shadow: 0 24px 30px -4px rgba(42,61,76,0.03); }
       html[data-theme="dark"] #screen-cpi-obs .bm-panel { background: var(--surface, #141a26); border: 1px solid var(--border); }
       #screen-cpi-obs .bm-chart-card { position: relative; min-width: 0; }
 
       /* KPI strip — inside left column above chart, same as Census Benchmark */
-      #screen-cpi-obs .bm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-      #screen-cpi-obs .bm-kpi { position: relative; display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
-      #screen-cpi-obs .bm-kpi-ic { width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; color: var(--accent); background: var(--accent-light); }
+      #screen-cpi-obs .bm-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      #screen-cpi-obs .bm-kpi { position: relative; display: flex; align-items: flex-start; gap: 12px; min-width: 0; padding: 14px 16px; border-radius: 16px; }
+      #screen-cpi-obs .bm-kpi-ic { width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0; display: grid; place-items: center; color: var(--accent); background: var(--accent-light); }
       #screen-cpi-obs .bm-kpi-ic i { font-size: var(--fs-lg); }
       #screen-cpi-obs .bm-kpi-body { min-width: 0; flex: 1; }
       #screen-cpi-obs .bm-kpi-val { font-size: var(--fs-2xl); font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-top: 6px; }
@@ -78,16 +78,16 @@
 
       /* Controls row — uses .bm-filter-row spacing from Census Benchmark */
       #screen-cpi-obs .bm-region-seg {
-        display: inline-flex; align-items: center; gap: 4px; height: 38px; padding: 4px;
-        border: 1px solid #ced4da; border-radius: 11px; background: #fff;
+        display: inline-flex; align-items: center; gap: 4px; height: 42px; padding: 4px;
+        border: 1px solid #ced4da; border-radius: 12px; background: #fff;
       }
       #screen-cpi-obs .bm-seg-btn {
-        display: inline-flex; align-items: center; gap: 6px; height: 100%; padding: 0 12px;
-        border: 0; border-radius: 8px; background: transparent; color: var(--text-primary, #0f172a);
-        font-family: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; white-space: nowrap;
+        display: inline-flex; align-items: center; gap: 7px; height: 100%; padding: 0 13px;
+        border: 0; border-radius: 9px; background: transparent; color: var(--text-primary, #0f172a);
+        font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
         transition: background 0.15s, color 0.15s;
       }
-      #screen-cpi-obs .bm-seg-btn i { font-size: var(--fs-lg); line-height: 1; }
+      #screen-cpi-obs .bm-seg-btn i { font-size: 16px; line-height: 1; }
       #screen-cpi-obs .bm-seg-btn:hover:not(.is-active) { background: var(--accent-light); color: var(--accent-dark); }
       #screen-cpi-obs .bm-seg-btn.is-active { background: var(--accent); color: #fff; }
       html[data-theme="dark"] #screen-cpi-obs .bm-region-seg { background: var(--surface); border-color: var(--border-md); }
@@ -99,7 +99,7 @@
       #screen-cpi-obs .abm-select-wrap .ti-chart-bar { position: absolute; left: 12px; font-size: var(--fs-lg); color: var(--accent); pointer-events: none; }
       #screen-cpi-obs .abm-select-wrap .ti-chevron-down { position: absolute; right: 12px; font-size: var(--fs-md); color: var(--text-tertiary); pointer-events: none; }
       #screen-cpi-obs .abm-select {
-        appearance: none; -webkit-appearance: none; height: 38px; padding: 0 34px 0 36px; min-width: 220px;
+        appearance: none; -webkit-appearance: none; height: 42px; padding: 0 34px 0 36px; min-width: 220px;
         border: 1px solid var(--border-solid); border-radius: 10px; background: var(--surface); color: var(--text-primary);
         font-family: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; transition: border-color 0.15s;
       }
@@ -107,7 +107,7 @@
       #screen-cpi-obs .abm-select:disabled { opacity: 0.5; cursor: not-allowed; }
 
       #screen-cpi-obs .abm-ref-pill {
-        display: inline-flex; align-items: center; gap: 6px; padding: 0 13px; height: 38px; border-radius: 10px;
+        display: inline-flex; align-items: center; gap: 6px; padding: 0 13px; height: 42px; border-radius: 10px;
         background: var(--surface2); color: var(--text-tertiary); font-size: var(--fs-xs); font-weight: 600;
         margin-inline-start: auto;
       }
@@ -121,7 +121,7 @@
       #screen-cpi-obs .bm-expand i { font-size: var(--fs-md); }
       #screen-cpi-obs .bm-expand:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
 
-      #screen-cpi-obs .abm-chart-canvas { position: relative; height: 360px; margin-top: 14px; }
+      #screen-cpi-obs .abm-chart-canvas { position: relative; height: 400px; margin-top: 16px; }
       #screen-cpi-obs .bm-main.is-expanded .abm-chart-canvas { height: 480px; }
       #screen-cpi-obs .abm-chart-note { font-size: 11.5px; color: var(--text-tertiary); line-height: 1.55; margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--border-solid); }
 
@@ -154,16 +154,21 @@
 
       /* Insight rail — ported verbatim from census-benchmark.html */
       #screen-cpi-obs .bm-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-      #screen-cpi-obs .bm-side .bm-panel.bm-ai-card { background: var(--accent-light); border: none; box-shadow: none; }
+      #screen-cpi-obs .bm-side .bm-panel.bm-ai-card {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.06), rgba(124, 58, 237, 0.04));
+        border: 1px solid rgba(0, 102, 255, 0.12);
+        border-radius: 16px;
+        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.03);
+      }
       #screen-cpi-obs .bm-side-hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-      #screen-cpi-obs .bm-side-hd-left { display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); font-weight: 700; color: var(--text); }
-      #screen-cpi-obs .bm-ai-ic { width: 24px; height: 24px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: #fff; font-size: var(--fs-sm); flex-shrink: 0; }
-      #screen-cpi-obs .bm-ai-btn { flex-shrink: 0; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: var(--accent); cursor: pointer; transition: background 0.15s; }
-      #screen-cpi-obs .bm-ai-btn i { font-size: var(--fs-lg); }
-      #screen-cpi-obs .bm-ai-btn:hover { background: rgba(15, 23, 42, 0.06); }
-      html[data-theme="dark"] #screen-cpi-obs .bm-ai-btn:hover { background: rgba(255, 255, 255, 0.09); }
+      #screen-cpi-obs .bm-side-hd-left { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); }
+      #screen-cpi-obs .bm-ai-ic { width: auto; height: auto; border-radius: 0; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--accent); font-size: 15px; flex-shrink: 0; }
+      #screen-cpi-obs .bm-ai-btn { flex-shrink: 0; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 0; background: transparent; color: var(--figma-navy-400, #0073f0); cursor: pointer; transition: opacity 0.15s; }
+      #screen-cpi-obs .bm-ai-btn i { font-size: 20px; }
+      #screen-cpi-obs .bm-ai-btn:hover { opacity: 0.8; }
+      html[data-theme="dark"] #screen-cpi-obs .bm-side .bm-panel.bm-ai-card { background: var(--surface2); border-color: var(--border-md); box-shadow: none; }
       #screen-cpi-obs .bm-ai-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-      #screen-cpi-obs .bm-point { font-size: var(--fs-sm); line-height: 1.6; color: #536277; }
+      #screen-cpi-obs .bm-point { font-size: 12.5px; line-height: 1.65; color: #536277; }
       #screen-cpi-obs .bm-point p { margin: 0; }
       #screen-cpi-obs .bm-point b { color: #172033; font-weight: 700; }
       html[data-theme="dark"] #screen-cpi-obs .bm-point { color: var(--text-secondary); }
@@ -225,21 +230,13 @@
                 <div class="sidebar-icon"><i class="ti ti-bulb"></i></div>
                 <span class="sidebar-label">Interpret</span>
               </a>
-              <a class="sidebar-item" href="ai-diagnose.html">
-                <div class="sidebar-icon"><i class="ti ti-stethoscope"></i></div>
-                <span class="sidebar-label">Diagnose</span>
-              </a>
-              <a class="sidebar-item" href="ai-themes.html">
-                <div class="sidebar-icon"><i class="ti ti-book-2"></i></div>
-                <span class="sidebar-label">Themes</span>
+              <a class="sidebar-item" href="ai-observe.html">
+                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
+                <span class="sidebar-label">Observe</span>
               </a>
               <a class="sidebar-item active" href="ai-benchmark.html">
                 <div class="sidebar-icon"><i class="ti ti-chart-bar"></i></div>
                 <span class="sidebar-label">Benchmark</span>
-              </a>
-              <a class="sidebar-item" href="ai-observe.html">
-                <div class="sidebar-icon"><i class="ti ti-eye"></i></div>
-                <span class="sidebar-label">Observe</span>
               </a>
             </aside>
           </div>
@@ -592,27 +589,48 @@
           const accentColor = (window.BayaanTheme && window.BayaanTheme.cssVar("--accent")) || "#0066FF";
           const mutedColor = (window.BayaanTheme && window.BayaanTheme.cssVar("--gray-300")) || "#CBD5E1";
           abmChart = new Chart(document.getElementById("abmCanvas"), {
-            type: "bar",
+            type: "line",
             data: {
               labels: ranked.map((e) => e.name),
               datasets: [{
                 data: ranked.map((e) => e.value),
-                backgroundColor: ranked.map((e) => (e.highlight ? accentColor : mutedColor)),
-                borderRadius: 6,
-                barThickness: 22,
+                borderColor: accentColor,
+                backgroundColor: "transparent",
+                fill: false,
+                borderWidth: 3,
+                pointBackgroundColor: ranked.map((e) => (e.highlight ? accentColor : mutedColor)),
+                pointBorderColor: "#fff",
+                pointBorderWidth: 1.5,
+                pointRadius: ranked.map((e) => (e.highlight ? 4 : 2.5)),
+                pointHoverRadius: 6,
+                tension: 0.35,
               }],
             },
             options: {
-              indexAxis: "y",
               responsive: true,
               maintainAspectRatio: false,
+              animation: { duration: 850, easing: "easeInOutCubic" },
+              interaction: { mode: "index", intersect: false },
+              layout: { padding: { top: 4 } },
               plugins: {
                 legend: { display: false },
-                tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.parsed.x}%` } },
+                tooltip: {
+                  backgroundColor: "rgba(15,23,42,.92)",
+                  borderColor: "rgba(255,255,255,.1)",
+                  borderWidth: 1,
+                  titleColor: "#fff",
+                  bodyColor: "#cbd5e1",
+                  padding: 10,
+                  displayColors: true,
+                  boxWidth: 8,
+                  boxHeight: 8,
+                  usePointStyle: true,
+                  callbacks: { label: (ctx) => `  ${ctx.label}: ${ctx.parsed.y}%` },
+                },
               },
               scales: {
-                x: { beginAtZero: true, max: 100, grid: { color: grid }, ticks: { color: tick, font: { size: 11 }, callback: (v) => v + "%" } },
-                y: { grid: { display: false }, ticks: { color: tick, font: { size: 12, weight: "600" } } },
+                x: { grid: { color: grid }, border: { display: false }, ticks: { color: tick, font: { size: 11 }, padding: 6, maxRotation: 0, autoSkip: true, autoSkipPadding: 10 } },
+                y: { beginAtZero: true, max: 100, grid: { color: grid }, border: { display: false }, ticks: { color: tick, font: { size: 11 }, padding: 8, callback: (v) => v + "%" }, title: { display: true, text: "Enterprise AI adoption (%)", color: tick, font: { size: 10 } } },
               },
             },
           });

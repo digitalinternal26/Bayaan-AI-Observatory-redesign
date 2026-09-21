@@ -28,20 +28,669 @@
     <script src="js/footer.js"></script>
     <script src="js/ai-observatory.js" defer></script>
     <style>
-      /* ============ BENCHMARK — comparison / position layout (page-local) ============
-         Structure and item order mirror census-benchmark.html exactly:
-         page header → filter row → main grid (KPI strip + chart left,
-         insight rail right) → disclaimer. AI-specific chart types and data
-         live here; shared .bm-* shell is ported from Census Benchmark. */
+      /* ============ AI BENCHMARK — styled to match the CPI Benchmark page ============
+         The shared .bm-* shell below is ported verbatim from benchmark.html
+         (CPI Benchmark): title row with search, segmented region toggle +
+         .prod-filter-dd dropdowns, subcard KPIs, chart panel with dot legend,
+         insight rail, and the .cpi-notice banner. AI-only pieces follow. */
+      /* Subcard tokens — redeclared here because the originals are scoped to
+         .screen-home (same as CPI.html / forecast.html). */
+      #screen-cpi-obs {
+        --figma-subcard-bg: rgba(255, 255, 255, 0.6);
+        --figma-subcard-shadow: 0 24px 30px 0 rgba(42, 61, 76, 0.03);
+      }
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card {
+        background: var(--figma-subcard-bg);
+        border: 1px solid #eaecf0;
+        box-shadow: var(--figma-subcard-shadow);
+      }
+      html:not([data-theme="dark"]) #screen-cpi-obs .obs-card:hover {
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-md);
+      }
+      /* Pre-existing: the light border shorthand in cpi-obs.css outranks the
+         dark `border-color` in theme.css, leaving pale edges on dark cards. */
+      html[data-theme="dark"] #screen-cpi-obs .obs-card {
+        border-color: var(--border);
+      }
 
-      /* Filter row — same spacing as census-benchmark.html */
-      #screen-cpi-obs .bm-filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0 20px; }
+      /* No rule under the page title — zero width rather than a colour
+         override, so the dark-theme border-bottom-color can't bring it back. */
+      #screen-cpi-obs .cpi-page-header-inner {
+        border-bottom: 0;
+      }
 
-      /* Export */
+      /* Search — the Forecast toolbar's .fx-search: leads the filter row,
+         at the same control height as the filters beside it. */
+      #screen-cpi-obs .bm-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 220px;
+        height: 42px;
+        padding: 0 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border, #eaecf0);
+        background: var(--white, #fff);
+        color: var(--text2);
+        font-size: 13px;
+      }
+      #screen-cpi-obs .bm-search > i {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .bm-search input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        outline: none;
+        background: none;
+        font-family: inherit;
+        font-size: 13px;
+        color: var(--text);
+      }
+      #screen-cpi-obs .bm-search input::placeholder {
+        color: var(--muted);
+      }
+      #screen-cpi-obs .bm-search:focus-within {
+        border-color: var(--accent);
+      }
+      #screen-cpi-obs .bm-kbd {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--accent-light);
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-search {
+        background: var(--surface);
+        border-color: var(--border-md);
+      }
+
+      /* ── Content stack ── */
+      #screen-cpi-obs #cpi-benchmark-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      /* ── Header toolbar: search only, on the title row (aligned right). ── */
+      #screen-cpi-obs .bm-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      /* ── Filter row below the heading: region · metric · year, left-aligned
+         above the KPI summary. ── */
+      #screen-cpi-obs .bm-filter-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      /* Region segmented toggle — GCC ⇄ Global. The shell is the secondary
+         button (white / #CED4DA / 12px); the selected option is the primary
+         button (flat --accent, white text). Ref: the original .bm-seg. */
+      #screen-cpi-obs .bm-region-seg {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        height: 42px;
+        padding: 4px;
+        border: 1px solid #ced4da;
+        border-radius: 12px;
+        background: #fff;
+      }
+      #screen-cpi-obs .bm-seg-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        height: 100%;
+        padding: 0 13px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: var(--text-primary, #0f172a);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .bm-seg-btn i {
+        font-size: 16px;
+        line-height: 1;
+      }
+      #screen-cpi-obs .bm-seg-btn:hover:not(.is-active) {
+        background: var(--accent-light);
+        color: var(--accent-dark);
+      }
+      #screen-cpi-obs .bm-seg-btn.is-active {
+        background: var(--accent);
+        color: #fff;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-region-seg {
+        background: var(--surface);
+        border-color: var(--border-md);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-seg-btn {
+        color: var(--text-primary);
+      }
+
+      /* Filter dropdowns — the application's standard filter control
+         (.prod-filter-dd from the Products screen). Its rules in style.css are
+         scoped to #screen-products, so the spec is mirrored here verbatim,
+         exactly as forecast.html does. Keep in sync with
+         `#screen-products .prod-filter-*` in style.css. */
+      #screen-cpi-obs .prod-filter-dd {
+        position: relative;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 168px;
+        max-width: 240px;
+        height: 42px;
+        padding: 0 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        color: #0f2744;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+      }
+      /* Leading glyph — names the dimension the way the field label does on the
+         Products filter bar, without stacking a second line above the row. */
+      #screen-cpi-obs .prod-filter-dd-lead {
+        font-size: 16px;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+        margin-right: auto;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger > i.ti-chevron-down {
+        font-size: 15px;
+        color: #9ca3af;
+        flex-shrink: 0;
+        transition: transform 0.15s;
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger.is-open > i.ti-chevron-down {
+        transform: rotate(180deg);
+      }
+      #screen-cpi-obs .prod-filter-dd-trigger:hover:not(:disabled),
+      #screen-cpi-obs .prod-filter-dd-trigger.is-open {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      #screen-cpi-obs .prod-filter-dd-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        z-index: 9000;
+        min-width: 100%;
+        width: max-content;
+        max-width: min(320px, calc(100vw - 32px));
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 12px 40px rgba(11, 28, 61, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+        padding: 6px;
+        animation: govEntityDropIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      #screen-cpi-obs .prod-filter-dd-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 9px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 500;
+        color: #0f2744;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.12s, color 0.12s;
+      }
+      #screen-cpi-obs .prod-filter-dd-option .ti-check {
+        margin-left: auto;
+        color: var(--accent);
+        font-size: 15px;
+        opacity: 0;
+      }
+      #screen-cpi-obs .prod-filter-dd-option.is-active .ti-check {
+        opacity: 1;
+      }
+      #screen-cpi-obs .prod-filter-dd-option:hover {
+        background: #f8fbff;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .prod-filter-dd-option.is-active {
+        background: #eff6ff;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      /* Dark theme — mirrors [data-theme="dark"] #screen-products
+         .prod-filter-* in css/theme.css. */
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger {
+        background: var(--surface);
+        border-color: var(--border-md);
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger:hover:not(:disabled),
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-trigger.is-open {
+        border-color: var(--accent);
+        color: var(--accent-mid);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-menu {
+        background: var(--surface);
+        border-color: var(--border-md);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option {
+        color: var(--text-primary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option:hover,
+      html[data-theme="dark"] #screen-cpi-obs .prod-filter-dd-option.is-active {
+        background: var(--accent-light);
+        color: var(--accent-mid);
+      }
+
+      /* ── Main row: KPI summary + chart in one column, insight panels in the
+         other. Both columns start at the same grid line, so the first insight
+         panel sits level with the KPI cards. ── */
+      #screen-cpi-obs .bm-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 16px;
+        align-items: start;
+      }
+      #screen-cpi-obs .bm-col {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+      }
+      /* Expanded: the chart takes the full content width. */
+      #screen-cpi-obs .bm-main.is-expanded {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      #screen-cpi-obs .bm-main.is-expanded .bm-side {
+        display: none;
+      }
+
+      /* Panel shell — identical recipe to .fx-panel on the Forecast page (the
+         home-page section module at the content-panel radius). */
+      #screen-cpi-obs .bm-panel {
+        background: linear-gradient(-76deg, #f3fbff 1.2%, rgba(255, 255, 255, 0) 40%),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
+        border-radius: 24px;
+        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.03);
+        padding: 20px 22px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-panel {
+        background: var(--surface, #141a26);
+        border: 1px solid var(--border);
+      }
+
+      #screen-cpi-obs .bm-chart-card {
+        position: relative;
+        min-width: 0;
+      }
+
+      /* ── KPI summary — two subcards: country + headline rate, and rank +
+         contextual status. Equal halves of the chart column, so the pair sits
+         flush with the chart panel below. Card recipe is .fx-kpi (icon chip ·
+         label + value · supporting line) on the shared .obs-card surface. ── */
+      #screen-cpi-obs .bm-kpis {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      #screen-cpi-obs .bm-kpi {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        min-width: 0;
+        border-radius: 16px;
+        padding: 14px 16px;
+        transition: box-shadow 0.22s ease, border-color 0.22s ease,
+          transform 0.22s ease, background 0.22s ease;
+      }
+      #screen-cpi-obs .bm-kpi:hover {
+        transform: translateY(-1px);
+      }
+      #screen-cpi-obs .bm-kpi-ic {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 9%, white);
+      }
+      #screen-cpi-obs .bm-kpi-ic i {
+        font-size: 17px;
+        line-height: 1;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-kpi-ic {
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+      }
+      #screen-cpi-obs .bm-kpi-body {
+        min-width: 0;
+        flex: 1;
+      }
+      #screen-cpi-obs .bm-kpi-val {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        margin-top: 8px; /* title → number */
+      }
+      /* Rank reads as "7 of 7" — the position carries the accent, the field
+         size stays muted, as on the .cpiby-col-val / -sub pairing. */
+      #screen-cpi-obs .bm-kpi-val--rank {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      #screen-cpi-obs .bm-kpi-val--rank b {
+        font-weight: 700;
+        font-size: 24px;
+        color: var(--text);
+      }
+      #screen-cpi-obs .bm-kpi .cpiby-col-sub {
+        margin-top: 4px;
+      }
+      /* Contextual status — the page's own .kpi-badge pill on the semantic
+         positive tone (--down), the counterpart of .kpi-badge--up. */
+      #screen-cpi-obs .bm-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 100px;
+        background: color-mix(in srgb, var(--down) 11%, white);
+        color: var(--down);
+      }
+      #screen-cpi-obs .bm-status i {
+        font-size: 12px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-status {
+        background: color-mix(in srgb, var(--down) 22%, transparent);
+      }
+
+      /* Expand control — secondary button standard (.home-widget-sidebar-create
+         in css/pages/home-widgets.css): white fill, #CED4DA border, 10px
+         radius, ink icon, blue-tinted hover. Icon-only, so the 9px/14px
+         padding becomes a square box at the same radius. Matches .fx-expand. */
+      #screen-cpi-obs .bm-expand {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: var(--font);
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+      }
+      #screen-cpi-obs .bm-expand i {
+        font-size: 15px;
+        line-height: 1;
+      }
+      #screen-cpi-obs .bm-expand:hover {
+        background: var(--accent-light);
+        border-color: var(--accent);
+        color: var(--accent-dark);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-expand {
+        background: var(--surface2, #1a2740);
+        border-color: var(--border-md);
+        color: var(--accent-mid);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-expand:hover {
+        background: var(--surface);
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      #screen-cpi-obs .bm-chart-canvas {
+        position: relative;
+        height: 400px;
+      }
+      #screen-cpi-obs .bm-main.is-expanded .bm-chart-canvas {
+        height: 480px;
+      }
+
+      /* Legend — dot + label, centred under the plot (matches .fx-legend on the
+         Forecast page). Seven series, so the row wraps. Each entry toggles its
+         series; muted state mirrors the disabled treatment used elsewhere. */
+      #screen-cpi-obs .bm-legend {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        margin-top: 14px;
+      }
+      #screen-cpi-obs .bm-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 4px 6px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        cursor: pointer;
+        transition: opacity 0.15s, background 0.15s;
+      }
+      #screen-cpi-obs .bm-legend-item:hover {
+        background: var(--accent-light);
+      }
+      #screen-cpi-obs .bm-legend-item.is-off {
+        opacity: 0.4;
+        text-decoration: line-through;
+      }
+      #screen-cpi-obs .bm-legend-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      /* ── Side insight panels — the app's AI-insight header treatment
+         (.dg-aisummary-hd / .fx-side-*) over brief-point copy rows. ── */
+      #screen-cpi-obs .bm-side {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+      }
+      /* These insight panels are AI-generated, so each takes the app's
+         AI-insight card treatment (blue→violet gradient tint + blue border),
+         same as the Forecast view's .fx-side .fx-panel. */
+      #screen-cpi-obs .bm-side .bm-panel {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.06), rgba(124, 58, 237, 0.04));
+        border: 1px solid rgba(0, 102, 255, 0.12);
+        border-radius: 16px;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-side .bm-panel {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.12), rgba(124, 58, 237, 0.10));
+        border-color: rgba(0, 102, 255, 0.25);
+      }
+      #screen-cpi-obs .bm-side-hd {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      #screen-cpi-obs .bm-side-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      #screen-cpi-obs .bm-side-title i {
+        font-size: 15px;
+      }
+      /* Ask-AI affordance — the app's module-header sparkle
+         (.home-module-sparkle in style.css): plain glowing sparkle, no box.
+         --figma-navy-400 is scoped to .screen-home there, so it is redeclared
+         here, dark value included. */
+      #screen-cpi-obs {
+        --figma-navy-400: #0073f0;
+      }
+      html[data-theme="dark"] #screen-cpi-obs {
+        --figma-navy-400: #5c9cff;
+      }
+      #screen-cpi-obs .bm-ask {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        color: var(--figma-navy-400);
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+      }
+      #screen-cpi-obs .bm-ask i {
+        font-size: 20px;
+        animation: sparkleGlow 2.4s ease-in-out infinite;
+      }
+      #screen-cpi-obs .bm-ask:hover {
+        opacity: 0.8;
+      }
+      #screen-cpi-obs .bm-point {
+        font-size: 12.5px;
+        line-height: 1.65;
+        color: #536277;
+      }
+      #screen-cpi-obs .bm-point p {
+        margin: 0;
+      }
+      #screen-cpi-obs .bm-point + .bm-point {
+        margin-top: 12px;
+      }
+      #screen-cpi-obs .bm-point b {
+        color: #172033;
+        font-weight: 700;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-point {
+        color: var(--text-secondary);
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-point b {
+        color: var(--text-primary);
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 1200px) {
+        #screen-cpi-obs .bm-main {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+      @media (max-width: 700px) {
+        #screen-cpi-obs .bm-kpis {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        #screen-cpi-obs .bm-search {
+          margin-left: 0;
+          width: 100%;
+          min-width: 0;
+        }
+        #screen-cpi-obs .bm-toolbar > * {
+          flex: 1 1 100%;
+        }
+        #screen-cpi-obs .prod-filter-dd-trigger {
+          width: 100%;
+          max-width: none;
+        }
+      }
+
+      /* Labels + notice — the CPI Observatory rules from css/pages/cpi-obs.css,
+         redeclared because this page doesn't load that stylesheet. */
+      #screen-cpi-obs .kpi-label { font-size: var(--fs-2xs); font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+      #screen-cpi-obs .cpiby-col-sub { font-size: var(--fs-xs); color: var(--text2); }
+      #screen-cpi-obs .cpi-notice { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; background: #faeeda; border: 1px solid #fde68a; border-radius: 8px; font-size: var(--fs-sm); color: #854f0b; }
+      #screen-cpi-obs .cpi-notice > i { font-size: var(--fs-lg); flex-shrink: 0; margin-top: 1px; }
+      #screen-cpi-obs .cpi-notice-text { flex: 1; min-width: 0; }
+      #screen-cpi-obs .cpi-notice-dismiss { background: none; border: none; cursor: pointer; color: inherit; padding: 2px; display: flex; align-items: center; }
+      #screen-cpi-obs .cpi-notice-dismiss i { transition: transform 0.15s; }
+      #screen-cpi-obs .cpi-notice-dismiss.is-open i { transform: rotate(180deg); }
+
+      /* CPI Observatory tokens + KPI size — css/pages/ai-observatory.css shrinks
+         .bm-kpi-val with !important, so restore the CPI Benchmark size here. */
+      #screen-cpi-obs { --up: #dc2626; --down: #16a34a; --muted: #94a3b8; }
+      html[data-theme="dark"] #screen-cpi-obs { --muted: #697693; }
+      #screen-cpi-obs .bm-kpi .bm-kpi-val { font-size: 24px !important; line-height: 1.15 !important; }
+      #screen-cpi-obs .bm-kpi .bm-kpi-val--rank { font-size: 14px !important; }
+      /* css/pages/ai-observatory.css also forces its own module surface onto
+         .bm-panel with !important — restore the CPI Benchmark insight cards. */
+      html #screen-cpi-obs .bm-main .bm-side .bm-panel {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.06), rgba(124, 58, 237, 0.04)) !important;
+        border: 1px solid rgba(0, 102, 255, 0.12) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.03) !important;
+      }
+      html[data-theme="dark"] #screen-cpi-obs .bm-main .bm-side .bm-panel {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.12), rgba(124, 58, 237, 0.10)) !important;
+        border-color: rgba(0, 102, 255, 0.25) !important;
+      }
+      #screen-cpi-obs .bm-kpi .cpiby-col-sub .bm-status { margin-inline-start: 6px; }
+
+      /* ============ AI-specific additions (no CPI equivalent) ============ */
+      /* Info popover sits in the KPI card's top-right corner */
+      #screen-cpi-obs .bm-kpi .aiobs-info { position: absolute; top: 12px; right: 12px; }
+
+      /* Export — icon button beside the search on the title row */
       #screen-cpi-obs .abm-export { position: relative; }
+      #screen-cpi-obs .abm-export .abm-export-btn { position: static; width: 42px; height: 42px; border-radius: 12px; }
       #screen-cpi-obs .abm-export-menu {
         position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; min-width: 190px;
-        background: var(--surface); border: 1px solid var(--border-solid); border-radius: var(--r-md);
+        background: var(--surface); border: 1px solid var(--border-solid); border-radius: 12px;
         box-shadow: var(--shadow-lg); padding: 6px; display: none; flex-direction: column;
       }
       #screen-cpi-obs .abm-export.is-open .abm-export-menu { display: flex; }
@@ -53,90 +702,23 @@
       #screen-cpi-obs .abm-export-opt:hover { background: var(--accent-light); color: var(--accent-dark); }
       #screen-cpi-obs .abm-export-opt .ti { font-size: var(--fs-lg); color: var(--accent); }
 
-      /* Main grid + panels — ported from census-benchmark.html */
-      #screen-cpi-obs .bm-main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
-      #screen-cpi-obs .bm-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-      #screen-cpi-obs .bm-main.is-expanded { grid-template-columns: minmax(0, 1fr); }
-      #screen-cpi-obs .bm-main.is-expanded .bm-side { display: none; }
-      #screen-cpi-obs .bm-panel { border-radius: 24px; padding: 20px 22px; }
-      html:not([data-theme="dark"]) #screen-cpi-obs .bm-panel { background: rgba(255,255,255,0.6); border: 1px solid #eaecf0; box-shadow: 0 24px 30px -4px rgba(42,61,76,0.03); }
-      html[data-theme="dark"] #screen-cpi-obs .bm-panel { background: var(--surface, #141a26); border: 1px solid var(--border); }
-      #screen-cpi-obs .bm-chart-card { position: relative; min-width: 0; }
-
-      /* KPI strip — inside left column above chart, same as Census Benchmark */
-      #screen-cpi-obs .bm-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-      #screen-cpi-obs .bm-kpi { position: relative; display: flex; align-items: flex-start; gap: 12px; min-width: 0; padding: 14px 16px; border-radius: 16px; }
-      #screen-cpi-obs .bm-kpi-ic { width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0; display: grid; place-items: center; color: var(--accent); background: var(--accent-light); }
-      #screen-cpi-obs .bm-kpi-ic i { font-size: var(--fs-lg); }
-      #screen-cpi-obs .bm-kpi-body { min-width: 0; flex: 1; }
-      #screen-cpi-obs .bm-kpi-val { font-size: var(--fs-2xl); font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-top: 6px; }
-      #screen-cpi-obs .bm-kpi-rank { margin-top: 3px; font-size: var(--fs-2xs); color: var(--text2); }
-      #screen-cpi-obs .bm-kpi-rank b { color: var(--accent); font-weight: 700; }
-      #screen-cpi-obs .bm-kpi-entity { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; color: var(--text2); margin-top: 3px; }
-      #screen-cpi-obs .bm-kpi .aiobs-info { position: absolute; top: 14px; right: 14px; }
-      @media (max-width: 1100px) { #screen-cpi-obs .bm-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-
-      /* Controls row — uses .bm-filter-row spacing from Census Benchmark */
-      #screen-cpi-obs .bm-region-seg {
-        display: inline-flex; align-items: center; gap: 4px; height: 42px; padding: 4px;
-        border: 1px solid #ced4da; border-radius: 12px; background: #fff;
-      }
-      #screen-cpi-obs .bm-seg-btn {
-        display: inline-flex; align-items: center; gap: 7px; height: 100%; padding: 0 13px;
-        border: 0; border-radius: 9px; background: transparent; color: var(--text-primary, #0f172a);
-        font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
-        transition: background 0.15s, color 0.15s;
-      }
-      #screen-cpi-obs .bm-seg-btn i { font-size: 16px; line-height: 1; }
-      #screen-cpi-obs .bm-seg-btn:hover:not(.is-active) { background: var(--accent-light); color: var(--accent-dark); }
-      #screen-cpi-obs .bm-seg-btn.is-active { background: var(--accent); color: #fff; }
-      html[data-theme="dark"] #screen-cpi-obs .bm-region-seg { background: var(--surface); border-color: var(--border-md); }
-      html[data-theme="dark"] #screen-cpi-obs .bm-seg-btn { color: var(--text-primary); }
       #screen-cpi-obs .bm-seg-btn .abm-seg-flag { font-size: 9.5px; font-weight: 800; background: rgba(255,255,255,0.28); padding: 1px 5px; border-radius: 999px; margin-inline-start: 2px; }
       #screen-cpi-obs .bm-seg-btn:not(.is-active) .abm-seg-flag { background: var(--surface2); color: var(--text-tertiary); }
 
-      #screen-cpi-obs .abm-select-wrap { position: relative; display: inline-flex; align-items: center; }
-      #screen-cpi-obs .abm-select-wrap .ti-chart-bar { position: absolute; left: 12px; font-size: var(--fs-lg); color: var(--accent); pointer-events: none; }
-      #screen-cpi-obs .abm-select-wrap .ti-chevron-down { position: absolute; right: 12px; font-size: var(--fs-md); color: var(--text-tertiary); pointer-events: none; }
-      #screen-cpi-obs .abm-select {
-        appearance: none; -webkit-appearance: none; height: 42px; padding: 0 34px 0 36px; min-width: 220px;
-        border: 1px solid var(--border-solid); border-radius: 10px; background: var(--surface); color: var(--text-primary);
-        font-family: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; transition: border-color 0.15s;
-      }
-      #screen-cpi-obs .abm-select:hover:not(:disabled) { border-color: var(--accent); }
-      #screen-cpi-obs .abm-select:disabled { opacity: 0.5; cursor: not-allowed; }
-
-      #screen-cpi-obs .abm-ref-pill {
-        display: inline-flex; align-items: center; gap: 6px; padding: 0 13px; height: 42px; border-radius: 10px;
-        background: var(--surface2); color: var(--text-tertiary); font-size: var(--fs-xs); font-weight: 600;
-        margin-inline-start: auto;
-      }
-      #screen-cpi-obs .abm-ref-pill .ti { font-size: var(--fs-md); }
-
-      #screen-cpi-obs .bm-expand {
-        position: absolute; top: 18px; right: 20px; z-index: 2; display: flex; align-items: center; justify-content: center;
-        width: 30px; height: 30px; border: 1px solid #ced4da; border-radius: 9px; background: #fff; color: var(--text-primary);
-        cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
-      }
-      #screen-cpi-obs .bm-expand i { font-size: var(--fs-md); }
-      #screen-cpi-obs .bm-expand:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
-
-      #screen-cpi-obs .abm-chart-canvas { position: relative; height: 400px; margin-top: 16px; }
-      #screen-cpi-obs .bm-main.is-expanded .abm-chart-canvas { height: 480px; }
       #screen-cpi-obs .abm-chart-note { font-size: 11.5px; color: var(--text-tertiary); line-height: 1.55; margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--border-solid); }
-
       #screen-cpi-obs .abm-empty { padding: 54px 16px; text-align: center; color: var(--text-tertiary); }
       #screen-cpi-obs .abm-empty i { display: block; font-size: 32px; color: var(--gray-300); margin-bottom: 10px; }
       #screen-cpi-obs .abm-empty p { font-size: var(--fs-sm); max-width: 46ch; margin: 0 auto; line-height: 1.6; }
       #screen-cpi-obs .abm-empty p.abm-empty-lede { font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
 
       /* Lollipop ranking (Global AI Positioning) */
-      #screen-cpi-obs .abm-lolli { display: flex; flex-direction: column; gap: 4px; margin-top: 14px; }
+      #screen-cpi-obs .abm-lolli { display: flex; flex-direction: column; gap: 4px; padding-top: 36px; }
       #screen-cpi-obs .abm-lolli-row { display: grid; grid-template-columns: 176px minmax(0,1fr) 88px; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--border-solid); }
       #screen-cpi-obs .abm-lolli-row:first-child { border-top: none; }
       #screen-cpi-obs .abm-lolli-label { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
       #screen-cpi-obs .abm-lolli-name { font-size: var(--fs-xs); font-weight: 700; color: var(--text-primary); }
       #screen-cpi-obs .abm-lolli-entity { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); }
+      #screen-cpi-obs .abm-lolli-src { font-size: 10.5px; color: var(--text-tertiary); margin-top: 1px; }
       #screen-cpi-obs .abm-lolli-track { position: relative; height: 6px; border-radius: 999px; background: var(--surface2); }
       #screen-cpi-obs .abm-lolli-fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent-light), var(--accent)); }
       #screen-cpi-obs .abm-lolli-dot { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--accent); transform: translate(-50%, -50%); }
@@ -145,55 +727,15 @@
       #screen-cpi-obs .abm-lolli-rank span { display: block; font-size: 10px; color: var(--text-tertiary); }
       #screen-cpi-obs .abm-lolli-axis { display: grid; grid-template-columns: 176px minmax(0,1fr) 88px; gap: 12px; margin-top: 6px; }
       #screen-cpi-obs .abm-lolli-axis-track { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); padding: 0 1px; }
-      #screen-cpi-obs .abm-lolli-src { font-size: 10.5px; color: var(--text-tertiary); margin-top: 1px; }
 
-      /* Ranked bar chart footnote row (source per bar, shown below Chart.js canvas) */
-      #screen-cpi-obs .abm-bar-legend { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--text-tertiary); }
-      #screen-cpi-obs .abm-bar-legend span { display: inline-flex; align-items: center; gap: 6px; }
-      #screen-cpi-obs .abm-bar-legend i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
-
-      /* Insight rail — ported verbatim from census-benchmark.html */
-      #screen-cpi-obs .bm-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-      #screen-cpi-obs .bm-side .bm-panel.bm-ai-card {
-        background: linear-gradient(135deg, rgba(0, 102, 255, 0.06), rgba(124, 58, 237, 0.04));
-        border: 1px solid rgba(0, 102, 255, 0.12);
-        border-radius: 16px;
-        box-shadow: 0 24px 30px -4px rgba(42, 61, 76, 0.03);
-      }
-      #screen-cpi-obs .bm-side-hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-      #screen-cpi-obs .bm-side-hd-left { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); }
-      #screen-cpi-obs .bm-ai-ic { width: auto; height: auto; border-radius: 0; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--accent); font-size: 15px; flex-shrink: 0; }
-      #screen-cpi-obs .bm-ai-btn { flex-shrink: 0; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 0; background: transparent; color: var(--figma-navy-400, #0073f0); cursor: pointer; transition: opacity 0.15s; }
-      #screen-cpi-obs .bm-ai-btn i { font-size: 20px; }
-      #screen-cpi-obs .bm-ai-btn:hover { opacity: 0.8; }
-      html[data-theme="dark"] #screen-cpi-obs .bm-side .bm-panel.bm-ai-card { background: var(--surface2); border-color: var(--border-md); box-shadow: none; }
-      #screen-cpi-obs .bm-ai-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-      #screen-cpi-obs .bm-point { font-size: 12.5px; line-height: 1.65; color: #536277; }
-      #screen-cpi-obs .bm-point p { margin: 0; }
-      #screen-cpi-obs .bm-point b { color: #172033; font-weight: 700; }
-      html[data-theme="dark"] #screen-cpi-obs .bm-point { color: var(--text-secondary); }
-      html[data-theme="dark"] #screen-cpi-obs .bm-point b { color: var(--text-primary); }
-
-      /* Source details toggle inside .cpi-notice */
-      #screen-cpi-obs .cpi-notice .abm-notice-body p { margin: 0; }
-      #screen-cpi-obs .abm-notice-toggle {
-        display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; border: none; background: none;
-        font-family: inherit; font-size: var(--fs-xs); font-weight: 700; color: var(--accent-dark); cursor: pointer; padding: 0;
-      }
-      #screen-cpi-obs .abm-notice-toggle .ti { font-size: 13px; transition: transform 0.15s; }
-      #screen-cpi-obs .abm-notice-toggle.is-open .ti { transform: rotate(180deg); }
+      /* Source details, expanded from the notice chevron */
       #screen-cpi-obs .abm-source-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #FCE7C3; }
       #screen-cpi-obs .abm-source-detail.is-open { display: block; }
       #screen-cpi-obs .abm-source-detail dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
-      #screen-cpi-obs .abm-source-detail dt { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); white-space: nowrap; }
-      #screen-cpi-obs .abm-source-detail dd { font-size: var(--fs-xs); color: var(--text-secondary); margin: 0; }
-
-      @media (max-width: 1200px) { #screen-cpi-obs .bm-main { grid-template-columns: minmax(0, 1fr); } }
+      #screen-cpi-obs .abm-source-detail dt { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.8; white-space: nowrap; }
+      #screen-cpi-obs .abm-source-detail dd { font-size: var(--fs-xs); margin: 0; }
       @media (max-width: 700px) {
-        #screen-cpi-obs .bm-kpis { grid-template-columns: minmax(0, 1fr); }
         #screen-cpi-obs .abm-lolli-row, #screen-cpi-obs .abm-lolli-axis { grid-template-columns: 120px minmax(0,1fr) 64px; }
-        #screen-cpi-obs .bm-filter-row { flex-direction: column; align-items: stretch; }
-        #screen-cpi-obs .abm-ref-pill { margin-inline-start: 0; }
       }
     </style>
   </head>
@@ -247,11 +789,16 @@
                 <div class="cpi-page-header-inner">
                   <div>
                     <h1 class="topic-title">Benchmark</h1>
-                    <p class="topic-title-sub">Compare Abu Dhabi's AI position against comparable economies and leading global AI indices — where we stand, and where the gap to the next tier is widest.</p>
+                    <p class="topic-title-sub">Abu Dhabi · Global AI peer comparison</p>
                   </div>
-                  <div class="cen-hdr-btns">
+                  <div class="bm-toolbar">
+                    <div class="bm-search">
+                      <i class="ti ti-search"></i>
+                      <input type="search" placeholder="Search…" aria-label="Search benchmarks" />
+                      <span class="bm-kbd">Ctrl+K</span>
+                    </div>
                     <div class="abm-export">
-                      <button type="button" class="cen-btn" onclick="abmToggleExport(event)"><i class="ti ti-download"></i> Export</button>
+                      <button type="button" class="bm-expand abm-export-btn" title="Export" aria-label="Export" onclick="abmToggleExport(event)"><i class="ti ti-download"></i></button>
                       <div class="abm-export-menu">
                         <button class="abm-export-opt" type="button" onclick="AIObs.toast('Export data (CSV) — coming soon in this preview')"><i class="ti ti-table"></i>Export data (CSV)</button>
                         <button class="abm-export-opt" type="button" onclick="AIObs.toast('Export chart (PNG) — coming soon in this preview')"><i class="ti ti-photo"></i>Export chart (PNG)</button>
@@ -265,12 +812,23 @@
                 <!-- ── Controls (same position as census-benchmark.html) ── -->
                 <div class="bm-filter-row">
                   <div class="bm-region-seg" role="group" aria-label="Comparison group" id="abmGroupSeg"></div>
-                  <div class="abm-select-wrap">
-                    <i class="ti ti-chart-bar"></i>
-                    <select class="abm-select" id="abmIndicatorSelect" aria-label="Indicator" onchange="abmSetIndicator(this.value)"></select>
-                    <i class="ti ti-chevron-down"></i>
+                  <div class="prod-filter-dd" id="abmIndicatorDd">
+                    <button type="button" class="prod-filter-dd-trigger" id="abmIndicatorTrigger" aria-expanded="false" aria-controls="abmIndicatorMenu" aria-label="Indicator" onclick="abmToggleDropdown('indicator')">
+                      <i class="ti ti-trending-up prod-filter-dd-lead" aria-hidden="true"></i>
+                      <span id="abmIndicatorLabel">Enterprise AI Adoption</span>
+                      <i class="ti ti-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="prod-filter-dd-menu" id="abmIndicatorMenu" role="listbox" aria-label="Indicator" hidden></div>
                   </div>
-                  <span class="abm-ref-pill" id="abmRefPill"><i class="ti ti-calendar"></i>Reference: 2025</span>
+
+                  <div class="prod-filter-dd" id="abmYearDd">
+                    <button type="button" class="prod-filter-dd-trigger" id="abmYearTrigger" aria-expanded="false" aria-controls="abmYearMenu" aria-label="Reference period" onclick="abmToggleDropdown('year')">
+                      <i class="ti ti-calendar prod-filter-dd-lead" aria-hidden="true"></i>
+                      <span id="abmYearLabel">2025</span>
+                      <i class="ti ti-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="prod-filter-dd-menu" id="abmYearMenu" role="listbox" aria-label="Reference period" hidden></div>
+                  </div>
                 </div>
 
                 <!-- ── KPI summary + chart, insight panels alongside ── -->
@@ -287,12 +845,11 @@
                             <dt>Source</dt><dd>SCAD Enterprise AI Adoption Survey 2026 (4,189 of 5,160 enterprises); Eurostat/OECD 2025</dd>
                           </dl>
                         </span>
-                        <div class="bm-kpi-ic"><i class="ti ti-building-skyscraper"></i></div>
+                        <div class="bm-kpi-ic"><i class="ti ti-map-pin"></i></div>
                         <div class="bm-kpi-body">
                           <div class="kpi-label">Enterprise AI Adoption</div>
                           <div class="bm-kpi-val">73%</div>
-                          <div class="bm-kpi-rank">Rank <b>#1</b> of 7 · Global Partners</div>
-                          <span class="bm-kpi-entity"><i class="ti ti-map-pin" style="font-size:10px"></i>Abu Dhabi · 2025</span>
+                          <div class="cpiby-col-sub">Abu Dhabi · 2025 <span class="bm-status"><i class="ti ti-arrow-up" aria-hidden="true"></i> Rank #1 of 7</span></div>
                         </div>
                       </div>
 
@@ -309,9 +866,8 @@
                         <div class="bm-kpi-ic"><i class="ti ti-world"></i></div>
                         <div class="bm-kpi-body">
                           <div class="kpi-label">Global AI Diffusion</div>
-                          <div class="bm-kpi-val">1st</div>
-                          <div class="bm-kpi-rank">of <b>147</b> countries</div>
-                          <span class="bm-kpi-entity"><i class="ti ti-map-pin" style="font-size:10px"></i>UAE · Q1 2026</span>
+                          <div class="bm-kpi-val bm-kpi-val--rank"><b>1</b>/147</div>
+                          <div class="cpiby-col-sub">UAE · Q1 2026 <span class="bm-status"><i class="ti ti-trophy" aria-hidden="true"></i> Top ranked</span></div>
                         </div>
                       </div>
 
@@ -327,9 +883,8 @@
                         <div class="bm-kpi-ic"><i class="ti ti-bolt"></i></div>
                         <div class="bm-kpi-body">
                           <div class="kpi-label">AI Vibrancy</div>
-                          <div class="bm-kpi-val">5th</div>
-                          <div class="bm-kpi-rank">of <b>36</b> economies</div>
-                          <span class="bm-kpi-entity"><i class="ti ti-map-pin" style="font-size:10px"></i>UAE · 2025</span>
+                          <div class="bm-kpi-val bm-kpi-val--rank"><b>5</b>/36</div>
+                          <div class="cpiby-col-sub">UAE · Stanford HAI · 2025</div>
                         </div>
                       </div>
 
@@ -345,49 +900,46 @@
                         <div class="bm-kpi-ic"><i class="ti ti-shield-check"></i></div>
                         <div class="bm-kpi-body">
                           <div class="kpi-label">Government AI Readiness</div>
-                          <div class="bm-kpi-val">19th</div>
-                          <div class="bm-kpi-rank">of <b>195</b> countries</div>
-                          <span class="bm-kpi-entity"><i class="ti ti-map-pin" style="font-size:10px"></i>UAE · 2025</span>
+                          <div class="bm-kpi-val bm-kpi-val--rank"><b>19</b>/195</div>
+                          <div class="cpiby-col-sub">UAE · Oxford Insights · 2025</div>
                         </div>
                       </div>
                     </div>
 
                     <div class="bm-panel bm-chart-card">
                       <button type="button" class="bm-expand" id="abmExpandBtn" aria-label="Expand" onclick="abmToggleExpand()">
-                        <i class="ti ti-arrows-maximize"></i>
+                        <i class="ti ti-arrows-diagonal-minimize-2"></i>
                       </button>
-                      <div class="cd-card-hd" id="abmChartTitle"><i class="ti ti-chart-bar"></i>Enterprise AI adoption benchmark</div>
-                      <p class="cd-card-sub" id="abmChartSub">Enterprise AI Adoption · Global Partners · 2025</p>
                       <div id="abmChartBody"></div>
                     </div>
                   </div>
 
                   <aside class="bm-side" id="abmSide">
-                    <section class="bm-panel bm-ai-card">
+                    <section class="bm-panel">
                       <div class="bm-side-hd">
-                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-trophy"></i></span>Global Leadership</span>
-                        <button type="button" class="bm-ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Tell me more about Abu Dhabi\'s global AI leadership position')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                        <div class="bm-side-title"><i class="ti ti-trophy"></i> Global Leadership</div>
+                        <button type="button" class="bm-ask" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Tell me more about Abu Dhabi\'s global AI leadership position')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
                       </div>
                       <div class="bm-point" id="abmInsightLeadership"></div>
                     </section>
-                    <section class="bm-panel bm-ai-card">
+                    <section class="bm-panel">
                       <div class="bm-side-hd">
-                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-world"></i></span>Peer Comparison</span>
-                        <button type="button" class="bm-ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('How does Abu Dhabi compare with its peer economies on AI?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                        <div class="bm-side-title"><i class="ti ti-world"></i> Peer Comparison</div>
+                        <button type="button" class="bm-ask" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('How does Abu Dhabi compare with its peer economies on AI?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
                       </div>
                       <div class="bm-point" id="abmInsightPeer"></div>
                     </section>
-                    <section class="bm-panel bm-ai-card">
+                    <section class="bm-panel">
                       <div class="bm-side-hd">
-                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-medal"></i></span>Relative Strength</span>
-                        <button type="button" class="bm-ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Where is Abu Dhabi\'s strongest benchmarked AI position?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                        <div class="bm-side-title"><i class="ti ti-medal"></i> Relative Strength</div>
+                        <button type="button" class="bm-ask" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('Where is Abu Dhabi\'s strongest benchmarked AI position?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
                       </div>
                       <div class="bm-point" id="abmInsightStrength"></div>
                     </section>
-                    <section class="bm-panel bm-ai-card">
+                    <section class="bm-panel">
                       <div class="bm-side-hd">
-                        <span class="bm-side-hd-left"><span class="bm-ai-ic"><i class="ti ti-alert-triangle"></i></span>Area to Watch</span>
-                        <button type="button" class="bm-ai-btn" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('What AI benchmark area should Abu Dhabi watch most closely?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
+                        <div class="bm-side-title"><i class="ti ti-alert-triangle"></i> Area to Watch</div>
+                        <button type="button" class="bm-ask" title="Ask Bayaan AI" aria-label="Ask Bayaan AI" onclick="AIObs.askAI('What AI benchmark area should Abu Dhabi watch most closely?')"><i class="ti ti-sparkles" aria-hidden="true"></i></button>
                       </div>
                       <div class="bm-point" id="abmInsightWatch"></div>
                     </section>
@@ -397,11 +949,8 @@
                 <div class="cpi-notice" style="margin:16px 0 0">
                   <i class="ti ti-alert-circle"></i>
                   <div class="cpi-notice-text abm-notice-body">
-                    <p>Benchmark figures combine Abu Dhabi's 2026 SCAD Enterprise and Individual AI Adoption Surveys with seven independent global AI indices and Eurostat/OECD 2025 figures for peer economies. Definitions, survey years and methodologies differ across sources — cross-comparisons are directional, not exact. GCC country-level AI adoption figures are not yet published and are not included here.</p>
-                    <button class="abm-notice-toggle" id="abmSourceToggle" type="button" onclick="abmToggleSourceDetail()">
-                      View source details <i class="ti ti-chevron-down"></i>
-                    </button>
-                    <div class="abm-source-detail" id="abmSourceDetail">
+                    <p>Benchmark figures combine Abu Dhabi's 2026 SCAD Enterprise and Individual AI Adoption Surveys with seven independent global AI indices and Eurostat/OECD 2025 figures for peer economies. Definitions, survey years and methodologies differ across sources — cross-comparisons are directional, not exact. GCC country-level AI adoption figures are not yet published and are not included here. Expand for source details.</p>
+                                        <div class="abm-source-detail" id="abmSourceDetail">
                       <dl>
                         <dt>Enterprise adoption</dt><dd>SCAD Enterprise AI Adoption Survey, 2026 — 4,189 of 5,160 enterprises surveyed (81% response); benchmarked against Eurostat/OECD 2025 national enterprise-AI-use figures.</dd>
                         <dt>Individual adoption</dt><dd>SCAD Individual AI Adoption Survey, 2026 — 15,042 respondents aged 15+, weighted to 2,540,268 residents. Not part of the cross-country benchmark shown here.</dd>
@@ -415,6 +964,9 @@
                       </dl>
                     </div>
                   </div>
+                  <button type="button" class="cpi-notice-dismiss" id="abmSourceToggle" aria-label="Expand source details" aria-expanded="false" onclick="abmToggleSourceDetail()">
+                    <i class="ti ti-chevron-down"></i>
+                  </button>
                 </div>
               </div>
             </main>
@@ -518,20 +1070,53 @@
         }).join("");
       }
 
-      /* ── Indicator select ── */
-      function abmRenderIndicatorSelect() {
-        const select = document.getElementById("abmIndicatorSelect");
+      /* ── Filter dropdowns (same behaviour as the CPI Benchmark page:
+         one menu open at a time, click-away / Escape close) ── */
+      const ABM_DROPDOWNS = {
+        indicator: ["abmIndicatorMenu", "abmIndicatorTrigger"],
+        year: ["abmYearMenu", "abmYearTrigger"],
+      };
+      function abmToggleDropdown(which, force) {
+        const [menuId, triggerId] = ABM_DROPDOWNS[which] || [];
+        const menu = document.getElementById(menuId);
+        const trigger = document.getElementById(triggerId);
+        if (!menu || !trigger) return;
+        const open = typeof force === "boolean" ? force : menu.hasAttribute("hidden") && !trigger.disabled;
+        if (open) Object.keys(ABM_DROPDOWNS).forEach((k) => { if (k !== which) abmToggleDropdown(k, false); });
+        menu.hidden = !open;
+        trigger.setAttribute("aria-expanded", open ? "true" : "false");
+        trigger.classList.toggle("is-open", open);
+      }
+      document.addEventListener("click", (e) => {
+        if (e.target.closest(".prod-filter-dd")) return;
+        Object.keys(ABM_DROPDOWNS).forEach((k) => abmToggleDropdown(k, false));
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") Object.keys(ABM_DROPDOWNS).forEach((k) => abmToggleDropdown(k, false));
+      });
+
+      function abmRenderFilters() {
         const available = abmAvailableIndicators(abmState.group);
+        const indTrigger = document.getElementById("abmIndicatorTrigger");
+        const yearTrigger = document.getElementById("abmYearTrigger");
+        const indMenu = document.getElementById("abmIndicatorMenu");
+        const yearMenu = document.getElementById("abmYearMenu");
         if (!available.length) {
-          select.disabled = true;
-          select.innerHTML = `<option>Not available for this group</option>`;
+          indTrigger.disabled = yearTrigger.disabled = true;
+          document.getElementById("abmIndicatorLabel").textContent = "Not available for this group";
+          document.getElementById("abmYearLabel").textContent = "No reference period";
+          indMenu.innerHTML = yearMenu.innerHTML = "";
           return;
         }
-        select.disabled = false;
+        indTrigger.disabled = yearTrigger.disabled = false;
         if (!available.includes(abmState.indicator)) abmState.indicator = available[0];
-        select.innerHTML = available
-          .map((k) => `<option value="${k}"${k === abmState.indicator ? " selected" : ""}>${ABM_INDICATORS[k].label}</option>`)
+        const ind = ABM_INDICATORS[abmState.indicator];
+        document.getElementById("abmIndicatorLabel").textContent = ind.label;
+        document.getElementById("abmYearLabel").textContent = ind.refPeriod;
+        indMenu.innerHTML = available
+          .map((k) => `<button type="button" class="prod-filter-dd-option${k === abmState.indicator ? " is-active" : ""}" role="option" onclick="abmSetIndicator('${k}')">${ABM_INDICATORS[k].label} <i class="ti ti-check" aria-hidden="true"></i></button>`)
           .join("");
+        yearMenu.innerHTML = `<button type="button" class="prod-filter-dd-option is-active" role="option" onclick="abmToggleDropdown('year', false)">${ind.refPeriod} <i class="ti ti-check" aria-hidden="true"></i></button>`;
       }
 
       function abmSetGroup(group) {
@@ -540,19 +1125,8 @@
       }
       function abmSetIndicator(key) {
         abmState.indicator = key;
+        abmToggleDropdown("indicator", false);
         abmRenderAll();
-      }
-
-      /* ── Reference pill ── */
-      function abmRenderRefPill() {
-        const pill = document.getElementById("abmRefPill");
-        const available = abmAvailableIndicators(abmState.group);
-        if (!available.length) {
-          pill.innerHTML = `<i class="ti ti-calendar"></i>No reference period`;
-          return;
-        }
-        const ind = ABM_INDICATORS[abmState.indicator];
-        pill.innerHTML = `<i class="ti ti-calendar"></i>Reference: ${ind.refPeriod}`;
       }
 
       /* ── Chart / empty state ── */
@@ -564,8 +1138,6 @@
         if (abmChart) { abmChart.destroy(); abmChart = null; }
 
         if (!available.length) {
-          document.getElementById("abmChartTitle").innerHTML = `<i class="ti ti-chart-bar"></i>AI benchmark`;
-          document.getElementById("abmChartSub").textContent = `${groupLabel} · no published data`;
           body.innerHTML = `<div class="abm-empty">
             <i class="ti ti-database-off"></i>
             <p class="abm-empty-lede">No AI benchmark indicators are available for ${groupLabel} yet.</p>
@@ -575,12 +1147,10 @@
         }
 
         const ind = ABM_INDICATORS[abmState.indicator];
-        document.getElementById("abmChartTitle").innerHTML = `<i class="ti ${ind.icon}"></i>${ind.label} benchmark`;
-        document.getElementById("abmChartSub").textContent = `${ind.label} · ${groupLabel} · ${ind.refPeriod}`;
 
         if (ind.chartType === "bar") {
-          body.innerHTML = `<div class="abm-chart-canvas"><canvas id="abmCanvas"></canvas></div>
-            <div class="abm-bar-legend"><span><i style="background:var(--accent)"></i>Abu Dhabi</span><span><i style="background:var(--gray-300)"></i>Peer economies</span></div>
+          body.innerHTML = `<div class="bm-chart-canvas"><canvas id="abmCanvas"></canvas></div>
+            <div class="bm-legend"><span class="bm-legend-item"><span class="bm-legend-dot" style="background:var(--accent)"></span>Abu Dhabi</span><span class="bm-legend-item"><span class="bm-legend-dot" style="background:var(--gray-300)"></span>Peer economies</span></div>
             <p class="abm-chart-note">${ind.note}</p>`;
           const ranked = [...ind.entities].sort((a, b) => b.value - a.value);
           const theme = window.BayaanTheme ? window.BayaanTheme.chartTheme() : {};
@@ -690,8 +1260,7 @@
 
       function abmRenderAll() {
         abmRenderGroupTabs();
-        abmRenderIndicatorSelect();
-        abmRenderRefPill();
+        abmRenderFilters();
         abmRenderChart();
         abmRenderInsights();
       }
@@ -701,7 +1270,7 @@
         const main = document.getElementById("abmMain");
         const icon = document.querySelector("#abmExpandBtn i");
         const expanded = main.classList.toggle("is-expanded");
-        icon.className = "ti " + (expanded ? "ti-arrows-minimize" : "ti-arrows-maximize");
+        icon.className = "ti " + (expanded ? "ti-arrows-diagonal-2" : "ti-arrows-diagonal-minimize-2");
         if (abmChart) requestAnimationFrame(() => abmChart.resize());
       }
 
@@ -715,7 +1284,8 @@
 
       function abmToggleSourceDetail() {
         document.getElementById("abmSourceDetail").classList.toggle("is-open");
-        document.getElementById("abmSourceToggle").classList.toggle("is-open");
+        const t = document.getElementById("abmSourceToggle");
+        t.setAttribute("aria-expanded", String(t.classList.toggle("is-open")));
       }
 
       document.addEventListener("DOMContentLoaded", function () {
